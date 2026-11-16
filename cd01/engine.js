@@ -50,7 +50,8 @@
     return { goal: g('x1.goal') || '', now: g('x1.now') || '', me: g('a13.me') || '', hope: ga('a13.hope'), first: g('a13.first') || '',
       like: ga('a21.sel'), good: ga('a22.sel'), value: ga('a23.rank'), ria: R.full ? R.code.join('') : '',
       main: g('a33.main') || '', mainName: g('a33.main') ? indName(g('a33.main'), 'a33.main') : '', b: g('a33.b') || '', bName: g('a33.b') ? indName(g('a33.b'), 'a33.b') : '', why: g('a33.why') || '',
-      visa: g('a44.path') || '', tl: g('a44.tl') || {}, jobKey: jobKey() || '', jobHist: ga('a42.hist').length, day: g('a42.day') || '', worry: worryText(g('a43.top')), ready: rdCount('r'), goWhy: g('a43.why') || '' };
+      visa: g('a44.path') || '', tl: g('a44.tl') || {}, jobKey: jobKey() || '', jobHist: ga('a42.hist').length, day: g('a42.day') || '', worry: worryText(g('a43.top')), ready: rdCount('r'), goWhy: g('a43.why') || '',
+      senpai: g('a51.who') || '', turn: g('a51.turn') || '', learn: g('a51.learn') || '', bring: g('a51.bring') || '', guide: g('a53.guide') || '', qs: [g('a53.q1') || '', g('a53.q2') || ''] };
   }
   function save(now) {
     clearTimeout(saveT);
@@ -166,6 +167,14 @@
         '<p><small class="lbl">Lộ trình · ' + esc(VISA[visaKey()].n) + '</small></p>' + tagsHTML(tls.map(function (x) { return x.lab + ' · ' + x.t; })) +
         (worryText(g('a43.top')) ? '<p><small class="lbl">Điều tôi còn lo nhất</small>' + esc(worryText(g('a43.top'))) + '</p>' : '') +
         '<small class="lbl">Sẵn sàng ' + rdCount('r') + '/' + RD().length + ' điều đời sống ở Nhật</small>';
+    }
+    if (n === 6) {
+      var qs = [g('a53.q1'), g('a53.q2')].filter(function (x) { return x; });
+      return '<p><small class="lbl">Senpai tôi học theo</small><b>' + esc(g('a51.who') || '') + '</b>' + (g('a51.turn') ? ' · ' + esc(g('a51.turn')) : '') + '</p>' +
+        (g('a51.learn') ? '<p>' + esc(g('a51.learn')) + '</p>' : '') +
+        (g('a51.bring') ? '<p><small class="lbl">Ngoài tiền, tôi muốn mang về</small>' + esc(own(FIELD['a51.bring'], g('a51.bring'))) + '</p>' : '') +
+        '<p><small class="lbl">Người dẫn đường</small>' + esc(g('a53.guide') || '') + '</p>' +
+        (qs.length ? '<small class="lbl">Câu tôi sẽ hỏi</small><ul class="cdq">' + qs.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' : '');
     }
     return '';
   }
@@ -355,6 +364,7 @@
   }
   function phOf(ph) { /* ví dụ theo nghề: '@wow' '@like' '@worry' '@dayph' */
     ph = ph || ''; if (ph.charAt(0) !== '@') return P(ph);
+    if (ph === '@who') { var so = STORY_IND[jobKey()]; return so ? 'Ví dụ: ' + so[0][1] + ', ngành ' + indName(jobKey(), '').toLowerCase() : 'Ví dụ: chị Trần Thị Thúy, ngành thủy sản'; }
     var J = JP(); if (ph === '@dayph') return 'Ví dụ: ' + J.day[0].replace(/^[^,]*,\s*/, '').split('. ')[0];
     return (J.ph && J.ph[ph.slice(1)]) || '';
   }
@@ -485,6 +495,7 @@
   function tikUrl(s) {
     if (s.dyn === 'job') { var m = jobKey(); return TIKME + '/nganh-nghe' + (m ? '/' + m : ''); }
     if (s.dyn === 'visa') return TIKME + VISA[visaKey()].u;
+    if (s.dyn === 'story') return TIKME + STORY_LIST;
     return s.url;
   }
   STEP.tik = function (s) {
@@ -492,8 +503,14 @@
     if (s.dyn === 'job' && g('a33.main') === 'khac') { tx = jobKey() ? s.tNear : s.tNone; bt = jobKey() ? 'Xem ngành ' + indName(jobKey(), '') + ' trên Tikme' : 'Xem 17 ngành trên Tikme'; }
     return shinSays('hi', T(tx)) + '<div class="card tik"><a class="btn btn--go btn--w" href="' + esc(tikUrl(s)) + '" target="_blank" rel="noopener" data-act="tikOpen" data-k="' + esc(s.key) + '">' + cdIcon('ext', 18) + '<span>' + Q(bt) + '</span></a>' +
       (op ? '<p class="tik__ok">' + PS.icon('check', 16, 3) + 'Đã mở Tikme. Làm xong thì quay lại đây.</p>' : '<p class="qsub" style="margin:10px 0 0">tikme.com · mở ở thẻ mới</p>') +
-      (s.more ? '<a class="vlink" href="' + esc(TIKME + s.more.u) + '" target="_blank" rel="noopener">' + cdIcon('ext', 15) + esc(s.more.t) + '</a>' : '') + tipsHTML(s.tips) + '</div>';
+      (s.more ? '<a class="vlink" href="' + esc(TIKME + s.more.u) + '" target="_blank" rel="noopener">' + cdIcon('ext', 15) + esc(s.more.t) + '</a>' : '') + (s.dyn === 'story' ? storyCards(s.key) : '') + tipsHTML(s.tips) + '</div>';
   };
+  function storyCards(key) { /* chuyện Đổi đời cùng ngành (đã mở thử trên Tikme) */
+    var so = STORY_IND[jobKey()] || [];
+    if (!so.length) return '<p class="ps-small" style="margin-top:12px">Ngành ' + esc(jobName()) + ' tìm trong danh sách nhé. Chưa có thì chọn chuyện bạn thấy gần mình.</p>';
+    return '<p class="grp" style="margin-top:14px">Chuyện ngành ' + esc(indName(jobKey(), '')) + ' trên Tikme</p>' +
+      so.map(function (x) { return tikCard(TIKME + '/cau-chuyen-thanh-cong/' + x[0], x[1], 'Chuyện Đổi đời', key); }).join('');
+  }
   STEP.inds = function (s) {
     var v = g(s.key), sel = s.multi ? ga(s.key) : [], ex = s.exclude ? g(s.exclude) : null;
     function on(x) { return s.multi ? sel.indexOf(x) >= 0 : v === x; }
@@ -508,8 +525,8 @@
     if (!s.multi && v && indOf(v)) h += tikCard(TIKME + '/nganh-nghe/' + v, 'Ngành ' + indOf(v).n, 'Xem công việc, lộ trình trên Tikme');
     return h + '</div>';
   };
-  function tikCard(u, title, sub) {
-    return '<a class="tikcard" href="' + esc(u) + '" target="_blank" rel="noopener"><span class="tikcard__lg" aria-hidden="true">T</span><span class="tikcard__tx"><small>' + esc(sub) + '</small><b>' + esc(title) + '</b></span><span class="tikcard__go">' + cdIcon('ext', 17) + '</span></a>';
+  function tikCard(u, title, sub, key) {
+    return '<a class="tikcard" href="' + esc(u) + '" target="_blank" rel="noopener"' + (key ? ' data-act="tikOpen" data-k="' + esc(key) + '"' : '') + '><span class="tikcard__lg" aria-hidden="true">T</span><span class="tikcard__tx"><small>' + esc(sub) + '</small><b>' + esc(title) + '</b></span><span class="tikcard__go">' + cdIcon('ext', 17) + '</span></a>';
   }
   /* a42 bước 1: đoán một ngày làm nghề (việc gợi ý theo nghề). Nghề khác: chọn ngành gần nhất trước */
   STEP.jobguess = function (s) {
@@ -569,7 +586,7 @@
     var v = g(s.key), vs = v == null ? '' : String(v);
     var h = '<div class="card"><span class="noscore">' + PS.icon('info', 14) + 'Đoán thử · không có đúng sai</span><p class="q">' + Q(s.q) + '</p><div class="opts">' +
       s.opts.map(function (o, i) { return optBtn(s.key, String(i), o, vs === String(i)); }).join('') + '</div></div>';
-    if (vs !== '') h += '<div class="fact"><b>' + PS.icon('bulb', 15) + 'Thực tế thường là</b><p>' + esc(s.fact) + '</p></div>' + senpaiHTML(s.senpai);
+    if (vs !== '') h += '<div class="fact"><b>' + PS.icon('bulb', 15) + (s.src ? 'Thực tế' : 'Thực tế thường là') + '</b><p>' + esc(s.fact) + '</p>' + (s.src ? '<small>' + esc(s.src) + '</small>' : '') + '</div>' + (s.senpai ? senpaiHTML(s.senpai) : '');
     return h;
   };
   STEP.visa = function (s) {
@@ -663,6 +680,58 @@
     else if (v) h += shinSays('think', 'Shin ghi lại rồi. Đến Ga 7, mình cùng tìm cách chuẩn bị nhé.');
     return h;
   };
+  /* ---------- Ga 5 ---------- */
+  STEP.comic = function (s) { /* truyện tranh: mở từng khung */
+    if (!g(s.key)) S.d[s.key] = 1;
+    var n = Math.min(s.fr.length, +g(s.key) || 1), more = n < s.fr.length;
+    return '<div class="card comic"><p class="q">' + Q(s.q) + '</p><p class="comic__who">' + esc(THUY.who) + '</p>' +
+      s.fr.slice(0, n).map(function (fi) {
+        var f = THUY.frames[fi];
+        return '<figure class="comic__p"><div class="comic__art">' + cdScene(f.art) + '<span class="comic__n">' + (fi + 1) + '/' + THUY.frames.length + '</span></div><figcaption><b>' + esc(f.y) + '</b>' +
+          f.t.map(function (x) { return '<span>' + esc(x) + '</span>'; }).join('') + '</figcaption></figure>';
+      }).join('') +
+      (more ? '<button type="button" class="btn btn--soft btn--w" data-act="cmNext">Xem tiếp ' + PS.icon('next', 15, 2.6) + '</button><p class="qsub" style="margin:8px 0 0;text-align:center">' + Q(s.sub) + '</p>' : '') + '</div>';
+  };
+  STEP.persp = function (s) { /* góc nhìn của bạn → lời chị Thúy (Tikme) → điều muốn mang về */
+    var h = STEP.multi(s);
+    if (!ga(s.key).length) return h;
+    return h + shinSays('think', 'Mỗi ý là một góc nhìn. Còn chị Thúy nói:') +
+      '<figure class="quote quote--sp"><p>' + esc(THUY.quote) + '</p><small>' + esc(THUY.qsrc) + '</small></figure>' +
+      tikCard(TIKME + THUY.url, 'Đọc trọn chuyện chị Thúy', 'Tikme · Câu chuyện Đổi đời') +
+      '<a class="vlink" href="' + esc(THUY.yt) + '" target="_blank" rel="noopener">' + cdIcon('play', 15) + 'Xem video chị Thúy chia sẻ</a>' +
+      '<div class="card" style="margin-top:14px">' + s.fields.map(function (f) { return fieldHTML(f); }).join('') + '</div>';
+  };
+  function minhAns(i) {
+    var a = MINH.qs[i].a, J = JP(), G = MINH.grp[J.grp] || MINH.grp.gen;
+    if (a === '@hard') return G.hard;
+    if (a === '@prep') return G.prep;
+    if (a === '@day') return String(J.day[1] || J.day[0]).replace(/mình/g, 'anh');
+    return a;
+  }
+  function msgT(html) { return '<div class="msg msg--t"><span class="msg__av" aria-hidden="true">M</span><div class="msg__b">' + html + '</div></div>'; }
+  STEP.chat = function (s) { /* trò chuyện với anh Minh (nhân vật giả định) */
+    var asked = ga(s.key), left = [], i;
+    for (i = 0; i < MINH.qs.length; i++) if (asked.indexOf(i) < 0) left.push(i);
+    var h = '<div class="card chatcard"><div class="chat__h"><span class="msg__av">M</span><span><b>Anh Minh</b><small>Senpai năm 3 ở Nhật · nhân vật giả định</small></span><span class="draft">' + esc(TXT.senpaiDraft) + '</span></div><div class="chat">' +
+      msgT(Q(g('a33.main') ? MINH.hi : MINH.hiGen));
+    asked.forEach(function (k) {
+      h += '<div class="msg msg--u"><div class="msg__b">' + esc(MINH.qs[k].q) + '</div></div>';
+      h += V.typing === k ? '<div class="msg msg--t"><span class="msg__av" aria-hidden="true">M</span><div class="msg__b typing" aria-label="Anh Minh đang trả lời"><i></i><i></i><i></i></div></div>' : msgT(esc(minhAns(k)));
+    });
+    h += '</div></div>';
+    if (left.length) h += '<div class="card"><p class="q">' + Q(s.q) + '</p><p class="qsub">' + Q(s.sub) + '</p><div class="qchips">' +
+      left.map(function (k) { return '<button type="button" class="qchip" data-act="chatAsk" data-v="' + k + '"' + (V.typing != null ? ' disabled' : '') + '>' + esc(MINH.qs[k].q) + '</button>'; }).join('') +
+      '</div><p class="counter">Đã hỏi ' + asked.length + (asked.length < s.min ? ' · cần ít nhất ' + s.min : '') + '</p></div>';
+    else h += shinSays('cheer', 'Bạn hỏi hết rồi! Bấm Tiếp tục nhé.');
+    return h;
+  };
+  STEP.chatpick = function (s) {
+    var asked = ga('a53.ask'), v = g(s.key);
+    var h = '<div class="card"><span class="noscore">' + PS.icon('info', 14) + esc(TXT.noScore) + '</span><p class="q">' + Q(s.q) + '</p><div class="opts">' +
+      asked.map(function (k) { return optBtn(s.key, String(k), MINH.qs[k].q, v === String(k)); }).join('') + '</div></div>';
+    if (v) h += shinSays('think', esc(MINH.note));
+    return h;
+  };
   function cdCardPreview(n) { return '<div style="margin-top:12px">' + cdCardForce(n) + '</div>'; }
   function cdCardForce(n) { /* xem trước ô trước khi đóng dấu */
     var c = CARDS[n - 1];
@@ -691,12 +760,17 @@
     tl: function (s) { var tl = g(s.key) || {}, n = 0; MILES.forEach(function (m) { if (!tl[m[0]]) n++; }); return n ? 'Còn ' + n + ' mốc chưa chọn năm' : ''; },
     tlview: function (s) { return fieldOK(s.fields[0]) ? '' : 'Viết cách bạn bắt đầu'; },
     swipe: function (s) { var r = g(s.key) || {}, n = 0; RD().forEach(function (x, i) { if (!r[i]) n++; }); return n ? 'Còn ' + n + ' thẻ' : ''; },
+    comic: function (s) { return (+g(s.key) || 1) >= s.fr.length ? '' : 'Xem hết ' + s.fr.length + ' khung'; },
+    persp: function (s) { var n = ga(s.key).length; if (n < (s.min || 1)) return 'Chọn ít nhất 1 ý'; return fieldOK(s.fields[0]) ? '' : 'Viết điều bạn muốn mang về'; },
+    chat: function (s) { var n = ga(s.key).length; return n >= s.min ? '' : 'Hỏi thêm ' + (s.min - n) + ' câu'; },
+    chatpick: function (s) { return g(s.key) ? '' : 'Chọn một câu'; },
     worry: function (s) { var v = g(s.key); if (!v) return 'Chọn một điều'; if (v === 'o' && String(g('a43.topo') || '').replace(/\s/g, '').length < 4) return 'Viết điều bạn lo'; return ''; }
   };
   function showMiss() {
     var body = D.getElementById('stepBody'); if (!body) return;
     var el = null, s = ACTS[V.id].steps[V.step];
-    if (s.k === 'write' || s.k === 'recap' || s.k === 'venn' || s.k === 'tlview') { (s.fields || []).forEach(function (f) { if (!el && !fieldOK(f)) el = body.querySelector('[data-k="' + f.key + '"]'); }); if (s.k === 'recap' && !g(s.key)) el = body.querySelector('.opts'); }
+    if (s.k === 'persp' && ga(s.key).length < (s.min || 1)) el = body.querySelector('.chips');
+    else if (s.k === 'write' || s.k === 'recap' || s.k === 'venn' || s.k === 'tlview' || s.k === 'persp') { (s.fields || []).forEach(function (f) { if (!el && !fieldOK(f)) el = body.querySelector('[data-k="' + f.key + '"]'); }); if (s.k === 'recap' && !g(s.key)) el = body.querySelector('.opts'); }
     else if (s.k === 'tag') { var tg = g(s.key) || {}; ga(s.from).forEach(function (it, i) { if (!el && !tg[it]) el = body.querySelector('[data-row="' + i + '"]'); }); }
     else if (s.k === 'dil' && g(s.key) === 'o') el = body.querySelector('[data-k="' + s.key + 'o"]');
     else if (s.k === 'tl') { var tl0 = g(s.key) || {}; MILES.forEach(function (m, i) { if (!el && !tl0[m[0]]) el = body.querySelector('[data-row="' + i + '"]'); }); }
@@ -835,7 +909,7 @@
     for (var id in S.done) if (S.done.hasOwnProperty(id) && ACTS[id]) { S.xp[id] = ACTS[id].warm ? CD_XP_WARM : CD_XP_ACT; S.ins[id] = insForAct(id); }
     ALLST.forEach(function (st) { if (stDone(st)) { S.chest[st.id] = 1; S.seen[st.id] = 1; } });
     NOSAVE = 0; save(true); V = { v: 'home' }; render(true);
-    PS.toast('<b>Bản demo giáo viên</b> · học viên giả định đã xong Sân ga đến Ga Ngành Nghề');
+    PS.toast('<b>Bản demo giáo viên</b> · học viên giả định đã xong Sân ga đến Ga Chuyện Trò');
   }
   function exitDemo() { NOSAVE = 1; clearTimeout(saveT); try { PS.set(DEMO_KEY, null); } catch (e) {} W.location.replace(W.location.pathname); }
 
@@ -919,7 +993,7 @@
     else if (a === 'nearReset') { delete S.d['a42.near']; save(); redrawStep(); }
     else if (a === 'ownMore') { V.ownN = Math.min(3, ownCount() + 1); var y8 = W.pageYOffset; redrawStep(); W.scrollTo(0, y8); var ins2 = D.querySelectorAll('.tlrow--own .inp'); if (ins2.length) ins2[ins2.length - 1].focus(); }
     else if (a === 'introGo') { S.intro = 1; save(true); go({ v: 'home' }); }
-    else if (a === 'next') { V.step++; S.d[V.id + '.st'] = V.step; V.ownOpen = null; V.riaI = null; V.swI = null; V.ownN = null; save(); render(true); }
+    else if (a === 'next') { V.step++; S.d[V.id + '.st'] = V.step; V.ownOpen = null; V.riaI = null; V.swI = null; V.ownN = null; V.typing = null; save(); render(true); }
     else if (a === 'prev') { if (V.step > 0) { V.step--; V.ownOpen = null; render(true); } }
     else if (a === 'finish') finish();
     else if (a === 'showMiss') showMiss();
@@ -945,6 +1019,8 @@
       var nxI = ri + 1; while (nxI < NQ && (arr[nxI] === 1 || arr[nxI] === 0)) nxI++;
       V.riaI = nxI; redrawStep();
     }
+    else if (a === 'cmNext') { var stc = ACTS[V.id].steps[V.step]; S.d[stc.key] = Math.min(stc.fr.length, (+g(stc.key) || 0) + 1); save(); sound('tap'); var yc = W.pageYOffset; redrawStep(); W.scrollTo(0, yc); var lp = D.querySelectorAll('#stepBody .comic__p'); if (lp.length && !RM) lp[lp.length - 1].scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+    else if (a === 'chatAsk') chatAsk(+v);
     else if (a === 'riaGo') { V.riaI = +b.getAttribute('data-i'); redrawStep(); }
     else if (a === 'swp') swAns(+b.getAttribute('data-i'), v);
     else if (a === 'swGo') { V.swI = +b.getAttribute('data-i'); redrawStep(); }
@@ -969,6 +1045,13 @@
     else if (a === 'tab') { NBTAB = b.getAttribute('data-t'); drawNb(); }
     else if (a === 'demoExit') exitDemo();
   });
+  function chatAsk(i) {
+    var arr = ga('a53.ask').slice(); if (arr.indexOf(i) >= 0 || V.typing != null) return;
+    arr.push(i); S.d['a53.ask'] = arr; save(); sound('tap');
+    V.typing = RM ? null : i; redrawStep(); chatScroll();
+    if (!RM) setTimeout(function () { V.typing = null; if (V.v === 'act' && V.id === 'a53') { redrawStep(); chatScroll(); } }, 900);
+  }
+  function chatScroll() { var c = D.querySelector('#stepBody .chat'); if (!c) return; var last = c.lastChild; if (last && last.scrollIntoView) last.scrollIntoView({ behavior: RM ? 'auto' : 'smooth', block: 'nearest' }); }
   function swAns(i, v) {
     var r = {}, o = g('a43.r') || {}; for (var x in o) if (o.hasOwnProperty(x)) r[x] = o[x];
     r[i] = v; S.d['a43.r'] = r; save(); sound('tap');

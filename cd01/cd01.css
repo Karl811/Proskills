@@ -556,13 +556,11 @@ button{font-family:inherit}
 @keyframes tikin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 @keyframes tikpulse{50%{box-shadow:0 0 0 4px rgba(47,107,255,.16),0 4px 0 var(--c-t2)}}
 @keyframes flipin{from{opacity:0;transform:perspective(700px) rotateY(-24deg) translateX(14px)}to{opacity:1;transform:none}}
-/* banner: họa tiết sóng Nhật (seigaiha) mờ + đường ray mảnh */
-.banner{background:
-  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='20' viewBox='0 0 40 20'%3E%3Cg fill='none' stroke='%23fff' stroke-opacity='.09' stroke-width='1'%3E%3Ccircle cx='20' cy='20' r='19'/%3E%3Ccircle cx='20' cy='20' r='14'/%3E%3Ccircle cx='20' cy='20' r='9'/%3E%3Ccircle cx='0' cy='10' r='19'/%3E%3Ccircle cx='0' cy='10' r='14'/%3E%3Ccircle cx='40' cy='10' r='19'/%3E%3Ccircle cx='40' cy='10' r='14'/%3E%3C/g%3E%3C/svg%3E") right bottom/40px 20px repeat,
-  radial-gradient(260px 160px at 100% 0,rgba(255,255,255,.18),transparent 70%),linear-gradient(150deg,#4C82FF,var(--c) 50%,var(--c-d))}
-.banner::after{content:"";position:absolute;left:0;right:0;bottom:4px;height:5px;pointer-events:none;
-  background:linear-gradient(rgba(255,255,255,.14),rgba(255,255,255,.14)) 0 0/100% 1px no-repeat,linear-gradient(rgba(255,255,255,.14),rgba(255,255,255,.14)) 0 100%/100% 1px no-repeat,
-  repeating-linear-gradient(90deg,rgba(255,255,255,.12) 0 2px,transparent 2px 14px)}
+/* banner: nền trơn + con tàu cách điệu mờ ở góc phải dưới (không họa tiết) */
+.banner{background:radial-gradient(260px 160px at 100% 0,rgba(255,255,255,.16),transparent 70%),linear-gradient(150deg,#4C82FF,var(--c) 50%,var(--c-d))}
+.banner::after{content:"";position:absolute;right:-14px;bottom:-4px;width:210px;height:96px;pointer-events:none;opacity:.14;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 100'%3E%3Cg fill='%23fff'%3E%3Cpath fill-rule='evenodd' d='M44 36H138C172 36 199 55 213 76Q215 83 206 84H44Q35 84 35 75V45Q35 36 44 36ZM50 47h13v11H50zM70 47h13v11H70zM90 47h13v11H90zM110 47h13v11H110zM147 46Q168 47 183 60H147z'/%3E%3C/g%3E%3Cg fill='none' stroke='%23fff' stroke-linecap='round'%3E%3Cpath d='M40 68H198' stroke-width='2.5' stroke-opacity='.6'/%3E%3Cpath d='M4 48H26M12 60H29M0 72H25' stroke-width='3'/%3E%3Cpath d='M20 93H216' stroke-width='2'/%3E%3C/g%3E%3C/svg%3E") right bottom/contain no-repeat}
+@media (max-width:380px){.banner::after{width:170px;height:78px}}
 .banner>*{position:relative;z-index:1}
 /* gợi ý nhỏ luôn căn trái */
 .tips,.tips ul,.tips li{text-align:left}
@@ -610,3 +608,45 @@ button{font-family:inherit}
 .tlrow--own .inp{flex:1 1 100%}
 .tlrow--own .tlsel{margin-left:auto}
 @media (max-width:380px){ .tlsel .sel{width:92px} .tlsel .sel--m{width:74px} .tlrow b{font-size:14px} }
+/* ---------- Ga 5 · truyện tranh, góc nhìn, trò chuyện ---------- */
+.comic__who{font-size:12.5px;color:var(--muted);font-weight:600;margin:-4px 0 10px}
+.comic__p{margin:0 0 12px;border-radius:18px;overflow:hidden;border:1.5px solid var(--rule);background:#fff;box-shadow:0 3px 0 var(--c-t2)}
+.comic__art{position:relative;line-height:0}
+.comic__art .scene{display:block;width:100%;height:auto;aspect-ratio:320/150}
+.comic__n{position:absolute;right:8px;top:8px;line-height:1;font-size:11.5px;font-weight:800;color:var(--c-d);background:rgba(255,255,255,.92);border-radius:999px;padding:4px 8px}
+.comic__p figcaption{padding:10px 12px 12px;font-size:14.5px;line-height:1.5;color:var(--ink)}
+.comic__p figcaption b{display:block;font-size:12.5px;letter-spacing:.04em;color:var(--c-d);margin-bottom:3px}
+.comic__p figcaption span{display:block}
+.comic__p figcaption span+span{margin-top:3px}
+.fact small{display:block;margin-top:4px;font-size:12px;color:var(--muted);font-weight:600}
+.quote--sp{margin-top:12px}
+.cdq{margin:4px 0 0;padding-left:18px;font-size:14px}
+.cdq li+li{margin-top:3px}
+.chatcard{padding:12px}
+.chat__h{display:flex;align-items:center;gap:10px;padding-bottom:10px;border-bottom:1px solid var(--rule);margin-bottom:10px}
+.chat__h b{display:block;font-size:15px}
+.chat__h small{display:block;font-size:12px;color:var(--muted)}
+.chat__h .draft{margin-left:auto}
+.msg__av{flex:none;width:32px;height:32px;border-radius:50%;background:var(--c);color:#fff;display:grid;place-items:center;font-weight:800;font-size:14px}
+.chat{display:flex;flex-direction:column;gap:8px}
+.msg{display:flex;gap:8px;align-items:flex-end}
+.msg__b{max-width:82%;padding:9px 12px;border-radius:16px;font-size:14.5px;line-height:1.5}
+.msg--t .msg__b{background:var(--c-t);color:var(--ink);border-bottom-left-radius:5px}
+.msg--u{justify-content:flex-end}
+.msg--u .msg__b{background:var(--c);color:#fff;border-bottom-right-radius:5px}
+.typing{display:flex;gap:4px;align-items:center;min-height:21px}
+.typing i{width:7px;height:7px;border-radius:50%;background:var(--c-d);opacity:.35}
+.qchips{display:grid;gap:8px}
+.qchip{text-align:left;width:100%;border:1.5px solid var(--c-t2);background:#fff;border-radius:14px;padding:10px 12px;font:inherit;font-size:14.5px;color:var(--ink);cursor:pointer;box-shadow:0 3px 0 var(--c-t2);-webkit-tap-highlight-color:transparent}
+.qchip:active{transform:translateY(2px);box-shadow:0 1px 0 var(--c-t2)}
+.qchip[disabled]{opacity:.55}
+@media (prefers-reduced-motion:no-preference){
+  .comic__p:last-of-type{animation:tikin .45s var(--ease) both}
+  .chat .msg:last-child{animation:tikin .3s var(--ease) both}
+  .typing i{animation:dot 1s ease-in-out infinite}
+  .typing i:nth-child(2){animation-delay:.15s}
+  .typing i:nth-child(3){animation-delay:.3s}
+}
+@keyframes dot{0%,80%,100%{opacity:.3;transform:none}40%{opacity:1;transform:translateY(-3px)}}
+.chat__h .draft{white-space:nowrap}
+.tikcard+.vlink{margin-top:10px}

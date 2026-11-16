@@ -5,6 +5,17 @@ Quy ước số phiên bản: **PS a.b.c**
 - b: giai đoạn / thêm module hoặc tính năng lớn
 - c: sửa nhỏ trong giai đoạn đó
 
+## PS1.3.5 · 16/11/2026 · CD01: Ga Chuyện Trò + banner mới
+- Banner trang ga: bỏ họa tiết sóng và đường ray; nền trơn, thêm con tàu cách điệu mờ ở góc phải dưới.
+- Ga 5 Chuyện Trò mở (`ready: 1`), 2 chặng, điền ô số 6. Shin lên đại bàng sau ga này.
+- a51 Chuyện chị Thúy: truyện tranh 3 khung (mở từng khung, có hình) → đoán thử “chị dùng giờ rảnh thế nào” → khung cuối → chọn 1–3 góc nhìn “điều gì giúp chị” (không đúng sai) → lời chị trích Tikme + link đọc trọn chuyện + video → viết “ngoài tiền, mình muốn mang về gì” → mở danh sách Đổi đời trên Tikme (bắt buộc mở), có thẻ chuyện cùng ngành (cơ khí, thực phẩm, thủy sản, in ấn, kỹ sư) → ghi chuyện của ai, bước ngoặt, điều muốn học theo.
+- a53 Trò chuyện với anh Minh (nhân vật giả định): giao diện chat, chạm câu mình tò mò (ít nhất 3/7), anh Minh trả lời theo nhóm nghề và “một ngày làm việc” theo nghề → chọn câu cho câu trả lời dùng được nhất (Shin nhắc: câu có/không nhận câu ngắn) → viết người dẫn đường ngoài đời + 2 câu hỏi.
+- Dạng bước mới: comic, persp, chat, chatpick; `guess` có `src`, không bắt buộc Senpai; `tik` có `dyn: 'story'`. Ví dụ ô viết `@who` theo nghề.
+- Dữ liệu cho CD02 thêm: senpai, turn, learn, bring, guide, qs. Demo giáo viên: xong đến Ga 5.
+- config: cd01 `ver: 'CD01.0.5'`.
+
+File cần xóa trên GitHub: không có.
+
 ## PS1.3.4 · 16/11/2026 · CD01: chỉnh theo góp ý thầy (22 ý) + cá nhân hóa theo nghề
 - Thanh trên chỉ còn Sơ đồ tuyến và Sổ tay. Chuỗi ngày, XP, Insight chuyển lên vé (dòng nhỏ). Nút "Proskills" chỉ ở đầu trang chủ CD (như TK); trong Cài đặt vẫn có "Về trang chính".
 - Vé: tàu chạy từ đầu đến chỗ đang học rồi lắc lư; thanh vàng chạy lên rồi ánh nhẹ; vệt sáng lướt qua vé; chạm vé thì vé nghiêng theo chỗ chạm. "Đi tiếp" và ga đang học nháy sáng nhẹ. Các ga hiện dần khi lướt. Bản Career Design: ô đã điền xanh đậm, số trắng. Máy bật giảm chuyển động thì tắt hiệu ứng.

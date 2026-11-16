@@ -75,3 +75,44 @@ function cdIcon(k, sz, sw) {
   sz = sz || 20;
   return '<svg class="ps-ic" width="' + sz + '" height="' + sz + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="' + (sw || 2) + '" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + p + '</svg>';
 }
+/* Cảnh truyện tranh Ga 5 (chuyện chị Thúy): home · snow · office. Hình phẳng, đơn giản, 320×150. */
+function cdGirl(x, y, c, extra) { /* nhân vật nữ tóc dài, x,y = tâm đầu */
+  return '<g><path d="M' + (x - 11) + ' ' + (y + 2) + 'q-2 16 2 22h18q4-6 2-22z" fill="#2A2118"/>' +
+    '<path d="M' + (x - 15) + ' ' + (y + 44) + 'q0-26 15-26t15 26z" fill="' + c + '"/>' +
+    '<circle cx="' + x + '" cy="' + y + '" r="10" fill="#F6D2B5"/>' +
+    '<path d="M' + (x - 10.5) + ' ' + (y + 1) + 'q1-13 10.5-13t10.5 13q-4-7-10.5-7t-10.5 7z" fill="#2A2118"/>' +
+    '<circle cx="' + (x - 3.6) + '" cy="' + (y + 1) + '" r="1.3" fill="#2A2118"/><circle cx="' + (x + 3.6) + '" cy="' + (y + 1) + '" r="1.3" fill="#2A2118"/>' +
+    '<path d="M' + (x - 3) + ' ' + (y + 5) + 'q3 2.4 6 0" stroke="#C0574A" stroke-width="1.4" fill="none" stroke-linecap="round"/>' + (extra || '') + '</g>';
+}
+function cdScene(k) {
+  var o = '<svg class="scene" viewBox="0 0 320 150" role="img" aria-hidden="true" preserveAspectRatio="xMidYMid slice">', b = '';
+  if (k === 'home') {
+    b = '<rect width="320" height="150" fill="#EAF2FF"/><circle cx="276" cy="30" r="15" fill="#FFD84D"/>' +
+      '<path d="M0 112Q60 74 132 102T320 96V150H0z" fill="#BFE3C8"/><path d="M0 128Q90 104 180 124T320 118V150H0z" fill="#9ED3AE"/>' +
+      '<rect x="34" y="84" width="50" height="36" rx="3" fill="#fff" stroke="#D6DDEE"/><path d="M27 86L59 62L91 86z" fill="#E0567F"/><rect x="52" y="98" width="14" height="22" rx="2" fill="#F2A20F"/>' +
+      cdGirl(150, 74, '#2F6BFF', '<rect x="160" y="96" width="20" height="7" rx="3.5" fill="#fff" stroke="#C9D3E6"/><rect x="168" y="95" width="4" height="9" fill="#E0453A"/>') +
+      '<path d="M186 66Q222 34 252 52" stroke="#7A8AB8" stroke-width="2" stroke-dasharray="4 5" fill="none"/>' +
+      '<g transform="translate(252 44) rotate(-12)"><path d="M0 6h26l6-4h4l-3 6 3 6h-4l-6-4H0z" fill="#2F6BFF"/><path d="M10 6l6-9h4l-2 9zM10 10l6 9h4l-2-9z" fill="#4C82FF"/></g>';
+  } else if (k === 'snow') {
+    b = '<rect width="320" height="150" fill="#24427F"/><circle cx="40" cy="28" r="12" fill="#FFF4D6"/><circle cx="45" cy="25" r="11" fill="#24427F"/>' +
+      '<g fill="#fff" opacity=".85"><circle cx="90" cy="20" r="2"/><circle cx="130" cy="40" r="1.6"/><circle cx="170" cy="16" r="2"/><circle cx="300" cy="22" r="2"/><circle cx="250" cy="12" r="1.5"/><circle cx="20" cy="66" r="1.8"/><circle cx="110" cy="70" r="1.5"/><circle cx="300" cy="58" r="1.6"/></g>' +
+      '<path d="M18 128V78l24-14v14l24-14v14l24-14v64z" fill="#DCE6F7"/><rect x="74" y="44" width="10" height="30" fill="#C2CFE8"/>' +
+      '<g transform="translate(36 98)"><path d="M0 8q14-12 30 0q-16 12-30 0z" fill="#FF8A7A"/><path d="M30 8l8-6v12z" fill="#FF8A7A"/><circle cx="7" cy="6" r="1.6" fill="#24427F"/></g>' +
+      '<rect x="168" y="40" width="128" height="88" rx="6" fill="#FFE9A8" stroke="#F2C230" stroke-width="3"/><path d="M232 40v88" stroke="#F2C230" stroke-width="2" opacity=".5"/>' +
+      cdGirl(212, 78, '#E0567F', '') +
+      '<rect x="190" y="108" width="96" height="8" rx="2" fill="#B9874E"/><path d="M220 100l14-4 14 4v8h-28z" fill="#fff" stroke="#C9D3E6"/><path d="M234 96v12" stroke="#C9D3E6"/>' +
+      '<path d="M268 108V86M262 86h12l-6-8z" stroke="#7A5530" stroke-width="2" fill="#FFC93C"/>' +
+      '<path d="M0 132Q80 122 160 132T320 130V150H0z" fill="#fff"/>';
+  } else {
+    b = '<rect width="320" height="150" fill="#F3F7FF"/><rect x="0" y="118" width="320" height="32" fill="#E1E8F7"/>' +
+      '<rect x="60" y="104" width="130" height="10" rx="3" fill="#B9874E"/><path d="M70 114v26M180 114v26" stroke="#9C6E3B" stroke-width="5"/>' +
+      '<path d="M116 104l6-22h34l-6 22z" fill="#5B6B95"/>' + cdGirl(98, 64, '#22A05E', '') +
+      '<g font-family="Be Vietnam Pro,Arial,sans-serif" font-weight="800" text-anchor="middle">' +
+      '<rect x="200" y="22" width="48" height="30" rx="12" fill="#fff" stroke="#2F6BFF" stroke-width="2"/><path d="M214 52l-4 9 12-9z" fill="#fff" stroke="#2F6BFF" stroke-width="2" stroke-linejoin="round"/><text x="224" y="42" font-size="14" fill="#2F6BFF">VN</text>' +
+      '<rect x="262" y="48" width="48" height="30" rx="12" fill="#fff" stroke="#E0453A" stroke-width="2"/><path d="M296 78l4 9-12-9z" fill="#fff" stroke="#E0453A" stroke-width="2" stroke-linejoin="round"/><text x="286" y="68" font-size="14" fill="#E0453A">JP</text></g>' +
+      '<path d="M250 36q14 0 20 10" stroke="#7A8AB8" stroke-width="2" fill="none" marker-end="none"/><path d="M266 42l5 5 1-7" stroke="#7A8AB8" stroke-width="2" fill="none" stroke-linecap="round"/>' +
+      '<path d="M258 66q-12 0-18-10" stroke="#7A8AB8" stroke-width="2" fill="none"/><path d="M244 60l-5-5-1 7" stroke="#7A8AB8" stroke-width="2" fill="none" stroke-linecap="round"/>' +
+      '<rect x="214" y="96" width="70" height="20" rx="6" fill="#FFF8E6" stroke="#F2C230"/><text x="249" y="110" font-size="10" font-weight="700" text-anchor="middle" fill="#9A6400" font-family="Be Vietnam Pro,Arial,sans-serif">Giám đốc</text>';
+  }
+  return o + b + '</svg>';
+}

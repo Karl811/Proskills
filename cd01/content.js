@@ -7,7 +7,7 @@
    - Senpai có cờ draft:1 = LỜI KỂ MẪU do Claude viết, cần thay bằng chuyện thật (ẩn danh) trước khi phát hành.
    ES5. */
 var CD_ID = 'cd01';
-var CD_VER = 'CD01.0.4';
+var CD_VER = 'CD01.0.5';
 var CD_TOTAL = 19;            /* Xuất phát (1) + 7 ga (18 chặng) */
 var CD_XP_ACT = 30, CD_XP_WARM = 10, CD_INS_WORDS = 20, CD_INS_FIELD = 5;
 var TIKME = 'https://tikme.com';
@@ -39,8 +39,11 @@ var STATIONS = [
     intro: 'Nghề [Nghề] ngoài đời thật ra sao? [Tên] đoán trước, rồi xem Tikme và Senpai nói gì nhé.',
     done: 'Ô số 5 đã có nghề và lộ trình của bạn.',
     word: { k: '仕事', kana: 'しごと', ro: 'shigoto', vn: 'công việc' } },
-  { id: 's5', n: 5, vn: 'Ga Chuyện Trò', k: '対話', kana: 'たいわ', ro: 'Taiwa · Chuyện trò', lc: '#2A74DB', ic: 'chat', card: 6,
-    sub: 'Học từ Senpai, tìm người dẫn đường', acts: ['a51', 'a53'] },
+  { id: 's5', n: 5, vn: 'Ga Chuyện Trò', k: '対話', kana: 'たいわ', ro: 'Taiwa · Chuyện trò', lc: '#2A74DB', ic: 'chat', card: 6, ready: 1,
+    sub: 'Học từ Senpai, tìm người dẫn đường', acts: ['a51', 'a53'],
+    intro: 'Người đi trước đã đi con đường [Tên] sắp đi. Cùng nghe họ kể, rồi tập hỏi cho hay nhé.',
+    done: 'Ô số 6 đã có Senpai và người dẫn đường của bạn.',
+    word: { k: '対話', kana: 'たいわ', ro: 'taiwa', vn: 'trò chuyện' } },
   { id: 's6', n: 6, vn: 'Ga Định Hướng', k: '道のり', kana: 'みちのり', ro: 'Michinori · Chặng đường', lc: '#0F9F98', ic: 'compass', card: 7,
     sub: 'Kế hoạch ở JPC và ở Nhật', acts: ['a62', 'a63'] },
   { id: 's7', n: 7, vn: 'Ga Thử Thách', k: '挑戦', kana: 'ちょうせん', ro: 'Chōsen · Thử thách', lc: '#DE3F35', ic: 'flag', card: 8,
@@ -314,6 +317,57 @@ var READY = [
 ];
 var READY_OPTS = [['r', 'Sẵn sàng'], ['w', 'Còn lo'], ['u', 'Chưa biết']];
 
+/* ---------- Ga 5 · Chuyện chị Thúy (a51) · TÓM TỪ TIKME, đối chiếu 16/11/2026 ----------
+   Nguồn: tikme.com/cau-chuyen-thanh-cong/tran-thi-thuy (chuyện đã công khai, giữ tên thật theo chốt của thầy).
+   Truyện tranh 3 khung: art = tên cảnh trong art.js (cdScene). Lời chị: chỉ dùng câu có trên Tikme. */
+var THUY = {
+  who: 'Chị Trần Thị Thúy · Lâm Đồng · từng là thực tập sinh ngành Thủy sản',
+  url: '/cau-chuyen-thanh-cong/tran-thi-thuy', yt: 'https://www.youtube.com/watch?v=l79ZbJ8msWY',
+  frames: [
+    { art: 'home', y: '2011 · Ở quê', t: ['Chị tốt nghiệp Sư phạm Vật lý. Lương hơn 2 triệu một tháng.', 'Ba mẹ không ủng hộ. Chị vay tiền của cậu để đi, chưa biết tiếng Nhật.'] },
+    { art: 'snow', y: '2012 · Nemuro, Hokkaido', t: ['Chị chế biến cá hồi, là thực tập sinh người Việt đầu tiên ở đây.', 'Thành phố nhỏ, mùa hè chỉ 15–20 độ. Ít chỗ vui chơi.'] },
+    { art: 'office', y: '2015 · Về nước', t: ['Chị có N2. Phần lớn nơi chị xin việc chỉ phỏng vấn một lần.', 'Chị làm cầu nối Việt – Nhật. Nay chị là Giám đốc đại diện Marukoshi Seagull Việt Nam.'] }
+  ],
+  quote: 'Đi Nhật không chỉ cho mình một khoản tiền tiết kiệm, mà quan trọng hơn là cho mình một nền tảng…',
+  qsrc: 'Chị Trần Thị Thúy · trích từ Tikme'
+};
+/* Chuyện Đổi đời cùng ngành trên Tikme (/cau-chuyen-thanh-cong/<mã>), link mở thử 16/11/2026. Ngành chưa có: dùng trang danh sách. */
+var STORY_IND = {
+  'co-khi': [['thach-phu-sang', 'Thạch Phú Sang'], ['pham-ngoc-hoai', 'Phạm Ngọc Hoài'], ['hoang-van-thieu', 'Hoàng Văn Thiệu']],
+  'thuc-pham': [['nguyen-thi-cam-vinh', 'Nguyễn Thị Cẩm Vinh'], ['tran-thi-thu-thao', 'Trần Thị Thu Thảo']],
+  'thuy-san': [['doan-hong-tham', 'Đoàn Hồng Thắm'], ['ho-ngoc-nhu', 'Hồ Ngọc Như']],
+  'in-an': [['nguyen-phan-xuan-thu', 'Nguyễn Phan Xuân Thu']],
+  'ky-su': [['nguyen-ngoc-trung-nguyen-ngoc-dung-nguyen-ngoc-hieu', 'Anh em Nguyễn Ngọc Trung, Dũng, Hiếu']]
+};
+var STORY_LIST = '/cau-chuyen-thanh-cong/danh-sach';
+
+/* ---------- Ga 5 · Trò chuyện với anh Minh (a53) · NHÂN VẬT GIẢ ĐỊNH, lời kể mẫu ----------
+   Học viên chọn câu mình tò mò; không chấm câu hay/dở. '@hard' '@prep' theo nhóm nghề (grp trong INDP), '@day' lấy INDP.day[1]. */
+var MINH = {
+  hi: 'Chào em! Anh là Minh, làm ngành [Nghề] năm thứ 3 ở Nhật. Em muốn hỏi gì cứ hỏi nhé.',
+  hiGen: 'Chào em! Anh là Minh, đang làm năm thứ 3 ở Nhật. Em muốn hỏi gì cứ hỏi nhé.',
+  qs: [
+    { q: 'Anh có vất vả không ạ?', a: 'Ừ… cũng có lúc vất vả em ạ.' },
+    { q: 'Tháng đầu, điều gì khó nhất với anh? Anh vượt qua thế nào?', a: '@hard' },
+    { q: 'Một ngày làm việc của anh thế nào?', a: '@day' },
+    { q: 'Lương bên đó bao nhiêu vậy anh?', a: 'Mỗi công ty một khác em ạ. Số tham khảo có trên Tikme. Anh thấy quan trọng hơn là mình học được gì.' },
+    { q: 'Nếu quay lại lúc còn ở trường, anh sẽ chuẩn bị gì thêm?', a: '@prep' },
+    { q: 'Thói quen nào giúp anh được giao việc khó hơn?', a: 'Xong việc nào anh báo việc đó, sai cũng báo ngay. Người Nhật gọi là Hō-ren-sō đó em.' },
+    { q: 'Anh nghĩ em có đi được không?', a: 'Cái đó tùy em thôi. Mà em muốn đi vì điều gì?' }
+  ],
+  grp: {
+    sx: { hard: 'Khó nhất là nghe không kịp hướng dẫn ở xưởng. Anh ghi từ mới, tối hỏi senpai. Hai tháng sau là theo kịp.', prep: 'Anh sẽ học từ vựng chuyên ngành sớm hơn. Và tập đúng giờ, 5S ngay từ ký túc xá.' },
+    xd: { hard: 'Khó nhất là trời nắng, việc nặng, lại nghe không kịp. Anh uống nước đều, chưa rõ là hỏi lại. Tháng thứ hai thì quen.', prep: 'Anh sẽ tập thể lực đều, học từ vựng an toàn lao động sớm hơn.' },
+    nn: { hard: 'Khó nhất là dậy sớm, làm theo mùa vụ. Anh ngủ sớm, ghi lịch việc từng tuần. Qua một mùa là quen.', prep: 'Anh sẽ tập dậy sớm, học tên cây, tên dụng cụ bằng tiếng Nhật.' },
+    kg: { hard: 'Khó nhất là nghe các cụ nói giọng địa phương. Anh ghi câu hay gặp, hỏi lại nhẹ nhàng. Các cụ thương lắm.', prep: 'Anh sẽ học kính ngữ và luyện nghe nhiều hơn.' },
+    dv: { hard: 'Khó nhất là tiếp khách bằng kính ngữ. Anh học thuộc câu mẫu, tập trước gương. Một tháng sau tự tin hơn.', prep: 'Anh sẽ luyện nói, luyện chào hỏi cho chuẩn ngay từ ở trường.' },
+    vs: { hard: 'Khó nhất là nhớ quy trình từng khu. Anh chụp ảnh, ghi chú từng bước. Hai tuần là nhớ.', prep: 'Anh sẽ tập làm kỹ từng việc nhỏ, đúng giờ ngay từ ký túc xá.' },
+    ks: { hard: 'Khó nhất là họp bằng tiếng Nhật. Anh chuẩn bị trước 3 câu báo cáo, tối luyện lại. Nửa năm sau tự tin hơn.', prep: 'Anh sẽ học tiếng Nhật công việc và kính ngữ sớm hơn.' },
+    gen: { hard: 'Khó nhất là nghe không kịp hướng dẫn. Anh ghi từ mới, tối hỏi senpai. Hai tháng sau là theo kịp.', prep: 'Anh sẽ học tiếng Nhật chuyên ngành sớm hơn, tập đúng giờ ngay từ ký túc xá.' }
+  },
+  note: 'Câu có/không thường chỉ nhận một câu ngắn. Hỏi cụ thể “lúc nào, việc gì, làm thế nào” thì người kia kể nhiều hơn.'
+};
+
 /* ---------- Lời Shin, chữ giao diện ---------- */
 var SHIN_NAMES = ['Shin trứng', 'Shin gà con', 'Shin gà rừng', 'Shin đại bàng'];
 var TXT = {
@@ -521,17 +575,51 @@ var ACTS = {
       { k: 'write', q: 'Dù còn lo, vì sao bạn vẫn muốn đi?', sub: 'Lý do của chính bạn, không cần hay.',
         fields: [{ key: 'a43.why', l: 'Viết 1–2 câu', starter: 'Mình vẫn muốn đi vì ', ph: 'Ví dụ: muốn sửa lại nhà cho ba mẹ', min: 12, rows: 3 }],
         tips: ['Mình vẫn muốn đi vì muốn có nghề vững và sửa lại nhà cho ba mẹ.', 'Mình vẫn muốn đi vì muốn thử sống tự lập, xem mình làm được tới đâu.'] }
+    ] },
+
+  /* ===== GA 5 · CHUYỆN TRÒ ===== */
+  a51: { t: 'Chuyện chị Thúy', mins: 5, st: 's5', d: 'Truyện tranh 3 khung, rồi đọc một chuyện cùng ngành.',
+    steps: [
+      { k: 'comic', key: 'a51.c1', fr: [0, 1], q: 'Chuyện thật trên Tikme', sub: 'Chạm “Xem tiếp” để mở từng khung.' },
+      { k: 'guess', key: 'a51.free', q: 'Ít chỗ chơi. Theo bạn, chị Thúy dùng thời gian rảnh thế nào?',
+        opts: ['Làm thêm thật nhiều', 'Học tiếng Nhật', 'Nghỉ ngơi cho khỏe', 'Mỗi người một khác'],
+        fact: 'Chị dồn thời gian để học. Khoảng 1,5–2 năm sau, chị đạt N2.', src: 'Theo Tikme' },
+      { k: 'comic', key: 'a51.c2', fr: [2], q: 'Ba năm sau', sub: 'Khung cuối.' },
+      { k: 'persp', key: 'a51.help', q: 'Theo bạn, điều gì giúp chị đi xa như vậy?', sub: 'Chọn 1–3 ý. Ý nào cũng là một góc nhìn.', min: 1, max: 3, own: 'Ý khác',
+        opts: ['Tiếng Nhật đến N2', 'Dám đi dù chưa được ủng hộ', 'Tác phong làm việc kiểu Nhật', 'Dùng giờ rảnh để học', 'Được công ty tin', 'Gặp may'],
+        fields: [{ key: 'a51.bring', l: 'Ngoài tiền, 3–5 năm ở Nhật bạn muốn mang về gì?', starter: 'Ngoài tiền, mình muốn mang về ', ph: 'Ví dụ: tay nghề [Nghề] vững, tiếng Nhật N3', min: 10, rows: 3 }] },
+      { k: 'tik', key: 'a51.open', dyn: 'story', btn: 'Mở danh sách chuyện Đổi đời',
+        t: 'Tikme có hơn 150 chuyện Đổi đời. Chọn một chuyện, nhất là ngành [Nghề], đọc rồi quay lại nhé.',
+        tips: ['Đọc phần họ bắt đầu thế nào và lúc khó nhất.', 'Ngành của bạn chưa có chuyện? Chọn chuyện bạn thấy gần mình.'] },
+      { k: 'write', q: 'Chuyện bạn vừa đọc', sub: 'Viết ngắn, mỗi ô một ý.',
+        fields: [
+          { key: 'a51.who', l: 'Chuyện của ai, ngành gì?', ph: '@who', min: 4, rows: 1, noIns: 1 },
+          { key: 'a51.turn', l: 'Bước ngoặt của họ là gì?', ph: 'Ví dụ: dám đi dù gia đình chưa ủng hộ', min: 8, rows: 2 },
+          { key: 'a51.learn', l: 'Điều bạn muốn học theo', starter: 'Mình muốn học theo ', ph: 'Ví dụ: cách anh tự học sau giờ làm', min: 8, rows: 3 }
+        ] }
+    ] },
+  a53: { t: 'Trò chuyện với anh Minh', mins: 5, st: 's5', d: 'Hỏi điều bạn tò mò, rồi soạn câu hỏi cho người thật.',
+    steps: [
+      { k: 'chat', key: 'a53.ask', min: 3, q: 'Bạn muốn hỏi anh Minh điều gì?', sub: 'Chạm ít nhất 3 câu. Không có câu đúng sai.' },
+      { k: 'chatpick', key: 'a53.best', q: 'Câu nào cho bạn câu trả lời dùng được nhất?' },
+      { k: 'write', q: 'Người dẫn đường của bạn', sub: 'Tuần này, hỏi họ 2 câu bạn soạn nhé.',
+        fields: [
+          { key: 'a53.guide', l: 'Ngoài đời, ai có thể dẫn đường cho bạn?', ph: 'Ví dụ: anh họ đang làm ở Nhật, thầy chủ nhiệm', min: 4, rows: 2, noIns: 1 },
+          { key: 'a53.q1', l: 'Câu hỏi 1', ph: 'Ví dụ: Tháng đầu làm [Nghề], điều gì khó nhất?', min: 10, rows: 2, noIns: 1 },
+          { key: 'a53.q2', l: 'Câu hỏi 2', ph: 'Ví dụ: Em nên luyện thói quen nào từ bây giờ?', min: 10, rows: 2, noIns: 1 }
+        ],
+        tips: ['Hỏi cụ thể: lúc nào, việc gì, làm thế nào.', 'Tránh câu chỉ trả lời có hoặc không.', 'Hỏi để biết mình nên làm gì từ hôm nay.'] }
     ] }
 };
 
 /* Thứ tự học (chặng chính). Ga chưa có hoạt động (ready:0) hiện "Đang xây". */
-var ORDER = ['x1', 'a11', 'a13', 'a21', 'a22', 'a23', 'a31', 'a32', 'a33', 'a42', 'a44', 'a43'];
+var ORDER = ['x1', 'a11', 'a13', 'a21', 'a22', 'a23', 'a31', 'a32', 'a33', 'a42', 'a44', 'a43', 'a51', 'a53'];
 
-/* ---------- Bản demo giáo viên: học viên giả đã xong Sân ga đến Ga 4 ---------- */
+/* ---------- Bản demo giáo viên: học viên giả đã xong Sân ga đến Ga 5 ---------- */
 var DEMO_DATA = {
   prof: { name: 'Nguyễn Văn An', by: '2005', sid: 'HV2026-0123', cls: 'E696', path: 'Ikusei Shuro' },
   intro: 1,
-  done: { x1: 1763260000000, w1: 1763260000000, a11: 1763260000000, a13: 1763260000000, a21: 1763260000000, a22: 1763260000000, a23: 1763260000000, a31: 1763260000000, a32: 1763260000000, a33: 1763260000000, w4: 1763260000000, a42: 1763260000000, a44: 1763260000000, a43: 1763260000000 },
+  done: { x1: 1763260000000, w1: 1763260000000, a11: 1763260000000, a13: 1763260000000, a21: 1763260000000, a22: 1763260000000, a23: 1763260000000, a31: 1763260000000, a32: 1763260000000, a33: 1763260000000, w4: 1763260000000, a42: 1763260000000, a44: 1763260000000, a43: 1763260000000, a51: 1763260000000, a53: 1763260000000 },
   d: {
     'x1.now': '2', 'x1.notice': ['Hoàn cảnh giống mình', 'Học tiếng Nhật bền bỉ'],
     'x1.goal': 'Mình muốn biết mình hợp nghề cơ khí hay nghề hàn hơn, và có kế hoạch học tiếng Nhật rõ ràng.',
@@ -566,6 +654,15 @@ var DEMO_DATA = {
     'a44.ownt': 'Đậu tay nghề cấp 3 ngành cơ khí',
     'a44.next': 'Mốc gần nhất của mình là N5 vào cuối năm nay. Mỗi tối mình học 20 từ và Chủ nhật làm một đề.',
     'a43.r': { 0: 'r', 1: 'w', 2: 'u', 3: 'r', 4: 'r', 5: 'r', 6: 'w', 7: 'u' }, 'a43.top': '1',
-    'a43.why': 'Mình vẫn muốn đi vì muốn có nghề cơ khí vững tay và sửa lại nhà cho ba mẹ.'
+    'a43.why': 'Mình vẫn muốn đi vì muốn có nghề cơ khí vững tay và sửa lại nhà cho ba mẹ.',
+    'a51.c1': 2, 'a51.free': '1', 'a51.c2': 1, 'a51.help': ['Tiếng Nhật đến N2', 'Dùng giờ rảnh để học', 'Tác phong làm việc kiểu Nhật'],
+    'a51.bring': 'Ngoài tiền, mình muốn mang về tay nghề CNC vững, tiếng Nhật N3 và thói quen báo cáo đúng giờ.',
+    'a51.open': 1, 'a51.who': 'Anh Thạch Phú Sang, ngành cơ khí',
+    'a51.turn': 'Mới 18 tuổi, anh dám chọn đi Nhật làm bảo dưỡng đường sắt.',
+    'a51.learn': 'Mình muốn học theo cách anh dám bắt đầu sớm, không chờ đủ tự tin mới đi.',
+    'a53.ask': [1, 2, 0, 4], 'a53.best': '1',
+    'a53.guide': 'Anh họ mình đang làm cơ khí ở Nhật năm thứ 2.',
+    'a53.q1': 'Tháng đầu làm cơ khí ở Nhật, anh thấy khó nhất là gì?',
+    'a53.q2': 'Em nên luyện thói quen nào từ bây giờ để sang đó đỡ bỡ ngỡ?'
   }
 };
