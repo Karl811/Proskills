@@ -5,6 +5,15 @@ Quy ước số phiên bản: **PS a.b.c**
 - b: giai đoạn / thêm module hoặc tính năng lớn
 - c: sửa nhỏ trong giai đoạn đó
 
+## PS1.3.9 · 16/11/2026 · CD01: Ga 7 Thử Thách (2 chặng, theo TỪNG NGHỀ)
+- Ga 7 còn 2 chặng (bỏ a73). Toàn khóa: Sân ga + 17 chặng = 18. Lời cam kết và soát vé chuyển sang Ga Ước Mơ.
+- a71 Tuần đầu ở Nhật: lịch tuần mini, mở 2 ngày. Thứ Ba: tình huống riêng nghề (`IND7[mã ngành].sc`, 17 nghề + `gen`). Thứ Năm: tình huống từ điều lo nhất ở Ga 4 (`WORRY7`, 8 thẻ; thẻ 4 dùng điều vất vả riêng nghề; điều tự viết dùng `WORRY7_OWN`). 3 cách đều có được/mất + “Mình làm khác” → “Điều có thể xảy ra” + Senpai kể. Cuối: chọn 1–2 việc chuẩn bị + một câu nhắn cho mình của tuần đầu.
+- a72 Việc khó đầu tiên: ba vùng (An toàn · Học hỏi · Quá sức), học viên tự xếp thẻ việc lấy từ chính hành trình (việc chuẩn bị ở a71, hỏi người dẫn đường 2 câu ở Ga 5, nói câu phỏng vấn 60 giây, 2 việc khó theo nghề `IND7.hard`, 2 việc chung, việc tự thêm). Nhận 1–2 việc, hạn chót (7 / 14 ngày / chọn ngày), ai cùng biết, “Nếu ngại, mình sẽ…”.
+- Sau hạn chót: trang chủ có lời Shin “kể Shin nghe”, chọn Làm được / Làm một phần / Chưa làm + 1 dòng (+10 XP lần đầu, không phán xét). Trang Ga 7 có nút “Kết quả việc khó” để kể bất cứ lúc nào.
+- Ô 8 đổi tên “Thử thách và việc khó của tôi”. Hình mới: `cdBoy`, `cdWork` (9 cảnh: xưởng, công trường, nông trại, kaigo, nhà hàng, xưởng thực phẩm, vệ sinh, văn phòng, ký túc xá), `cdZones`.
+- Demo giáo viên: học viên giả định xong đến Ga 7, hạn việc khó là hôm qua để thấy lời Shin hỏi kết quả.
+- File cần xóa: không có.
+
 ## PS1.3.8 · 16/11/2026 · CD01: Ga 6 cá nhân hóa theo TỪNG NGHỀ (17 nghề)
 - Đọc lại 17 trang ngành Tikme (16/11/2026), tóm vào `IND6[mã ngành]` (content.js). Ga 6 không còn chung theo nhóm: cơ khí, may mặc, đóng gói… mỗi nghề một bộ gợi ý riêng.
 - Khởi động “Rõ mấy phần?”: Senpai kể theo nghề (kế hoạch từng đổi trong nghề đó).

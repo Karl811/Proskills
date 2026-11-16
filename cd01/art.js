@@ -160,3 +160,90 @@ function cdBridge(n1, n2) {
     flags(n1, 52, 142, 0, C) + flags(n2, 178, 268, n1, D2) + '</svg>';
   return o;
 }
+/* Ga 7 · nhân vật nam nửa người (cùng kiểu cdGirl, không vẽ bàn tay). hat: 'helmet' mũ bảo hộ · 'net' mũ lưới vệ sinh · 'cap' mũ vải */
+function cdBoy(x, y, c, hat) {
+  function P(d) { return d.replace(/X([-+]?\d+(?:\.\d+)?)/g, function (m, n) { return String(x + (+n)); }).replace(/Y([-+]?\d+(?:\.\d+)?)/g, function (m, n) { return String(y + (+n)); }); }
+  var H = '#2E241E', K = '#F3CDB0';
+  var hb = hat === 'helmet' ? '<path d="' + P('MX-13 Y-3 CX-13 Y-15 X-6 Y-19 X0 Y-19 CX6 Y-19 X13 Y-15 X13 Y-3 Z') + '" fill="#FFC93C"/><rect x="' + (x - 15) + '" y="' + (y - 4) + '" width="30" height="3.4" rx="1.7" fill="#E5A50A"/><path d="' + P('MX0 Y-19 LX0 Y-5') + '" stroke="#E5A50A" stroke-width="2"/>'
+    : (hat === 'net' ? '<path d="' + P('MX-12.5 Y-1 CX-14 Y-14 X-5 Y-18 X0 Y-18 CX5 Y-18 X14 Y-14 X12.5 Y-1 CX6 Y-5 X-6 Y-5 X-12.5 Y-1 Z') + '" fill="#fff" stroke="#D6DDEE" stroke-width="1"/>'
+    : (hat === 'cap' ? '<path d="' + P('MX-12 Y-4 CX-12 Y-14 X-5 Y-17 X0 Y-17 CX5 Y-17 X12 Y-14 X12 Y-4 Z') + '" fill="' + c + '"/><path d="' + P('MX4 Y-5 LX19 Y-3') + '" stroke="' + c + '" stroke-width="3" stroke-linecap="round"/>' : ''));
+  return '<g>' +
+    '<path d="' + P('MX-21 Y46 CX-21 Y28 X-12 Y20 X0 Y20 CX12 Y20 X21 Y28 X21 Y46 Z') + '" fill="' + c + '"/>' +
+    '<path d="' + P('MX-4 Y8 LX4 Y8 LX4 Y19 QX0 Y23 X-4 Y19 Z') + '" fill="#E7BB9A"/>' +
+    '<path d="' + P('MX-6 Y20 LX0 Y26 LX6 Y20') + '" fill="none" stroke="#fff" stroke-width="1.6" stroke-linejoin="round" opacity=".85"/>' +
+    '<ellipse cx="' + x + '" cy="' + y + '" rx="10.5" ry="11.6" fill="' + K + '"/>' +
+    (hat ? '' : '<path d="' + P('MX-11 Y0 CX-12 Y-10 X-5 Y-14 X1 Y-13 CX8 Y-13 X12 Y-8 X11 Y0 CX9 Y-5 X6 Y-6 X2 Y-5 CX-2 Y-7 X-7 Y-5 X-11 Y0 Z') + '" fill="' + H + '"/>') +
+    '<path d="' + P('MX-6.4 Y-1.2 LX-2.4 Y-1.8 MX2.4 Y-1.8 LX6.4 Y-1.2') + '" stroke="' + H + '" stroke-width="1.4" fill="none" stroke-linecap="round"/>' +
+    '<ellipse cx="' + (x - 4.2) + '" cy="' + (y + 2.4) + '" rx="1.35" ry="1.8" fill="#2A2118"/><ellipse cx="' + (x + 4.2) + '" cy="' + (y + 2.4) + '" rx="1.35" ry="1.8" fill="#2A2118"/>' +
+    '<circle cx="' + (x - 3.8) + '" cy="' + (y + 1.8) + '" r=".5" fill="#fff"/><circle cx="' + (x + 4.6) + '" cy="' + (y + 1.8) + '" r=".5" fill="#fff"/>' +
+    '<path d="' + P('MX-2.4 Y7 QX0 Y8.6 X2.4 Y7') + '" stroke="#A9554A" stroke-width="1.2" fill="none" stroke-linecap="round"/>' + hb + '</g>';
+}
+/* Ga 7 · cảnh tuần đầu ở Nhật, 320×130, hình phẳng: factory site farm care shop food clean office dorm */
+function cdWork(k) {
+  var o = '<svg class="scene" viewBox="0 0 320 130" role="img" aria-hidden="true" preserveAspectRatio="xMidYMid slice">', b = '';
+  var F = 'font-family="Be Vietnam Pro,Arial,sans-serif" font-weight="800"';
+  if (k === 'site') {
+    b = '<rect width="320" height="130" fill="#DCEBFF"/><circle cx="280" cy="26" r="14" fill="#FFD84D"/>' +
+      '<path d="M210 120V18M210 18h86M210 30l86-12M296 18v22" stroke="#E5A50A" stroke-width="4" fill="none"/><path d="M286 40v14" stroke="#5B6B95" stroke-width="2"/><rect x="280" y="54" width="12" height="9" fill="#5B6B95"/>' +
+      '<g stroke="#9AA8CC" stroke-width="3"><path d="M20 120V48M62 120V48M104 120V48M20 70h84M20 96h84M20 48h84"/></g><rect x="14" y="44" width="96" height="6" fill="#B9874E"/>' +
+      '<rect x="0" y="112" width="320" height="18" fill="#C9B79A"/>' + cdBoy(160, 70, '#F07F1E', 'helmet') +
+      '<rect x="146" y="98" width="28" height="4" fill="#E8F06A" opacity=".9"/>';
+  } else if (k === 'farm') {
+    b = '<rect width="320" height="130" fill="#FFF1D6"/><circle cx="50" cy="30" r="14" fill="#FFC93C"/>' +
+      '<path d="M190 112V60Q250 14 312 60v52z" fill="#fff" fill-opacity=".7" stroke="#BFD3F5" stroke-width="2"/><path d="M220 112V44M251 112V36M282 112V44" stroke="#D6E2FF" stroke-width="2"/>' +
+      '<rect x="0" y="104" width="320" height="26" fill="#B98A5A"/><g fill="#3FA85E">' +
+      '<circle cx="18" cy="104" r="8"/><circle cx="48" cy="104" r="8"/><circle cx="78" cy="104" r="8"/><circle cx="208" cy="104" r="8"/><circle cx="240" cy="104" r="8"/><circle cx="272" cy="104" r="8"/><circle cx="304" cy="104" r="8"/></g>' +
+      cdGirl(140, 66, '#22A05E', 0) + '<ellipse cx="140" cy="56" rx="22" ry="5" fill="#E8C26A"/><path d="M128 56q12-17 24 0z" fill="#F2D27E"/><path d="M128.5 53.5h23" stroke="#C0392B" stroke-width="2.4"/>';
+  } else if (k === 'care') {
+    b = '<rect width="320" height="130" fill="#FFF4F0"/><rect x="214" y="18" width="78" height="54" rx="6" fill="#DFF0FF" stroke="#F3D6CC" stroke-width="3"/><path d="M253 18v54M214 45h78" stroke="#F3D6CC" stroke-width="3"/>' +
+      '<rect x="0" y="108" width="320" height="22" fill="#F3E2D6"/>' + cdGirl(110, 66, '#E0567F', 0) +
+      '<rect x="62" y="104" width="160" height="10" rx="4" fill="#C99A6B"/><ellipse cx="190" cy="100" rx="16" ry="5" fill="#fff" stroke="#E3C9B5"/><path d="M178 98q12 8 24 0" fill="#F2C230"/>' +
+      '<rect x="40" y="88" width="10" height="16" rx="3" fill="#BFD3F5"/><circle cx="45" cy="82" r="6" fill="#FF9FB0"/><path d="M45 88v-6" stroke="#3FA85E" stroke-width="2"/>';
+  } else if (k === 'shop') {
+    b = '<rect width="320" height="130" fill="#FFF8EC"/><rect x="0" y="0" width="320" height="34" fill="#E0453A"/>' +
+      '<g fill="#fff" opacity=".9"><rect x="40" y="0" width="3" height="34"/><rect x="120" y="0" width="3" height="34"/><rect x="200" y="0" width="3" height="34"/><rect x="280" y="0" width="3" height="34"/></g>' +
+      '<g><ellipse cx="26" cy="54" rx="10" ry="13" fill="#FF8A5B"/><ellipse cx="294" cy="54" rx="10" ry="13" fill="#FF8A5B"/></g>' +
+      cdGirl(160, 70, '#18203F', 0) + '<path d="M150 98h20v18h-20z" fill="#fff"/>' +
+      '<rect x="0" y="110" width="320" height="20" fill="#B9874E"/><ellipse cx="248" cy="108" rx="18" ry="5" fill="#fff" stroke="#E3C9B5"/><ellipse cx="80" cy="108" rx="14" ry="4" fill="#fff" stroke="#E3C9B5"/>';
+  } else if (k === 'food') {
+    b = '<rect width="320" height="130" fill="#F2F8FF"/><rect x="0" y="0" width="320" height="10" fill="#DCE8F7"/>' +
+      cdBoy(150, 58, '#9CC3F0', 'net') +
+      '<rect x="0" y="108" width="320" height="10" rx="4" fill="#8E9BBF"/><g fill="#C9D3E6"><circle cx="10" cy="124" r="5"/><circle cx="90" cy="124" r="5"/><circle cx="170" cy="124" r="5"/><circle cx="250" cy="124" r="5"/><circle cx="310" cy="124" r="5"/></g>' +
+      '<g fill="#7FB0E8"><path d="M30 104q12-8 24 0q-12 8-24 0z"/><path d="M54 104l6-4v8z"/><path d="M230 104q12-8 24 0q-12 8-24 0z"/><path d="M254 104l6-4v8z"/></g>' +
+      '<rect x="270" y="24" width="38" height="24" rx="4" fill="#fff" stroke="#BFD3F5"/><text x="289" y="40" font-size="10" text-anchor="middle" fill="#2F6BFF" ' + F + '>5°C</text>';
+  } else if (k === 'clean') {
+    b = '<rect width="320" height="130" fill="#EEF3FF"/><path d="M0 100L80 70H240L320 100z" fill="#DCE3F2"/><rect x="80" y="20" width="160" height="50" fill="#F8FAFF" stroke="#D6DDEE"/>' +
+      '<path d="M100 20v50M140 20v50M180 20v50M220 20v50" stroke="#E3E7F5"/><rect x="0" y="100" width="320" height="30" fill="#CFD8EC"/><path d="M30 112h60M200 118h80" stroke="#fff" stroke-width="3" opacity=".7" stroke-linecap="round"/>' +
+      cdBoy(150, 64, '#22A05E', 'cap') + '<path d="M228 72v40" stroke="#7A5530" stroke-width="3"/><path d="M216 112h24l-4 10h-16z" fill="#2F6BFF"/><rect x="250" y="96" width="22" height="20" rx="3" fill="#FFC93C"/>';
+  } else if (k === 'office') {
+    b = '<rect width="320" height="130" fill="#F3F7FF"/><rect x="200" y="16" width="100" height="58" rx="4" fill="#fff" stroke="#D6DDEE" stroke-width="2"/>' +
+      '<path d="M214 62l18-16 16 10 18-22 18 14" stroke="#2F6BFF" stroke-width="2.5" fill="none" stroke-linecap="round"/>' +
+      cdBoy(110, 66, '#2B3966', 0) + '<rect x="40" y="108" width="190" height="10" rx="3" fill="#B9874E"/><rect x="150" y="80" width="56" height="30" rx="3" fill="#18203F"/><rect x="154" y="84" width="48" height="22" fill="#7FB0E8"/>' +
+      '<rect x="0" y="118" width="320" height="12" fill="#E1E8F7"/>';
+  } else if (k === 'dorm') {
+    b = '<rect width="320" height="130" fill="#2B3B6B"/><rect x="214" y="16" width="80" height="56" rx="6" fill="#1B2A55" stroke="#F2C230" stroke-width="3"/><circle cx="262" cy="38" r="10" fill="#FFF4D6"/><circle cx="267" cy="35" r="9" fill="#1B2A55"/>' +
+      '<g fill="#fff" opacity=".8"><circle cx="230" cy="30" r="1.4"/><circle cx="282" cy="58" r="1.4"/><circle cx="240" cy="60" r="1.2"/></g>' +
+      '<rect x="18" y="38" width="70" height="80" rx="4" fill="#3E5390"/><rect x="22" y="58" width="62" height="10" rx="3" fill="#E9EEF9"/><rect x="22" y="96" width="62" height="10" rx="3" fill="#E9EEF9"/>' +
+      '<rect x="0" y="112" width="320" height="18" fill="#22305A"/>' + cdGirl(160, 66, '#7A55D3', 0) +
+      '<rect x="184" y="104" width="44" height="6" rx="2" fill="#8A6A4A"/><rect x="198" y="84" width="13" height="20" rx="3" fill="#18203F"/><rect x="200" y="87" width="9" height="14" rx="1.5" fill="#BFE3FF"/><circle cx="204.5" cy="94" r="12" fill="#BFE3FF" opacity=".22"/>';
+  } else {
+    b = '<rect width="320" height="130" fill="#EEF3FF"/><rect x="0" y="108" width="320" height="22" fill="#DCE3F2"/>' +
+      '<rect x="196" y="28" width="104" height="80" rx="6" fill="#C9D3E6"/><rect x="208" y="40" width="44" height="28" rx="3" fill="#18203F"/><rect x="211" y="43" width="38" height="22" fill="#7FB0E8"/>' +
+      '<circle cx="276" cy="46" r="6" fill="#E0453A"/><circle cx="276" cy="64" r="6" fill="#22A05E"/><rect x="208" y="78" width="80" height="8" rx="3" fill="#9AA8CC"/>' +
+      '<rect x="28" y="52" width="56" height="22" rx="4" fill="#fff" stroke="#22A05E" stroke-width="2"/><text x="56" y="68" font-size="12" text-anchor="middle" fill="#1E6B3C" ' + F + '>5S</text>' +
+      cdBoy(130, 66, '#2F6BFF', 'cap');
+  }
+  return o + b + '</svg>';
+}
+/* Ga 7 · ba vùng: an toàn (trong) · học hỏi (giữa) · quá sức (ngoài). 300×190 */
+function cdZones() {
+  var F = 'font-family="Be Vietnam Pro,Arial,sans-serif" font-weight="800" text-anchor="middle"';
+  return '<svg class="zones" viewBox="0 0 300 190" role="img" aria-label="Ba vùng: an toàn, học hỏi, quá sức">' +
+    '<circle cx="150" cy="95" r="90" fill="#FDECEA" stroke="#E58A80" stroke-width="2" stroke-dasharray="5 5"/>' +
+    '<circle cx="150" cy="95" r="62" fill="#FFF4D6" stroke="#E5A50A" stroke-width="2.5"/>' +
+    '<circle cx="150" cy="95" r="32" fill="#E3F5EA" stroke="#1E9E5A" stroke-width="2.5"/>' +
+    '<text x="150" y="99" font-size="11" fill="#1E6B3C" ' + F + '>An toàn</text>' +
+    '<text x="150" y="52" font-size="11.5" fill="#9A6400" ' + F + '>Học hỏi</text>' +
+    '<text x="150" y="22" font-size="11" fill="#B43A2E" ' + F + '>Quá sức</text>' +
+    '<g class="zarrow"><path d="M182 118l26 18" stroke="#2F6BFF" stroke-width="2.4" stroke-linecap="round"/><path d="M200 138l9-1-2-9" stroke="#2F6BFF" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g></svg>';
+}

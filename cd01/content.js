@@ -7,8 +7,8 @@
    - Senpai có cờ draft:1 = LỜI KỂ MẪU do Claude viết, cần thay bằng chuyện thật (ẩn danh) trước khi phát hành.
    ES5. */
 var CD_ID = 'cd01';
-var CD_VER = 'CD01.0.8';
-var CD_TOTAL = 19;            /* Xuất phát (1) + 7 ga (18 chặng) */
+var CD_VER = 'CD01.0.9';
+var CD_TOTAL = 18;            /* Xuất phát (1) + 7 ga (17 chặng) */
 var CD_XP_ACT = 30, CD_XP_WARM = 10, CD_INS_WORDS = 20, CD_INS_FIELD = 5;
 var TIKME = 'https://tikme.com';
 
@@ -49,8 +49,11 @@ var STATIONS = [
     intro: 'Bạn đã có nghề và lộ trình. Giờ [Tên] chia thành 2 chặng: ở JPC và ở Nhật, rồi biến thành việc làm mỗi ngày.',
     done: 'Ô số 7 đã có kế hoạch và 2 thói quen của bạn.',
     word: { k: '道のり', kana: 'みちのり', ro: 'michinori', vn: 'chặng đường' } },
-  { id: 's7', n: 7, vn: 'Ga Thử Thách', k: '挑戦', kana: 'ちょうせん', ro: 'Chōsen · Thử thách', lc: '#DE3F35', ic: 'flag', card: 8,
-    sub: 'Chọn việc khó, viết cam kết', acts: ['a71', 'a72', 'a73'] }
+  { id: 's7', n: 7, vn: 'Ga Thử Thách', k: '挑戦', kana: 'ちょうせん', ro: 'Chōsen · Thử thách', lc: '#DE3F35', ic: 'flag', card: 8, ready: 1,
+    sub: 'Tập dượt tuần đầu, nhận một việc khó', acts: ['a71', 'a72'],
+    intro: 'Tuần đầu ở Nhật, ai cũng gặp chuyện bất ngờ. [Tên] tập dượt trước, rồi nhận một việc khó để thử ngay nhé.',
+    done: 'Ô số 8 đã điền. Bản Career Design của bạn đủ 8 ô rồi!',
+    word: { k: '挑戦', kana: 'ちょうせん', ro: 'chōsen', vn: 'thử thách' } }
 ];
 var FINAL = { id: 's8', n: 8, vn: 'Ga Ước Mơ', k: '夢', kana: 'ゆめ', ro: 'Yume · Ước mơ', lc: '#F2A20F', ic: 'star',
   sub: 'Nhận Bản Career Design 1 trang' };
@@ -64,7 +67,7 @@ var CARDS = [
   { n: 5, t: 'Nghề và lộ trình của tôi', st: 's4' },
   { n: 6, t: 'Senpai và người dẫn đường', st: 's5' },
   { n: 7, t: 'Kế hoạch ở JPC và ở Nhật', st: 's6' },
-  { n: 8, t: 'Việc khó và cam kết', st: 's7' }
+  { n: 8, t: 'Thử thách và việc khó của tôi', st: 's7' }
 ];
 
 /* ---------- 17 ngành trên Tikme (tikme.com/nganh-nghe/<s>) · r = nhóm RIASEC ngành thường cần (khóa học ước lượng, tham khảo) ---------- */
@@ -639,6 +642,255 @@ var IV = {
   stop: 'Bạn nói trong [s] giây. Tập thêm lần nữa cũng được.'
 };
 
+/* ---------- Ga 7 · THỬ THÁCH · TUẦN ĐẦU Ở NHẬT (a71) · THEO TỪNG NGHỀ (CD01.0.9) ----------
+   Không đúng sai: 3 cách ứng xử đều hợp lý, mỗi cách có được/mất. Sau khi chọn: "Điều có thể xảy ra" + Senpai kể (lời kể mẫu).
+   Khóa = mã ngành trong INDS. Không có nghề → IND7.gen. Hình cảnh: ART7[nhóm grp] hoặc sc.art.
+   sc: tt tên ngắn (vào ô 8) · who người nói · msg tình huống · opts [{t, get, lose, may}] · sp [ai, lời]
+   prep: 2 gợi ý chuẩn bị từ bây giờ · hard: 2 việc khó (vùng học hỏi) theo nghề */
+var ART7 = { sx: 'factory', xd: 'site', nn: 'farm', kg: 'care', dv: 'shop', vs: 'clean', ks: 'office', gen: 'factory' };
+var WEEK7 = ['T2', 'T3', 'T4', 'T5', 'T6'];
+var IND7 = {
+  'co-khi': {
+    sc: { tt: 'Chưa nghe kịp chỉ thị', who: 'Tổ trưởng', msg: '“Kore, 0.05 made ne!” Tổ trưởng nói nhanh rồi đi. Bạn chưa chắc mình hiểu đúng.',
+      opts: [
+        { t: 'Chạy theo hỏi lại ngay', get: 'Hiểu đúng từ đầu', lose: 'Hơi ngại làm phiền', may: 'Tổ trưởng chỉ vào bản vẽ, nói chậm lại. Lần sau bạn hỏi dễ hơn.' },
+        { t: 'Làm thử 1 cái, đưa tổ trưởng xem', get: 'Chủ động, có cái để hỏi', lose: 'Sai thì làm lại', may: 'Tổ trưởng đo thử, chỉ chỗ cần chỉnh. Bạn hiểu “0,05” là gì.' },
+        { t: 'Hỏi bạn Việt đứng máy bên cạnh', get: 'Nhanh, dễ hỏi', lose: 'Bạn ấy cũng có thể nhầm', may: 'Bạn ấy giải thích được. Nhưng có lúc bạn ấy cũng không chắc.' }],
+      sp: ['Anh khóa trước · ngành cơ khí', 'Tuần đầu mình ghi số dung sai ra giấy rồi hỏi lại. Hỏi vài lần là quen cách tổ trưởng nói.'] },
+    prep: ['Học cách đọc số, dung sai bằng tiếng Nhật', 'Tập câu “Mō ichido onegaishimasu” (Xin nói lại)'],
+    hard: ['Đọc 1 bản vẽ mẫu, giải thích cho bạn trong 2 phút', 'Đo 10 chi tiết bằng thước cặp, ghi kết quả'] },
+  'dien-tu': {
+    sc: { tt: 'Gắn ngược linh kiện', who: 'Senpai', msg: '“Kono buhin, gyaku da yo.” Senpai chỉ linh kiện bạn gắn ngược. Cả khay 20 bo mạch đã xong.',
+      opts: [
+        { t: 'Xin lỗi, tháo ra gắn lại ngay', get: 'Sửa liền, không để lâu', lose: 'Mất thời gian, hơi ngượng', may: 'Senpai gật đầu, chỉ dấu chấm trên linh kiện. Bạn nhớ luôn.' },
+        { t: 'Hỏi cách nhận biết chiều linh kiện', get: 'Lần sau không nhầm', lose: 'Lộ ra mình chưa biết', may: 'Senpai chỉ ký hiệu chiều. Từ đó bạn tự kiểm trước khi gắn.' },
+        { t: 'Báo tổ trưởng, ghi vào phiếu lỗi', get: 'Đúng quy trình, rõ ràng', lose: 'Sợ bị đánh giá', may: 'Tổ trưởng cảm ơn vì bạn báo sớm. Lỗi được chặn trước khi đi tiếp.' }],
+      sp: ['Chị khóa trước · ngành điện tử', 'Tuần đầu mình gắn ngược cả khay. Mình báo ngay, tổ trưởng bảo báo sớm là tốt nhất.'] },
+    prep: ['Học tên linh kiện, ký hiệu chiều', 'Tập câu báo lỗi: “Mondai ga arimasu”'],
+    hard: ['Học 20 tên linh kiện bằng tiếng Nhật, nhờ bạn kiểm tra', 'Tự kiểm bài của mình theo bảng kiểm, 7 ngày liền'] },
+  'han': {
+    sc: { tt: 'Bị bảo hàn lại', who: 'Tổ trưởng', msg: '“Yarinaoshi.” Tổ trưởng chỉ mối hàn của bạn: làm lại. Không nói thêm gì.',
+      opts: [
+        { t: 'Hỏi lỗi ở đâu rồi mới làm lại', get: 'Biết sửa chỗ nào', lose: 'Sợ tổ trưởng đang bận', may: 'Tổ trưởng chỉ chỗ mối hàn chưa đều. Lần sau bạn tự thấy.' },
+        { t: 'Làm lại ngay, so với mối hàn mẫu', get: 'Tự học, không chờ', lose: 'Có thể sai chỗ cũ', may: 'Lần hai khá hơn. Bạn vẫn cần hỏi thêm một chỗ.' },
+        { t: 'Xin đứng xem senpai hàn', get: 'Học từ tay người giỏi', lose: 'Chậm hơn một chút', may: 'Senpai cho xem 5 phút. Bạn để ý tốc độ tay của anh.' }],
+      sp: ['Anh khóa trước · ngành hàn', 'Nghe “làm lại” mình buồn lắm. Mình hỏi “Doko ga dame desu ka?”, rồi mới thấy tổ trưởng không giận.'] },
+    prep: ['Tập câu “Doko ga dame desu ka?” (Chỗ nào chưa được?)', 'Xem video so mối hàn đạt và chưa đạt'],
+    hard: ['Học 15 ký hiệu hàn, giải thích cho bạn nghe', 'Tập thể lực 20 phút mỗi ngày, 14 ngày liền'] },
+  'son': {
+    sc: { tt: 'Băng che bị hở', who: 'Senpai', msg: '“Masukingu, mō ikkai.” Băng che bị hở, sơn lem sang chỗ khác.',
+      opts: [
+        { t: 'Xin lỗi, che lại kỹ từng mép', get: 'Sửa đúng chỗ', lose: 'Chậm hơn người khác', may: 'Lần này kín hơn. Senpai bảo che kỹ là nửa phần việc.' },
+        { t: 'Nhờ senpai làm mẫu một góc', get: 'Thấy cách làm chuẩn', lose: 'Làm phiền senpai', may: 'Senpai làm mẫu một góc, bạn làm các góc còn lại.' },
+        { t: 'Hỏi có mẹo che nhanh hơn không', get: 'Học mẹo của nghề', lose: 'Dễ bị nhắc làm kỹ trước', may: 'Senpai bảo: kỹ trước, nhanh sau. Rồi chỉ bạn một mẹo dán băng.' }],
+      sp: ['Anh khóa trước · ngành sơn', 'Tháng đầu mình chủ yếu che và chà nhám. Làm kỹ phần đó, mình được phun sơn sớm hơn.'] },
+    prep: ['Tập dán băng che thật thẳng mép', 'Học 10 từ vựng ngành sơn'],
+    hard: ['Học 15 từ vựng ngành sơn, nhờ bạn kiểm tra', 'Tìm hiểu cách đeo mặt nạ lọc, nói lại cho lớp 2 phút'] },
+  'duc-nhua': {
+    sc: { tt: 'Máy báo lỗi', who: 'Máy ép', msg: 'Máy ép báo đèn đỏ, kêu “pi pi”. Senpai đang ở đầu xưởng.',
+      opts: [
+        { t: 'Bấm dừng theo hướng dẫn, gọi senpai', get: 'An toàn trước', lose: 'Chuyền dừng một lúc', may: 'Senpai tới, cảm ơn bạn đã gọi. Rồi chỉ bạn đọc mã lỗi.' },
+        { t: 'Đứng chờ, không đụng vào máy', get: 'Không làm sai thêm', lose: 'Chờ lâu nếu không ai thấy', may: 'Một lúc sau senpai thấy đèn. Senpai dặn lần sau gọi luôn.' },
+        { t: 'Đọc bảng hướng dẫn cạnh máy', get: 'Tự tìm cách xử lý', lose: 'Đọc tiếng Nhật còn chậm', may: 'Bảng ghi: báo người phụ trách. Bạn đi gọi senpai.' }],
+      sp: ['Chị khóa trước · ngành đúc nhựa', 'Tuần đầu máy báo lỗi, mình sợ lắm. Mình nhớ câu “Chotto ii desu ka?” và gọi senpai ngay.'] },
+    prep: ['Học tên các nút, đèn báo trên máy', 'Tập câu gọi người: “Chotto ii desu ka?”'],
+    hard: ['Học 15 từ vựng an toàn, đọc cho thầy cô nghe', 'Ghi một quy trình 5 bước, rồi dạy lại cho bạn'] },
+  'dong-goi-cong-nghiep': {
+    sc: { tt: 'Thùng hàng thiếu', who: 'Tổ trưởng', msg: '“Kazu ga chigau yo.” Thùng bạn đóng thiếu 1 hộp. Tổ trưởng đếm lại trước mặt bạn.',
+      opts: [
+        { t: 'Xin lỗi, đếm lại và bù ngay', get: 'Sửa liền', lose: 'Ngượng trước mọi người', may: 'Tổ trưởng gật đầu. Bạn bắt đầu đếm 2 lần trước khi đóng.' },
+        { t: 'Hỏi cách đếm để không sót', get: 'Có cách làm lâu dài', lose: 'Mất thêm vài phút', may: 'Tổ trưởng chỉ cách xếp theo hàng 5. Từ đó bạn ít sót hơn.' },
+        { t: 'Tự làm bảng kiểm nhỏ cho mình', get: 'Chủ động, nhớ lâu', lose: 'Lúc đầu làm chậm', may: 'Tuần sau bạn không sót hộp nào. Bảng kiểm thành thói quen.' }],
+      sp: ['Chị khóa trước · ngành đóng gói', 'Mình bị nhắc thiếu hàng 2 lần. Sau đó mình đếm theo hàng 5, không sót nữa.'] },
+    prep: ['Tập đọc số tiếng Nhật thật nhanh', 'Tập làm theo bảng kiểm khi dọn phòng'],
+    hard: ['Đọc số tiếng Nhật từ 1 đến 1000 cho thầy cô nghe', 'Làm theo bảng kiểm 5 mục mỗi ngày, 14 ngày liền'] },
+  'in-an': {
+    sc: { tt: 'Bản in lệch màu', who: 'Thợ chính', msg: '“Iro ga chigau.” Màu bản in lệch so với mẫu. Đã chạy 200 tờ.',
+      opts: [
+        { t: 'Dừng máy, báo thợ chính ngay', get: 'Không in hỏng thêm', lose: 'Chuyền dừng một lúc', may: 'Thợ chính chỉnh mực. 200 tờ để riêng kiểm lại.' },
+        { t: 'Hỏi cách so màu với mẫu', get: 'Lần sau tự thấy', lose: 'Lộ ra mình chưa biết', may: 'Anh chỉ cách so dưới đèn chuẩn. Bạn ghi vào sổ tay.' },
+        { t: 'Tự so lại mẫu, tìm chỗ lệch', get: 'Tập mắt nhìn màu', lose: 'Chậm, có thể chưa thấy', may: 'Bạn thấy màu đỏ đậm hơn, báo lại cho thợ chính.' }],
+      sp: ['Chị khóa trước · ngành in ấn', 'Lúc đầu mình chưa nhìn ra màu lệch. Mình mang sổ tay, mỗi lần sai ghi lại một dòng.'] },
+    prep: ['Tập so màu: tìm 3 chỗ khác giữa 2 hình', 'Học tên màu, tên giấy bằng tiếng Nhật'],
+    hard: ['Học 20 từ vựng ngành in, nhờ bạn kiểm tra', 'Ghi sổ lỗi của mình mỗi ngày, 14 ngày liền'] },
+  'may-mac': {
+    sc: { tt: 'Chưa theo kịp chuyền', who: 'Chị tổ trưởng', msg: '“Daijōbu?” Chuyền chạy nhanh. Hàng dồn ở chỗ bạn, người sau phải chờ.',
+      opts: [
+        { t: 'Nói thật: mình chưa theo kịp', get: 'Được giúp sớm', lose: 'Ngại nói mình chậm', may: 'Chị chia bớt việc, chỉ cách cầm vải. Một tuần sau bạn nhanh hơn.' },
+        { t: 'Cố may nhanh hơn trong ca', get: 'Theo kịp trong ngày', lose: 'Mệt, dễ may lỗi', may: 'Hôm đó bạn theo kịp. Nhưng có vài đường may phải tháo lại.' },
+        { t: 'Nhìn người bên cạnh cầm vải', get: 'Học mẹo của người giỏi', lose: 'Hàng vẫn dồn lúc đó', may: 'Bạn thấy chị bên cạnh gấp mép trước. Hôm sau bạn thử theo.' }],
+      sp: ['Chị khóa trước · ngành may mặc', 'Mấy tuần đầu mình chậm hơn chuyền. Mình nói thật với chị tổ trưởng, chị chỉ cách cầm vải.'] },
+    prep: ['Tập câu “Sumimasen, oshiete kudasai” (Xin chỉ giúp em)', 'Tập một thao tác tay mỗi ngày cho đều'],
+    hard: ['Học 20 từ vựng ngành may, nhờ bạn kiểm tra', 'Bấm giờ một việc tay quen, làm nhanh hơn sau 7 ngày'] },
+  'xay-dung': {
+    sc: { tt: 'Họp an toàn nghe chưa kịp', who: 'Tổ trưởng', msg: 'Họp sáng, tổ trưởng nói nhanh về an toàn. Bạn chỉ nghe kịp chữ “abunai” (nguy hiểm).',
+      opts: [
+        { t: 'Hỏi lại tổ trưởng sau buổi họp', get: 'Hiểu điều an toàn', lose: 'Ngại vì ai cũng hiểu', may: 'Tổ trưởng nói chậm lại, chỉ chỗ cấm vào. Bạn ghi vào sổ.' },
+        { t: 'Đi theo senpai, làm như senpai', get: 'Vào việc ngay', lose: 'Chưa hiểu lý do', may: 'Bạn làm được việc. Nhưng có chỗ senpai vào được, bạn chưa chắc.' },
+        { t: 'Hỏi bạn Việt cùng tổ', get: 'Nhanh, dễ hỏi', lose: 'Bạn ấy có thể nghe sót', may: 'Bạn ấy kể được 2 ý. Ý thứ 3, hai bạn cùng đi hỏi lại.' }],
+      sp: ['Anh khóa trước · ngành xây dựng', 'Điều an toàn thì mình luôn hỏi lại. Tổ trưởng bảo hỏi lại là an toàn, không ai cười.'] },
+    prep: ['Học 10 hiệu lệnh an toàn công trường', 'Tập thể lực, quen làm ngoài trời'],
+    hard: ['Học thuộc 10 hiệu lệnh an toàn, đọc cho thầy cô nghe', 'Tập thể lực 20 phút mỗi ngày, 14 ngày liền'] },
+  'o-to': {
+    sc: { tt: 'Đưa dụng cụ', who: 'Senpai', msg: '“Supana, jū-ni ban!” Senpai đang dưới gầm xe, gọi bạn đưa cờ lê.',
+      opts: [
+        { t: 'Hỏi lại: “Jū-ni ban desu ka?”', get: 'Đưa đúng món', lose: 'Chậm vài giây', may: 'Senpai nói “hai”. Bạn đưa đúng, việc chạy tiếp.' },
+        { t: 'Tìm nhanh, đưa cái giống nhất', get: 'Nhanh, không để chờ', lose: 'Dễ đưa nhầm', may: 'Lần này nhầm cỡ 14. Senpai chỉ số khắc trên cán.' },
+        { t: 'Mang 2–3 cái tới hỏi cái nào', get: 'Chắc chắn, nhớ tên', lose: 'Hơi lúng túng', may: 'Senpai chọn một cái, nói tên. Bạn nhớ thêm một từ.' }],
+      sp: ['Anh khóa trước · ngành ô tô', 'Tuần đầu mình chủ yếu đưa đồ nghề. Mình học tên từng món, tháng sau được làm việc chính.'] },
+    prep: ['Học tên 20 dụng cụ bằng tiếng Nhật', 'Tập đọc số, cỡ nhanh bằng tiếng Nhật'],
+    hard: ['Học tên 20 dụng cụ bằng tiếng Nhật, nhờ bạn kiểm tra', 'Tìm hiểu các bước bảo dưỡng xe, kể cho lớp 2 phút'] },
+  'nong-nghiep': {
+    sc: { tt: 'Vào việc lúc 5 giờ sáng', who: 'Chủ trại', msg: '“Ashita, go-ji ni kite ne.” Mai vào lúc 5 giờ sáng. Tối nay cả phòng định thức xem phim.',
+      opts: [
+        { t: 'Ngủ sớm, xem phim dịp khác', get: 'Sáng mai tỉnh táo', lose: 'Lỡ một tối vui', may: 'Bạn tới đúng giờ, còn kịp nghe dặn việc.' },
+        { t: 'Xem một chút rồi ngủ', get: 'Vẫn vui với bạn', lose: 'Dễ quá giờ', may: 'Phim hay, bạn ngủ lúc 12 giờ. Sáng hơi mệt nhưng vẫn kịp.' },
+        { t: 'Rủ cả phòng xem tối thứ Bảy', get: 'Vui mà không lệch giờ', lose: 'Mọi người có thể không chịu', may: 'Cả phòng đồng ý. Thứ Bảy thành tối phim chung.' }],
+      sp: ['Anh khóa trước · ngành nông nghiệp', 'Mùa thu hoạch mình ngủ lúc 9 giờ. Phim để dành tối thứ Bảy, xem vui hơn.'] },
+    prep: ['Tập dậy sớm dần, mỗi tuần sớm 15 phút', 'Học tên rau, dụng cụ bằng tiếng Nhật'],
+    hard: ['Dậy lúc 5 giờ 30 liên tục 7 ngày', 'Học tên 20 loại rau, cây bằng tiếng Nhật'] },
+  'thuy-san': {
+    sc: { tt: 'Tay lạnh, chuyền nhanh', art: 'food', who: 'Chị senpai', msg: '“Samui? Daijōbu?” Xưởng lạnh, cá chạy trên băng chuyền rất nhanh. Tay bạn lạnh cứng.',
+      opts: [
+        { t: 'Nói thật: tay em lạnh quá', get: 'Được chỉ cách giữ ấm', lose: 'Sợ bị nghĩ là yếu', may: 'Chị cho bạn găng lót, nhắc hơ tay giờ nghỉ.' },
+        { t: 'Cố làm, đợi giờ nghỉ', get: 'Không làm chậm chuyền', lose: 'Tay cứng, dễ lỗi', may: 'Bạn qua được ca. Nhưng tối về tay còn đau.' },
+        { t: 'Nhìn cách senpai cầm dao', get: 'Học mẹo đỡ mỏi', lose: 'Chưa đỡ lạnh ngay', may: 'Bạn thấy senpai co duỗi ngón tay giữa hai con cá. Bạn làm theo.' }],
+      sp: ['Chị khóa trước · ngành thủy sản', 'Lúc đầu tay lạnh lắm. Mình nói với senpai, được chỉ đeo thêm găng lót, vài tuần là quen.'] },
+    prep: ['Tập câu “Te ga tsumetai desu” (Tay em lạnh)', 'Rửa tay đủ các bước trước mỗi bữa ăn'],
+    hard: ['Học 15 tên hải sản, dụng cụ bằng tiếng Nhật', 'Tập rửa tay đủ 6 bước, dạy lại cho 3 bạn'] },
+  'thuc-pham': {
+    sc: { tt: 'Quên lưới tóc', art: 'food', who: 'Tổ trưởng', msg: '“Chotto!” Bạn quên đeo lưới tóc, đã bước qua cửa phòng sạch.',
+      opts: [
+        { t: 'Xin lỗi, ra làm lại từ đầu', get: 'Đúng quy trình vệ sinh', lose: 'Mất vài phút', may: 'Tổ trưởng gật đầu. Bạn dán hình nhắc trên tủ đồ.' },
+        { t: 'Hỏi lại các bước trước khi vào', get: 'Nhớ đủ các bước', lose: 'Ngại vì là tuần đầu', may: 'Tổ trưởng chỉ bảng các bước ở cửa. Bạn chép lại học thuộc.' },
+        { t: 'Nhờ bạn cùng ca nhắc mỗi sáng', get: 'Có người nhắc', lose: 'Dựa vào người khác', may: 'Tuần đầu bạn ấy nhắc. Tuần sau bạn tự nhớ.' }],
+      sp: ['Chị khóa trước · ngành thực phẩm', 'Tuần đầu mình quên lưới tóc một lần. Từ đó mình đọc thầm từng bước trước cửa, không quên nữa.'] },
+    prep: ['Học các bước vệ sinh trước khi vào xưởng', 'Tập kiểm đồ trước khi ra khỏi phòng'],
+    hard: ['Rửa tay đủ 6 bước mỗi lần, 14 ngày liền', 'Học 20 từ vựng ngành thực phẩm, nhờ bạn kiểm tra'] },
+  'dieu-duong': {
+    sc: { tt: 'Cụ không chịu ăn', who: 'Giờ ăn trưa', msg: 'Cụ bà không chịu ăn, đẩy thìa ra. Senpai đang giúp cụ khác.',
+      opts: [
+        { t: 'Ngồi xuống, hỏi chuyện cụ một lúc', get: 'Cụ thấy được quan tâm', lose: 'Chậm giờ ăn', may: 'Cụ kể chuyện quê. Rồi cụ ăn được nửa bát.' },
+        { t: 'Để cụ nghỉ, lát quay lại mời', get: 'Không ép cụ', lose: 'Cụ có thể bỏ bữa', may: 'Lát sau cụ ăn được vài thìa. Bạn ghi lại vào sổ.' },
+        { t: 'Hỏi senpai thói quen của cụ', get: 'Hiểu cụ hơn', lose: 'Senpai đang bận', may: 'Senpai bảo cụ thích ăn canh trước. Lần sau bạn đổi thứ tự.' }],
+      sp: ['Chị khóa trước · ngành kaigo', 'Mỗi cụ một thói quen. Mình hỏi senpai và ghi sổ, tháng sau mình hiểu các cụ hơn.'] },
+    prep: ['Tập 5 câu kính ngữ hay nói với các cụ', 'Hỏi chuyện một người lớn tuổi 10 phút'],
+    hard: ['Trò chuyện 10 phút với người lớn tuổi, chủ yếu nghe', 'Học 10 câu kính ngữ kaigo, nói cho thầy cô nghe'] },
+  'nha-hang': {
+    sc: { tt: 'Nghe gọi món chưa kịp', who: 'Khách', msg: 'Giờ trưa đông khách. Một khách gọi món rất nhanh. Bạn chỉ nghe được một nửa.',
+      opts: [
+        { t: 'Lặp lại món để khách xác nhận', get: 'Ghi đúng món', lose: 'Khách chờ thêm chút', may: 'Khách sửa một món. Món ra đúng, khách cảm ơn.' },
+        { t: 'Đưa thực đơn, nhờ khách chỉ món', get: 'Nhanh, rõ ràng', lose: 'Hơi ngại', may: 'Khách chỉ vào hình, bạn ghi lại. Không ai thấy phiền.' },
+        { t: 'Nhờ senpai đứng cạnh giúp', get: 'Không sai món', lose: 'Senpai đang bận', may: 'Senpai giúp lần này, dặn bạn tập lặp lại món.' }],
+      sp: ['Chị khóa trước · ngành nhà hàng', 'Tuần đầu mình luôn lặp lại món khách gọi. Chậm một chút mà không sai, khách vẫn vui.'] },
+    prep: ['Luyện 5 câu chào, xác nhận món bằng kính ngữ', 'Học tên 20 món ăn Nhật phổ biến'],
+    hard: ['Đóng vai phục vụ khách bằng tiếng Nhật 3 phút trước lớp', 'Học tên 20 món ăn Nhật, nhờ bạn kiểm tra'] },
+  've-sinh-toa-nha': {
+    sc: { tt: 'Góc tường chưa sạch', who: 'Senpai', msg: '“Mada kitanai ne.” Bạn lau xong hành lang. Senpai chỉ vào góc tường.',
+      opts: [
+        { t: 'Lau lại góc đó ngay', get: 'Sửa liền', lose: 'Chậm việc sau', may: 'Góc tường sạch. Senpai nói góc là chỗ khách hay nhìn.' },
+        { t: 'Hỏi senpai thường lau góc thế nào', get: 'Học cách làm của nghề', lose: 'Hơi ngại hỏi', may: 'Senpai chỉ dụng cụ lau góc. Bạn làm nhanh hơn.' },
+        { t: 'Tự ghi các góc hay sót', get: 'Lần sau tự kiểm', lose: 'Mất chút thời gian', may: 'Tuần sau bạn ít bị nhắc. Việc ghi thành thói quen.' }],
+      sp: ['Anh khóa trước · ngành vệ sinh tòa nhà', 'Người Nhật để ý góc khuất lắm. Mình lau góc trước, rồi mới lau giữa.'] },
+    prep: ['Tập dọn phòng theo bảng kiểm 5 mục', 'Học tên dụng cụ, hóa chất vệ sinh'],
+    hard: ['Dọn phòng theo bảng kiểm, nhờ bạn kiểm 7 ngày liền', 'Dậy lúc 5 giờ 30 liên tục 7 ngày'] },
+  'ky-su': {
+    sc: { tt: 'Bị hỏi tiến độ bất ngờ', who: 'Trưởng nhóm', msg: '“Kinō no shinchoku wa?” (Tiến độ hôm qua?) Họp sáng, bạn chưa chuẩn bị.',
+      opts: [
+        { t: 'Nói ngắn việc đã làm, hẹn báo kỹ sau', get: 'Trả lời được ngay', lose: 'Chưa đủ ý', may: 'Trưởng nhóm gật đầu, hẹn chiều nghe chi tiết.' },
+        { t: 'Xin 1 phút xem lại ghi chép', get: 'Báo cáo chính xác', lose: 'Cả nhóm phải chờ', may: 'Bạn báo cáo rõ. Từ hôm sau bạn ghi 3 ý trước giờ họp.' },
+        { t: 'Thành thật: em chưa chuẩn bị', get: 'Thật thà', lose: 'Dễ bị nhắc', may: 'Trưởng nhóm nhắc nhẹ. Hôm sau bạn chuẩn bị 3 câu báo cáo.' }],
+      sp: ['Anh khóa trước · kỹ sư', 'Trước giờ họp mình viết 3 dòng: đã làm, đang làm, vướng gì. Đỡ run hẳn.'] },
+    prep: ['Tập báo cáo 3 câu: đã làm, đang làm, vướng gì', 'Học 20 từ tiếng Nhật công việc văn phòng'],
+    hard: ['Báo cáo 1 phút bằng tiếng Nhật trước lớp', 'Làm 1 đề N3 ngắn, tự chấm, ghi lại chỗ sai'] },
+  gen: {
+    sc: { tt: 'Chưa hiểu việc được giao', who: 'Tổ trưởng', msg: 'Tổ trưởng giao việc bằng tiếng Nhật rất nhanh. Bạn chỉ hiểu một nửa.',
+      opts: [
+        { t: 'Hỏi lại ngay', get: 'Hiểu đúng từ đầu', lose: 'Hơi ngại làm phiền', may: 'Tổ trưởng nói chậm lại, làm mẫu một lần.' },
+        { t: 'Làm thử, rồi nhờ kiểm tra', get: 'Chủ động', lose: 'Sai thì làm lại', may: 'Tổ trưởng chỉ chỗ cần sửa. Bạn hiểu việc rõ hơn.' },
+        { t: 'Hỏi bạn Việt bên cạnh', get: 'Nhanh, dễ hỏi', lose: 'Bạn ấy cũng có thể nhầm', may: 'Bạn ấy giải thích được. Có lúc vẫn phải hỏi lại tổ trưởng.' }],
+      sp: ['Anh khóa trước · Senpai', 'Tuần đầu mình hỏi lại rất nhiều. Tổ trưởng bảo hỏi lại còn hơn làm sai.'] },
+    prep: ['Tập câu “Mō ichido onegaishimasu” (Xin nói lại)', 'Học 20 từ vựng chuyên ngành'],
+    hard: ['Học 20 từ vựng chuyên ngành, nhờ bạn kiểm tra', 'Ghi một quy trình 5 bước, rồi dạy lại cho bạn'] }
+};
+/* Ngày 4 · tình huống từ điều lo nhất (a43.top). Chỉ số = thẻ sẵn sàng READY (thẻ 3 theo nghề: [R3] = điều vất vả riêng, Senpai lấy INDP.r3). */
+var WORRY7 = [
+  { art: 'dorm', who: 'Tối thứ Năm', msg: 'Tan ca về 7 giờ tối, mệt rã rời. Bài tiếng Nhật hôm nay chưa học.',
+    opts: [
+      { t: 'Học 10 phút rồi ngủ', get: 'Giữ nhịp mỗi ngày', lose: 'Phải cố lúc mệt', may: 'Chỉ 10 phút, nhưng bạn giữ được chuỗi ngày học.' },
+      { t: 'Nghỉ hôm nay, mai học bù', get: 'Lấy lại sức', lose: 'Dễ thành thói quen hoãn', may: 'Mai bạn học bù được. Tuần sau mệt, bạn lại hẹn mai.' },
+      { t: 'Nghe bài nghe lúc tắm, ăn tối', get: 'Học mà không thêm giờ', lose: 'Nhớ không sâu bằng', may: 'Bạn nghe được 2 bài. Tai quen dần tiếng Nhật ở xưởng.' }],
+    sp: ['Anh khóa trước · ngành cơ khí', 'Hôm mệt mình chỉ học 10 phút, nhưng không bỏ ngày nào. Năm hai mình nghe hiểu tổ trưởng hơn hẳn.'],
+    prep: ['Đặt giờ học tiếng Nhật cố định mỗi ngày', 'Tải sẵn bài nghe ngắn vào điện thoại'] },
+  { art: 'dorm', who: 'Mẹ gọi video', msg: 'Tối thứ Năm, mẹ gọi. Thấy căn bếp ở nhà, bạn nhớ nhà, muốn khóc.',
+    opts: [
+      { t: 'Kể thật với mẹ là con nhớ nhà', get: 'Nhẹ lòng hơn', lose: 'Sợ mẹ lo', may: 'Mẹ cũng nhớ bạn. Hai mẹ con hẹn gọi tối Chủ nhật.' },
+      { t: 'Cười nói vui, kể chuyện chỗ làm', get: 'Mẹ yên tâm', lose: 'Giữ buồn một mình', may: 'Mẹ yên tâm. Tắt máy, bạn buồn một lúc rồi đi ngủ.' },
+      { t: 'Rủ cả phòng nấu một món quê', get: 'Có người chia sẻ', lose: 'Mất một buổi tối', may: 'Cả phòng nấu canh chua. Ai cũng kể chuyện nhà mình.' }],
+    sp: ['Chị khóa trước · ngành thực phẩm', 'Tháng đầu mình nhớ nhà lắm. Mình hẹn gọi mẹ tối Chủ nhật, ngày thường nhắn tin ngắn.'],
+    prep: ['Hẹn với gia đình giờ gọi cố định mỗi tuần', 'Tập nấu 2 món quê đơn giản'] },
+  { art: 'dorm', who: 'Sau ca đêm', msg: 'Bạn vừa chuyển ca đêm. Sáng về phòng, trời sáng, ồn ào, bạn không ngủ được.',
+    opts: [
+      { t: 'Che kín cửa sổ, bịt mắt, ngủ ngay', get: 'Ngủ sâu hơn', lose: 'Phải chuẩn bị đồ', may: 'Đến ngày thứ ba, bạn ngủ được 6 tiếng.' },
+      { t: 'Thức chơi, tối ngủ bù', get: 'Có thời gian riêng', lose: 'Dễ mệt khi vào ca', may: 'Ca đêm sau bạn buồn ngủ, làm chậm hơn.' },
+      { t: 'Hỏi senpai cách quen ca đêm', get: 'Học từ người đi trước', lose: 'Ngại hỏi chuyện riêng', may: 'Senpai chỉ cách ăn nhẹ trước khi ngủ. Bạn thử thấy hợp.' }],
+    sp: ['Anh khóa trước · ngành điện tử', 'Tuần ca đêm, mình che kín cửa sổ, ăn nhẹ rồi ngủ. Quen nếp thì không mệt như mình sợ.'],
+    prep: ['Tập ngủ đúng giờ, kể cả cuối tuần', 'Tìm hiểu cách ngủ ngon khi làm ca'] },
+  { art: '@job', who: 'Cuối tuần đầu', msg: 'Bạn mệt vì [R3]. Tối thứ Năm, bạn nằm dài trong phòng.',
+    opts: [
+      { t: 'Nghỉ kỹ, ngủ sớm', get: 'Hồi sức nhanh', lose: 'Bỏ việc riêng tối đó', may: 'Sáng hôm sau bạn thấy đỡ hơn nhiều.' },
+      { t: 'Hỏi senpai cách họ đã quen', get: 'Có mẹo từ người đi trước', lose: 'Ngại kể mình mệt', may: 'Senpai kể tuần đầu cũng vậy, rồi chỉ bạn một mẹo nhỏ.' },
+      { t: 'Viết ra chỗ mệt nhất, tìm cách đỡ', get: 'Hiểu mình hơn', lose: 'Mất thêm chút thời gian', may: 'Bạn thấy chỗ mệt nhất, thử một cách đỡ ngay hôm sau.' }],
+    sp: '@r3',
+    prep: ['Tập thể lực 20 phút mỗi ngày', 'Hỏi 1 anh chị đi trước cách họ đã quen'] },
+  { art: '@job', who: 'Tổ trưởng', msg: 'Bạn tới đúng 8 giờ. Tổ trưởng nhắc: ở đây ai cũng tới trước 10 phút.',
+    opts: [
+      { t: 'Xin lỗi, mai tới sớm 15 phút', get: 'Sửa ngay', lose: 'Phải dậy sớm hơn', may: 'Hôm sau bạn có 10 phút thay đồ, nghe dặn việc.' },
+      { t: 'Hỏi vì sao cần tới sớm', get: 'Hiểu lý do', lose: 'Sợ bị nghĩ là cãi', may: 'Tổ trưởng nói: để thay đồ, họp đầu ca. Bạn thấy hợp lý.' },
+      { t: 'Hỏi senpai về giờ giấc ở đây', get: 'Biết thêm luật nhỏ', lose: 'Chưa thân senpai', may: 'Senpai kể thêm vài luật nhỏ. Bạn ghi lại.' }],
+    sp: ['Anh khóa trước · ngành xây dựng', 'Ở JPC mình thấy giờ giấc hơi khắt khe. Sang Nhật mới hiểu, quen từ trước nên mình đỡ bị nhắc.'],
+    prep: ['Tới lớp trước 10 phút, 14 ngày liền', 'Giữ chỗ ở, chỗ học gọn theo 5S'] },
+  { art: '@job', who: 'Cả tuần đầu', msg: 'Cả tuần bạn chỉ lau máy, xếp đồ. Bạn muốn làm việc chính mà chưa được giao.',
+    opts: [
+      { t: 'Làm thật kỹ, ghi lại từng bước', get: 'Được tin dần', lose: 'Phải kiên nhẫn', may: 'Tổ trưởng để ý bạn làm kỹ. Tuần sau bạn được xem việc chính.' },
+      { t: 'Hỏi khi nào được học việc chính', get: 'Biết lộ trình', lose: 'Sợ bị nghĩ là vội', may: 'Tổ trưởng nói khoảng một tháng. Bạn đỡ sốt ruột.' },
+      { t: 'Xin đứng xem senpai lúc rảnh', get: 'Học trước việc sau', lose: 'Mất giờ nghỉ', may: 'Senpai cho xem, còn giải thích vài bước.' }],
+    sp: ['Anh khóa trước · ngành ô tô', 'Tuần đầu mình chỉ lau máy, xếp đồ. Mình ghi lại từng bước, tháng thứ hai được làm việc chính.'],
+    prep: ['Tập làm việc nhỏ thật kỹ, không vội', 'Tập ghi chép quy trình từng bước'] },
+  { art: 'dorm', who: 'Bạn cùng phòng', msg: '“Cuối tuần đi mua sắm không?” Bạn chưa nhận lương tháng đầu, tiền còn ít.',
+    opts: [
+      { t: 'Đi cùng, chỉ mua đồ cần', get: 'Vui, vẫn giữ tiền', lose: 'Dễ mua thêm', may: 'Bạn mua đôi găng, còn lại giữ nguyên. Đi chơi vẫn vui.' },
+      { t: 'Hẹn bạn sau ngày lương', get: 'Giữ được tiền', lose: 'Sợ bạn buồn', may: 'Bạn ấy hiểu, còn rủ bạn đi chợ rẻ tuần sau.' },
+      { t: 'Rủ đi dạo công viên', get: 'Vui mà không tốn', lose: 'Bạn ấy có thể không thích', may: 'Hai bạn đi dạo, chụp ảnh lá đỏ. Không tốn đồng nào.' }],
+    sp: ['Chị khóa trước · ngành may mặc', 'Tháng đầu mình chỉ mua đồ cần. Ngày lương mình chia ba phần: gửi nhà, để dành, tiêu.'],
+    prep: ['Ghi chi tiêu mỗi ngày trong 1 tháng', 'Tập chia tiền 3 phần: gửi nhà, để dành, tiêu'] },
+  { art: 'dorm', who: 'Bạn cùng phòng', msg: '11 giờ đêm, bạn cùng phòng vẫn gọi điện to. Mai bạn vào ca lúc 7 giờ.',
+    opts: [
+      { t: 'Nhẹ nhàng nhờ bạn nói nhỏ', get: 'Ngủ được', lose: 'Sợ mất lòng', may: 'Bạn ấy xin lỗi, ra ngoài nói tiếp.' },
+      { t: 'Đeo tai nghe, cố ngủ', get: 'Tránh va chạm', lose: 'Ngủ không sâu', may: 'Bạn ngủ được. Nhưng tối sau chuyện lặp lại.' },
+      { t: 'Rủ cả phòng đặt giờ yên lặng', get: 'Có luật chung', lose: 'Cần cả phòng đồng ý', may: 'Cả phòng chọn 22 giờ 30. Ai cũng dễ chịu hơn.' }],
+    sp: ['Anh khóa trước · ngành nông nghiệp', 'Phòng bốn người, tụi mình cùng đặt giờ tắt đèn. Có luật chung thì ít va chạm.'],
+    prep: ['Tập nói lời nhờ nhẹ nhàng, không trách', 'Cùng phòng đặt 3 quy tắc chung'] }
+];
+/* điều lo do học viên tự viết (a43.top = 'job' hoặc 'o'): [W] = lời học viên */
+var WORRY7_OWN = { art: 'dorm', who: 'Tối thứ Năm', msg: 'Chuyện bạn từng lo đã đến: “[W]”. Tối đó bạn cứ nghĩ mãi.',
+  opts: [
+    { t: 'Tự tìm cách xoay xở trước', get: 'Chủ động', lose: 'Dễ ôm một mình', may: 'Bạn tìm được một cách. Chưa ổn thì bạn vẫn có thể hỏi.' },
+    { t: 'Hỏi senpai hoặc tổ trưởng', get: 'Có người giúp sớm', lose: 'Ngại làm phiền', may: 'Senpai từng gặp chuyện giống vậy, chỉ bạn cách làm.' },
+    { t: 'Nhắn người dẫn đường của bạn', get: 'Được người tin cậy nghe', lose: 'Họ ở xa, trả lời chậm', may: 'Họ trả lời tối đó, kèm một lời động viên.' }],
+  sp: ['Chị khóa trước · ngành điện tử', 'Điều mình lo rồi cũng xảy ra. Nhờ đã nghĩ trước cách làm, mình bình tĩnh hơn mình tưởng.'],
+  prep: ['Viết ra 3 cách xử lý nếu điều đó xảy ra', 'Hỏi 1 anh chị đi trước về điều này'] };
+
+/* ---------- Ga 7 · VIỆC KHÓ ĐẦU TIÊN (a72): ba vùng, thẻ việc lấy từ chính hành trình ---------- */
+var ZONES = [['a', 'An toàn', 'Quen, dễ làm'], ['h', 'Học hỏi', 'Hơi run, cố là làm được'], ['q', 'Quá sức', 'Lúc này còn quá xa']];
+var HARD_LINK = { guide: 'Hỏi người dẫn đường 2 câu bạn soạn ở Ga 5', iv: 'Nói câu trả lời phỏng vấn 60 giây cho thầy cô nghe' };
+var HARD_COMMON = ['Bắt chuyện tiếng Nhật 5 phút với thầy cô', 'Nhờ thầy cô góp ý thẳng 1 điểm yếu của mình'];
+var DUE7 = [['7', '7 ngày'], ['14', '14 ngày'], ['d', 'Chọn ngày']];
+var WHO7 = ['Người dẫn đường của bạn', 'Thầy cô chủ nhiệm', 'Bạn cùng lớp, cùng phòng', 'Gia đình', 'Mình tự làm, chưa kể ai'];
+var RES7 = [['y', 'Làm được', 'Bạn vừa làm được một việc ở vùng học hỏi. Vùng an toàn của bạn rộng thêm rồi.'],
+  ['p', 'Làm một phần', 'Làm một phần cũng là bước ra rồi. Phần còn lại, bạn muốn thử lại khi nào?'],
+  ['n', 'Chưa làm', 'Chưa làm cũng không sao. Điều gì cản bạn? Chọn một việc nhỏ hơn cũng được.']];
+
 /* ---------- Lời Shin, chữ giao diện ---------- */
 var SHIN_NAMES = ['Shin trứng', 'Shin gà con', 'Shin gà rừng', 'Shin đại bàng'];
 var TXT = {
@@ -647,7 +899,7 @@ var TXT = {
   introBtn: 'Chào Shin! Mình bắt đầu nhé',
   gateToast: 'Chính xác! Shin mê Oden lắm. Lên tàu thôi!',
   homeHi: ['Chào [Tên]! Hôm nay đi tiếp một ga nhé.', 'Chào [Tên]! Mỗi ga chỉ khoảng 15 phút thôi.', 'Chào [Tên]! Bản Career Design của bạn đang lớn dần đó.'],
-  homeWait: '[Tên] giỏi quá! Các ga sau đang được xây, chờ Shin chút nhé.',
+  homeWait: '[Tên] đã đủ 8 ô rồi! Ga Ước Mơ đang được xây, chờ Shin chút nhé.',
   warmT: 'Khởi động 30 giây', warmSub: 'Không bắt buộc · +10 XP',
   stampBtn: 'Đóng dấu',
   redo: 'Bạn đang xem lại bài đã làm. Sửa chỗ nào cũng được.',
@@ -915,17 +1167,38 @@ var ACTS = {
         fields: [{ key: 'a63.iv', l: 'Câu trả lời của bạn', starter: 'Em chọn nghề này vì ', ph: '@iv', min: 40, rows: 6 }],
         tips: '@ivt' },
       { k: 'say', mood: 'cheer', card: 7, t: 'Ô số 7 sắp có chữ của bạn. Bấm <b>Đóng dấu</b> nhé.' }
+    ] },
+
+  /* ===== GA 7 · THỬ THÁCH (theo từng nghề: IND7, WORRY7; thẻ việc khó lấy từ hành trình) ===== */
+  a71: { t: 'Tuần đầu ở Nhật', mins: 5, st: 's7', d: 'Tập dượt 2 ngày: một chuyện của nghề, một điều bạn lo.',
+    steps: [
+      { k: 'week', t: 'Tuần đầu ở Nhật, ai cũng gặp chuyện bất ngờ. Mình mở 2 ngày, xem [Tên] sẽ làm gì nhé.' },
+      { k: 'sc', key: 'a71.s1', slot: 'job', day: 1 },
+      { k: 'sc', key: 'a71.s2', slot: 'worry', day: 3 },
+      { k: 'prep7', key: 'a71.prep', q: 'Từ bây giờ, bạn muốn chuẩn bị gì?', sub: 'Chọn 1–2 việc. Gợi ý từ 2 ngày vừa rồi.', min: 1, max: 2, own: 'Việc khác',
+        fields: [{ key: 'a71.note', l: 'Một câu nhắn cho bạn của tuần đầu ở Nhật', ph: 'Ví dụ: Chưa hiểu thì hỏi lại, không ai cười đâu.', min: 8, rows: 2 }],
+        tips: ['Chưa hiểu thì hỏi lại. Hỏi lại là cẩn thận, không phải kém.', 'Tuần đầu ai cũng chậm. Mình chỉ cần hơn hôm qua một chút.', 'Nhớ lý do mình sang đây, rồi ngủ một giấc thật ngon.'] }
+    ] },
+  a72: { t: 'Việc khó đầu tiên', mins: 5, st: 's7', d: 'Xếp việc vào 3 vùng, nhận 1 việc ở vùng học hỏi.',
+    steps: [
+      { k: 'zones', t: 'Việc ở <b>vùng học hỏi</b> làm bạn hơi run, nhưng cố là làm được. Mỗi người một vùng khác nhau.' },
+      { k: 'zsort', key: 'a72.z', q: 'Với bạn, mỗi việc ở vùng nào?', sub: 'Chạm để xếp. Không có đúng sai.' },
+      { k: 'hard', key: 'a72.sel', q: 'Bạn nhận việc nào?', sub: 'Chọn 1 việc, tối đa 2. Làm trong 2 tuần tới.', max: 2 },
+      { k: 'write', q: 'Nếu ngại thì sao?', sub: 'Ai cũng có lúc ngại. Nghĩ trước cách vượt qua nhé.',
+        fields: [{ key: 'a72.if', l: 'Lúc ngại, bạn sẽ làm gì?', starter: 'Nếu ngại, mình sẽ ', ph: 'Ví dụ: làm thử 5 phút trước, rồi tính tiếp', min: 10, rows: 3 }],
+        tips: ['Nếu ngại, mình sẽ làm thử 5 phút trước, rồi tính tiếp.', 'Nếu ngại, mình sẽ nhắn người cùng biết để có người nhắc.', 'Nếu ngại, mình sẽ nhớ lý do mình muốn đi Nhật.'] },
+      { k: 'say', mood: 'cheer', card: 8, t: 'Ô số 8 sắp có chữ của bạn. Hết hạn, Shin sẽ hỏi bạn làm thế nào nhé. Bấm <b>Đóng dấu</b>!' }
     ] }
 };
 
 /* Thứ tự học (chặng chính). Ga chưa có hoạt động (ready:0) hiện "Đang xây". */
-var ORDER = ['x1', 'a11', 'a13', 'a21', 'a22', 'a23', 'a31', 'a32', 'a33', 'a42', 'a44', 'a43', 'a51', 'a53', 'a62', 'a63'];
+var ORDER = ['x1', 'a11', 'a13', 'a21', 'a22', 'a23', 'a31', 'a32', 'a33', 'a42', 'a44', 'a43', 'a51', 'a53', 'a62', 'a63', 'a71', 'a72'];
 
-/* ---------- Bản demo giáo viên: học viên giả đã xong Sân ga đến Ga 6 ---------- */
+/* ---------- Bản demo giáo viên: học viên giả đã xong Sân ga đến Ga 7 (hạn việc khó đặt là hôm qua để thấy lời Shin hỏi kết quả) ---------- */
 var DEMO_DATA = {
   prof: { name: 'Nguyễn Văn An', by: '2005', sid: 'HV2026-0123', cls: 'E696', path: 'Ikusei Shuro' },
   intro: 1,
-  done: { x1: 1763260000000, w1: 1763260000000, a11: 1763260000000, a13: 1763260000000, a21: 1763260000000, a22: 1763260000000, a23: 1763260000000, a31: 1763260000000, a32: 1763260000000, a33: 1763260000000, w4: 1763260000000, a42: 1763260000000, a44: 1763260000000, a43: 1763260000000, a51: 1763260000000, a53: 1763260000000, w6: 1763260000000, a62: 1763260000000, a63: 1763260000000 },
+  done: { x1: 1763260000000, w1: 1763260000000, a11: 1763260000000, a13: 1763260000000, a21: 1763260000000, a22: 1763260000000, a23: 1763260000000, a31: 1763260000000, a32: 1763260000000, a33: 1763260000000, w4: 1763260000000, a42: 1763260000000, a44: 1763260000000, a43: 1763260000000, a51: 1763260000000, a53: 1763260000000, w6: 1763260000000, a62: 1763260000000, a63: 1763260000000, a71: 1763260000000, a72: 1763260000000 },
   d: {
     'x1.now': '2', 'x1.notice': ['Hoàn cảnh giống mình', 'Học tiếng Nhật bền bỉ'],
     'x1.goal': 'Mình muốn biết mình hợp nghề cơ khí hay nghề hàn hơn, và có kế hoạch học tiếng Nhật rõ ràng.',
@@ -980,6 +1253,13 @@ var DEMO_DATA = {
       'Tiếng Nhật đủ nghe hướng dẫn, báo cáo': 'p', 'Đúng giờ, giữ 5S chỗ ở, chỗ học': 'h', 'Sức khỏe để làm theo ca': 'h', 'Tự lo chi tiêu, sinh hoạt': 'n' },
     'a63.h1w': '4', 'a63.h1d': 'tra 3 ký hiệu bản vẽ', 'a63.h2w': '5', 'a63.h2d': 'ghi chi tiêu trong ngày',
     'a63.iv': 'Em chọn nghề này vì từ nhỏ em hay cùng chú sửa máy, em thích làm ra chi tiết chính xác. Ở JPC em đang học N4 và tập đọc bản vẽ mỗi tuần. Sang Nhật, em muốn đậu Ginou Kentei cấp 3 và lên N3. 5 năm sau, em muốn là thợ CNC vững tay, kèm được người mới và lo cho ba mẹ.',
-    'a63.ivn': 2
+    'a63.ivn': 2,
+    'a71.s1': '1', 'a71.s2': '0', 'a71.prep': ['Tập câu “Mō ichido onegaishimasu” (Xin nói lại)', 'Hẹn với gia đình giờ gọi cố định mỗi tuần'],
+    'a71.note': 'Chưa hiểu thì hỏi lại, không ai cười đâu. Nhớ gọi cho mẹ tối Chủ nhật.',
+    'a72.z': { 'Tập câu “Mō ichido onegaishimasu” (Xin nói lại)': 'a', 'Hẹn với gia đình giờ gọi cố định mỗi tuần': 'a', 'Hỏi người dẫn đường 2 câu bạn soạn ở Ga 5': 'h',
+      'Nói câu trả lời phỏng vấn 60 giây cho thầy cô nghe': 'h', 'Đọc 1 bản vẽ mẫu, giải thích cho bạn trong 2 phút': 'h', 'Đo 10 chi tiết bằng thước cặp, ghi kết quả': 'a',
+      'Bắt chuyện tiếng Nhật 5 phút với thầy cô': 'q', 'Nhờ thầy cô góp ý thẳng 1 điểm yếu của mình': 'h' },
+    'a72.sel': ['Nói câu trả lời phỏng vấn 60 giây cho thầy cô nghe'], 'a72.due': '14', 'a72.who': '1',
+    'a72.if': 'Nếu ngại, mình sẽ tập nói trước gương 2 lần, rồi nhờ bạn cùng phòng nghe thử trước khi gặp cô.'
   }
 };

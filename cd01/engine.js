@@ -53,7 +53,8 @@
       visa: g('a44.path') || '', tl: g('a44.tl') || {}, jobKey: jobKey() || '', jobHist: ga('a42.hist').length, day: g('a42.day') || '', worry: worryText(g('a43.top')), ready: rdCount('r'), goWhy: g('a43.why') || '',
       senpai: g('a51.who') || '', turn: g('a51.turn') || '', learn: g('a51.learn') || '', bring: g('a51.bring') || '', guide: g('a53.guide') || '', qs: [g('a53.q1') || '', g('a53.q2') || ''],
       clear: g('w6.clear'), jp1: g('a62.jp1') || '', do1: ga('a62.do1'), p1: g('a62.p1') || '', jp2: g('a62.jp2') || '', work: ga('a62.work'),
-      save: g('a62.save'), joy: ga('a62.joy'), p2: g('a62.p2') || '', gapNeed: gapNeed(), habits: [habitText(1), habitText(2)], iv: g('a63.iv') || '', ivn: +g('a63.ivn') || 0 };
+      save: g('a62.save'), joy: ga('a62.joy'), p2: g('a62.p2') || '', gapNeed: gapNeed(), habits: [habitText(1), habitText(2)], iv: g('a63.iv') || '', ivn: +g('a63.ivn') || 0,
+      week: [scPick('a71.s1', 'job'), scPick('a71.s2', 'worry')], prep: ga('a71.prep'), note: g('a71.note') || '', hard: ga('a72.sel'), due: g('a72.dl') || '', with: whoText(), ifNo: g('a72.if') || '', res: g('a72.res') || '', resT: g('a72.rest') || '' };
   }
   function save(now) {
     clearTimeout(saveT);
@@ -189,6 +190,17 @@
         (hb.length ? '<small class="lbl">Thói quen bắt đầu từ tuần này</small><ul class="cdq">' + hb.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' : '') +
         '<small class="lbl">' + (nd ? 'Còn ' + nd + ' điều cần rèn' : 'Đo khoảng cách xong') + (cl != null && cl !== '' ? ' · lúc vào ga, kế hoạch rõ ' + esc(cl) + '/10 phần' : '') + '</small>';
     }
+    if (n === 8) {
+      var r7 = [[DAYN[1], scPick('a71.s1', 'job')], [DAYN[3], scPick('a71.s2', 'worry')]].filter(function (x) { return x[1]; }), sel7 = ga('a72.sel'), rs = g('a72.res'), rl = '', dl7 = g('a72.dl'), wh = whoText();
+      RES7.forEach(function (x) { if (x[0] === rs) rl = x[1]; });
+      return '<small class="lbl">Tuần đầu ở Nhật · tôi đã tập dượt</small><ul class="cdq">' + r7.map(function (x) { return '<li><b>' + esc(x[0]) + ':</b> ' + esc(x[1]) + '</li>'; }).join('') + '</ul>' +
+        (ga('a71.prep').length ? '<small class="lbl">Tôi chuẩn bị từ bây giờ</small>' + tagsHTML(ga('a71.prep')) : '') +
+        (g('a71.note') ? '<p class="cdnote">“' + esc(g('a71.note')) + '”</p>' : '') +
+        '<p><small class="lbl">Việc khó tôi nhận · vùng học hỏi</small></p><ul class="cdq">' + sel7.map(function (t) { return '<li><b>' + esc(t) + '</b></li>'; }).join('') + '</ul>' +
+        (dlOK(dl7) || wh ? '<small class="lbl">' + (dlOK(dl7) ? 'Hạn chót ' + esc(fmtDl(dl7)) : '') + (wh ? (dlOK(dl7) ? ' · ' : '') + 'Cùng biết: ' + esc(wh) : '') + '</small>' : '') +
+        (g('a72.if') ? '<p>' + esc(g('a72.if')) + '</p>' : '') +
+        (rl ? '<p><small class="lbl">Kết quả</small><b>' + esc(rl) + '</b>' + (g('a72.rest') ? ' · ' + esc(g('a72.rest')) : '') + '</p>' : (sel7.length ? '<small class="lbl">Đang làm · hết hạn, kể Shin nghe nhé</small>' : ''));
+    }
     return '';
   }
   function cdCard(n, isNew) {
@@ -265,7 +277,7 @@
     else { var cs = curStation(); cta = '<button type="button" class="btn btn--go btn--w" disabled>' + esc(cs.vn) + ' sắp mở</button>'; }
     var trainX = 8 + Math.min(84, pct * 0.84);
     return '<button type="button" class="pshome" data-act="psHome">' + cdIcon('arrowL', 15, 2.4) + 'Proskills</button>' +
-      shinSays(nx ? 'hi' : 'cheer', T(hi)) +
+      (dueOver() ? '<div class="follow">' + shinSays('surprise', 'Việc khó “<b>' + esc(ga('a72.sel')[0] || '') + '</b>” đến hạn rồi. Bạn làm thế nào, kể Shin nghe nhé.') + '<button type="button" class="btn btn--go btn--w btn--sm" data-act="res7">Kể Shin nghe · +' + CD_XP_WARM + ' XP</button></div>' : shinSays(nx ? 'hi' : 'cheer', T(hi))) +
       '<section class="ticket" id="ticket" aria-label="Vé hành trình"><span class="ticket__shine" aria-hidden="true"></span><div class="ticket__body">' +
       '<div class="ticket__lab"><span>Vé hành trình</span><span>CD01</span></div>' +
       '<div class="ticket__route"><div><small>しゅっぱつ</small><b>JPC</b></div><div></div><div class="r"><small>ゆめ</small><b>Ước Mơ</b></div></div>' +
@@ -327,6 +339,8 @@
         (bk ? '<p class="restore"><button type="button" class="link" data-act="actRestore" data-id="' + id + '">Khôi phục bài cũ</button></p>' : '');
     }).join('') + '</div>';
     var cn = st.card, cdn = stDone(st);
+    if (st.id === 's7' && S.done.a72 && ga('a72.sel').length) { var rs7 = '', dl8 = g('a72.dl'); RES7.forEach(function (x) { if (x[0] === g('a72.res')) rs7 = x[1]; });
+      h += '<button type="button" class="chest' + (dueOver() ? ' chest--due' : '') + '" data-act="res7"><span class="chest__ic" style="background:#FDECEA;color:#B43A2E">' + cdIcon('flag', 22) + '</span><span><b>Kết quả việc khó</b><small>' + (rs7 ? esc(rs7) + ' · chạm để sửa' : (dlOK(dl8) ? 'Hạn ' + esc(fmtDl(dl8)) + ' · làm xong thì kể Shin nghe' : 'Làm xong thì kể Shin nghe')) + '</small></span></button>'; }
     if (st.report && cdn) h += '<button type="button" class="chest" data-act="report"><span class="chest__ic" style="background:var(--c-t);color:var(--c-d)">' + PS.icon('people', 22) + '</span><span><b>' + esc(TXT.reportT) + '</b><small>' + (g('rep.mid') ? 'Đã gửi · chạm để gửi lại' : 'Gửi thầy cô 4 ô đầu của bạn') + '</small></span></button>';
     h += '<button type="button" class="chest' + (cdn ? '' : ' chest--lock') + '"' + (cdn ? ' data-act="chest" data-st="' + st.id + '"' : ' disabled') + '><span class="chest__ic">' + (cdn ? cdIcon('ticket', 24) : PS.icon('lock', 22)) + '</span><span><b>Ô số ' + cn + ' · ' + esc(CARDS[cn - 1].t) + '</b><small>' + (cdn ? 'Đã điền · chạm để xem' : 'Xong ' + acts.length + ' chặng để điền ô này') + '</small></span></button>';
     return h;
@@ -940,6 +954,145 @@
     if (b) b.textContent = 'Tập lại'; if (n && !full) n.textContent = IV.secs;
     if (m) m.innerHTML = PS.icon('check', 14, 3) + esc(full ? IV.done : IV.stop.replace('[s]', el)) + (cnt ? ' · Đã tập ' + cnt + ' lần' : '');
   }
+  /* ---------- Ga 7 · Thử thách (theo từng nghề: IND7; điều lo nhất: WORRY7) ---------- */
+  var DAYN = ['Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu'], WDAY = ['Chủ nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+  function J7() { return IND7[jobKey()] || IND7.gen; }
+  function jobArt() { return J7().sc.art || ART7[grpKey()] || 'factory'; }
+  function sc7(slot) { /* tình huống đã chuẩn hóa: tt, who, msg, opts, sp, prep, art */
+    var x, o = { tt: '', who: '', msg: '', opts: [], sp: null, prep: [], art: '' };
+    if (slot === 'job') {
+      x = J7().sc; o.tt = x.tt; o.who = x.who; o.msg = x.msg; o.opts = x.opts; o.sp = { who: x.sp[0], t: x.sp[1], draft: 1 }; o.prep = J7().prep; o.art = jobArt();
+      return o;
+    }
+    var v = g('a43.top'), RDx = RD(), w = trim(worryText(v));
+    if (v === 'job' || v === 'o' || !RDx[+v] || v == null || v === '') {
+      x = WORRY7_OWN; o.tt = w || 'Điều bạn lo'; o.msg = x.msg.replace('[W]', w || 'điều bạn lo');
+    } else {
+      x = WORRY7[+v]; o.tt = RDx[+v][0]; o.msg = x.msg.replace('[R3]', low1(RDx[3][0]));
+    }
+    o.who = x.who; o.opts = x.opts; o.prep = x.prep; o.art = x.art === '@job' ? jobArt() : x.art;
+    o.sp = x.sp === '@r3' ? { who: RDx[3][1], t: RDx[3][2], draft: 1 } : { who: x.sp[0], t: x.sp[1], draft: 1 };
+    return o;
+  }
+  function scPick(key, slot) { /* lựa chọn của học viên ở một ngày (cho ô 8, báo cáo) */
+    var x = sc7(slot), v = g(key);
+    if (v == null || v === '') return '';
+    var t = v === 'o' ? trim(g(key + 'o')) : (x.opts[+v] ? x.opts[+v].t : '');
+    return x.tt + ' → ' + t;
+  }
+  function weekHTML(cur) {
+    var mk = [1, 3], keys = { 1: 'a71.s1', 3: 'a71.s2' };
+    return '<div class="wk" aria-label="Tuần đầu ở Nhật">' + WEEK7.map(function (d, i) {
+      var m = mk.indexOf(i) >= 0, ok = m && g(keys[i]) != null && g(keys[i]) !== '' && i !== cur;
+      return '<span class="wk__d' + (i === cur ? ' cur' : '') + (m ? ' mk' : '') + (ok ? ' ok' : '') + '"><small>' + d + '</small><b>' + (ok ? PS.icon('check', 14, 3) : (i + 1)) + '</b></span>';
+    }).join('') + '</div>';
+  }
+  STEP.week = function (s) {
+    var a = sc7('job'), b = sc7('worry');
+    return shinSays('think', T(s.t)) + weekHTML(-1) +
+      '<div class="card"><span class="noscore">' + PS.icon('info', 14) + esc(TXT.noScore) + '</span>' +
+      '<div class="wkplan"><p><b>' + DAYN[1] + '</b><span>Chuyện của nghề ' + esc(jobName()) + '</span><small>' + esc(a.tt) + '</small></p>' +
+      '<p><b>' + DAYN[3] + '</b><span>Điều bạn lo nhất ở Ga 4</span><small>' + esc(b.tt) + '</small></p></div>' +
+      '<p class="qsub" style="margin:10px 0 0">Mỗi ngày có 3 cách. Cách nào cũng có được, có mất.</p></div>';
+  };
+  STEP.sc = function (s) {
+    var x = sc7(s.slot), v = g(s.key), vs = v == null ? '' : String(v);
+    var h = weekHTML(s.day) + '<div class="card sc"><div class="sc__art">' + cdWork(x.art) + '<span class="sc__day">' + DAYN[s.day] + ' · Ngày ' + (s.day + 1) + '</span></div>' +
+      '<p class="sc__tt">' + esc(x.tt) + '</p>' +
+      '<div class="msg msg--t sc__msg"><span class="msg__av" aria-hidden="true">' + cdIcon('chat', 15) + '</span><div class="msg__b">' + (x.who ? '<small>' + esc(x.who) + '</small>' : '') + esc(P(x.msg)) + '</div></div>' +
+      '<p class="q" style="margin-top:14px">Bạn sẽ làm gì?</p><div class="dil">' +
+      x.opts.map(function (o, i) {
+        var on = vs === String(i);
+        return '<button type="button" class="side' + (on ? ' on' : '') + '" data-act="pick" data-k="' + esc(s.key) + '" data-v="' + i + '" aria-pressed="' + on + '"><span class="tick">' + (on ? PS.icon('check', 13, 3.2) : '') + '</span><b>' + esc(o.t) + '</b><span class="gl"><span class="g"><em>Được</em>' + esc(o.get) + '</span><span class="l"><em>Mất</em>' + esc(o.lose) + '</span></span></button>';
+      }).join('') + optBtn(s.key, 'o', 'Mình làm khác', vs === 'o') + '</div>';
+    if (vs === 'o') h += '<label class="field"><span class="field__l">Bạn sẽ làm gì?</span><input class="inp" data-k="' + esc(s.key) + 'o" maxlength="120" placeholder="Viết ngắn gọn" value="' + esc(g(s.key + 'o') || '') + '"></label>';
+    h += '</div>';
+    if (vs !== '' && vs !== 'o' && x.opts[+vs]) h += '<div class="fact"><b>' + PS.icon('bulb', 15) + 'Điều có thể xảy ra</b><p>' + esc(x.opts[+vs].may) + '</p></div>' + senpaiHTML(x.sp);
+    else if (vs === 'o') h += shinSays('think', 'Cách của bạn cũng là một cách. Nghe Senpai kể thêm nhé.') + senpaiHTML(x.sp);
+    return h;
+  };
+  function prepOpts() { var out = []; sc7('job').prep.concat(sc7('worry').prep).forEach(function (x) { if (out.indexOf(x) < 0) out.push(x); }); return out; }
+  STEP.prep7 = function (s) {
+    var x = {}; for (var k in s) if (s.hasOwnProperty(k)) x[k] = s[k];
+    x.opts = prepOpts();
+    var r = [scPick('a71.s1', 'job'), scPick('a71.s2', 'worry')];
+    return '<div class="guessd"><small class="lbl">2 ngày vừa rồi, bạn chọn</small><ul class="cdq">' + r.map(function (t, i) { return t ? '<li><b>' + DAYN[i ? 3 : 1] + ':</b> ' + esc(t) + '</li>' : ''; }).join('') + '</ul></div>' +
+      STEP.multi(x) + '<div class="card">' + s.fields.map(function (f) { return fieldHTML(f); }).join('') + tipsHTML(s.tips) + '</div>';
+  };
+  function hardPool() { /* thẻ việc lấy từ chính hành trình của học viên */
+    var out = [];
+    function add(t) { t = trim(t); if (t && out.indexOf(t) < 0) out.push(t); }
+    ga('a71.prep').forEach(add);
+    if (trim(g('a53.q1')) || trim(g('a53.guide'))) add(HARD_LINK.guide);
+    if (trim(g('a63.iv'))) add(HARD_LINK.iv);
+    J7().hard.forEach(add); HARD_COMMON.forEach(add); ga('a72.own').forEach(add);
+    return out;
+  }
+  function zMap() { return g('a72.z') || {}; }
+  STEP.zones = function (s) {
+    return shinSays('think', T(s.t)) + '<div class="card"><div class="zones__w">' + cdZones() + '</div><div class="zleg">' +
+      ZONES.map(function (z) { return '<p class="z-' + z[0] + '"><i></i><b>' + esc(z[1]) + '</b><span>' + esc(z[2]) + '</span></p>'; }).join('') + '</div></div>' +
+      shinSays('encourage', 'Làm được việc ở vùng học hỏi, vùng an toàn của bạn rộng thêm.');
+  };
+  STEP.zsort = function (s) {
+    var L = hardPool(), m = zMap(), left = 0, nh = 0;
+    L.forEach(function (t) { if (!m[t]) left++; else if (m[t] === 'h') nh++; });
+    var own = ga('a72.own'), h = '<div class="card"><span class="noscore">' + PS.icon('info', 14) + esc(TXT.noScore) + '</span><p class="q">' + Q(s.q) + '</p><p class="qsub">' + Q(s.sub) + '</p>' +
+      L.map(function (t, i) {
+        return '<div class="tagrow" data-row="' + i + '"><b>' + esc(t) + '</b><div class="seg seg--z">' + ZONES.map(function (z) {
+          var on = m[t] === z[0];
+          return '<button type="button" class="z-' + z[0] + (on ? ' on' : '') + '" data-act="zSet" data-i="' + i + '" data-v="' + z[0] + '" aria-pressed="' + on + '">' + esc(z[1]) + '</button>';
+        }).join('') + '</div></div>';
+      }).join('') +
+      (own.length < 2 ? (V.ownOpen === 'a72.own' ? '<div class="ownrow"><input class="inp" id="ownIn" maxlength="70" placeholder="Việc khó bạn tự nghĩ ra" data-ownk="a72.own"><button type="button" class="btn btn--sm" data-act="ownAdd" data-k="a72.own">Thêm</button></div>'
+        : '<button type="button" class="chip chip--own" data-act="ownOpen" data-k="a72.own" style="margin-top:6px">+ Việc khó khác của bạn</button>') : '') + '</div>';
+    if (!left) h += shinSays('think', nh ? 'Vùng học hỏi của bạn có <b>' + nh + '</b> việc. Bước sau, bạn nhận một việc nhé.' : 'Chưa có việc ở vùng học hỏi. Bước sau, chọn việc gần vùng đó nhất nhé.');
+    return h;
+  }
+  function hardList() { var L = hardPool(), m = zMap(), a = L.filter(function (t) { return m[t] === 'h'; }); if (!a.length) a = L.filter(function (t) { return m[t] !== 'a'; }); if (!a.length) a = L; ga('a72.sel').forEach(function (t) { if (a.indexOf(t) < 0) a.push(t); }); return a; }
+  function pad2(n) { return (n < 10 ? '0' : '') + n; }
+  function isoDay(off) { var d = new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() + off); return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
+  function dlOK(s) { return /^\d{4}-\d{2}-\d{2}$/.test(String(s || '')); }
+  function fmtDl(s) { if (!dlOK(s)) return ''; var p = s.split('-'), d = new Date(+p[0], +p[1] - 1, +p[2]); return WDAY[d.getDay()] + ', ' + p[2] + '/' + p[1] + '/' + p[0]; }
+  function whoText() { var v = g('a72.who'); if (v == null || v === '') return ''; if (v === 'o') return trim(g('a72.whoo')); if (v === '0' && trim(g('a53.guide'))) return 'Người dẫn đường của bạn'; return WHO7[+v] || ''; }
+  function dueOver() { var dl = g('a72.dl'); return !!S.done.a72 && dlOK(dl) && !g('a72.res') && isoDay(0) >= dl; }
+  STEP.hard = function (s) {
+    var x = {}; for (var k in s) if (s.hasOwnProperty(k)) x[k] = s[k];
+    var L = hardPool(), m = zMap(), nh = L.filter(function (t) { return m[t] === 'h'; }).length;
+    x.opts = hardList();
+    var due = g('a72.due'), dl = g('a72.dl'), who = g('a72.who'), gd = trim(g('a53.guide'));
+    var h = (nh ? '' : shinSays('think', 'Vùng học hỏi đang trống. Chọn việc bạn thấy gần vùng đó nhất nhé.')) +
+      '<div class="card"><p class="q">' + Q(s.q) + '</p><p class="qsub">' + Q(s.sub) + '</p>' + chipsHTML(x) + '</div>' +
+      '<div class="card" data-blk="due"><p class="q">Hạn chót của bạn</p><div class="lvrow">' +
+      DUE7.map(function (d) { var on = due === d[0]; return '<button type="button" class="lvb' + (on ? ' on' : '') + '" data-act="dueSet" data-v="' + d[0] + '" aria-pressed="' + on + '">' + esc(d[1]) + '</button>'; }).join('') + '</div>' +
+      (due === 'd' ? '<input type="date" class="inp" data-k="a72.dl" min="' + isoDay(1) + '" max="' + isoDay(30) + '" value="' + esc(dlOK(dl) ? dl : '') + '" style="margin-top:10px">' : '') +
+      (dlOK(dl) && due ? '<p class="lvrep">' + PS.icon('clock', 14) + '<span>Hạn chót: <b>' + esc(fmtDl(dl)) + '</b>. Hết hạn, Shin sẽ hỏi bạn.</span></p>' : '') + '</div>' +
+      '<div class="card" data-blk="who"><p class="q">Ai cùng biết việc này?</p><p class="qsub">Có người biết, bạn dễ giữ lời hơn.</p><div class="opts">' +
+      WHO7.map(function (t, i) { if (i === 0 && !gd) return ''; return optBtn('a72.who', String(i), t + (i === 0 ? ' · ' + (gd.length > 34 ? gd.slice(0, 32) + '…' : gd) : ''), who === String(i)); }).join('') +
+      optBtn('a72.who', 'o', 'Người khác', who === 'o') + '</div>' +
+      (who === 'o' ? '<input class="inp" data-k="a72.whoo" maxlength="60" placeholder="Ví dụ: chị họ ở Osaka" value="' + esc(g('a72.whoo') || '') + '" style="margin-top:8px">' : '') + '</div>';
+    return h;
+  };
+  /* kết quả việc khó sau hạn chót: không phán xét, +10 XP lần đầu */
+  function resOv() {
+    var v = V.res7 != null ? V.res7 : (g('a72.res') || ''), r = null;
+    RES7.forEach(function (x) { if (x[0] === v) r = x; });
+    var h = '<h2>Việc khó của bạn</h2><ul class="cdq" style="text-align:left">' + ga('a72.sel').map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>' +
+      (dlOK(g('a72.dl')) ? '<p class="ps-small">Hạn chót: ' + esc(fmtDl(g('a72.dl'))) + '</p>' : '') +
+      '<div class="opts" style="margin:12px 0">' + RES7.map(function (x) { var on = v === x[0]; return '<button type="button" class="opt' + (on ? ' on' : '') + '" data-act="res7v" data-v="' + x[0] + '" aria-pressed="' + on + '"><span class="dot">' + (on ? PS.icon('check', 13, 3.2) : '') + '</span><span>' + esc(x[1]) + '</span></button>'; }).join('') + '</div>' +
+      (r ? shinSays('think', esc(r[2])) : '') +
+      '<textarea class="ta" id="res7t" rows="3" maxlength="300" placeholder="Kể ngắn: bạn đã làm gì, thấy sao?">' + esc(V.res7t != null ? V.res7t : (g('a72.rest') || '')) + '</textarea>' +
+      '<button type="button" class="btn btn--w" data-act="res7save"' + (v ? '' : ' disabled') + ' style="margin-top:12px">Lưu kết quả</button><button type="button" class="link" data-act="ovClose">Để sau</button>';
+    ov(h, null);
+  }
+  function resSave() {
+    var v = V.res7 != null ? V.res7 : g('a72.res'), ta = D.getElementById('res7t'); if (!v) return;
+    var first = !S.xp.a72r;
+    S.d['a72.res'] = v; S.d['a72.rest'] = ta ? trim(ta.value) : ''; S.d['a72.resAt'] = Date.now();
+    if (first) S.xp.a72r = CD_XP_WARM;
+    V.res7 = null; V.res7t = null; markDay(); save(true); closeOv(); sound(first ? 'badge' : 'tap');
+    PS.toast(first ? 'Shin ghi lại rồi · <b>+' + CD_XP_WARM + ' XP</b>' : 'Đã lưu kết quả.'); render(false);
+  }
   function cdCardPreview(n) { return '<div style="margin-top:12px">' + cdCardForce(n) + '</div>'; }
   function cdCardForce(n) { /* xem trước ô trước khi đóng dấu */
     var c = CARDS[n - 1];
@@ -978,6 +1131,12 @@
     gap: function (s) { var m = g(s.key) || {}, n = 0; gapList().forEach(function (x) { if (!m[x[0]]) n++; }); return n ? 'Còn ' + n + ' điều chưa chọn' : ''; },
     habit: function () { for (var i = 1; i <= 2; i++) { var w = g('a63.h' + i + 'w'); if (w == null || w === '') return 'Chọn “Khi…” cho thói quen ' + i; if (w === 'o' && trim(g('a63.h' + i + 'wo')).length < 3) return 'Viết lúc nào cho thói quen ' + i; if (trim(g('a63.h' + i + 'd')).length < 4) return 'Viết “tôi sẽ…” cho thói quen ' + i; } return ''; },
     iv: function (s) { return fieldOK(s.fields[0]) ? '' : 'Viết câu trả lời của bạn'; },
+    week: function () { return ''; },
+    zones: function () { return ''; },
+    sc: function (s) { var v = g(s.key); if (v == null || v === '') return 'Chọn cách bạn sẽ làm'; if (v === 'o' && trim(g(s.key + 'o')).length < 4) return 'Viết cách bạn sẽ làm'; return ''; },
+    prep7: function (s) { var n = ga(s.key).length; if (n < 1) return 'Chọn ít nhất 1 việc'; return fieldOK(s.fields[0]) ? '' : 'Viết một câu nhắn cho mình'; },
+    zsort: function () { var m = zMap(), n = 0; hardPool().forEach(function (t) { if (!m[t]) n++; }); return n ? 'Còn ' + n + ' việc chưa xếp' : ''; },
+    hard: function (s) { if (!ga(s.key).length) return 'Chọn 1 việc khó'; var d = g('a72.due'); if (!d) return 'Chọn hạn chót'; if (!dlOK(g('a72.dl')) || (d === 'd' && !S.done.a72 && g('a72.dl') < isoDay(1))) return 'Chọn ngày hạn chót'; var w = g('a72.who'); if (w == null || w === '') return 'Chọn ai cùng biết'; if (w === 'o' && trim(g('a72.whoo')).length < 2) return 'Viết tên người cùng biết'; return ''; },
     worry: function (s) { var v = g(s.key); if (!v) return 'Chọn một điều'; if (v === 'o' && String(g('a43.topo') || '').replace(/\s/g, '').length < 4) return 'Viết điều bạn lo'; return ''; }
   };
   function showMiss() {
@@ -994,6 +1153,10 @@
     else if (s.k === 'tl') { var tl0 = g(s.key) || {}; MILES.forEach(function (m, i) { if (!el && !tl0[m[0]]) el = body.querySelector('[data-row="' + i + '"]'); }); }
     else if (s.k === 'worry' && g(s.key) === 'o') el = body.querySelector('[data-k="a43.topo"]');
     else if (s.k === 'jobguess' && g('a33.main') === 'khac' && !g('a42.near')) el = body.querySelector('.inds');
+    else if (s.k === 'sc') el = body.querySelector(g(s.key) === 'o' ? '[data-k="' + s.key + 'o"]' : '.dil');
+    else if (s.k === 'prep7') el = ga(s.key).length ? body.querySelector('[data-k="a71.note"]') : body.querySelector('.chips');
+    else if (s.k === 'zsort') { var zm = zMap(); hardPool().forEach(function (t, i) { if (!el && !zm[t]) el = body.querySelector('[data-row="' + i + '"]'); }); }
+    else if (s.k === 'hard') { var hm7 = CHECK.hard(s); el = /việc khó/.test(hm7) ? body.querySelector('.chips') : (/hạn chót/.test(hm7) ? body.querySelector('[data-blk="due"]') : body.querySelector('[data-blk="who"]')); }
     if (!el) el = body.querySelector('.card') || body;
     el.scrollIntoView({ behavior: 'smooth', block: 'center' });
     el.classList.add('need', 'pulse'); setTimeout(function () { el.classList.remove('pulse'); }, 2600);
@@ -1124,10 +1287,11 @@
     var s = JSON.parse(JSON.stringify(DEMO_DATA)); s = normalize(s);
     s.demo = 1; s.created = Date.now() - 3 * 864e5;
     S = s;
+    S.d['a72.dl'] = isoDay(-1);
     for (var id in S.done) if (S.done.hasOwnProperty(id) && ACTS[id]) { S.xp[id] = ACTS[id].warm ? CD_XP_WARM : CD_XP_ACT; S.ins[id] = insForAct(id); }
     ALLST.forEach(function (st) { if (stDone(st)) { S.chest[st.id] = 1; S.seen[st.id] = 1; } });
     NOSAVE = 0; save(true); V = { v: 'home' }; render(true);
-    PS.toast('<b>Bản demo giáo viên</b> · học viên giả định đã xong Sân ga đến Ga Định Hướng');
+    PS.toast('<b>Bản demo giáo viên</b> · học viên giả định đã xong Sân ga đến Ga Thử Thách');
   }
   function exitDemo() { NOSAVE = 1; clearTimeout(saveT); try { PS.set(DEMO_KEY, null); } catch (e) {} W.location.replace(W.location.pathname); }
 
@@ -1241,6 +1405,11 @@
     else if (a === 'chatAsk') chatAsk(+v);
     else if (a === 'gapSet') { var gl = gapList()[+b.getAttribute('data-i')], gm2 = {}, go2 = g('a63.gap') || {}; for (var gx in go2) if (go2.hasOwnProperty(gx)) gm2[gx] = go2[gx]; if (gl) { gm2[gl[0]] = v; S.d['a63.gap'] = gm2; save(); sound('tap'); var yg = W.pageYOffset; redrawStep(); W.scrollTo(0, yg); } }
     else if (a === 'habFill') habFill(v);
+    else if (a === 'zSet') { var zt = hardPool()[+b.getAttribute('data-i')], zo = zMap(), zn = {}; for (var zx in zo) if (zo.hasOwnProperty(zx)) zn[zx] = zo[zx]; if (zt) { zn[zt] = v; S.d['a72.z'] = zn; save(); sound('tap'); var yz = W.pageYOffset; redrawStep(); W.scrollTo(0, yz); } }
+    else if (a === 'dueSet') { S.d['a72.due'] = v; if (v !== 'd') S.d['a72.dl'] = isoDay(+v); else if (!dlOK(g('a72.dl')) || g('a72.dl') < isoDay(1)) delete S.d['a72.dl']; save(); sound('tap'); var yd = W.pageYOffset; redrawStep(); W.scrollTo(0, yd); }
+    else if (a === 'res7') { V.res7 = null; V.res7t = null; resOv(); }
+    else if (a === 'res7v') { var rt = D.getElementById('res7t'); V.res7t = rt ? rt.value : null; V.res7 = v; sound('tap'); resOv(); }
+    else if (a === 'res7save') resSave();
     else if (a === 'useTip') { S.d[k] = v; S.d[k + '~'] = v; save(); sound('tap'); var yt = W.pageYOffset; redrawStep(); W.scrollTo(0, yt); var ta = D.querySelector('[data-k="' + k + '"]'); if (ta) ta.classList.add('pulse'); }
     else if (a === 'tmGo') tmGo();
     else if (a === 'riaGo') { V.riaI = +b.getAttribute('data-i'); redrawStep(); }
@@ -1304,7 +1473,7 @@
     t.className = 'sel' + (t.value ? ' on' : ''); var row = PS.closest(t, '.tlrow'); if (row) { if (t.value) row.classList.add('on'); else row.classList.remove('on'); row.classList.remove('need'); }
     refreshBar();
   }
-  D.addEventListener('change', function (e) { var t = e.target; if (t && t.getAttribute && t.getAttribute('data-tl')) tlSet(t); else if (t && t.getAttribute && t.getAttribute('data-sl')) slSet(t); });
+  D.addEventListener('change', function (e) { var t = e.target; if (t && t.getAttribute && t.getAttribute('data-k') === 'a72.dl') { S.d['a72.dl'] = t.value; save(); var yq = W.pageYOffset; redrawStep(); W.scrollTo(0, yq); } else if (t && t.getAttribute && t.getAttribute('data-tl')) tlSet(t); else if (t && t.getAttribute && t.getAttribute('data-sl')) slSet(t); });
   D.addEventListener('input', function (e) {
     var t = e.target; if (!t || !t.getAttribute) return;
     if (t.getAttribute('data-tl')) { tlSet(t); return; }
@@ -1315,6 +1484,7 @@
     S.d[k] = t.value; t.classList.remove('need'); save();
     if (/^a63\.h[12]/.test(k)) { var fm = D.getElementById('fm' + k.charAt(5)); if (fm) fm.innerHTML = formulaHTML(+k.charAt(5)); }
     if (k === 'a63.iv') { var ie = D.getElementById('ivEst'); if (ie) ie.innerHTML = ivEst(); }
+
     var ins = D.querySelector('[data-ins="' + k + '"]');
     if (ins) { var tmp = D.createElement('div'); tmp.innerHTML = insHTML({ key: k }); ins.parentNode.replaceChild(tmp.firstChild, ins); }
     refreshBar();
