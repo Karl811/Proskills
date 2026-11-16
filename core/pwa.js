@@ -1,0 +1,91 @@
+/* =========================================================
+   PROSKILLS · CÀI ỨNG DỤNG VÀ CẬP NHẬT (pwa.js)
+   Một ứng dụng Proskills cho mọi module: service worker đặt ở thư mục gốc.
+   Nút có thuộc tính data-pwa="install" ở bất kỳ trang nào sẽ mở hướng dẫn cài.
+   Phỏng theo bộ PWA của TK13, viết lại kiểu ES5.
+   ========================================================= */
+(function (W, D) {
+  'use strict';
+  if (!W.PS) return;
+  var PS = W.PS, APP = PS.cfg.APP || 'Proskills';
+  var deferred = null, installedNow = false, reg = null, reloading = false, later = false;
+  var mq = W.matchMedia ? W.matchMedia('(display-mode: standalone)') : null;
+  function standalone() { return (mq && mq.matches) || W.navigator.standalone === true; }
+  function installed() { return standalone() || installedNow; }
+  function isIOS() { return /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); }
+  function isAndroid() { return /Android/i.test(navigator.userAgent); }
+  PS.standalone = standalone;
+
+  function refresh() {
+    D.documentElement.classList.toggle('ps-installed', installed());
+    Array.prototype.forEach.call(D.querySelectorAll('[data-pwa="install"] [data-pwa-label]'), function (l) {
+      var t = installed() ? (standalone() ? 'Đang dùng ứng dụng' : 'Đã cài ứng dụng') : 'Cài ứng dụng';
+      if (l.textContent !== t) l.textContent = t;
+    });
+  }
+  PS.pwaRefresh = refresh;
+  function steps() {
+    if (isIOS()) return '<ol class="ps-steps"><li>Mở link bằng <b>Safari</b>.</li><li>Chạm nút <b>Chia sẻ</b> (ô vuông có mũi tên lên), chọn <b>Thêm vào MH chính</b>.</li><li>Nếu thấy <b>Mở dưới dạng ứng dụng web</b>, hãy bật. Chạm <b>Thêm</b>.</li><li>Mở biểu tượng <b>' + APP + '</b> trên màn hình chính.</li></ol>';
+    if (isAndroid()) return '<ol class="ps-steps"><li>Mở link bằng <b>Chrome</b>.</li><li>Chạm dấu <b>⋮</b> → <b>Cài đặt ứng dụng</b> hoặc <b>Thêm vào màn hình chính</b>.</li><li>Xác nhận, rồi mở biểu tượng <b>' + APP + '</b>.</li></ol>';
+    return '<ol class="ps-steps"><li>Mở link bằng <b>Chrome</b> hoặc <b>Edge</b>.</li><li>Chọn biểu tượng cài đặt ở thanh địa chỉ, hoặc tìm mục cài trang này thành ứng dụng trong menu.</li><li>Trên điện thoại: Chrome (Android) hoặc Safari (iPhone).</li></ol>';
+  }
+  function help() {
+    var file = location.protocol === 'file:';
+    var html;
+    if (installed()) html = '<p>' + (standalone() ? 'Bạn đang học trong ứng dụng ' + APP + '.' : 'Ứng dụng đã được cài. Mở biểu tượng ' + APP + ' trên máy để học.') + '</p>';
+    else if (file) html = '<p>Để cài ứng dụng, hãy mở <b>đường link website</b> thầy cô gửi. Tệp mở trực tiếp trên máy chưa cài được.</p>';
+    else html = '<p>Cài ' + APP + ' lên màn hình chính để mở nhanh, học cả khi mất mạng và giữ bài làm ổn định hơn.</p>' + steps() +
+      '<p class="ps-small">Đã học trên trình duyệt trước đó? Vào Cài đặt → Tải sao lưu, rồi Khôi phục trong ứng dụng. Trên iPhone, ứng dụng và Safari lưu bài riêng.</p>';
+    var btns = [];
+    if (deferred && !installed()) btns.push({ t: 'Cài trên máy này', cls: 'ps-btn--go', fn: function () { native(); } });
+    btns.push({ t: deferred && !installed() ? 'Để sau' : 'Đã hiểu', cls: 'ps-btn--soft' });
+    PS.dialog({ icon: 'phone', title: installed() ? 'Ứng dụng ' + APP : 'Cài ứng dụng ' + APP, html: html + '<p class="ps-small">Video và bài đọc ở website khác vẫn cần mạng.</p>', buttons: btns });
+  }
+  PS.installHelp = help;
+  function native() {
+    var ev = deferred; if (!ev) { help(); return; }
+    deferred = null;
+    try {
+      ev.prompt();
+      if (ev.userChoice && ev.userChoice.then) ev.userChoice.then(function (c) { if (c && c.outcome === 'accepted') installedNow = true; refresh(); });
+    } catch (e) { help(); }
+  }
+  function showUpdate() {
+    if (!reg || !reg.waiting || later || D.getElementById('ps-update')) return;
+    var el = D.createElement('div'); el.id = 'ps-update'; el.className = 'ps-update'; el.setAttribute('role', 'status');
+    el.innerHTML = '<span>Có phiên bản mới.</span><button type="button" data-pwa="update">Cập nhật</button><button type="button" class="ps-update__x" data-pwa="later" aria-label="Để sau">' + PS.icon('close', 16) + '</button>';
+    D.body.appendChild(el);
+  }
+  function startUpdate() {
+    if (!reg || !reg.waiting) return;
+    PS.fire('beforeBackup'); /* module lưu bài ngay */
+    reloading = true; reg.waiting.postMessage({ type: 'ACTIVATE_UPDATE' });
+    var b = D.querySelector('[data-pwa="update"]'); if (b) { b.disabled = true; b.textContent = 'Đang cập nhật…'; }
+  }
+  function watch(r) {
+    reg = r; if (r.waiting) showUpdate();
+    r.addEventListener('updatefound', function () {
+      var w = r.installing; if (!w) return;
+      w.addEventListener('statechange', function () { if (w.state === 'installed' && navigator.serviceWorker.controller) showUpdate(); });
+    });
+  }
+  function register() {
+    if (!('serviceWorker' in navigator) || !W.isSecureContext || location.protocol === 'file:') return;
+    try { navigator.serviceWorker.register(PS.url('sw.js'), { scope: PS.url('') }).then(watch)['catch'](function () {}); } catch (e) {}
+  }
+  W.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); deferred = e; refresh(); });
+  W.addEventListener('appinstalled', function () { installedNow = true; deferred = null; refresh(); });
+  if (mq && mq.addListener) mq.addListener(refresh);
+  if ('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('controllerchange', function () { if (reloading) W.location.reload(); });
+  D.addEventListener('click', function (e) {
+    var b = PS.closest(e.target, '[data-pwa]'); if (!b) return;
+    var a = b.getAttribute('data-pwa');
+    if (a === 'install') { e.preventDefault(); if (deferred && !installed()) native(); else help(); }
+    else if (a === 'update') { e.preventDefault(); startUpdate(); }
+    else if (a === 'later') { e.preventDefault(); later = true; var el = D.getElementById('ps-update'); if (el) el.parentNode.removeChild(el); }
+  });
+  /* MutationObserver giữ nhãn nút luôn đúng khi module vẽ lại */
+  if (W.MutationObserver) { var t = null; new MutationObserver(function () { clearTimeout(t); t = setTimeout(refresh, 60); }).observe(D.documentElement, { childList: true, subtree: true }); }
+  refresh();
+  if (D.readyState === 'complete') register(); else W.addEventListener('load', register);
+})(window, document);
