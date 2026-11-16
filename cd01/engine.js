@@ -223,18 +223,33 @@
      ========================================================= */
   var APP = D.getElementById('app');
   var V = { v: 'home' }, nbOpen = false, NBTAB = 'tq';
+  /* tiến độ hôm nay: số chặng xong của ga đang học từ đầu ngày; xong cả ga thì vòng xanh */
+  function dayRing() {
+    var k = PS.today(), cs;
+    if (S.d['day.k'] !== k || !stById(S.d['day.st'])) { cs = curStation(); S.d['day.k'] = k; S.d['day.st'] = cs ? cs.id : 's0'; save(); }
+    var st = stById(S.d['day.st']), acts = (st && st.acts) || [], nd = 0;
+    acts.forEach(function (a) { if (S.done[a]) nd++; });
+    var f = acts.length ? nd / acts.length : 0, full = f >= 1, C = 2 * Math.PI * 18.5;
+    return { st: st, nd: nd, n: acts.length, full: full,
+      svg: '<svg class="tn-ring" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18.5" fill="none" class="tn-ring__bg"/>' +
+        (f > 0 ? '<circle cx="20" cy="20" r="18.5" fill="none" class="tn-ring__v' + (full ? ' ok' : '') + '" stroke-dasharray="' + (C * f).toFixed(1) + ' ' + C.toFixed(1) + '" transform="rotate(-90 20 20)"/>' : '') + '</svg>' };
+  }
   function topnav() {
+    var dr = dayRing(), lab = 'Sơ đồ tuyến · hôm nay ' + dr.nd + '/' + dr.n + ' chặng' + (dr.st ? ' · ' + dr.st.vn : '') + (dr.full ? ' · đã đủ' : '');
     return '<nav class="topnav" aria-label="Điều hướng"><div class="topnav__in">' +
       '<span class="tn-sp"></span><div class="tn-pill">' +
-      '<button type="button" class="tn-btn' + (V.v === 'home' ? ' on' : '') + '" data-act="home" aria-label="Sơ đồ tuyến" title="Sơ đồ tuyến">' + cdIcon('map', 20) + '</button>' +
+      '<button type="button" class="tn-btn tn-btn--map' + (V.v === 'home' ? ' on' : '') + '" data-act="home" aria-label="' + esc(lab) + '" title="' + esc(lab) + '">' + dr.svg + cdIcon('map', 20) + '</button>' +
       '<button type="button" class="tn-btn" data-act="nb" aria-label="Sổ tay" title="Sổ tay">' + PS.icon('book', 20) + '</button></div></div></nav>';
   }
   function demoStrip() { return S.demo ? '<div class="demo-strip"><span>Bản demo giáo viên · học viên giả định</span><button type="button" data-act="demoExit">Thoát demo</button></div>' : ''; }
+  function hState(v, y) { return { cd: 1, v: v.v, st: v.st || null, id: v.id || null, step: v.step || 0, ret: v.ret || null, y: y || 0 }; }
+  var QUIET = false;
   function render(top) {
     tmKill(); if (HOLD) { clearInterval(HOLD.h); HOLD = null; }
+    try { if (!history.state || !history.state.cd) history.replaceState(hState(V), ''); } catch (e) {}
     if (V.v === 'intro') { APP.innerHTML = '<div class="wrap enter">' + viewIntro() + '</div>'; stagger(); return; }
     var h = V.v === 'st' ? viewStation() : (V.v === 'act' ? viewAct() : viewHome());
-    APP.innerHTML = topnav() + '<div class="wrap enter' + (S.demo ? ' wrap--demo' : '') + '">' + h + '</div>' + demoStrip();
+    APP.innerHTML = topnav() + '<div class="wrap' + (QUIET ? '' : ' enter') + (S.demo ? ' wrap--demo' : '') + '">' + h + '</div>' + demoStrip();
     stagger();
     if (top !== false) W.scrollTo(0, 0);
     if (V.v === 'home') homeFx();
@@ -245,7 +260,7 @@
     var tr = D.getElementById('tkTrain'), bar = D.getElementById('tkBar'), tk = D.getElementById('ticket');
     if (tr && bar) {
       var go2 = function () { tr.style.left = tr.getAttribute('data-x') + '%'; bar.style.width = bar.getAttribute('data-w') + '%'; };
-      if (RM) go2(); else { setTimeout(go2, 120); setTimeout(function () { tr.className += ' rock'; bar.className = 'shim'; }, 1650); }
+      if (RM || QUIET) { tr.style.transition = bar.style.transition = 'none'; go2(); if (!RM) { tr.className += ' rock'; bar.className = 'shim'; } } else { setTimeout(go2, 120); setTimeout(function () { tr.className += ' rock'; bar.className = 'shim'; }, 1650); }
     }
     if (tk && !RM) {
       var press = function (x, y) { var r = tk.getBoundingClientRect(), px = (x - r.left) / r.width - 0.5, py = (y - r.top) / r.height - 0.5; tk.style.transform = 'perspective(800px) rotateX(' + (-py * 7).toFixed(2) + 'deg) rotateY(' + (px * 7).toFixed(2) + 'deg) scale(.985)'; };
@@ -256,7 +271,7 @@
     }
     var route = APP.querySelector('.route'); if (!route) return;
     var stops = route.querySelectorAll('.rv');
-    if (RM || !('IntersectionObserver' in W)) return;
+    if (RM || QUIET || !('IntersectionObserver' in W)) return;
     route.className += ' rvon';
     var io = new W.IntersectionObserver(function (ents) {
       var k = 0;
@@ -265,7 +280,24 @@
     for (var i = 0; i < stops.length; i++) io.observe(stops[i]);
   }
   function stagger() { var w = APP.querySelector('.enter'); if (!w) return; var c = w.children; for (var i = 0; i < c.length; i++) c[i].style.setProperty('--i', Math.min(i, 8)); }
-  function go(v) { V = v; render(true); }
+  function go(v) {
+    try { var same = v.v === V.v && v.st === V.st && v.id === V.id; if (V.v !== 'intro' && !same) { history.replaceState(hState(V, W.pageYOffset || 0), ''); history.pushState(hState(v), ''); } else history.replaceState(hState(v), ''); } catch (e) {}
+    V = v; render(true);
+  }
+  function stepState() { try { history.replaceState(hState(V), ''); } catch (e) {} }
+  W.addEventListener('popstate', function (e) {
+    var keep = function () { try { history.pushState(hState(V), ''); } catch (er) {} };
+    if (D.getElementById('cdov')) { closeOv(); keep(); return; }
+    if (nbOpen) { closeNb(); keep(); return; }
+    if (V.v === 'intro') return;
+    var h = e.state;
+    if (!h || !h.cd) { V = { v: 'home' }; }
+    else if (h.v === 'act' && ACTS[h.id] && (actOpen(h.id) || S.done[h.id])) V = { v: 'act', id: h.id, step: Math.min(h.step || 0, ACTS[h.id].steps.length - 1), ret: h.ret || undefined };
+    else if (h.v === 'st' && stById(h.st)) V = { v: 'st', st: h.st };
+    else V = { v: 'home' };
+    QUIET = true; render(false); QUIET = false;
+    W.scrollTo(0, h && h.y ? h.y : 0);
+  });
 
   /* ---------- màn mở đầu ---------- */
   function viewIntro() {
@@ -303,7 +335,7 @@
       '<p class="foot">Proskills · Career Design 01 · ' + esc(CD_VER) + '<br>Bài làm tự lưu trên trình duyệt của máy này</p>';
   }
   function trainSvg() {
-    return '<svg width="34" height="22" viewBox="0 0 34 22" aria-hidden="true"><rect x="2" y="3" width="28" height="14" rx="6" fill="#fff"/><rect x="6" y="6" width="7" height="5" rx="1.5" fill="#2F6BFF"/><rect x="15" y="6" width="7" height="5" rx="1.5" fill="#2F6BFF"/><circle cx="9" cy="18.5" r="2.5" fill="#FFC93C"/><circle cx="23" cy="18.5" r="2.5" fill="#FFC93C"/><rect x="25" y="7" width="3" height="3" rx="1" fill="#FFC93C"/></svg>';
+    return '<svg width="34" height="22" viewBox="0 0 34 22" aria-hidden="true"><rect x="2" y="3" width="28" height="14" rx="6" fill="#fff"/><rect x="6" y="6" width="7" height="5" rx="1.5" style="fill:var(--c)"/><rect x="15" y="6" width="7" height="5" rx="1.5" style="fill:var(--c)"/><circle cx="9" cy="18.5" r="2.5" fill="#FFC93C"/><circle cx="23" cy="18.5" r="2.5" fill="#FFC93C"/><rect x="25" y="7" width="3" height="3" rx="1" fill="#FFC93C"/></svg>';
   }
   function stopHTML(st) {
     var isFinal = st === FINAL, ready = stReady(st), dn = ready && stDone(st), open = ready && stOpen(st);
@@ -329,7 +361,8 @@
     var h = '<button type="button" class="back" data-act="home">' + cdIcon('arrowL', 18, 2.4) + 'Sơ đồ tuyến</button>' +
       '<section class="banner"><div class="banner__top"><div class="kanji' + (st.k.length > 2 ? ' k3' : '') + ' jp">' + esc(st.k) + '</div><div>' +
       '<div class="banner__lab">' + esc(stLabel(st).toUpperCase()) + '</div><h1>' + esc(st.vn) + '</h1>' +
-      '<div class="banner__ro"><span class="jp">' + esc(st.kana) + '</span><span>' + esc(st.ro) + '</span><button type="button" class="say-btn" data-act="speak" data-t="' + esc(st.kana) + '" aria-label="Nghe đọc">' + PS.icon('sound', 16) + '</button></div></div></div>' +
+      (KW[st.n] && st !== START ? '<div class="banner__ro"><button type="button" class="kwchip" data-act="kw" data-n="' + st.n + '"><span class="jp">' + esc(KW[st.n].w) + '</span>' + esc(KW[st.n].m) + ' <i aria-hidden="true">›</i></button></div></div></div>' :
+      '<div class="banner__ro"><span class="jp">' + esc(st.kana) + '</span><span>' + esc(st.ro) + '</span><button type="button" class="say-btn" data-act="speak" data-t="' + esc(st.kana) + '" aria-label="Nghe đọc">' + PS.icon('sound', 16) + '</button></div></div></div>') +
       '<div class="banner__bar"><i style="width:' + Math.round(nd / acts.length * 100) + '%"></i></div><div class="banner__meta"><span>' + nd + '/' + acts.length + ' chặng xong</span><span>' + stMins(st) + ' phút</span></div></section>';
     h += (first || V.showIntro) ? shinSays('hi', T(st.intro)) : '<button type="button" class="shinmini" data-act="showIntro">' + shinNow('hi', 34) + '<span><b>' + esc(SHIN_NAMES[shinStage()]) + '</b> · Xem lời Shin</span></button>';
     if (st.quote) h += '<figure class="quote"><p>' + esc(st.quote.t) + '</p><small>' + esc(st.quote.by) + '</small></figure>';
@@ -626,13 +659,13 @@
     function lst(k) { return ga(k).slice(0, 4).map(esc).join(' · ') || '—'; }
     return '<div class="card"><svg class="venn" viewBox="0 0 300 210" role="img" aria-label="Ba vòng tròn">' +
       '<circle cx="112" cy="82" r="68" fill="#E0567F" fill-opacity=".16" stroke="#E0567F" stroke-width="2"/>' +
-      '<circle cx="188" cy="82" r="68" fill="#2F6BFF" fill-opacity=".14" stroke="#2F6BFF" stroke-width="2"/>' +
+      '<circle cx="188" cy="82" r="68" style="fill:var(--c);stroke:var(--c)" fill-opacity=".14" stroke-width="2"/>' +
       '<circle cx="150" cy="140" r="68" fill="#F2A20F" fill-opacity=".16" stroke="#F2A20F" stroke-width="2"/>' +
       '<text x="78" y="62" text-anchor="middle" font-size="14" font-weight="700" fill="#B83260">Thích</text>' +
-      '<text x="222" y="62" text-anchor="middle" font-size="14" font-weight="700" fill="#1C4FD8">Giỏi</text>' +
+      '<text x="222" y="62" text-anchor="middle" font-size="14" font-weight="700" style="fill:var(--c-d)">Giỏi</text>' +
       '<text x="150" y="190" text-anchor="middle" font-size="14" font-weight="700" fill="#9A6400">Coi trọng</text>' +
       '<circle cx="150" cy="104" r="17" fill="#fff" stroke="#18203F" stroke-width="1.5"/><text x="150" y="110" text-anchor="middle" font-size="16" font-weight="800" fill="#18203F">?</text></svg>' +
-      '<div class="vl"><p><i style="background:#E0567F"></i><b>Thích</b>' + lst('a21.sel') + '</p><p><i style="background:#2F6BFF"></i><b>Giỏi</b>' + lst('a22.sel') + '</p><p><i style="background:#F2A20F"></i><b>Coi trọng</b>' + lst('a23.rank') + '</p></div></div>' +
+      '<div class="vl"><p><i style="background:#E0567F"></i><b>Thích</b>' + lst('a21.sel') + '</p><p><i style="background:var(--c)"></i><b>Giỏi</b>' + lst('a22.sel') + '</p><p><i style="background:#F2A20F"></i><b>Coi trọng</b>' + lst('a23.rank') + '</p></div></div>' +
       '<div class="card"><p class="q">' + Q(s.q) + '</p><p class="qsub">' + Q(s.sub) + '</p>' + s.fields.map(function (f) { return fieldHTML(f); }).join('') + '</div>';
   };
   /* ---------- Ga 4 ---------- */
@@ -1274,7 +1307,7 @@
   };
   /* vé hoàn thành (lần đầu về đích, hoặc mở lại ở trang Ga Ước Mơ) */
   function finaleOv(again) {
-    var p = prof(), mo = trim(g('a81.motto')), cf = '', cols = ['#FFC93C', '#2F6BFF', '#E0567F', '#22A05E', '#7A55D3', '#F07F1E'];
+    var p = prof(), mo = trim(g('a81.motto')), cf = '', cols = ['#FFC93C', CV('--c'), '#E0567F', '#22A05E', '#7A55D3', '#F07F1E'];
     if (!RM) for (var i = 0; i < 18; i++) cf += '<i style="left:' + ((i * 37) % 100) + '%;background:' + cols[i % cols.length] + ';--d:' + ((i % 6) * 0.18).toFixed(2) + 's;--r:' + ((i * 47) % 360) + 'deg"></i>';
     var h = '<div class="fin">' + (cf ? '<div class="confetti" aria-hidden="true">' + cf + '</div>' : '') +
       '<div class="gold"><div class="gold__hd"><span>Vé hoàn thành</span><span class="jp">修了乗車券</span></div>' +
@@ -1333,14 +1366,14 @@
     function lines(L, x, mw) {
       L.forEach(function (ln) {
         if (ln.k === 'lbl') { y += 6; font('600', 23); txt(ln.t, x, mw, 32, '#7A82A3'); }
-        else if (ln.k === 'tag') { font('600', 26); txt(ln.t, x, mw, 38, '#1C4FD8'); }
+        else if (ln.k === 'tag') { font('600', 26); txt(ln.t, x, mw, 38, CV('--c-d')); }
         else { font('400', 27); txt(ln.t, x, mw, 40, '#18203F'); }
       });
     }
     function section(n, title, L, extra) {
       var y0 = y, i = si++; rr(PAD, y0, IN, HS[i] || 0, 26, '#FFFFFF', '#E3E7F5');
       y += 26;
-      if (n) { rr(PAD + 24, y, 50, 50, 14, '#2F6BFF'); if (draw) { font('800', 26); cx.fillStyle = '#fff'; cx.textAlign = 'center'; cx.fillText(String(n), PAD + 49, y + 10); cx.textAlign = 'left'; } }
+      if (n) { rr(PAD + 24, y, 50, 50, 14, CV('--c')); if (draw) { font('800', 26); cx.fillStyle = '#fff'; cx.textAlign = 'center'; cx.fillText(String(n), PAD + 49, y + 10); cx.textAlign = 'left'; } }
       var x = PAD + (n ? 94 : 28), mw = IN - (n ? 94 : 28) - 28;
       font('800', 30); txt(title, x, mw, 42, '#18203F'); y += 2;
       lines(L, x, mw); if (extra) extra(x, mw);
@@ -1348,7 +1381,7 @@
     }
     function layout() {
       y = 0; si = 0; cx.textBaseline = 'top';
-      if (draw) { cx.fillStyle = '#F4F6FE'; cx.fillRect(0, 0, Wd, cv.height); var gr = cx.createLinearGradient(0, 0, Wd, 300); gr.addColorStop(0, '#4C82FF'); gr.addColorStop(1, '#1C4FD8'); cx.fillStyle = gr; cx.fillRect(0, 0, Wd, 292); font('700', 150, JF); cx.fillStyle = 'rgba(255,255,255,.16)'; cx.fillText('夢', Wd - PAD - 150, 70); }
+      if (draw) { cx.fillStyle = '#F4F6FE'; cx.fillRect(0, 0, Wd, cv.height); var gr = cx.createLinearGradient(0, 0, Wd, 300); gr.addColorStop(0, CV('--c-l')); gr.addColorStop(1, CV('--c-d')); cx.fillStyle = gr; cx.fillRect(0, 0, Wd, 292); font('700', 150, JF); cx.fillStyle = 'rgba(255,255,255,.16)'; cx.fillText('夢', Wd - PAD - 150, 70); }
       y = 54; font('700', 25); txt('PROSKILLS · CAREER DESIGN 01', PAD, IN, 44, '#FFE08A');
       font('800', 54); txt('Bản Career Design của tôi', PAD, IN - 120, 70, '#FFFFFF');
       font('600', 28); txt((p.name || '') + (p.cls ? ' · Lớp ' + p.cls : '') + (p.sid ? ' · ' + p.sid : ''), PAD, IN - 120, 40, 'rgba(255,255,255,.92)');
@@ -1359,7 +1392,7 @@
       var mo = trim(g('a81.motto')), lt = trim(g('a81.letter')), L = [];
       if (lt) L.push({ t: lt });
       section(0, 'Lời hứa với mình năm ' + y5(), L, function (x, mw) {
-        if (mo) { y += 8; font('700', 32); txt('“' + mo + '”', x, mw - 150, 44, '#1C4FD8'); }
+        if (mo) { y += 8; font('700', 32); txt('“' + mo + '”', x, mw - 150, 44, CV('--c-d')); }
         y += 14; font('600', 23); txt(sa ? 'Đã đóng dấu ' + dmy(sa) : 'Chưa đóng dấu', x, mw, 32, '#7A82A3');
         font('800', 34); var ys = y; txt(p.name || '', x, mw - 150, 46, '#18203F');
         if (sa && draw) { var cxp = PAD + IN - 110, cyp = ys - 20; cx.save(); cx.translate(cxp, cyp); cx.rotate(-0.24); cx.beginPath(); cx.arc(0, 0, 62, 0, Math.PI * 2); cx.strokeStyle = '#D2372C'; cx.lineWidth = 6; cx.stroke(); font('700', 38, JF); cx.fillStyle = '#D2372C'; cx.textAlign = 'center'; cx.textBaseline = 'middle'; cx.fillText('約束', 0, 2); cx.restore(); cx.textAlign = 'left'; cx.textBaseline = 'top'; }
@@ -1544,13 +1577,81 @@
   }
   function closeOv(run) { var el = D.getElementById('cdov'); if (el) el.parentNode.removeChild(el); if (!nbOpen) D.body.classList.remove('ps-lock'); var cb = OVCB; OVCB = null; if (run && cb) cb(); }
 
+  /* ---------- Thẻ Từ khóa của ga (nội dung bản CD49) ---------- */
+  /* màu chủ đạo đọc từ CSS (để Lưu ảnh dùng đúng màu đang chọn) */
+  function CV(n) { try { var v = W.getComputedStyle(D.documentElement).getPropertyValue(n).replace(/^\s+|\s+$/g, ''); if (v) return v; } catch (e) {} return { '--c': '#2C5BC4', '--c-d': '#2149A6', '--c-l': '#4472D6' }[n] || '#2C5BC4'; }
+  function sayBtn(t, lab, sm) { return '<button type="button" class="kw__say' + (sm ? ' sm' : '') + '" data-act="speak" data-t="' + esc(t) + '" aria-label="' + esc(lab) + '">' + PS.icon('sound', sm ? 15 : 20) + '</button>'; }
+  function kwCard(n) {
+    var k = KW[n]; if (!k) return;
+    sound('tap');
+    ov('<div class="kw"><small class="kw__tag">Từ khóa của ' + (n === 8 ? 'Ga Ước Mơ' : 'ga ' + (n < 10 ? '0' : '') + n) + '</small>' +
+      '<div class="kw__w"><span class="jp" lang="ja">' + esc(k.w) + '</span>' + sayBtn(k.r, 'Nghe phát âm') + '</div>' +
+      '<p class="kw__r"><span class="jp" lang="ja">' + esc(k.r) + '</span> · ' + esc(k.ro) + '</p><p class="kw__m">' + esc(k.m) + '</p>' +
+      '<div class="kw__sym"><svg viewBox="0 0 64 64" width="64" height="64" aria-hidden="true">' + k.sym.svg + '</svg><div><small>Biểu tượng của ga</small><b>' + esc(k.sym.t) + '</b><p>' + esc(k.sym.d) + '</p></div></div>' +
+      '<div class="kw__ex"><p class="jp" lang="ja">' + esc(k.ex[0]) + ' ' + sayBtn(k.ex[0], 'Nghe câu ví dụ', 1) + '</p><p class="kw__ro">' + esc(k.ex[1]) + '</p><p>' + esc(k.ex[2]) + '</p></div>' +
+      '<div class="kw__ins"><small>Bài học Oden</small><ul>' + k.oden.map(function (x) { return '<li><b>' + esc(x[0]) + '</b><span>' + esc(x[1]) + '</span></li>'; }).join('') + '</ul></div>' +
+      '<div class="kw__act"><small>Hành động ngay</small><p><b>' + esc(k.act[0]) + '</b></p><p class="jp" lang="ja">' + esc(k.act[1]) + ' ' + sayBtn(k.act[1], 'Nghe', 1) + '</p><p class="kw__ro">' + esc(k.act[2]) + ' · ' + esc(k.act[3]) + '</p></div>' +
+      '<div class="kw__hk"><small>Shin gửi bạn</small><p class="jp" lang="ja">' + k.hk.map(esc).join('<br>') + ' ' + sayBtn(k.hk.join('、'), 'Nghe bài haiku', 1) + '</p><p class="kw__ro">' + esc(k.hro) + '</p><p class="kw__vn">' + esc(k.hvn).replace(/ \/ /g, '<br>') + '</p></div>' +
+      '<p class="kw__ok"><button type="button" class="btn" data-act="ovClose">Đã hiểu</button></p></div>');
+    var box = D.querySelector('#cdov .ov__box'); if (box) { box.className += ' ov__box--kw'; box.scrollTop = 0; setTimeout(function () { box.scrollTop = 0; }, 120); }
+  }
+
+  /* ---------- Màn hình tàu vào ga (lần đầu vào mỗi ga, như CD49; tàu là tàu trên Vé hành trình) ---------- */
+  function arrTrain() { /* tàu của Vé hành trình, vẽ chi tiết: thân bo liền, mũi thuôn, kính phản sáng, sọc vàng, bánh xoay */
+    var w = [40, 62, 138, 160].map(function (x) {
+      return '<g class="wh"><circle cx="' + x + '" cy="72" r="7.2" fill="#FFC93C" stroke="#E2A41E" stroke-width="1.4"/><path d="M' + (x - 4.6) + ' 72h9.2M' + x + ' 67.4v9.2" stroke="#E2A41E" stroke-width="1.3" stroke-linecap="round"/><circle cx="' + x + '" cy="72" r="2.2" fill="#fff"/></g>';
+    }).join('');
+    var win = [24, 54, 84].map(function (x) {
+      return '<rect x="' + x + '" y="25" width="23" height="13" rx="4.5" style="fill:var(--c)"/><path d="M' + (x + 4) + ' 36.5l6-10h4.5l-6 10z" fill="#fff" opacity=".28"/>';
+    }).join('');
+    return '<svg class="arr__tr" viewBox="0 0 200 84" aria-hidden="true"><defs>' +
+      '<linearGradient id="arrB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".75" stop-color="#F1F4FA"/><stop offset="1" stop-color="#E1E7F2"/></linearGradient>' +
+      '<radialGradient id="arrL"><stop offset="0" stop-color="#FFF3B8" stop-opacity=".9"/><stop offset="1" stop-color="#FFF3B8" stop-opacity="0"/></radialGradient>' +
+      '<clipPath id="arrC"><path d="M26 16H148C171 16 187 30 193 50C195 57 191 62 184 62H26C15 62 8 55 8 44V34C8 24 16 16 26 16Z"/></clipPath></defs>' +
+      '<path d="M66 15.5h12" stroke="#B9C3D8" stroke-width="3" stroke-linecap="round"/><path d="M64 15l8-8 8 8M68 7h8" fill="none" stroke="#8D97B0" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '<path d="M18 62H186C186 66 183 68.5 179 68.5H25C21 68.5 18 66 18 62Z" fill="#2B3553"/>' +
+      '<rect x="31" y="64.5" width="40" height="5" rx="2.5" fill="#3A4466"/><rect x="129" y="64.5" width="40" height="5" rx="2.5" fill="#3A4466"/>' + w +
+      '<path d="M26 16H148C171 16 187 30 193 50C195 57 191 62 184 62H26C15 62 8 55 8 44V34C8 24 16 16 26 16Z" fill="url(#arrB)" stroke="#C9D2E4" stroke-width="1"/>' +
+      '<g clip-path="url(#arrC)"><rect x="0" y="45" width="200" height="6.5" fill="#FFC93C"/><rect x="0" y="51.5" width="200" height="2.6" style="fill:var(--c)"/></g>' +
+      '<path d="M30 19.5H146" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity=".9"/>' + win +
+      '<rect x="118" y="22" width="16" height="21" rx="3.5" fill="none" stroke="#C9D2E4" stroke-width="1.1"/><rect x="121.5" y="25" width="9" height="8" rx="2.5" style="fill:var(--c)" opacity=".85"/>' +
+      '<path d="M148 25C162 25 174 31 181 41H156C151.5 41 148 38.5 148 35Z" style="fill:var(--c-d)"/><path d="M155 39l7-12h4l-7 12z" fill="#fff" opacity=".25"/>' +
+      '<circle cx="187" cy="53.5" r="9" fill="url(#arrL)"/><ellipse cx="187" cy="53.5" rx="3.2" ry="2.2" fill="#FFF6CF"/>' +
+      '<ellipse cx="11.5" cy="50" rx="1.6" ry="2.2" fill="#F06A5A"/></svg>';
+  }
+  function arrRail() {
+    return '<svg class="arr__rail" width="100%" height="34" aria-hidden="true"><defs>' +
+      '<pattern id="arrS" width="22" height="34" patternUnits="userSpaceOnUse"><rect x="5" y="10.5" width="12" height="4" rx="2" fill="#fff" fill-opacity=".32"/></pattern>' +
+      '<pattern id="arrT" width="9" height="34" patternUnits="userSpaceOnUse"><circle cx="4.5" cy="25" r="1.5" fill="#FFC93C" fill-opacity=".85"/></pattern></defs>' +
+      '<rect x="0" y="0" width="100%" height="34" fill="url(#arrS)"/><rect x="0" y="19" width="100%" height="15" rx="0" fill="#fff" fill-opacity=".08"/>' +
+      '<rect x="0" y="0" width="100%" height="34" fill="url(#arrT)"/><line x1="0" y1="8" x2="100%" y2="8" stroke="#fff" stroke-opacity=".9" stroke-width="3" stroke-linecap="round"/></svg>';
+  }
+  function arriveOv(st) {
+    var n = st.n, a1 = ARRIVE[n] || '', a2 = T(st.intro || '');
+    closeOv();
+    var el = D.createElement('div'); el.className = 'ov ov--arr'; el.id = 'cdov'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-label', 'Tàu vào ga');
+    el.innerHTML = '<div class="arr"><div class="arr__sign"><i class="arr__post arr__post--l"></i><i class="arr__post arr__post--r"></i><div class="arr__board">' +
+      '<small>' + (st === FINAL ? 'Ga cuối' : 'Ga ' + (n < 10 ? '0' : '') + n + ' · Ga mới') + '</small><b>' + esc(st.vn) + '</b><span class="jp">' + esc(st.kana) + '</span></div></div>' +
+      '<div class="arr__track">' + arrRail() + '<span class="arr__trw"><span class="arr__sp"><i></i><i></i><i></i></span>' + arrTrain() + '</span></div>' +
+      '<div class="arr__talk">' + (a1 ? '<div class="arr__m arr__m1">' + shinSays('hi', esc(a1), 50) + '</div>' : '') + '<div class="arr__m arr__m2">' + shinSays('cheer', a2, 50) + '</div></div>' +
+      '<div class="arr__go"><button type="button" class="btn btn--go btn--w" data-act="arrGo">Vào ga thôi!</button></div></div>';
+    D.body.appendChild(el); D.body.classList.add('ps-lock');
+    if (!RM) { sound('tap'); setTimeout(function () { sound('arrive'); }, 1450); }
+  }
+  function openStation(stx) {
+    var firstArr = stx !== START && !S.seen['arr.' + stx.id] && !S.done[stx.acts[0]];
+    if (firstArr) { S.seen['arr.' + stx.id] = 1; S.seen[stx.id] = 1; save(); }
+    go({ v: 'st', st: stx.id });
+    if (firstArr) arriveOv(stx);
+  }
+
   /* âm thanh nhẹ (Web Audio), theo công tắc chung */
   var AC = null;
   function sound(k) {
     if (!PS.soundOn() || S.demo) return;
     try {
       AC = AC || new (W.AudioContext || W.webkitAudioContext)();
-      var seq = { stamp: [220, 330, 523], badge: [392, 523, 659, 784], tap: [520] }[k] || [440], t0 = AC.currentTime;
+      var seq = { stamp: [220, 330, 523], badge: [392, 523, 659, 784], tap: [520], arrive: [784, 659] }[k] || [440], t0 = AC.currentTime;
       seq.forEach(function (f, i) {
         var o = AC.createOscillator(), gn = AC.createGain(); o.type = 'sine'; o.frequency.value = f;
         gn.gain.setValueAtTime(0.0001, t0 + i * 0.09); gn.gain.exponentialRampToValueAtTime(0.16, t0 + i * 0.09 + 0.02); gn.gain.exponentialRampToValueAtTime(0.0001, t0 + i * 0.09 + 0.28);
@@ -1589,7 +1690,7 @@
     if (NBTAB === 'set' && !S.demo) PS.wireSettings(D.getElementById('nbBody'), { ctx: 'module', mod: ID, onChange: function () { } });
   }
   function openNb(tab) { NBTAB = tab || NBTAB; if (!nbOpen) { nbOpen = true; var el = D.createElement('div'); el.id = 'nb'; el.className = 'nb'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', 'Sổ tay'); D.body.appendChild(el); D.body.classList.add('ps-lock'); } drawNb(); }
-  function closeNb() { var el = D.getElementById('nb'); if (el) el.parentNode.removeChild(el); nbOpen = false; D.body.classList.remove('ps-lock'); render(false); }
+  function closeNb() { var el = D.getElementById('nb'); if (el) el.parentNode.removeChild(el); nbOpen = false; D.body.classList.remove('ps-lock'); QUIET = true; render(false); QUIET = false; }
 
   /* =========================================================
      8. DEMO GIÁO VIÊN
@@ -1628,7 +1729,7 @@
   function resetDo(id) {
     var keep = S.bak[id] || {}, fresh = !S.bak[id];
     actKeys(id).forEach(function (k) { if (fresh) keep[k] = S.d[k]; delete S.d[k]; });
-    S.bak[id] = keep; save(true); closeOv(); V = { v: 'act', id: id, step: 0 }; render(true);
+    S.bak[id] = keep; save(true); closeOv(); go({ v: 'act', id: id, step: 0 });
   }
   function restoreDo(id) {
     var bk = S.bak[id]; if (!bk) return;
@@ -1670,7 +1771,9 @@
     var a = b.getAttribute('data-act'), k = b.getAttribute('data-k'), v = b.getAttribute('data-v');
     if (a === 'psHome') { save(true); PS.home(); }
     else if (a === 'home') { closeOv(); if (nbOpen) closeNb(); go({ v: 'home' }); }
-    else if (a === 'station') { var stx = stById(b.getAttribute('data-st')); if (stx && (stOpen(stx) || stDone(stx))) go({ v: 'st', st: stx.id }); }
+    else if (a === 'station') { var stx = stById(b.getAttribute('data-st')); if (stx && (stOpen(stx) || stDone(stx))) openStation(stx); }
+    else if (a === 'kw') kwCard(+b.getAttribute('data-n'));
+    else if (a === 'arrGo') { closeOv(); sound('tap'); }
     else if (a === 'showIntro') { V.showIntro = 1; render(false); }
     else if (a === 'open') openAct(b.getAttribute('data-id'));
     else if (a === 'actMenu') actMenu(b.getAttribute('data-id'));
@@ -1682,12 +1785,12 @@
     else if (a === 'backupNow') { if (!S.demo) PS.backup(); }
     else if (a === 'mainChange') mainChange(v);
     else if (a === 'riaMode') { S.d['a31.n'] = +v; save(); sound('tap'); V.riaI = null; var y7 = W.pageYOffset; redrawStep(); W.scrollTo(0, y7); }
-    else if (a === 'riaMore') { S.d['a31.n'] = 60; save(true); V.step = 1; V.riaI = 30; render(true); }
+    else if (a === 'riaMore') { S.d['a31.n'] = 60; save(true); V.step = 1; V.riaI = 30; stepState(); render(true); }
     else if (a === 'nearReset') { delete S.d['a42.near']; save(); redrawStep(); }
     else if (a === 'ownMore') { V.ownN = Math.min(3, ownCount() + 1); var y8 = W.pageYOffset; redrawStep(); W.scrollTo(0, y8); var ins2 = D.querySelectorAll('.tlrow--own .inp'); if (ins2.length) ins2[ins2.length - 1].focus(); }
     else if (a === 'introGo') { S.intro = 1; save(true); go({ v: 'home' }); }
-    else if (a === 'next') { V.step++; S.d[V.id + '.st'] = V.step; V.ownOpen = null; V.riaI = null; V.swI = null; V.ownN = null; V.typing = null; save(); render(true); }
-    else if (a === 'prev') { if (V.step > 0) { V.step--; V.ownOpen = null; render(true); } }
+    else if (a === 'next') { V.step++; S.d[V.id + '.st'] = V.step; V.ownOpen = null; V.riaI = null; V.swI = null; V.ownN = null; V.typing = null; save(); stepState(); render(true); }
+    else if (a === 'prev') { if (V.step > 0) { V.step--; V.ownOpen = null; stepState(); render(true); } }
     else if (a === 'finish') finish();
     else if (a === 'showMiss') showMiss();
     else if (a === 'pick') {
@@ -1746,7 +1849,7 @@
     else if (a === 'nbClose') closeNb();
     else if (a === 'tab') { NBTAB = b.getAttribute('data-t'); drawNb(); }
     else if (a === 'demoExit') exitDemo();
-    else if (a === 'gateFix') { var fp = FPOS[k]; if (fp) { V = { v: 'act', id: fp[0], step: fp[1], ret: 'a80' }; render(true); var fe = D.querySelector('#stepBody [data-k="' + k + '"]'); if (fe) { fe.scrollIntoView({ block: 'center' }); fe.classList.add('pulse'); } } }
+    else if (a === 'gateFix') { var fp = FPOS[k]; if (fp) { closeOv(); go({ v: 'act', id: fp[0], step: fp[1], ret: 'a80' }); var fe = D.querySelector('#stepBody [data-k="' + k + '"]'); if (fe) { fe.scrollIntoView({ block: 'center' }); fe.classList.add('pulse'); } } }
     else if (a === 'gateBack') { var gid = V.id; if (S.done[gid]) S.ins[gid] = Math.max(S.ins[gid] || 0, insForAct(gid)); save(true); go({ v: 'act', id: 'a80', step: 0 }); }
     else if (a === 'open8') open8();
     else if (a === 'finale') finaleOv(true);

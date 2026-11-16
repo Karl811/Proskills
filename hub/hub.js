@@ -67,13 +67,22 @@
     var st = m.state === 'soon' ? 'soon' : (!PS.isUnlocked(m.id) ? 'lock' : (done === 0 && !s.xp ? 'new' : (pct >= 100 ? 'done' : 'go')));
     return { s: s, total: total, done: done, pct: pct, st: st };
   }
+  /* pha màu thẻ khóa học (không dùng color-mix để chạy trên máy cũ) */
+  function mix(a, b, t) {
+    function rgb(h) { h = String(h).replace('#', ''); if (h.length === 3) h = h.charAt(0) + h.charAt(0) + h.charAt(1) + h.charAt(1) + h.charAt(2) + h.charAt(2); var n = parseInt(h, 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
+    var x = rgb(a), y = rgb(b), o = '#';
+    for (var j = 0; j < 3; j++) { var v = Math.round(x[j] + (y[j] - x[j]) * t).toString(16); o += v.length < 2 ? '0' + v : v; }
+    return o;
+  }
   function cardHTML(m, i) {
     var k = modState(m);
     var cta = { soon: 'Sắp ra mắt', lock: icon('lock', 17) + ' Mở khóa', 'new': 'Bắt đầu ' + icon('next', 17), go: 'Học tiếp ' + icon('next', 17), done: 'Ôn lại ' + icon('next', 17) }[k.st];
     var meta = k.st === 'soon' ? '<span class="mcard__soon">Đang xây dựng</span>' :
       (k.st === 'lock' ? '<span class="mcard__hint">' + icon('info', 14) + ' Thầy cô cho mật khẩu khi bắt đầu khóa tại lớp</span>' :
         '<div class="mcard__bar"><i style="width:' + k.pct + '%"></i></div><span class="mcard__meta">' + k.done + (k.total ? '/' + k.total : '') + ' hoạt động' + (k.s.xp ? ' · ' + k.s.xp + ' XP' : '') + '</span>');
-    return '<article class="mcard mcard--' + k.st + '" style="--mc:' + esc(m.color || '#24307A') + ';--i:' + (i + 3) + '">' +
+    var mc = m.color || '#24307A';
+    return '<article class="mcard mcard--' + k.st + '" style="--mc:' + esc(mc) + ';--ml:' + mix(mc, '#FFFFFF', 0.18) + ';--md:' + mix(mc, '#0B1233', 0.28) + ';--mt:' + mix(mc, '#FFFFFF', 0.9) + ';--i:' + (i + 3) + '">' +
+      '<span class="mcard__wm" aria-hidden="true">' + icon(m.icon, 124, 1.4) + '</span>' +
       '<div class="mcard__ic">' + icon(m.icon, 26, 2) + '</div>' +
       '<div class="mcard__tx"><span class="mcard__code">' + esc(m.code) + (m.state === 'hidden' ? ' · ẩn' : '') + '</span><h3>' + esc(m.title) + '</h3><p>' + esc(m.sub) + '</p>' + meta + '</div>' +
       '<button type="button" class="mcard__go" data-act="mod" data-id="' + esc(m.id) + '"' + (k.st === 'soon' ? ' disabled' : '') + '>' + cta + '</button>' +
@@ -171,6 +180,11 @@
     if ((e.key === 'Escape' || e.keyCode === 27) && D.querySelector('.sheet') && !D.querySelector('.ps-ov')) closeSettings();
   });
   W.addEventListener('ps:change', function (e) { if (e.detail && (e.detail.field === 'backup') && !D.querySelector('.sheet')) render(false); });
+  var hbT = null;
+  W.addEventListener('scroll', function () {
+    if (hbT) return;
+    hbT = setTimeout(function () { hbT = null; var hb = D.querySelector('.hbar'); if (hb) { if ((W.pageYOffset || 0) > 8) hb.classList.add('is-scrolled'); else hb.classList.remove('is-scrolled'); } }, 60);
+  }, { passive: true });
   W.addEventListener('pageshow', function (e) { if (e.persisted) { D.body.classList.remove('leaving'); render(false); } });
 
   render(true);

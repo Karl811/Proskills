@@ -103,9 +103,9 @@ function cdScene(k) {
       '<path d="M0 108Q60 74 132 100T320 92V150H0z" fill="#BFE3C8"/>' +
       '<rect x="214" y="80" width="54" height="38" rx="3" fill="#fff" stroke="#D6DDEE"/><path d="M206 82L241 58L276 82z" fill="#E0567F"/><rect x="234" y="96" width="14" height="22" rx="2" fill="#F2A20F"/><rect x="252" y="90" width="10" height="9" rx="1.5" fill="#BFD3F5"/>' +
       '<path d="M0 126Q90 104 180 122T320 116V150H0z" fill="#9ED3AE"/>' +
-      cdGirl(150, 92, '#2F6BFF', 1) +
+      cdGirl(150, 92, '#2C5BC4', 1) +
       '<path d="M182 44Q222 18 270 30" stroke="#9AA8CC" stroke-width="2" stroke-dasharray="4 5" fill="none"/>' +
-      '<g transform="translate(270 22) rotate(8)"><path d="M0 6h26l6-4h4l-3 6 3 6h-4l-6-4H0z" fill="#2F6BFF"/><path d="M10 6l6-9h4l-2 9zM10 10l6 9h4l-2-9z" fill="#4C82FF"/></g>';
+      '<g transform="translate(270 22) rotate(8)"><path d="M0 6h26l6-4h4l-3 6 3 6h-4l-6-4H0z" fill="#2C5BC4"/><path d="M10 6l6-9h4l-2 9zM10 10l6 9h4l-2-9z" fill="#4472D6"/></g>';
   } else if (k === 'snow') {
     b = '<rect width="320" height="150" fill="#24427F"/><circle cx="40" cy="28" r="12" fill="#FFF4D6"/><circle cx="45" cy="25" r="11" fill="#24427F"/>' +
       '<g fill="#fff" opacity=".85"><circle cx="90" cy="20" r="2"/><circle cx="130" cy="40" r="1.6"/><circle cx="170" cy="16" r="2"/><circle cx="305" cy="22" r="2"/><circle cx="150" cy="70" r="1.5"/><circle cx="20" cy="66" r="1.8"/><circle cx="110" cy="62" r="1.5"/><circle cx="308" cy="74" r="1.6"/></g>' +
@@ -124,7 +124,7 @@ function cdScene(k) {
       '<path d="M84 112l6-22h38l-6 22z" fill="#5B6B95"/><path d="M104 101l2-6" stroke="#9AA8CC" stroke-width="2" stroke-linecap="round"/>' +
       '<rect x="44" y="112" width="130" height="15" rx="3" fill="#B9874E"/><path d="M54 127v20M164 127v20" stroke="#9C6E3B" stroke-width="5"/>' +
       '<g font-family="Be Vietnam Pro,Arial,sans-serif" font-weight="800" text-anchor="middle">' +
-      '<rect x="198" y="22" width="48" height="30" rx="12" fill="#fff" stroke="#2F6BFF" stroke-width="2"/><path d="M212 52l-4 9 12-9z" fill="#fff" stroke="#2F6BFF" stroke-width="2" stroke-linejoin="round"/><text x="222" y="42" font-size="14" fill="#2F6BFF">VN</text>' +
+      '<rect x="198" y="22" width="48" height="30" rx="12" fill="#fff" stroke="#2C5BC4" stroke-width="2"/><path d="M212 52l-4 9 12-9z" fill="#fff" stroke="#2C5BC4" stroke-width="2" stroke-linejoin="round"/><text x="222" y="42" font-size="14" fill="#2C5BC4">VN</text>' +
       '<rect x="262" y="48" width="48" height="30" rx="12" fill="#fff" stroke="#E0453A" stroke-width="2"/><path d="M296 78l4 9-12-9z" fill="#fff" stroke="#E0453A" stroke-width="2" stroke-linejoin="round"/><text x="286" y="68" font-size="14" fill="#E0453A">JP</text></g>' +
       '<path d="M248 36q14 0 20 10" stroke="#7A8AB8" stroke-width="2" fill="none"/><path d="M264 42l5 5 1-7" stroke="#7A8AB8" stroke-width="2" fill="none" stroke-linecap="round"/>' +
       '<path d="M258 66q-12 0-18-10" stroke="#7A8AB8" stroke-width="2" fill="none"/><path d="M244 60l-5-5-1 7" stroke="#7A8AB8" stroke-width="2" fill="none" stroke-linecap="round"/>' +
@@ -134,7 +134,7 @@ function cdScene(k) {
 }
 /* Ga 6 · cây cầu mốc: nhịp 1 = ở JPC, trụ giữa = bay sang Nhật, nhịp 2 = ở Nhật. n1, n2 = số mốc mỗi nhịp (cờ đánh số). 320×140, hình phẳng. */
 function cdBridge(n1, n2) {
-  var C = '#2F6BFF', D2 = '#1C4FD8', Y = '#FFC93C', o = '';
+  var C = '#2C5BC4', D2 = '#2149A6', Y = '#FFC93C', o = '';
   function flags(n, x0, x1, start, col) {
     var s = '', k = Math.min(n, 6), i, x;
     for (i = 0; i < k; i++) {
@@ -153,7 +153,7 @@ function cdBridge(n1, n2) {
     '<path d="M160 64Q223 118 286 64" fill="none" stroke="' + D2 + '" stroke-width="5" stroke-linecap="round"/>' +
     '<rect x="154" y="64" width="12" height="56" rx="3" fill="#5B6B95"/>' +
     '<rect x="30" y="60" width="260" height="6" rx="3" fill="#18203F"/>' +
-    '<g transform="translate(148 14)"><path d="M0 9h17l5-4h3l-2 4 2 4h-3l-5-4H0z" fill="' + D2 + '"/><path d="M7 9l4-7h3l-1 7zM7 9l4 7h3l-1-7z" fill="#4C82FF"/></g>' +
+    '<g transform="translate(148 14)"><path d="M0 9h17l5-4h3l-2 4 2 4h-3l-5-4H0z" fill="' + D2 + '"/><path d="M7 9l4-7h3l-1 7zM7 9l4 7h3l-1-7z" fill="#4472D6"/></g>' +
     '<g font-family="Be Vietnam Pro,Arial,sans-serif" font-weight="800" text-anchor="middle">' +
     '<text x="17" y="88" font-size="10" fill="#1E6B3C">JPC</text><text x="303" y="88" font-size="10" fill="#1E6B3C">Nhật</text>' +
     '<text x="97" y="132" font-size="9.5" fill="' + D2 + '">Chặng 1 · Ở JPC</text><text x="223" y="132" font-size="9.5" fill="' + D2 + '">Chặng 2 · Ở Nhật</text></g>' +
@@ -190,7 +190,7 @@ function cdWork(k) {
       '<rect x="146" y="98" width="28" height="4" fill="#E8F06A" opacity=".9"/>';
   } else if (k === 'farm') {
     b = '<rect width="320" height="130" fill="#FFF1D6"/><circle cx="50" cy="30" r="14" fill="#FFC93C"/>' +
-      '<path d="M190 112V60Q250 14 312 60v52z" fill="#fff" fill-opacity=".7" stroke="#BFD3F5" stroke-width="2"/><path d="M220 112V44M251 112V36M282 112V44" stroke="#D6E2FF" stroke-width="2"/>' +
+      '<path d="M190 112V60Q250 14 312 60v52z" fill="#fff" fill-opacity=".7" stroke="#BFD3F5" stroke-width="2"/><path d="M220 112V44M251 112V36M282 112V44" stroke="#D3E0F6" stroke-width="2"/>' +
       '<rect x="0" y="104" width="320" height="26" fill="#B98A5A"/><g fill="#3FA85E">' +
       '<circle cx="18" cy="104" r="8"/><circle cx="48" cy="104" r="8"/><circle cx="78" cy="104" r="8"/><circle cx="208" cy="104" r="8"/><circle cx="240" cy="104" r="8"/><circle cx="272" cy="104" r="8"/><circle cx="304" cy="104" r="8"/></g>' +
       cdGirl(140, 66, '#22A05E', 0) + '<ellipse cx="140" cy="56" rx="22" ry="5" fill="#E8C26A"/><path d="M128 56q12-17 24 0z" fill="#F2D27E"/><path d="M128.5 53.5h23" stroke="#C0392B" stroke-width="2.4"/>';
@@ -210,14 +210,14 @@ function cdWork(k) {
       cdBoy(150, 58, '#9CC3F0', 'net') +
       '<rect x="0" y="108" width="320" height="10" rx="4" fill="#8E9BBF"/><g fill="#C9D3E6"><circle cx="10" cy="124" r="5"/><circle cx="90" cy="124" r="5"/><circle cx="170" cy="124" r="5"/><circle cx="250" cy="124" r="5"/><circle cx="310" cy="124" r="5"/></g>' +
       '<g fill="#7FB0E8"><path d="M30 104q12-8 24 0q-12 8-24 0z"/><path d="M54 104l6-4v8z"/><path d="M230 104q12-8 24 0q-12 8-24 0z"/><path d="M254 104l6-4v8z"/></g>' +
-      '<rect x="270" y="24" width="38" height="24" rx="4" fill="#fff" stroke="#BFD3F5"/><text x="289" y="40" font-size="10" text-anchor="middle" fill="#2F6BFF" ' + F + '>5°C</text>';
+      '<rect x="270" y="24" width="38" height="24" rx="4" fill="#fff" stroke="#BFD3F5"/><text x="289" y="40" font-size="10" text-anchor="middle" fill="#2C5BC4" ' + F + '>5°C</text>';
   } else if (k === 'clean') {
     b = '<rect width="320" height="130" fill="#EEF3FF"/><path d="M0 100L80 70H240L320 100z" fill="#DCE3F2"/><rect x="80" y="20" width="160" height="50" fill="#F8FAFF" stroke="#D6DDEE"/>' +
       '<path d="M100 20v50M140 20v50M180 20v50M220 20v50" stroke="#E3E7F5"/><rect x="0" y="100" width="320" height="30" fill="#CFD8EC"/><path d="M30 112h60M200 118h80" stroke="#fff" stroke-width="3" opacity=".7" stroke-linecap="round"/>' +
-      cdBoy(150, 64, '#22A05E', 'cap') + '<path d="M228 72v40" stroke="#7A5530" stroke-width="3"/><path d="M216 112h24l-4 10h-16z" fill="#2F6BFF"/><rect x="250" y="96" width="22" height="20" rx="3" fill="#FFC93C"/>';
+      cdBoy(150, 64, '#22A05E', 'cap') + '<path d="M228 72v40" stroke="#7A5530" stroke-width="3"/><path d="M216 112h24l-4 10h-16z" fill="#2C5BC4"/><rect x="250" y="96" width="22" height="20" rx="3" fill="#FFC93C"/>';
   } else if (k === 'office') {
     b = '<rect width="320" height="130" fill="#F3F7FF"/><rect x="200" y="16" width="100" height="58" rx="4" fill="#fff" stroke="#D6DDEE" stroke-width="2"/>' +
-      '<path d="M214 62l18-16 16 10 18-22 18 14" stroke="#2F6BFF" stroke-width="2.5" fill="none" stroke-linecap="round"/>' +
+      '<path d="M214 62l18-16 16 10 18-22 18 14" stroke="#2C5BC4" stroke-width="2.5" fill="none" stroke-linecap="round"/>' +
       cdBoy(110, 66, '#2B3966', 0) + '<rect x="40" y="108" width="190" height="10" rx="3" fill="#B9874E"/><rect x="150" y="80" width="56" height="30" rx="3" fill="#18203F"/><rect x="154" y="84" width="48" height="22" fill="#7FB0E8"/>' +
       '<rect x="0" y="118" width="320" height="12" fill="#E1E8F7"/>';
   } else if (k === 'dorm') {
@@ -231,7 +231,7 @@ function cdWork(k) {
       '<rect x="196" y="28" width="104" height="80" rx="6" fill="#C9D3E6"/><rect x="208" y="40" width="44" height="28" rx="3" fill="#18203F"/><rect x="211" y="43" width="38" height="22" fill="#7FB0E8"/>' +
       '<circle cx="276" cy="46" r="6" fill="#E0453A"/><circle cx="276" cy="64" r="6" fill="#22A05E"/><rect x="208" y="78" width="80" height="8" rx="3" fill="#9AA8CC"/>' +
       '<rect x="28" y="52" width="56" height="22" rx="4" fill="#fff" stroke="#22A05E" stroke-width="2"/><text x="56" y="68" font-size="12" text-anchor="middle" fill="#1E6B3C" ' + F + '>5S</text>' +
-      cdBoy(130, 66, '#2F6BFF', 'cap');
+      cdBoy(130, 66, '#2C5BC4', 'cap');
   }
   return o + b + '</svg>';
 }
@@ -245,5 +245,5 @@ function cdZones() {
     '<text x="150" y="99" font-size="11" fill="#1E6B3C" ' + F + '>An toàn</text>' +
     '<text x="150" y="52" font-size="11.5" fill="#9A6400" ' + F + '>Học hỏi</text>' +
     '<text x="150" y="22" font-size="11" fill="#B43A2E" ' + F + '>Quá sức</text>' +
-    '<g class="zarrow"><path d="M182 118l26 18" stroke="#2F6BFF" stroke-width="2.4" stroke-linecap="round"/><path d="M200 138l9-1-2-9" stroke="#2F6BFF" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g></svg>';
+    '<g class="zarrow"><path d="M182 118l26 18" stroke="#2C5BC4" stroke-width="2.4" stroke-linecap="round"/><path d="M200 138l9-1-2-9" stroke="#2C5BC4" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g></svg>';
 }

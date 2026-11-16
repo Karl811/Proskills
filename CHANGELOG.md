@@ -5,6 +5,36 @@ Quy ước số phiên bản: **PS a.b.c**
 - b: giai đoạn / thêm module hoặc tính năng lớn
 - c: sửa nhỏ trong giai đoạn đó
 
+## PS1.3.12 · 16/11/2026 · CD01: màu coban dịu + tàu vào ga vẽ lại · CD01.1.2
+- Màu chủ đạo CD01 chốt **Xanh coban dịu #2C5BC4** (sáng #4472D6, đậm #2149A6, đậm hơn #1A3A85, nhạt #E9F0FC). Đổi cả thẻ CD01 ở trang chủ, nhãn Sân ga, hình minh họa, Lưu ảnh. Bỏ chế độ thử màu `?mau=` (máy nào đã thử cũng tự về màu mới).
+- Màn hình tàu vào ga vẽ lại kỹ hơn:
+  - Biển tên ga treo kiểu biển ga Nhật: 2 thanh treo, bảng trắng bo tròn, chữ kana dưới tên ga, dải màu ở chân có vạch vàng giữa; khi hiện thì đung đưa nhẹ rồi đứng yên.
+  - Tàu (dáng tàu trên Vé hành trình) vẽ chi tiết: thân một nét liền, mũi thuôn bo tròn, kính có vệt phản sáng, cửa, cần lấy điện, sọc vàng chạy theo thân, gầm tối, đèn pha có quầng sáng, đèn hậu đỏ. Bánh xe quay rồi chậm dần khi tàu dừng, có vệt gió phía sau, tàu nhún nhẹ khi đỗ.
+  - Đường ray liền, tà vẹt bo tròn, mép sân ga có hàng chấm vàng.
+  - Giảm chuyển động: hiện ngay, không chạy.
+- Giữ: câu tàu vào Ga Ước Mơ (đã duyệt); Ga 5 thẻ từ khóa 先輩 như CD49.
+
+File cần xóa trên GitHub: không có.
+
+## PS1.3.11 · 16/11/2026 · Trang chủ mới + CD01 nhẹ mắt hơn · CD01.1.1
+Trang chủ Proskills
+- Thẻ khóa học: bỏ thanh màu bên trái; thiết kế lại có chiều sâu nhẹ (nền loang màu khóa ở góc, biểu tượng lớn mờ làm nền, ô biểu tượng có độ sáng, nút nổi mảnh 2px, mã khóa dạng nhãn).
+- Thanh trên (Cài ứng dụng · Cài đặt): nền trong suốt, hết khung chữ nhật; chỉ hiện nền mờ khi cuộn xuống.
+- Banner chào: bỏ quầng vàng ở góc, thay bằng hoa văn mảnh từ biểu tượng các khóa (tàu, la bàn, cuộn giấy, tạ); một vệt sáng nhẹ lướt qua khoảng 9 giây một lần (tắt khi “giảm chuyển động”).
+- Thêm thẻ TC01 · Huấn luyện thể chất (Sức khỏe, luyện tập, thao tác vận động an toàn), trạng thái Sắp ra mắt. Lõi thêm biểu tượng `dumbbell`.
+CD01
+- Đưa lại **Thẻ Từ khóa của ga** (bản CD49): chip từ khóa trên banner mỗi ga (Ga 1–7 và Ga Ước Mơ), chạm mở thẻ: chữ Nhật + loa, phát âm, nghĩa, Biểu tượng của ga (hình vẽ), câu ví dụ, Bài học Oden (2 ý), Hành động ngay, Shin gửi bạn (haiku). Nội dung giữ nguyên CD49 (`KW` trong content.js); chỉ sửa lỗi gõ “gioir” → “giỏi”.
+- Đưa lại **màn hình tàu vào ga** lần đầu vào mỗi ga (không có ở Sân ga): biển ga rơi xuống, tàu trên Vé hành trình chạy vào, 2 lời Shin (câu giới thiệu ga từ CD49 `ARRIVE` + lời mở ga hiện tại), nút “Vào ga thôi!”. Ga 7 sửa lỗi gõ “không không”. Ga Ước Mơ: câu mới, chờ thầy duyệt.
+- Nút và viền: nổi khối 2px (trước 3–5px), bóng mờ nhẹ, viền 1px; nút “Soft” phẳng; nút “Đi tiếp” thay quầng sáng tỏa ra (gây chồng màu trên vé) bằng vệt sáng mảnh chạy bên trong. Vé: nền xanh chuyển vào thân vé, bóng trung tính, hết viền xanh dưới cuống vàng.
+- Vé hành trình: vệt sáng mảnh hơn (12%), mờ hơn, 10 giây một lần; thanh tiến độ 6px, ánh vàng chậm và dịu.
+- Thanh điều hướng theo kiểu TK: viên thuốc trong, 2 nút tròn đồng tâm với viền. Vòng quanh nút Sơ đồ tuyến = tiến độ hôm nay: vàng tăng theo từng chặng xong của ga đang học (tính từ đầu ngày), xong cả ga thì xanh.
+- Chữ đậm 3 mức: 700 (tiêu đề), 600 (nhấn, nút, nhãn), 500 (phụ); chữ thường 400. Trước đây 600–800.
+- Nút Back của điện thoại: về trang trước trong khóa (chặng → ga → sơ đồ tuyến → trang chủ Proskills), không hoạt cảnh, giữ chỗ cuộn; đang mở thẻ/Sổ tay thì Back chỉ đóng thẻ.
+- Màu chủ đạo thành biến (`--c-l`, `--c-rgb`…), Lưu ảnh đọc màu từ CSS. Thử 4 màu: mở `cd01/?mau=1` (Chàm Proskills), `?mau=2` (Xanh coban dịu), `?mau=3` (Xanh denim), `?mau=4` (Xanh cổ vịt đậm), `?mau=0` về màu cũ. Máy nhớ lựa chọn. Chờ thầy chọn rồi đặt làm mặc định.
+- Kiểm 390/360/1280, giảm chuyển động; ES5 đạt; không lỗi console; không tràn ngang.
+
+File cần xóa trên GitHub: không có.
+
 ## PS1.3.10 · 16/11/2026 · CD01: Ga Ước Mơ (Ga 8, về đích) · CD01.1.0
 - Ga Ước Mơ mở khi xong 18 chặng. 3 chặng nghi thức (`FIN_ORDER`: a80, a81, a82), không tính vào 18. Đi liền một mạch: xong chặng nào mở luôn chặng sau.
 - a80 Cổng soát vé: máy soát 8 ô (tia quét, ô sáng lần lượt). Ô sơ sài (ít từ hơn mức trong `GATE8`, hoặc còn nguyên câu gợi ý) hiện vàng + Shin “Ô 3 còn ngắn. Muốn thêm chút cho trọn không?”. Nút **Bổ sung** mở đúng ô viết (thanh “Xong, quay lại cổng”, Insight tính lại). Luôn qua cổng được. Lưu `a80.thin`.
