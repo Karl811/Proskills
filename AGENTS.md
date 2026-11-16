@@ -31,7 +31,9 @@ Gắn lõi nằm ở đầu `engine.js`: `S.name/by/cls/path` là thuộc tính 
 ### Module cd01 (Career Design 1)
 Nạp theo thứ tự trong `cd01/index.html`: `art.js` (Shin, biểu tượng) → `content.js` (**chữ, nội dung: sửa ở đây**; ga, chặng, các bước, demo) → `engine.js` (trạng thái, gắn lõi, điều hướng, các dạng bước, Sổ tay, demo).
 Thêm ga mới: khai báo hoạt động trong `ACTS`, thêm id vào `acts` của ga, đặt `ready: 1` cho ga, nối id vào `ORDER`, viết cách điền ô Bản Career Design (`cardFilled`, `cardBody` trong engine.js).
-Dạng bước có sẵn: say, pick, multi, video, write, dil (tình huống hai bên, không đúng/sai), recap, age, tag. **CD không chấm đúng/sai** (xem đầu content.js).
+Dạng bước có sẵn (khóa `k`): say, pick, multi, video, write (+show), dil, recap, age, tag, venn, ria, riares, tik (+dyn: job/visa, more), inds, cmp, guess (đoán thử → thực tế + Senpai), visa, tl (chọn năm cho từng mốc), tlview, swipe (thẻ Sẵn sàng/Còn lo/Chưa biết, vuốt được), worry.
+Chữ có thể chèn `[Tên]`, `[Nghề]` (nghề chính ở a33), `[Diện]` (a44 hoặc hồ sơ). Dữ liệu diện đi Nhật ở `VISA` (content.js) là tóm tắt tham khảo: soát lại với Tikme và nguồn Nhật trước mỗi đợt phát hành.
+Dạng bước có sẵn: say, pick, multi (có groups), video, write, dil (tình huống hai bên), recap, age, tag, venn, ria (RIASEC từng câu), riares, tik (mở link Tikme bắt buộc), inds (chọn ngành), cmp. **CD không chấm đúng/sai; chữ viết cho điện thoại: câu ngắn, một ý một câu** (xem đầu content.js).
 
 ## 3. Hợp đồng giữa module và lõi (bắt buộc)
 1. Trang module nạp theo thứ tự: `../config.js`, `../core/core.css`, `../core/core.js`, `../core/pwa.js`, rồi file của module.
