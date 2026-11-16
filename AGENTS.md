@@ -31,7 +31,9 @@ Gắn lõi nằm ở đầu `engine.js`: `S.name/by/cls/path` là thuộc tính 
 ### Module cd01 (Career Design 1)
 Nạp theo thứ tự trong `cd01/index.html`: `art.js` (Shin, biểu tượng) → `content.js` (**chữ, nội dung: sửa ở đây**; ga, chặng, các bước, demo) → `engine.js` (trạng thái, gắn lõi, điều hướng, các dạng bước, Sổ tay, demo).
 Thêm ga mới: khai báo hoạt động trong `ACTS`, thêm id vào `acts` của ga, đặt `ready: 1` cho ga, nối id vào `ORDER`, viết cách điền ô Bản Career Design (`cardFilled`, `cardBody` trong engine.js).
-Dạng bước có sẵn (khóa `k`): say, pick, multi, video, write (+show), dil, recap, age, tag, venn, ria, riares, tik (+dyn: job/visa, more), inds, cmp, guess (đoán thử → thực tế + Senpai), visa, tl (chọn năm cho từng mốc), tlview, swipe (thẻ Sẵn sàng/Còn lo/Chưa biết, vuốt được), worry.
+Dạng bước có sẵn (khóa `k`): say, pick, multi, video, write (+show, +real), dil, recap, age, tag, venn, riamode (chọn 30/60 câu), ria, riares, tik (+dyn: job/visa, more), inds, cmp, guess (đoán thử → thực tế + Senpai; `slot` = câu theo nghề), jobguess (đoán việc theo nghề; Nghề khác chọn ngành gần nhất), visa, tl (năm + tháng không bắt buộc, tối đa 3 mốc riêng), tlview, swipe (thẻ bấm Sẵn sàng/Còn lo/Chưa biết), worry.
+**Cá nhân hóa theo nghề (từ Ga 4 trở đi):** câu hỏi, ví dụ, gợi ý lấy từ `INDP[jobKey()]` (content.js, tóm từ trang ngành Tikme); chỉ khung hoạt động là cố định. Ví dụ ô viết: `ph: '@wow'`; gợi ý: `tips: '@day'`; chữ chèn `[Nơi]`. Ga mới cũng làm như vậy.
+**Chặng đã xong:** bấm vào hiện Xem và sửa / Làm lại từ đầu (bài cũ giữ ở `S.bak` đến khi đóng dấu lại, có Khôi phục). Đổi nghề chính khi Ga 4 đã làm: hộp thoại, bài cũ vào `a42.hist`, chặng a42 hiện "Cần làm lại theo nghề mới".
 Chữ có thể chèn `[Tên]`, `[Nghề]` (nghề chính ở a33), `[Diện]` (a44 hoặc hồ sơ). Dữ liệu diện đi Nhật ở `VISA` (content.js) là tóm tắt tham khảo: soát lại với Tikme và nguồn Nhật trước mỗi đợt phát hành.
 Dạng bước có sẵn: say, pick, multi (có groups), video, write, dil (tình huống hai bên), recap, age, tag, venn, ria (RIASEC từng câu), riares, tik (mở link Tikme bắt buộc), inds (chọn ngành), cmp. **CD không chấm đúng/sai; chữ viết cho điện thoại: câu ngắn, một ý một câu** (xem đầu content.js).
 
@@ -56,6 +58,7 @@ Dạng bước có sẵn: say, pick, multi (có groups), video, write, dil (tìn
 - Tên file giữ cố định giữa các phiên bản. Phiên bản ghi trong config.js, sw.js và tham số `?v=`.
 - Trong module: chữ (nội dung) tách khỏi luồng xử lý và giao diện, để sửa chữ không đụng mã.
 - Ưu tiên điện thoại 390px, rồi máy tính 1280px. Tôn trọng `prefers-reduced-motion`.
+- **Từ ngữ:** không dùng từ "đơn hàng" ở mọi module. Dùng "cơ hội việc làm" hoặc "công việc" tùy ngữ cảnh.
 
 ## 5. Phát hành một bản mới (PSa.b.c)
 1. Sao chép cả thư mục bản trước thành thư mục mới `PSa.b.c` rồi mới sửa.

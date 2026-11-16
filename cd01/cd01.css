@@ -103,7 +103,7 @@ button{font-family:inherit}
 .ticket__route .r{text-align:right}
 .ticket__track{position:relative;height:22px;margin-bottom:4px}
 .ticket__track::before{content:"";position:absolute;left:0;right:0;top:50%;border-top:2px dashed rgba(255,224,138,.7)}
-.ticket__train{position:absolute;top:0;width:34px;height:22px;transform:translateX(-50%);transition:left .8s var(--ease)}
+.ticket__train{position:absolute;top:0;width:34px;height:22px;transform:translateX(-50%);transition:left 1.4s cubic-bezier(.3,.8,.3,1)}
 .ticket__grid{display:grid;grid-template-columns:1.4fr 1fr;border:1px solid rgba(255,255,255,.22);border-radius:14px;overflow:hidden;background:rgba(255,255,255,.06)}
 .ticket__grid div{padding:7px 11px;border-right:1px solid rgba(255,255,255,.18);border-bottom:1px solid rgba(255,255,255,.18);min-width:0}
 .ticket__grid div:nth-child(2n){border-right:0}
@@ -111,8 +111,9 @@ button{font-family:inherit}
 .ticket__grid small{display:block;font-size:11.5px;opacity:.72}
 .ticket__grid b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ticket__bar{height:8px;border-radius:8px;background:rgba(255,255,255,.22);margin:14px 0 6px;overflow:hidden}
-.ticket__bar i{display:block;height:100%;border-radius:8px;background:linear-gradient(90deg,#FFE08A,#FFC93C);transition:width .8s var(--ease)}
-.ticket__meta{font-size:12.5px;opacity:.85;margin-bottom:12px}
+.ticket__bar i{display:block;height:100%;border-radius:8px;background:linear-gradient(90deg,#FFE08A,#FFC93C);transition:width 1.4s cubic-bezier(.3,.8,.3,1)}
+.ticket__meta{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12.5px;margin-bottom:12px}
+.ticket__meta>span:first-child{opacity:.85}
 .ticket__stub{display:flex;justify-content:space-between;align-items:center;padding:10px 18px;background:linear-gradient(90deg,#FFD866,#FFC93C);color:#3B2A00;font-size:12.5px;border-top:2px dashed rgba(59,42,0,.25)}
 .ticket__stub b{font-size:22px;font-weight:800}
 
@@ -518,3 +519,94 @@ button{font-family:inherit}
   .swc.out-r{transform:translateX(70%) rotate(8deg);opacity:0}
   .swc.out-l{transform:translateX(-70%) rotate(-8deg);opacity:0}
 }
+
+/* ===== PS1.3.4 · CD01.0.4 ===== */
+/* về Proskills: nút nhỏ đầu trang chủ module (như TK), không ở thanh trên */
+.pshome{display:inline-flex;align-items:center;gap:5px;margin:2px 0 4px;padding:6px 12px 6px 9px;min-height:34px;border:1px solid var(--rule);border-radius:999px;background:#fff;color:var(--c-d);font:600 13px/1.3 var(--f);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.pshome:active{transform:translateY(1px)}
+/* điểm trên vé: gọn, không nổi */
+.ticket__pts{display:inline-flex;gap:9px;font-weight:700;font-size:12px;color:rgba(255,255,255,.88)}
+.ticket__pts span{display:inline-flex;align-items:center;gap:3px}
+.ticket__pts svg{opacity:.85}
+/* vé: nghiêng theo chỗ chạm + vệt sáng lướt qua */
+.ticket{transition:transform .25s ease;-webkit-transform-origin:50% 50%;transform-origin:50% 50%}
+.ticket__shine{position:absolute;top:0;bottom:0;left:-60%;width:45%;pointer-events:none;z-index:2;opacity:0;
+  background:linear-gradient(100deg,rgba(255,255,255,0) 0%,rgba(255,255,255,.28) 50%,rgba(255,255,255,0) 100%);-webkit-transform:skewX(-18deg);transform:skewX(-18deg)}
+/* nháy sáng nhẹ: Đi tiếp, ga đang học, chữ Hán trên banner */
+.btn--go.glow{position:relative}
+.cdmini__dots i.on{background:var(--c-d);border:1.5px solid var(--c-d);color:#fff}
+@media (prefers-reduced-motion:no-preference){
+  .ticket__shine{animation:shine 8s ease-in-out .8s infinite}
+  .ticket__train.rock svg{-webkit-transform-origin:50% 90%;transform-origin:50% 90%;animation:rock 1.6s ease-in-out infinite}
+  .ticket__bar i.shim{background:linear-gradient(90deg,#FFE08A,#FFC93C,#FFF1C2,#FFC93C);background-size:200% 100%;animation:shim 3.2s linear infinite}
+  .btn--go.glow{animation:glowgo 2.6s ease-in-out infinite}
+  .stop--cur .stop__ic{animation:glowic 2.6s ease-in-out infinite}
+  .kanji{animation:glowkj 3.4s ease-in-out infinite}
+  .route.rvon .rv{opacity:0;-webkit-transform:translateY(18px);transform:translateY(18px);transition:opacity .5s ease,transform .55s cubic-bezier(.3,.8,.3,1)}
+  .route.rvon .rv.in{opacity:1;-webkit-transform:none;transform:none}
+  .tikcard{animation:tikin .5s var(--ease) both,tikpulse 1.6s ease-in-out .5s 2}
+  .swc{animation:flipin .38s var(--ease) both}
+}
+@keyframes shine{0%{left:-60%;opacity:0}3%{opacity:1}14%{left:120%;opacity:1}15%,100%{left:120%;opacity:0}}
+@keyframes rock{0%,100%{transform:rotate(0) translateY(0)}25%{transform:rotate(-3deg) translateY(-1px)}75%{transform:rotate(3deg) translateY(-1px)}}
+@keyframes shim{from{background-position:200% 0}to{background-position:0 0}}
+@keyframes glowgo{0%,100%{box-shadow:0 4px 0 var(--go-d),0 10px 20px -12px rgba(217,154,11,.9)}50%{box-shadow:0 4px 0 var(--go-d),0 0 0 5px rgba(255,216,102,.35),0 10px 24px -8px rgba(255,201,60,.95)}}
+@keyframes glowic{0%,100%{box-shadow:0 3px 0 rgba(0,0,0,.12)}50%{box-shadow:0 3px 0 rgba(0,0,0,.12),0 0 0 5px rgba(255,255,255,.28),0 0 16px 2px rgba(255,255,255,.55)}}
+@keyframes glowkj{0%,100%{box-shadow:0 5px 0 #E8C35A}50%{box-shadow:0 5px 0 #E8C35A,0 0 0 4px rgba(255,248,230,.25),0 0 18px 3px rgba(255,224,138,.6)}}
+@keyframes tikin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes tikpulse{50%{box-shadow:0 0 0 4px rgba(47,107,255,.16),0 4px 0 var(--c-t2)}}
+@keyframes flipin{from{opacity:0;transform:perspective(700px) rotateY(-24deg) translateX(14px)}to{opacity:1;transform:none}}
+/* banner: họa tiết sóng Nhật (seigaiha) mờ + đường ray mảnh */
+.banner{background:
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='20' viewBox='0 0 40 20'%3E%3Cg fill='none' stroke='%23fff' stroke-opacity='.09' stroke-width='1'%3E%3Ccircle cx='20' cy='20' r='19'/%3E%3Ccircle cx='20' cy='20' r='14'/%3E%3Ccircle cx='20' cy='20' r='9'/%3E%3Ccircle cx='0' cy='10' r='19'/%3E%3Ccircle cx='0' cy='10' r='14'/%3E%3Ccircle cx='40' cy='10' r='19'/%3E%3Ccircle cx='40' cy='10' r='14'/%3E%3C/g%3E%3C/svg%3E") right bottom/40px 20px repeat,
+  radial-gradient(260px 160px at 100% 0,rgba(255,255,255,.18),transparent 70%),linear-gradient(150deg,#4C82FF,var(--c) 50%,var(--c-d))}
+.banner::after{content:"";position:absolute;left:0;right:0;bottom:4px;height:5px;pointer-events:none;
+  background:linear-gradient(rgba(255,255,255,.14),rgba(255,255,255,.14)) 0 0/100% 1px no-repeat,linear-gradient(rgba(255,255,255,.14),rgba(255,255,255,.14)) 0 100%/100% 1px no-repeat,
+  repeating-linear-gradient(90deg,rgba(255,255,255,.12) 0 2px,transparent 2px 14px)}
+.banner>*{position:relative;z-index:1}
+/* gợi ý nhỏ luôn căn trái */
+.tips,.tips ul,.tips li{text-align:left}
+.tips summary{justify-content:flex-start}
+/* thẻ link Tikme nổi hơn */
+.tikcard{display:flex;align-items:center;gap:11px;margin:12px 0 0;padding:10px 12px;border-radius:16px;background:#fff;border:1.5px solid var(--c);color:var(--ink);text-decoration:none;box-shadow:0 4px 0 var(--c-t2);-webkit-tap-highlight-color:transparent}
+.tikcard:active{transform:translateY(2px);box-shadow:0 2px 0 var(--c-t2)}
+.tikcard__lg{flex:none;width:36px;height:36px;border-radius:11px;background:var(--c);color:#fff;display:grid;place-items:center;font-weight:800;font-size:18px}
+.tikcard__tx{flex:1;min-width:0}
+.tikcard__tx small{display:block;font-size:12px;color:var(--muted);font-weight:600}
+.tikcard__tx b{display:block;font-size:15.5px;color:var(--c-d)}
+.tikcard__go{flex:none;color:var(--c)}
+/* chặng đã xong: hộp chọn Xem và sửa / Làm lại */
+.sheet{display:grid;gap:8px;margin:14px 0 6px;text-align:left}
+.sheetbtn{display:flex;align-items:center;gap:12px;width:100%;border:1.5px solid var(--rule);background:#fff;border-radius:16px;padding:11px 12px;font:inherit;color:var(--ink);cursor:pointer;text-align:left;-webkit-tap-highlight-color:transparent}
+.sheetbtn svg{flex:none;color:var(--c-d)}
+.sheetbtn b{display:block;font-size:15px}
+.sheetbtn small{display:block;font-size:12.5px;color:var(--muted)}
+.sheetbtn:active{background:var(--c-t)}
+.link--in{padding:0;font-size:inherit}
+.restore{margin:-4px 0 10px;text-align:right}
+.restore .link{font-size:13px;padding:2px 4px}
+.badge--warn{background:#FFF3E3;color:#B86A12}
+.stale{display:flex;gap:5px;align-items:flex-start;font-size:13px;color:#B86A12;margin:2px 0 6px}
+.stale svg{flex:none;margin-top:2px}
+/* RIASEC: chọn bản, làm thêm */
+.rec{font-style:normal;font-size:11.5px;font-weight:700;color:var(--ok);background:var(--ok-t);border-radius:999px;padding:1px 7px;margin-left:4px;vertical-align:1px}
+.opt--rc b{display:block;font-size:15px}
+.opt--rc span small{font-weight:600}
+.morebtn{display:flex;align-items:center;gap:10px;width:100%;margin:6px 0 0;border:1.5px dashed var(--c-t2);background:rgba(255,255,255,.75);border-radius:16px;padding:10px 12px;font:inherit;color:var(--ink);cursor:pointer;text-align:left}
+.morebtn svg{flex:none;color:var(--c)}
+.morebtn b{display:block;font-size:14.5px;color:var(--c-d)}
+.morebtn small{display:block;font-size:12.5px;color:var(--muted)}
+/* nghề khác: ngành gần nhất */
+.nearline{font-size:13.5px;color:var(--ink-2);margin:4px 0 0}
+.nearline .link{font-size:13.5px;padding:0 2px}
+.guessd--real{background:#EEF8F2}
+.guessd--real .tags span{border-color:#CDEBD8;color:var(--ok)}
+/* dòng thời gian: năm + tháng (không bắt buộc), tối đa 3 mốc riêng */
+.tlsel{flex:none;display:flex;gap:6px}
+.tlsel .sel{width:104px}
+.tlsel .sel--m{width:80px;padding-right:22px}
+.addown{display:block;margin:2px 0 0;font-size:14px}
+.tlrow--own{flex-wrap:wrap;gap:8px}
+.tlrow--own .inp{flex:1 1 100%}
+.tlrow--own .tlsel{margin-left:auto}
+@media (max-width:380px){ .tlsel .sel{width:92px} .tlsel .sel--m{width:74px} .tlrow b{font-size:14px} }

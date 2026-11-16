@@ -5,6 +5,22 @@ Quy ước số phiên bản: **PS a.b.c**
 - b: giai đoạn / thêm module hoặc tính năng lớn
 - c: sửa nhỏ trong giai đoạn đó
 
+## PS1.3.4 · 16/11/2026 · CD01: chỉnh theo góp ý thầy (22 ý) + cá nhân hóa theo nghề
+- Thanh trên chỉ còn Sơ đồ tuyến và Sổ tay. Chuỗi ngày, XP, Insight chuyển lên vé (dòng nhỏ). Nút "Proskills" chỉ ở đầu trang chủ CD (như TK); trong Cài đặt vẫn có "Về trang chính".
+- Vé: tàu chạy từ đầu đến chỗ đang học rồi lắc lư; thanh vàng chạy lên rồi ánh nhẹ; vệt sáng lướt qua vé; chạm vé thì vé nghiêng theo chỗ chạm. "Đi tiếp" và ga đang học nháy sáng nhẹ. Các ga hiện dần khi lướt. Bản Career Design: ô đã điền xanh đậm, số trắng. Máy bật giảm chuyển động thì tắt hiệu ứng.
+- Banner ga: họa tiết sóng Nhật mờ + đường ray mảnh; chữ Hán nháy sáng nhẹ.
+- RIASEC: chọn Bản đầy đủ 60 câu (khuyên dùng) hoặc Bản nhanh 30 câu; 60 = 30 câu cũ + 30 câu mới (RQ2). Ai làm 30 câu có nút "Làm thêm 30 câu".
+- Chặng đã xong: chạm vào hiện "Xem và sửa" / "Làm lại từ đầu" (hỏi xác nhận, nhắc tải sao lưu; bài cũ giữ đến khi đóng dấu lại, bỏ dở thì "Khôi phục bài cũ"; không cộng, không trừ XP).
+- Đổi nghề chính ở Ga 3 khi Ga 4 đã làm: hộp thoại xác nhận, nhắc sao lưu; bài cũ lưu vào lịch sử (a42.hist); chặng "Nghề của tôi" hiện "Cần làm lại theo nghề mới", ô 5 có ghi chú.
+- Cá nhân hóa Ga 4 theo nghề (17 ngành, tóm từ trang ngành Tikme): 3 câu khởi động, 12 việc để đoán, phần "thực tế theo Tikme" sau khi xem Tikme, ví dụ 3 ô viết, gợi ý "một ngày làm nghề", mốc "Đậu thi tay nghề [Nghề]", thẻ sẵn sàng số 4 + Senpai theo nghề. Nghề khác: chọn ngành gần nhất (hoặc không có) để lấy gợi ý và link Tikme.
+- Link Tikme ở bước chọn nghề chính, phương án 2 thành thẻ nổi bật.
+- Lộ trình: tháng không bắt buộc cho mỗi mốc; tối đa 3 mốc riêng. Bỏ vuốt thẻ ở chặng Sẵn sàng (chỉ bấm 3 nút), bỏ dòng hướng dẫn vuốt.
+- Đổi "Báo cáo giữa đường" thành "Báo cáo tiến độ". Bỏ từ "đơn hàng" (mốc: "Đậu phỏng vấn công việc ở Nhật"); ghi quy tắc vào AGENTS.md.
+- Gợi ý nhỏ luôn căn trái. Demo: RIASEC 60 câu, có tháng và mốc riêng.
+- config: cd01 `ver: 'CD01.0.4'`.
+
+File cần xóa trên GitHub: không có.
+
 ## PS1.3.3 · 16/11/2026 · CD01: Ga Ngành Nghề
 - Ga 4 Ngành Nghề mở (`ready: 1`), 3 chặng + khởi động, điền ô số 5.
 - Khởi động “Đoán thử” 3 câu (người mới làm gì, KY, Omotenashi): đoán xong hiện “Thực tế thường là” + Senpai kể. Không đúng sai.
