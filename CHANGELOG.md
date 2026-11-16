@@ -5,6 +5,40 @@ Quy ước số phiên bản: **PS a.b.c**
 - b: giai đoạn / thêm module hoặc tính năng lớn
 - c: sửa nhỏ trong giai đoạn đó
 
+## PS1.3.8 · 16/11/2026 · CD01: Ga 6 cá nhân hóa theo TỪNG NGHỀ (17 nghề)
+- Đọc lại 17 trang ngành Tikme (16/11/2026), tóm vào `IND6[mã ngành]` (content.js). Ga 6 không còn chung theo nhóm: cơ khí, may mặc, đóng gói… mỗi nghề một bộ gợi ý riêng.
+- Khởi động “Rõ mấy phần?”: Senpai kể theo nghề (kế hoạch từng đổi trong nghề đó).
+- a62: việc ở JPC (3 gợi ý riêng nghề đứng đầu, rồi gợi ý chung); điều muốn đạt ở Nhật (tên kỳ thi, máy, vị trí đúng nghề, vd. Ginou Kentei cơ khí cấp 3, lái xe nâng, Kaigo Fukushishi); Senpai để dành theo nghề.
+- Ghi chú trình độ tiếng Nhật theo diện + nghề: “kaigo cần N4” chỉ hiện khi nghề là kaigo (Thực tập sinh); kaigo Kỹ năng đặc định thêm bài thi tiếng Nhật kaigo; kỹ sư: N3 trở lên. Thực tập sinh nghề khác: “thường học khoảng N5–N4 trước khi bay”.
+- Sau khi chọn trình độ trước khi bay: thêm 1 câu theo nghề (vd. kaigo, nhà hàng cần giao tiếp nhiều).
+- a63 Đo khoảng cách: 4 điều riêng nghề + điều vất vả của nghề (r3) + 4 điều chung; việc nhỏ gợi ý cho “Khi… tôi sẽ…” theo nghề. Đã bỏ các ý trùng với r3.
+- Phỏng vấn 60 giây: ví dụ + 3 gợi ý cấu trúc theo nghề; thẻ mới “Người phỏng vấn ngành … hay hỏi thêm” (1 câu + cách trả lời, không bắt buộc viết).
+- Nghề khác không có ngành gần: giữ gợi ý theo nhóm (dự phòng `PLAN.jpcG/workG`, `GAP_GRP`, `IV6_GEN`).
+- Demo giáo viên (cơ khí) cập nhật theo gợi ý mới. Kiểm 390/1280: cơ khí, may mặc, kaigo, nhà hàng, kỹ sư, Nghề khác; lướt đủ 17 nghề; ES5 đạt; không lỗi console.
+- config: cd01 `ver: 'CD01.0.8'`.
+
+File cần xóa trên GitHub: không có.
+
+## PS1.3.7 · 16/11/2026 · CD01: Ga 6 Định Hướng
+- Ga 6 Định Hướng mở (`ready: 1`), khởi động + 2 chặng, điền ô số 7. Câu hỏi, gợi ý theo nghề chính (nhóm nghề trong INDP; thực phẩm, thủy sản có nhóm riêng).
+- Khởi động “Rõ mấy phần?”: thanh trượt 0–10, kéo xong hiện Senpai kể (lời kể mẫu).
+- a62 Kế hoạch 2 chặng: cây cầu mốc (lấy các mốc ở Ga 4, chia Chặng 1 · Ở JPC / Chặng 2 · Ở Nhật theo mốc bay) → trình độ tiếng Nhật trước khi bay (ghi chú theo diện) + 2–4 việc ở JPC → trình độ ở Nhật + 1–3 điều trong công việc → thanh trượt để dành mỗi năm (số tự đặt, tham khảo, có “Mình chưa tính được”, link trang ngành Tikme) + trải nghiệm ngoài giờ → viết 2 câu kế hoạch (gợi ý ghép từ lựa chọn, chạm để dùng; câu gợi ý chưa sửa thì chưa tính Insight).
+- a63 Đo khoảng cách: “Nghề cần − Bạn đã có = Việc cần rèn”, 8 điều theo nghề, chọn Đã có / Đang có dần / Chưa có (không đúng sai) → 2 công thức “Khi… tôi sẽ…” (chạm việc nhỏ gợi ý từ điều còn thiếu, có “Lúc khác”) → trả lời phỏng vấn 60 giây: xem lại ý đã viết ở các ga trước, ước lượng số giây đọc to, đồng hồ 60 giây tập nói (không bắt buộc, đếm số lần tập).
+- Dạng bước mới: slide, bridge, plan, gap, habit, iv. Hình mới: `cdBridge()` (art.js).
+- Dữ liệu cho CD02 thêm: clear, jp1, do1, p1, jp2, work, save, joy, p2, gapNeed, habits, iv, ivn. Demo giáo viên: xong đến Ga 6.
+- config: cd01 `ver: 'CD01.0.7'`.
+
+File cần xóa trên GitHub: không có.
+
+## PS1.3.6 · 16/11/2026 · CD01: chỉnh Ga 5 + banner theo góp ý
+- Banner trang ga: bỏ hình tàu; nền chấm bi mờ như CD49, đậm dần về bên phải. Không có chữ Hán mờ trên nền.
+- Truyện tranh chị Thúy: vẽ lại nhân vật (nửa người, không vẽ bàn tay, có tóc mái, cổ, vai, mũ tốt nghiệp ở khung 1), bỏ vật cầm tay.
+- Video chị Thúy nhúng ngay trong chặng 1 (bấm mới tải, có link mở YouTube dự phòng).
+- Gợi ý chuyện Đổi đời theo ngành: chỉ chọn anh chị đã đi Nhật, đạt N1–N3 hoặc đang làm quản lý, giáo viên; bỏ các bạn N4, N5. Ưu tiên có video, có nam có nữ. Ngành dưới 2 chuyện thì thêm chuyện chung (anh Hoàng Văn Thiệu, chị Nguyễn Thị Son). Thẻ ghi JLPT, việc hiện nay, nhãn "Có video".
+- config: cd01 `ver: 'CD01.0.6'`.
+
+File cần xóa trên GitHub: không có.
+
 ## PS1.3.5 · 16/11/2026 · CD01: Ga Chuyện Trò + banner mới
 - Banner trang ga: bỏ họa tiết sóng và đường ray; nền trơn, thêm con tàu cách điệu mờ ở góc phải dưới.
 - Ga 5 Chuyện Trò mở (`ready: 1`), 2 chặng, điền ô số 6. Shin lên đại bàng sau ga này.

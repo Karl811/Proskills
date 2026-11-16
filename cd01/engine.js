@@ -51,7 +51,9 @@
       like: ga('a21.sel'), good: ga('a22.sel'), value: ga('a23.rank'), ria: R.full ? R.code.join('') : '',
       main: g('a33.main') || '', mainName: g('a33.main') ? indName(g('a33.main'), 'a33.main') : '', b: g('a33.b') || '', bName: g('a33.b') ? indName(g('a33.b'), 'a33.b') : '', why: g('a33.why') || '',
       visa: g('a44.path') || '', tl: g('a44.tl') || {}, jobKey: jobKey() || '', jobHist: ga('a42.hist').length, day: g('a42.day') || '', worry: worryText(g('a43.top')), ready: rdCount('r'), goWhy: g('a43.why') || '',
-      senpai: g('a51.who') || '', turn: g('a51.turn') || '', learn: g('a51.learn') || '', bring: g('a51.bring') || '', guide: g('a53.guide') || '', qs: [g('a53.q1') || '', g('a53.q2') || ''] };
+      senpai: g('a51.who') || '', turn: g('a51.turn') || '', learn: g('a51.learn') || '', bring: g('a51.bring') || '', guide: g('a53.guide') || '', qs: [g('a53.q1') || '', g('a53.q2') || ''],
+      clear: g('w6.clear'), jp1: g('a62.jp1') || '', do1: ga('a62.do1'), p1: g('a62.p1') || '', jp2: g('a62.jp2') || '', work: ga('a62.work'),
+      save: g('a62.save'), joy: ga('a62.joy'), p2: g('a62.p2') || '', gapNeed: gapNeed(), habits: [habitText(1), habitText(2)], iv: g('a63.iv') || '', ivn: +g('a63.ivn') || 0 };
   }
   function save(now) {
     clearTimeout(saveT);
@@ -176,6 +178,17 @@
         '<p><small class="lbl">Người dẫn đường</small>' + esc(g('a53.guide') || '') + '</p>' +
         (qs.length ? '<small class="lbl">Câu tôi sẽ hỏi</small><ul class="cdq">' + qs.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' : '');
     }
+    if (n === 7) {
+      var hb = [habitText(1), habitText(2)].filter(function (x) { return x; }), sv = g('a62.save'), nd = gapNeed(), cl = g('w6.clear');
+      var lvC = function (k) { var v = g('a62.jp' + k); return v && v !== 'u' ? v : ''; };
+      return '<p><small class="lbl">Chặng 1 · Ở JPC</small>' + (lvC(1) ? '<b>Tiếng Nhật ' + esc(lvC(1)) + '</b>' : '') + '</p>' + (g('a62.p1') ? '' : tagsHTML(ga('a62.do1'))) +
+        (g('a62.p1') ? '<p>' + esc(g('a62.p1')) + '</p>' : '') +
+        '<p><small class="lbl">Chặng 2 · Ở Nhật</small>' + (lvC(2) ? '<b>Tiếng Nhật ' + esc(lvC(2)) + '</b>' : '') + '</p>' + (g('a62.p2') ? '' : tagsHTML(ga('a62.work'))) +
+        (g('a62.p2') ? '<p>' + esc(g('a62.p2')) + '</p>' : '') +
+        (sv != null && sv !== 'u' ? '<p><small class="lbl">Để dành mỗi năm · số tự đặt, tham khảo</small>Khoảng <b>' + esc(sv) + ' triệu</b></p>' : '') +
+        (hb.length ? '<small class="lbl">Thói quen bắt đầu từ tuần này</small><ul class="cdq">' + hb.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' : '') +
+        '<small class="lbl">' + (nd ? 'Còn ' + nd + ' điều cần rèn' : 'Đo khoảng cách xong') + (cl != null && cl !== '' ? ' · lúc vào ga, kế hoạch rõ ' + esc(cl) + '/10 phần' : '') + '</small>';
+    }
     return '';
   }
   function cdCard(n, isNew) {
@@ -198,6 +211,7 @@
   }
   function demoStrip() { return S.demo ? '<div class="demo-strip"><span>Bản demo giáo viên · học viên giả định</span><button type="button" data-act="demoExit">Thoát demo</button></div>' : ''; }
   function render(top) {
+    tmKill();
     if (V.v === 'intro') { APP.innerHTML = '<div class="wrap enter">' + viewIntro() + '</div>'; stagger(); return; }
     var h = V.v === 'st' ? viewStation() : (V.v === 'act' ? viewAct() : viewHome());
     APP.innerHTML = topnav() + '<div class="wrap enter' + (S.demo ? ' wrap--demo' : '') + '">' + h + '</div>' + demoStrip();
@@ -351,10 +365,12 @@
   function words(t) { t = String(t || '').replace(/^\s+|\s+$/g, ''); return t ? t.split(/\s+/).length : 0; }
   function own(f, v) { v = String(v || ''); if (f.starter && v.indexOf(f.starter) === 0) v = v.slice(f.starter.length); return v.replace(/^\s+|\s+$/g, ''); }
   function fieldOK(f) { return own(f, g(f.key)).length >= (f.min || 1); }
-  function insOf(f) { return !f.noIns && words(own(f, g(f.key))) >= CD_INS_WORDS ? CD_INS_FIELD : 0; }
+  function autoSame(f) { var a = S.d[f.key + '~']; return !!a && a === g(f.key); } /* câu gợi ý chưa sửa thì chưa tính Insight */
+  function insOf(f) { return !f.noIns && !autoSame(f) && words(own(f, g(f.key))) >= CD_INS_WORDS ? CD_INS_FIELD : 0; }
   function insHTML(f) {
     f = FIELD[f.key] || f; if (f.noIns) return '';
     var w = words(own(f, g(f.key))), full = w >= CD_INS_WORDS;
+    if (autoSame(f)) return '<span class="ins" data-ins="' + esc(f.key) + '">' + PS.icon('bulb', 13) + 'Sửa thành lời của bạn để +' + CD_INS_FIELD + ' Insight</span>';
     return '<span class="ins' + (full ? ' full' : '') + '" data-ins="' + esc(f.key) + '">' + PS.icon('bulb', 13) + (full ? '+' + CD_INS_FIELD + ' Insight' : w + '/' + CD_INS_WORDS + ' từ để +' + CD_INS_FIELD + ' Insight') + '</span>';
   }
   function fieldHTML(f, i) {
@@ -364,11 +380,15 @@
   }
   function phOf(ph) { /* ví dụ theo nghề: '@wow' '@like' '@worry' '@dayph' */
     ph = ph || ''; if (ph.charAt(0) !== '@') return P(ph);
-    if (ph === '@who') { var so = STORY_IND[jobKey()]; return so ? 'Ví dụ: ' + so[0][1] + ', ngành ' + indName(jobKey(), '').toLowerCase() : 'Ví dụ: chị Trần Thị Thúy, ngành thủy sản'; }
+    if (ph === '@who') { var so = storyList()[0]; return 'Ví dụ: ' + (so[2] === 'f' ? 'chị ' : 'anh ') + so[1] + ', ngành ' + (so[6] || indName(jobKey(), '')).toLowerCase(); }
+    if (ph === '@iv') return J6() ? J6().ivx : 'Ví dụ: Em chọn nghề ' + jobName().toLowerCase() + ' vì em khéo tay. 5 năm sau, em muốn là thợ chính, kèm được người mới.';
     var J = JP(); if (ph === '@dayph') return 'Ví dụ: ' + J.day[0].replace(/^[^,]*,\s*/, '').split('. ')[0];
     return (J.ph && J.ph[ph.slice(1)]) || '';
   }
-  function tipsHTML(t) { if (t === '@day') t = JP().day; return t && t.length ? '<details class="tips"><summary>' + PS.icon('bulb', 15) + 'Gợi ý nhỏ</summary><ul>' + t.map(function (x) { return '<li>' + Q(x) + '</li>'; }).join('') + '</ul></details>' : ''; }
+  function tipsHTML(t) {
+    if (t === '@plan') { var pt = planTips(); return '<details class="tips" open><summary>' + PS.icon('bulb', 15) + 'Gợi ý nhỏ · chạm để dùng rồi sửa theo ý bạn</summary><ul class="tipuse">' +
+      pt.map(function (x) { return '<li><button type="button" data-act="useTip" data-k="' + x[0] + '" data-v="' + esc(x[1]) + '">' + esc(x[1]) + '</button></li>'; }).join('') + '</ul></details>'; }
+    if (t === '@day') t = JP().day; if (t === '@ivt') t = (J6() || IV6_GEN).ivt; return t && t.length ? '<details class="tips"><summary>' + PS.icon('bulb', 15) + 'Gợi ý nhỏ</summary><ul>' + t.map(function (x) { return '<li>' + Q(x) + '</li>'; }).join('') + '</ul></details>' : ''; }
   function chipsHTML(s) {
     var sel = ga(s.key), max = s.max || 99, full = sel.length >= max;
     function chip(o) { var on = sel.indexOf(o) >= 0; return '<button type="button" class="chip' + (on ? ' on' : '') + '" data-act="chip" data-k="' + esc(s.key) + '" data-v="' + esc(o) + '"' + (!on && full ? ' disabled' : '') + ' aria-pressed="' + on + '">' + esc(o) + '</button>'; }
@@ -385,6 +405,12 @@
   }
   function optBtn(key, v, t, on, extra) { return '<button type="button" class="opt' + (on ? ' on' : '') + '" data-act="pick" data-k="' + esc(key) + '" data-v="' + esc(v) + '" aria-pressed="' + on + '">' + (extra || '<span class="dot">' + (on ? PS.icon('check', 13, 3.2) : '') + '</span>') + '<span>' + esc(t) + '</span></button>'; }
 
+  function ytBox(yt, start, url, title, id) { /* video YouTube: bấm mới tải (nhẹ máy), có link dự phòng */
+    var played = !!g(id + '.vid');
+    return '<div class="vid">' + (played ? '<iframe src="https://www.youtube-nocookie.com/embed/' + yt + '?start=' + (start || 0) + '&rel=0&playsinline=1' + (V.autoplay ? '&autoplay=1' : '') + '" title="' + esc(title) + '" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>'
+      : '<button type="button" class="vid__poster" data-act="vplay"><span><span class="vid__play">' + cdIcon('play', 28, 2.4) + '</span>Bấm để xem video</span></button>') +
+      '</div><a class="vlink" href="' + esc(url) + '" target="_blank" rel="noopener">' + cdIcon('ext', 15) + 'Không xem được? Mở trên YouTube</a>';
+  }
   var STEP = {
     say: function (s) {
       var h = shinSays(s.mood || 'hi', T(s.t));
@@ -501,15 +527,30 @@
   STEP.tik = function (s) {
     var op = !!g(s.key), tx = s.t, bt = s.btn;
     if (s.dyn === 'job' && g('a33.main') === 'khac') { tx = jobKey() ? s.tNear : s.tNone; bt = jobKey() ? 'Xem ngành ' + indName(jobKey(), '') + ' trên Tikme' : 'Xem 17 ngành trên Tikme'; }
+    if (s.dyn === 'story') return shinSays('hi', T(tx)) + '<div class="card tik">' + storyCards(s.key) +
+      '<a class="btn btn--soft btn--w" style="margin-top:14px" href="' + esc(tikUrl(s)) + '" target="_blank" rel="noopener" data-act="tikOpen" data-k="' + esc(s.key) + '">' + cdIcon('ext', 17) + '<span>' + Q(bt) + '</span></a>' +
+      (op ? '<p class="tik__ok">' + PS.icon('check', 16, 3) + 'Đã mở Tikme. Đọc xong thì quay lại đây.</p>' : '<p class="qsub" style="margin:10px 0 0">Chạm một chuyện để mở trên Tikme</p>') + tipsHTML(s.tips) + '</div>';
     return shinSays('hi', T(tx)) + '<div class="card tik"><a class="btn btn--go btn--w" href="' + esc(tikUrl(s)) + '" target="_blank" rel="noopener" data-act="tikOpen" data-k="' + esc(s.key) + '">' + cdIcon('ext', 18) + '<span>' + Q(bt) + '</span></a>' +
       (op ? '<p class="tik__ok">' + PS.icon('check', 16, 3) + 'Đã mở Tikme. Làm xong thì quay lại đây.</p>' : '<p class="qsub" style="margin:10px 0 0">tikme.com · mở ở thẻ mới</p>') +
-      (s.more ? '<a class="vlink" href="' + esc(TIKME + s.more.u) + '" target="_blank" rel="noopener">' + cdIcon('ext', 15) + esc(s.more.t) + '</a>' : '') + (s.dyn === 'story' ? storyCards(s.key) : '') + tipsHTML(s.tips) + '</div>';
+      (s.more ? '<a class="vlink" href="' + esc(TIKME + s.more.u) + '" target="_blank" rel="noopener">' + cdIcon('ext', 15) + esc(s.more.t) + '</a>' : '') + tipsHTML(s.tips) + '</div>';
   };
-  function storyCards(key) { /* chuyện Đổi đời cùng ngành (đã mở thử trên Tikme) */
-    var so = STORY_IND[jobKey()] || [];
-    if (!so.length) return '<p class="ps-small" style="margin-top:12px">Ngành ' + esc(jobName()) + ' tìm trong danh sách nhé. Chưa có thì chọn chuyện bạn thấy gần mình.</p>';
-    return '<p class="grp" style="margin-top:14px">Chuyện ngành ' + esc(indName(jobKey(), '')) + ' trên Tikme</p>' +
-      so.map(function (x) { return tikCard(TIKME + '/cau-chuyen-thanh-cong/' + x[0], x[1], 'Chuyện Đổi đời', key); }).join('');
+  function storyList() { /* chuyện gợi ý theo ngành; dưới 2 chuyện thì thêm STORY_GEN (ưu tiên khác giới) */
+    var out = (STORY_IND[jobKey()] || []).slice(), have = {}, i;
+    out.forEach(function (x) { have[x[0]] = 1; });
+    var gen = STORY_GEN.slice();
+    if (out.length && out[0][2] === 'm') gen.reverse();
+    for (i = 0; i < gen.length && out.length < 2; i++) if (!have[gen[i][0]]) { out.push(gen[i]); have[gen[i][0]] = 1; }
+    return out;
+  }
+  function storyCards(key) {
+    var so = storyList(), own = STORY_IND[jobKey()] ? 1 : 0;
+    return '<p class="grp" style="margin-top:0">' + (own ? 'Anh chị đi trước ngành ' + esc(indName(jobKey(), '')) : 'Anh chị đi trước nên đọc') + '</p>' +
+      so.map(function (x) {
+        var sub = (x[6] ? 'Ngành ' + x[6] + ' · ' : '') + (x[4] ? x[4] + ' · ' : '') + x[3];
+        return '<a class="tikcard story" href="' + esc(TIKME + '/cau-chuyen-thanh-cong/' + x[0]) + '" target="_blank" rel="noopener" data-act="tikOpen" data-k="' + esc(key) + '">' +
+          '<span class="tikcard__lg story__av story__av--' + x[2] + '" aria-hidden="true">' + esc(x[1].split(' ').pop().charAt(0)) + '</span>' +
+          '<span class="tikcard__tx"><b>' + esc(x[1]) + '</b><small>' + esc(sub) + '</small>' + (x[5] ? '<em class="story__v">' + cdIcon('play', 12, 2.6) + 'Có video</em>' : '') + '</span><span class="tikcard__go">' + cdIcon('ext', 17) + '</span></a>';
+      }).join('');
   }
   STEP.inds = function (s) {
     var v = g(s.key), sel = s.multi ? ga(s.key) : [], ex = s.exclude ? g(s.exclude) : null;
@@ -698,7 +739,7 @@
     return h + shinSays('think', 'Mỗi ý là một góc nhìn. Còn chị Thúy nói:') +
       '<figure class="quote quote--sp"><p>' + esc(THUY.quote) + '</p><small>' + esc(THUY.qsrc) + '</small></figure>' +
       tikCard(TIKME + THUY.url, 'Đọc trọn chuyện chị Thúy', 'Tikme · Câu chuyện Đổi đời') +
-      '<a class="vlink" href="' + esc(THUY.yt) + '" target="_blank" rel="noopener">' + cdIcon('play', 15) + 'Xem video chị Thúy chia sẻ</a>' +
+      '<div class="card" style="margin-top:14px"><p class="q">Nghe chị Thúy chia sẻ</p>' + ytBox(THUY.ytId, 0, THUY.yt, 'Nghe chị Trần Thị Thúy chia sẻ', 'a51') + '</div>' +
       '<div class="card" style="margin-top:14px">' + s.fields.map(function (f) { return fieldHTML(f); }).join('') + '</div>';
   };
   function minhAns(i) {
@@ -732,6 +773,173 @@
     if (v) h += shinSays('think', esc(MINH.note));
     return h;
   };
+  /* ---------- Ga 6 ---------- */
+  function trim(x) { return String(x == null ? '' : x).replace(/^\s+|\s+$/g, ''); }
+  function low1(x) { x = String(x); return x.charAt(0).toLowerCase() + x.slice(1); }
+  function grpKey() { return JP().grp || 'gen'; }
+  function J6() { return IND6[jobKey()] || null; } /* Ga 6 theo từng nghề; null = không có nghề → dùng nhóm */
+  function j6Senpai(k) { var J = J6(), x = (J && J[k]) || IV6_GEN[k]; return { who: x[0], t: x[1], draft: 1 }; }
+  function lvNoteTxt() { /* ghi chú trình độ: theo nghề (nếu có) rồi theo diện */
+    var J = J6(), vk = visaKey(), n = J && J.note;
+    if (n && typeof n === 'object') n = n[vk];
+    return n || PLAN.lvNote[vk] || '';
+  }
+  function planOpts(d) { /* gợi ý theo TỪNG NGHỀ đứng trước (IND6), rồi gợi ý chung; không có nghề thì theo nhóm */
+    var gk = grpKey(), J = J6(), a;
+    if (d === 'work') a = J ? J.work.concat(PLAN.workC) : (PLAN.workG[gk] || PLAN.workG.gen).concat(PLAN.work);
+    else a = J ? J.jpc.concat(PLAN.jpc) : (PLAN.jpcG[gk] || PLAN.jpcG.gen).concat(PLAN.jpc);
+    return a.filter(function (x) { return !(x === '@next' && gk === 'ks'); }).map(function (x) { return x === '@next' ? (MILE_NEXT[visaKey()] || 'Lên Kỹ năng đặc định 1') : P(x); });
+  }
+  function lvName(n) { var v = g('a62.jp' + n), L = PLAN['lv' + n], i; if (!v || v === 'u') return ''; for (i = 0; i < L.length; i++) if (L[i][0] === v) return L[i][1]; return v; }
+  function planTips() {
+    var t1 = [], t2 = [], sv = g('a62.save');
+    if (lvName(1)) t1.push('đạt ' + lvName(1) + ' trước khi bay');
+    ga('a62.do1').slice(0, 2).forEach(function (x) { t1.push(low1(x)); });
+    if (lvName(2)) t2.push(g('a62.jp2') === 'N4' ? 'giữ vững N4' : 'lên ' + lvName(2));
+    ga('a62.work').slice(0, 2).forEach(function (x) { t2.push(low1(x)); });
+    if (sv != null && sv !== 'u' && +sv > 0) t2.push('để dành khoảng ' + sv + ' triệu mỗi năm');
+    function join(a) { return a.length > 1 ? a.slice(0, -1).join(', ') + ' và ' + a[a.length - 1] : (a[0] || '…'); }
+    return [['a62.p1', 'Ở JPC, mình sẽ ' + join(t1) + '.'], ['a62.p2', 'Ở Nhật, mình sẽ ' + join(t2) + '.']];
+  }
+  function gapList() { /* điều nghề cần: theo từng nghề (IND6.gap; không có nghề thì theo nhóm) + điều vất vả riêng (INDP.r3) + điều chung */
+    var J = J6(), gk = GAP_JOB[jobKey()] || grpKey(), out = J ? J.gap.slice() : (GAP_GRP[gk] || GAP_GRP.gen).slice(), r = JP().r3;
+    if (r) out.push(['Quen với: ' + low1(r[0]), 'hỏi 1 anh chị đi trước cách họ đã quen']);
+    return out.concat(GAP_COMMON);
+  }
+  function gapNeed() { var m = g('a63.gap') || {}, n = 0; gapList().forEach(function (x) { if (m[x[0]] === 'n' || m[x[0]] === 'p') n++; }); return n; }
+  function habitWhen(i) { var w = g('a63.h' + i + 'w'); if (w == null || w === '') return ''; return w === 'o' ? trim(g('a63.h' + i + 'wo')) : (HABIT_WHEN[+w] || ''); }
+  function habitText(i) { var w = habitWhen(i), d = trim(g('a63.h' + i + 'd')).replace(/\.$/, ''); return w && d ? 'Khi ' + w + ', tôi sẽ ' + d + '.' : ''; }
+  function formulaHTML(i) { var t = habitText(i); return t ? PS.icon('check', 14, 3) + '<span>' + esc(t) + '</span>' : '<span class="muted">Chọn “Khi…”, rồi viết “tôi sẽ…”</span>'; }
+  function slOut(c, v) {
+    if (v == null || v === '') return '<span class="sl__hint">Kéo để chọn</span>';
+    if (v === 'u') return '<b>Chưa tính được</b>';
+    v = +v;
+    if (c.unit === 'part') return '<b>' + v + '</b> / 10 phần';
+    return '<b>' + v + '</b> triệu/năm <small>≈ ' + String(Math.round(v / 12 * 10) / 10).replace('.', ',') + ' triệu/tháng</small>';
+  }
+  STEP.slide = function (s) { /* thanh trượt: khởi động Ga 6 (rõ mấy phần) và để dành mỗi năm */
+    var c = s.sl, v = g(c.key), has = v != null && v !== '', num = (has && v !== 'u') ? +v : c.def;
+    var h = '<div class="card"><p class="q">' + Q(s.q) + '</p>' + (s.sub ? '<p class="qsub">' + Q(s.sub) + '</p>' : '') +
+      '<div class="sl' + (has ? ' on' : '') + '" id="slBox"><div class="sl__out" id="slOut">' + slOut(c, has ? v : null) + '</div>' +
+      '<input type="range" class="sl__r" min="' + c.min + '" max="' + c.max + '" step="' + c.step + '" value="' + num + '" data-sl="' + esc(c.key) + '" aria-label="' + esc(P(s.q)) + '">' +
+      '<div class="sl__lh"><span>' + esc(c.lo) + '</span><span>' + esc(c.hi) + '</span></div></div>' +
+      (c.skip ? '<button type="button" class="chip chip--sm' + (v === 'u' ? ' on' : '') + '" id="slSkip" data-act="pick" data-k="' + esc(c.key) + '" data-v="u">' + esc(c.skip) + '</button>' : '') +
+      (s.note ? '<p class="slnote">' + PS.icon('info', 14) + '<span>' + esc(s.note) + '</span></p>' + tikCard(TIKME + '/nganh-nghe' + (jobKey() ? '/' + jobKey() : ''), 'Ngành ' + (jobKey() ? indName(jobKey(), '') : 'nghề') + ' trên Tikme', 'Xem số tham khảo') : '') + '</div>';
+    if (s.senpai) h += '<div id="slSp"' + (has ? '' : ' hidden') + '>' + senpaiHTML(typeof s.senpai === 'string' ? j6Senpai(s.senpai.slice(1)) : s.senpai) + '</div>';
+    if (s.opts) h += '<div class="card"><p class="q">' + Q(s.cq) + '</p><p class="qsub">' + Q(s.csub) + '</p>' + chipsHTML(s) + '</div>';
+    return h;
+  };
+  function slSet(t) {
+    var k = t.getAttribute('data-sl'), st = ACTS[V.id].steps[V.step], c = st.sl, first = g(k) == null || g(k) === '';
+    S.d[k] = +t.value; save();
+    var o = D.getElementById('slOut'), sp = D.getElementById('slSp'), bx = D.getElementById('slBox'), sk = D.getElementById('slSkip');
+    if (o) o.innerHTML = slOut(c, S.d[k]);
+    if (bx) bx.className = 'sl on'; if (sk) sk.className = 'chip chip--sm';
+    if (sp && sp.hasAttribute('hidden')) sp.removeAttribute('hidden');
+    if (first) sound('tap');
+    refreshBar();
+  }
+  STEP.bridge = function (s) { /* cây cầu mốc: lấy các mốc ở a44, chia 2 chặng theo mốc bay sang Nhật */
+    var all = tlItems(), y0 = new Date().getFullYear(), fly = null, c1 = [], c2 = [], dn = [], uk = [];
+    function rk(x) { return +x.y * 100 + (x.m || 12); }
+    all.forEach(function (x) { if (x.i === 2 && /^\d+$/.test(x.y)) fly = x; });
+    var cut = fly ? rk(fly) : (y0 + 1) * 100 + 12;
+    all.forEach(function (x) { if (x.y === 'done') dn.push(x.t); else if (x.y === 'u') uk.push(x.t); else if (rk(x) <= cut) c1.push(x); else c2.push(x); });
+    function list(a, start) { return a.length ? '<ol class="br__ol" start="' + (start + 1) + '">' + a.map(function (x) { return '<li><b>' + esc(x.lab) + '</b>' + esc(x.t) + '</li>'; }).join('') + '</ol>' : '<p class="ps-small">Chưa có mốc. Phần sau bạn tự đặt nhé.</p>'; }
+    return '<div class="card"><p class="q">' + Q(s.q) + '</p><p class="qsub">' + Q(s.sub) + '</p>' + cdBridge(c1.length, c2.length) +
+      '<div class="br"><div class="br__seg"><small class="lbl">Chặng 1 · Ở JPC</small>' + list(c1, 0) + '</div><div class="br__seg br__seg--2"><small class="lbl">Chặng 2 · Ở Nhật</small>' + list(c2, c1.length) + '</div></div>' +
+      (dn.length ? '<p class="ps-small"><b>Đã xong:</b> ' + esc(dn.join(' · ')) + '</p>' : '') + (uk.length ? '<p class="ps-small"><b>Chưa biết:</b> ' + esc(uk.join(' · ')) + '</p>' : '') + '</div>' +
+      shinSays('think', 'Mỗi chặng là một nhịp cầu. Giờ mình lên kế hoạch cho từng nhịp nhé.') +
+      '<p class="ps-small" style="text-align:center">Muốn sửa mốc? Vào Ga 4 › Lộ trình của tôi › Xem và sửa.</p>';
+  };
+  STEP.plan = function (s) { /* trình độ tiếng Nhật + việc muốn làm được (gợi ý theo nghề) */
+    var L = s.lv, v = g(L.key), rp = '', note = L.note ? lvNoteTxt() : '', J = J6();
+    var h = '<div class="card"><p class="q">' + Q(L.q) + '</p>' + (note ? '<p class="qsub">' + esc(note) + ' Tham khảo.</p>' : '') + '<div class="lvrow">' +
+      PLAN[L.opts].map(function (o) { var on = v === o[0]; if (on) rp = o[2]; return '<button type="button" class="lvb' + (on ? ' on' : '') + (o[0] === 'u' ? ' lvb--u' : '') + '" data-act="pick" data-k="' + esc(L.key) + '" data-v="' + esc(o[0]) + '" aria-pressed="' + on + '">' + esc(o[1]) + '</button>'; }).join('') + '</div>' +
+      (rp ? '<p class="lvrep">' + PS.icon('bulb', 14) + '<span>' + esc(rp) + '</span></p>' + (L.note && J && J.lvs ? '<p class="lvrep lvrep--job">' + PS.icon('compass', 14) + '<span><b>Nghề ' + esc(jobName()) + ':</b> ' + esc(J.lvs) + '</span></p>' : '') : '') + '</div>';
+    var x = {}; for (var k in s) if (s.hasOwnProperty(k)) x[k] = s[k];
+    x.opts = planOpts(s.dyn);
+    return h + STEP.multi(x);
+  };
+  STEP.gap = function (s) { /* nghề cần − bạn đã có = việc cần rèn. Không đúng sai */
+    var L = gapList(), m = g(s.key) || {}, left = 0, nh = 0;
+    L.forEach(function (x) { if (!m[x[0]]) left++; else if (m[x[0]] === 'h') nh++; });
+    var h = '<div class="gapeq" aria-label="Nghề cần trừ bạn đã có bằng việc cần rèn"><span>Nghề cần</span><i>−</i><span>Bạn đã có</span><i>=</i><span class="gapeq__r">Việc cần rèn</span></div>' +
+      '<div class="card"><span class="noscore">' + PS.icon('info', 14) + esc(TXT.noScore) + '</span><p class="q">' + Q(s.q) + '</p><p class="qsub">' + Q(s.sub) + '</p>' +
+      L.map(function (x, i) {
+        return '<div class="tagrow" data-row="' + i + '"><b>' + esc(x[0]) + '</b><div class="seg">' + GAP_OPTS.map(function (o) {
+          var on = m[x[0]] === o[0];
+          return '<button type="button" class="' + o[0] + (on ? ' on' : '') + '" data-act="gapSet" data-i="' + i + '" data-v="' + o[0] + '" aria-pressed="' + on + '">' + esc(o[1]) + '</button>';
+        }).join('') + '</div></div>';
+      }).join('') + '</div>';
+    if (!left) h += shinSays('think', nh === L.length ? 'Bạn thấy mình có đủ cả. Bước sau, chọn 2 điều muốn giữ vững nhé.' : 'Còn <b>' + (L.length - nh) + '</b> điều cần rèn. Đây là việc cần làm, không phải điểm trừ.');
+    return h + tikCard(TIKME + '/nganh-nghe' + (jobKey() ? '/' + jobKey() : ''), 'Nghề ' + jobName() + ' cần gì? Xem thêm trên Tikme', 'Tikme · tham khảo');
+  };
+  STEP.habit = function (s) { /* 2 công thức “Khi… tôi sẽ…”, việc nhỏ gợi ý từ điều còn thiếu */
+    var L = gapList(), m = g('a63.gap') || {}, need = [], i, h;
+    L.forEach(function (x) { if (m[x[0]] === 'n' || m[x[0]] === 'p') need.push(x); });
+    if (!need.length) need = L.slice(0, 4);
+    h = '<div class="card"><p class="q">' + Q(s.q) + '</p><p class="qsub">' + Q(s.sub) + '</p><p class="grp" style="margin-top:4px">Việc nhỏ gợi ý · chạm để dùng</p><div class="chips">' +
+      need.slice(0, 6).map(function (x) { return '<button type="button" class="chip chip--sug" data-act="habFill" data-v="' + esc(x[1]) + '">+ ' + esc(x[1]) + '</button>'; }).join('') + '</div></div>';
+    for (i = 1; i <= 2; i++) {
+      var wk = 'a63.h' + i + 'w', w = g(wk);
+      h += '<div class="card habit" data-hab="' + i + '"><p class="habit__n">Thói quen ' + i + '</p><p class="habit__l">Khi…</p><div class="chips chips--sm">' +
+        HABIT_WHEN.map(function (x, j) { var on = w === String(j); return '<button type="button" class="chip' + (on ? ' on' : '') + '" data-act="pick" data-k="' + wk + '" data-v="' + j + '" aria-pressed="' + on + '">' + esc(x) + '</button>'; }).join('') +
+        '<button type="button" class="chip chip--own' + (w === 'o' ? ' on' : '') + '" data-act="pick" data-k="' + wk + '" data-v="o">Lúc khác</button></div>' +
+        (w === 'o' ? '<input class="inp" data-k="' + wk + 'o" maxlength="60" placeholder="Ví dụ: tan ca làm thêm" value="' + esc(g(wk + 'o') || '') + '" style="margin-top:8px">' : '') +
+        '<p class="habit__l">…tôi sẽ</p><input class="inp" data-k="a63.h' + i + 'd" maxlength="100" placeholder="Ví dụ: ' + esc(need[i - 1] ? need[i - 1][1] : 'học 10 từ mới') + '" value="' + esc(g('a63.h' + i + 'd') || '') + '">' +
+        '<p class="formula" id="fm' + i + '">' + formulaHTML(i) + '</p></div>';
+    }
+    return h;
+  };
+  function habFill(v) {
+    var k = !trim(g('a63.h1d')) ? 'a63.h1d' : (!trim(g('a63.h2d')) ? 'a63.h2d' : null);
+    if (!k) { PS.toast('Hai ô “tôi sẽ…” đã có chữ. Xóa một ô để dùng gợi ý này.'); return; }
+    S.d[k] = v; save(); sound('tap'); var y = W.pageYOffset; redrawStep(); W.scrollTo(0, y);
+  }
+  function ivEst() {
+    var n = words(g('a63.iv')), sec = Math.round(n / IV.wps);
+    if (!n) return '';
+    return PS.icon('clock', 14) + '<span>Khoảng <b>' + n + '</b> từ · đọc to chừng <b>' + sec + '</b> giây (ước lượng). ' +
+      (sec < 40 ? 'Hơi ngắn, thêm 1–2 câu nhé.' : (sec > 75 ? 'Hơi dài, thử bớt một ý nhé.' : 'Vừa đẹp cho 60 giây.')) + '</span>';
+  }
+  var TMC = 326.7, TM = null; /* đồng hồ 60 giây: chu vi vòng r=52 */
+  STEP.iv = function (s) { /* trả lời phỏng vấn 60 giây: viết, rồi tập nói to có đồng hồ */
+    var f = s.fields[0], n = +g('a63.ivn') || 0, hints = [];
+    [['a33.why', 'Vì sao chọn nghề'], ['a13.me', '5 năm sau'], ['a51.bring', 'Muốn mang về']].forEach(function (x) { var t = trim(g(x[0])); if (t) hints.push([x[1], t.length > 110 ? t.slice(0, 108) + '…' : t]); });
+    var h = '<div class="card ivq"><span class="ivq__lab">' + PS.icon('people', 14) + 'Câu hỏi phỏng vấn</span><p class="q">' + Q(s.q) + '</p><p class="qsub">' + Q(s.sub) + '</p>' +
+      (hints.length ? '<div class="guessd"><small class="lbl">Ý bạn đã viết ở các ga trước</small><ul class="ivh">' + hints.map(function (x) { return '<li><b>' + esc(x[0]) + '</b>' + esc(x[1]) + '</li>'; }).join('') + '</ul></div>' : '') +
+      fieldHTML(f) + '<p class="ivest" id="ivEst">' + ivEst() + '</p>' + tipsHTML(s.tips) + '</div>';
+    if (J6() && J6().ivq) h += '<div class="card ivmore"><small class="lbl">' + Q(IV.more) + '</small><p class="ivmore__q">“' + esc(J6().ivq[0]) + '”</p><p class="ivmore__h">' + PS.icon('bulb', 14) + '<span>' + esc(J6().ivq[1]) + '</span></p></div>';
+    h += '<div class="card tm"><div class="tm__ring"><svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="52" class="tm__bg"/><circle cx="60" cy="60" r="52" class="tm__fg" id="tmFg" stroke-dasharray="' + TMC + '" stroke-dashoffset="0" transform="rotate(-90 60 60)"/></svg>' +
+      '<span class="tm__c"><b id="tmN">' + IV.secs + '</b><small>giây</small></span></div><div class="tm__r"><p class="q">Tập nói to 60 giây</p><p class="qsub">Đọc bài của bạn như đang phỏng vấn. Không bắt buộc, nhưng nên thử.</p>' +
+      '<button type="button" class="btn btn--sm" id="tmBtn" data-act="tmGo">' + (n ? 'Tập lại' : 'Bắt đầu') + '</button></div></div>' +
+      '<p class="tm__msg" id="tmMsg" aria-live="polite">' + (n ? PS.icon('check', 14, 3) + 'Đã tập nói ' + n + ' lần' : '') + '</p>';
+    return h;
+  };
+  function tmKill() { if (TM) { clearInterval(TM.h); TM = null; } }
+  function tmGo() {
+    if (TM) { tmEnd(false); return; }
+    var fg = D.getElementById('tmFg'), b = D.getElementById('tmBtn'), m = D.getElementById('tmMsg');
+    if (fg) fg.style.strokeDashoffset = '0'; if (b) b.textContent = 'Dừng'; if (m) m.innerHTML = '';
+    TM = { t0: Date.now(), h: setInterval(tmTick, 200) }; sound('tap');
+  }
+  function tmTick() {
+    var n = D.getElementById('tmN'), fg = D.getElementById('tmFg');
+    if (!TM) return; if (!n) { tmKill(); return; }
+    var el = (Date.now() - TM.t0) / 1000, left = Math.max(0, IV.secs - el);
+    n.textContent = Math.ceil(left); if (fg) fg.style.strokeDashoffset = String(Math.min(TMC, TMC * el / IV.secs));
+    if (left <= 0) tmEnd(true);
+  }
+  function tmEnd(full) {
+    if (!TM) return;
+    var el = Math.round((Date.now() - TM.t0) / 1000); tmKill();
+    if (full || el >= 10) { S.d['a63.ivn'] = (+g('a63.ivn') || 0) + 1; save(); }
+    sound(full ? 'badge' : 'tap');
+    var b = D.getElementById('tmBtn'), m = D.getElementById('tmMsg'), n = D.getElementById('tmN'), cnt = +g('a63.ivn') || 0;
+    if (b) b.textContent = 'Tập lại'; if (n && !full) n.textContent = IV.secs;
+    if (m) m.innerHTML = PS.icon('check', 14, 3) + esc(full ? IV.done : IV.stop.replace('[s]', el)) + (cnt ? ' · Đã tập ' + cnt + ' lần' : '');
+  }
   function cdCardPreview(n) { return '<div style="margin-top:12px">' + cdCardForce(n) + '</div>'; }
   function cdCardForce(n) { /* xem trước ô trước khi đóng dấu */
     var c = CARDS[n - 1];
@@ -764,13 +972,23 @@
     persp: function (s) { var n = ga(s.key).length; if (n < (s.min || 1)) return 'Chọn ít nhất 1 ý'; return fieldOK(s.fields[0]) ? '' : 'Viết điều bạn muốn mang về'; },
     chat: function (s) { var n = ga(s.key).length; return n >= s.min ? '' : 'Hỏi thêm ' + (s.min - n) + ' câu'; },
     chatpick: function (s) { return g(s.key) ? '' : 'Chọn một câu'; },
+    slide: function (s) { var v = g(s.sl.key); if (v == null || v === '') return 'Kéo thanh trượt để chọn'; return s.opts ? CHECK.multi(s) : ''; },
+    bridge: function () { return ''; },
+    plan: function (s) { return g(s.lv.key) ? CHECK.multi(s) : 'Chọn trình độ tiếng Nhật'; },
+    gap: function (s) { var m = g(s.key) || {}, n = 0; gapList().forEach(function (x) { if (!m[x[0]]) n++; }); return n ? 'Còn ' + n + ' điều chưa chọn' : ''; },
+    habit: function () { for (var i = 1; i <= 2; i++) { var w = g('a63.h' + i + 'w'); if (w == null || w === '') return 'Chọn “Khi…” cho thói quen ' + i; if (w === 'o' && trim(g('a63.h' + i + 'wo')).length < 3) return 'Viết lúc nào cho thói quen ' + i; if (trim(g('a63.h' + i + 'd')).length < 4) return 'Viết “tôi sẽ…” cho thói quen ' + i; } return ''; },
+    iv: function (s) { return fieldOK(s.fields[0]) ? '' : 'Viết câu trả lời của bạn'; },
     worry: function (s) { var v = g(s.key); if (!v) return 'Chọn một điều'; if (v === 'o' && String(g('a43.topo') || '').replace(/\s/g, '').length < 4) return 'Viết điều bạn lo'; return ''; }
   };
   function showMiss() {
     var body = D.getElementById('stepBody'); if (!body) return;
     var el = null, s = ACTS[V.id].steps[V.step];
     if (s.k === 'persp' && ga(s.key).length < (s.min || 1)) el = body.querySelector('.chips');
-    else if (s.k === 'write' || s.k === 'recap' || s.k === 'venn' || s.k === 'tlview' || s.k === 'persp') { (s.fields || []).forEach(function (f) { if (!el && !fieldOK(f)) el = body.querySelector('[data-k="' + f.key + '"]'); }); if (s.k === 'recap' && !g(s.key)) el = body.querySelector('.opts'); }
+    else if (s.k === 'plan') el = body.querySelector(g(s.lv.key) ? '.chips' : '.lvrow');
+    else if (s.k === 'slide') { var sv0 = g(s.sl.key); el = body.querySelector(sv0 == null || sv0 === '' ? '.sl' : '.chips'); }
+    else if (s.k === 'gap') { var gm = g(s.key) || {}; gapList().forEach(function (x, i) { if (!el && !gm[x[0]]) el = body.querySelector('[data-row="' + i + '"]'); }); }
+    else if (s.k === 'habit') { var hm = CHECK.habit(), hi2 = hm.charAt(hm.length - 1); el = body.querySelector('[data-hab="' + hi2 + '"]'); }
+    else if (s.k === 'write' || s.k === 'recap' || s.k === 'venn' || s.k === 'tlview' || s.k === 'persp' || s.k === 'iv') { (s.fields || []).forEach(function (f) { if (!el && !fieldOK(f)) el = body.querySelector('[data-k="' + f.key + '"]'); }); if (s.k === 'recap' && !g(s.key)) el = body.querySelector('.opts'); }
     else if (s.k === 'tag') { var tg = g(s.key) || {}; ga(s.from).forEach(function (it, i) { if (!el && !tg[it]) el = body.querySelector('[data-row="' + i + '"]'); }); }
     else if (s.k === 'dil' && g(s.key) === 'o') el = body.querySelector('[data-k="' + s.key + 'o"]');
     else if (s.k === 'tl') { var tl0 = g(s.key) || {}; MILES.forEach(function (m, i) { if (!el && !tl0[m[0]]) el = body.querySelector('[data-row="' + i + '"]'); }); }
@@ -909,7 +1127,7 @@
     for (var id in S.done) if (S.done.hasOwnProperty(id) && ACTS[id]) { S.xp[id] = ACTS[id].warm ? CD_XP_WARM : CD_XP_ACT; S.ins[id] = insForAct(id); }
     ALLST.forEach(function (st) { if (stDone(st)) { S.chest[st.id] = 1; S.seen[st.id] = 1; } });
     NOSAVE = 0; save(true); V = { v: 'home' }; render(true);
-    PS.toast('<b>Bản demo giáo viên</b> · học viên giả định đã xong Sân ga đến Ga Chuyện Trò');
+    PS.toast('<b>Bản demo giáo viên</b> · học viên giả định đã xong Sân ga đến Ga Định Hướng');
   }
   function exitDemo() { NOSAVE = 1; clearTimeout(saveT); try { PS.set(DEMO_KEY, null); } catch (e) {} W.location.replace(W.location.pathname); }
 
@@ -1021,6 +1239,10 @@
     }
     else if (a === 'cmNext') { var stc = ACTS[V.id].steps[V.step]; S.d[stc.key] = Math.min(stc.fr.length, (+g(stc.key) || 0) + 1); save(); sound('tap'); var yc = W.pageYOffset; redrawStep(); W.scrollTo(0, yc); var lp = D.querySelectorAll('#stepBody .comic__p'); if (lp.length && !RM) lp[lp.length - 1].scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
     else if (a === 'chatAsk') chatAsk(+v);
+    else if (a === 'gapSet') { var gl = gapList()[+b.getAttribute('data-i')], gm2 = {}, go2 = g('a63.gap') || {}; for (var gx in go2) if (go2.hasOwnProperty(gx)) gm2[gx] = go2[gx]; if (gl) { gm2[gl[0]] = v; S.d['a63.gap'] = gm2; save(); sound('tap'); var yg = W.pageYOffset; redrawStep(); W.scrollTo(0, yg); } }
+    else if (a === 'habFill') habFill(v);
+    else if (a === 'useTip') { S.d[k] = v; S.d[k + '~'] = v; save(); sound('tap'); var yt = W.pageYOffset; redrawStep(); W.scrollTo(0, yt); var ta = D.querySelector('[data-k="' + k + '"]'); if (ta) ta.classList.add('pulse'); }
+    else if (a === 'tmGo') tmGo();
     else if (a === 'riaGo') { V.riaI = +b.getAttribute('data-i'); redrawStep(); }
     else if (a === 'swp') swAns(+b.getAttribute('data-i'), v);
     else if (a === 'swGo') { V.swI = +b.getAttribute('data-i'); redrawStep(); }
@@ -1082,14 +1304,17 @@
     t.className = 'sel' + (t.value ? ' on' : ''); var row = PS.closest(t, '.tlrow'); if (row) { if (t.value) row.classList.add('on'); else row.classList.remove('on'); row.classList.remove('need'); }
     refreshBar();
   }
-  D.addEventListener('change', function (e) { var t = e.target; if (t && t.getAttribute && t.getAttribute('data-tl')) tlSet(t); });
+  D.addEventListener('change', function (e) { var t = e.target; if (t && t.getAttribute && t.getAttribute('data-tl')) tlSet(t); else if (t && t.getAttribute && t.getAttribute('data-sl')) slSet(t); });
   D.addEventListener('input', function (e) {
     var t = e.target; if (!t || !t.getAttribute) return;
     if (t.getAttribute('data-tl')) { tlSet(t); return; }
+    if (t.getAttribute('data-sl')) { slSet(t); return; }
     var k = t.getAttribute('data-k'), c = t.getAttribute('data-calc');
     if (c) { var m = +t.value; S.d[c] = m; var cm = D.getElementById('calcM'), ch = D.getElementById('calcH'); if (cm) cm.textContent = m; if (ch) ch.textContent = Math.round(m * 365 / 60); save(); return; }
     if (!k || V.v !== 'act') return;
     S.d[k] = t.value; t.classList.remove('need'); save();
+    if (/^a63\.h[12]/.test(k)) { var fm = D.getElementById('fm' + k.charAt(5)); if (fm) fm.innerHTML = formulaHTML(+k.charAt(5)); }
+    if (k === 'a63.iv') { var ie = D.getElementById('ivEst'); if (ie) ie.innerHTML = ivEst(); }
     var ins = D.querySelector('[data-ins="' + k + '"]');
     if (ins) { var tmp = D.createElement('div'); tmp.innerHTML = insHTML({ key: k }); ins.parentNode.replaceChild(tmp.firstChild, ins); }
     refreshBar();

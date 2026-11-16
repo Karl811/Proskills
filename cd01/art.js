@@ -75,44 +75,88 @@ function cdIcon(k, sz, sw) {
   sz = sz || 20;
   return '<svg class="ps-ic" width="' + sz + '" height="' + sz + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="' + (sw || 2) + '" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + p + '</svg>';
 }
-/* Cảnh truyện tranh Ga 5 (chuyện chị Thúy): home · snow · office. Hình phẳng, đơn giản, 320×150. */
-function cdGirl(x, y, c, extra) { /* nhân vật nữ tóc dài, x,y = tâm đầu */
-  return '<g><path d="M' + (x - 11) + ' ' + (y + 2) + 'q-2 16 2 22h18q4-6 2-22z" fill="#2A2118"/>' +
-    '<path d="M' + (x - 15) + ' ' + (y + 44) + 'q0-26 15-26t15 26z" fill="' + c + '"/>' +
-    '<circle cx="' + x + '" cy="' + y + '" r="10" fill="#F6D2B5"/>' +
-    '<path d="M' + (x - 10.5) + ' ' + (y + 1) + 'q1-13 10.5-13t10.5 13q-4-7-10.5-7t-10.5 7z" fill="#2A2118"/>' +
-    '<circle cx="' + (x - 3.6) + '" cy="' + (y + 1) + '" r="1.3" fill="#2A2118"/><circle cx="' + (x + 3.6) + '" cy="' + (y + 1) + '" r="1.3" fill="#2A2118"/>' +
-    '<path d="M' + (x - 3) + ' ' + (y + 5) + 'q3 2.4 6 0" stroke="#C0574A" stroke-width="1.4" fill="none" stroke-linecap="round"/>' + (extra || '') + '</g>';
+/* Cảnh truyện tranh Ga 5 (chuyện chị Thúy): home · snow · office. Hình phẳng, 320×150. Nhân vật vẽ nửa người, không vẽ bàn tay. */
+function cdGirl(x, y, c, hat) { /* x,y = tâm mặt; c = màu áo; hat = mũ tốt nghiệp */
+  function P(d) { return d.replace(/X([-+]?\d+(?:\.\d+)?)/g, function (m, n) { return String(x + (+n)); }).replace(/Y([-+]?\d+(?:\.\d+)?)/g, function (m, n) { return String(y + (+n)); }); }
+  var H = '#3A2A22', K = '#F8D7BF';
+  return '<g>' +
+    '<path d="' + P('MX-13 Y-1 CX-15 Y14 X-13 Y27 X-8 Y31 LX8 Y31 CX13 Y27 X15 Y14 X13 Y-1 Z') + '" fill="' + H + '"/>' +
+    '<path d="' + P('MX-21 Y46 CX-21 Y28 X-12 Y20 X0 Y20 CX12 Y20 X21 Y28 X21 Y46 Z') + '" fill="' + c + '"/>' +
+    '<path d="' + P('MX-4 Y8 LX4 Y8 LX4 Y19 QX0 Y23 X-4 Y19 Z') + '" fill="#EDC2A3"/>' +
+    '<path d="' + P('MX-6 Y20 LX0 Y27 LX6 Y20') + '" fill="none" stroke="#fff" stroke-width="1.6" stroke-linejoin="round" opacity=".9"/>' +
+    '<ellipse cx="' + x + '" cy="' + y + '" rx="10.5" ry="11.6" fill="' + K + '"/>' +
+    '<path d="' + P('MX-11.2 Y1 CX-11.5 Y-11 X-4 Y-13.6 X1 Y-13.2 CX8 Y-13 X12 Y-8 X11.2 Y2 CX9 Y-4 X4 Y-6.5 X-1 Y-6 CX-5 Y-5 X-8.5 Y-3 X-11.2 Y1 Z') + '" fill="' + H + '"/>' +
+    '<path d="' + P('MX-11 Y0 CX-12.5 Y8 X-12 Y16 X-10 Y22 LX-8 Y8 Z') + '" fill="' + H + '"/>' +
+    '<path d="' + P('MX11 Y0 CX12.5 Y8 X12 Y16 X10 Y22 LX8 Y8 Z') + '" fill="' + H + '"/>' +
+    '<path d="' + P('MX-6.4 Y-1.4 QX-4.2 Y-2.6 X-2.2 Y-1.6 MX2.2 Y-1.6 QX4.2 Y-2.6 X6.4 Y-1.4') + '" stroke="' + H + '" stroke-width="1.1" fill="none" stroke-linecap="round"/>' +
+    '<ellipse cx="' + (x - 4.2) + '" cy="' + (y + 2.4) + '" rx="1.35" ry="1.8" fill="#2A2118"/><ellipse cx="' + (x + 4.2) + '" cy="' + (y + 2.4) + '" rx="1.35" ry="1.8" fill="#2A2118"/>' +
+    '<circle cx="' + (x - 3.8) + '" cy="' + (y + 1.8) + '" r=".5" fill="#fff"/><circle cx="' + (x + 4.6) + '" cy="' + (y + 1.8) + '" r=".5" fill="#fff"/>' +
+    '<circle cx="' + (x - 6.6) + '" cy="' + (y + 6.4) + '" r="2" fill="#F29C9C" opacity=".35"/><circle cx="' + (x + 6.6) + '" cy="' + (y + 6.4) + '" r="2" fill="#F29C9C" opacity=".35"/>' +
+    '<path d="' + P('MX-2.4 Y7 QX0 Y9 X2.4 Y7') + '" stroke="#B85A4E" stroke-width="1.2" fill="none" stroke-linecap="round"/>' +
+    (hat ? '<path d="' + P('MX-16 Y-12 LX0 Y-19 LX16 Y-12 LX0 Y-5 Z') + '" fill="#1F2A4D"/><path d="' + P('MX-9 Y-9 LX-9 Y-5 QX0 Y-1 X9 Y-5 LX9 Y-9 LX0 Y-5 Z') + '" fill="#2B3966"/><path d="' + P('MX0 Y-12 LX13 Y-9 LX13 Y0') + '" stroke="#F2C230" stroke-width="1.3" fill="none"/><circle cx="' + (x + 13) + '" cy="' + (y + 1) + '" r="1.6" fill="#F2C230"/>' : '') +
+    '</g>';
 }
 function cdScene(k) {
   var o = '<svg class="scene" viewBox="0 0 320 150" role="img" aria-hidden="true" preserveAspectRatio="xMidYMid slice">', b = '';
   if (k === 'home') {
-    b = '<rect width="320" height="150" fill="#EAF2FF"/><circle cx="276" cy="30" r="15" fill="#FFD84D"/>' +
-      '<path d="M0 112Q60 74 132 102T320 96V150H0z" fill="#BFE3C8"/><path d="M0 128Q90 104 180 124T320 118V150H0z" fill="#9ED3AE"/>' +
-      '<rect x="34" y="84" width="50" height="36" rx="3" fill="#fff" stroke="#D6DDEE"/><path d="M27 86L59 62L91 86z" fill="#E0567F"/><rect x="52" y="98" width="14" height="22" rx="2" fill="#F2A20F"/>' +
-      cdGirl(150, 74, '#2F6BFF', '<rect x="160" y="96" width="20" height="7" rx="3.5" fill="#fff" stroke="#C9D3E6"/><rect x="168" y="95" width="4" height="9" fill="#E0453A"/>') +
-      '<path d="M186 66Q222 34 252 52" stroke="#7A8AB8" stroke-width="2" stroke-dasharray="4 5" fill="none"/>' +
-      '<g transform="translate(252 44) rotate(-12)"><path d="M0 6h26l6-4h4l-3 6 3 6h-4l-6-4H0z" fill="#2F6BFF"/><path d="M10 6l6-9h4l-2 9zM10 10l6 9h4l-2-9z" fill="#4C82FF"/></g>';
+    b = '<rect width="320" height="150" fill="#EAF2FF"/><circle cx="64" cy="30" r="15" fill="#FFD84D" opacity=".9"/>' +
+      '<path d="M0 108Q60 74 132 100T320 92V150H0z" fill="#BFE3C8"/>' +
+      '<rect x="214" y="80" width="54" height="38" rx="3" fill="#fff" stroke="#D6DDEE"/><path d="M206 82L241 58L276 82z" fill="#E0567F"/><rect x="234" y="96" width="14" height="22" rx="2" fill="#F2A20F"/><rect x="252" y="90" width="10" height="9" rx="1.5" fill="#BFD3F5"/>' +
+      '<path d="M0 126Q90 104 180 122T320 116V150H0z" fill="#9ED3AE"/>' +
+      cdGirl(150, 92, '#2F6BFF', 1) +
+      '<path d="M182 44Q222 18 270 30" stroke="#9AA8CC" stroke-width="2" stroke-dasharray="4 5" fill="none"/>' +
+      '<g transform="translate(270 22) rotate(8)"><path d="M0 6h26l6-4h4l-3 6 3 6h-4l-6-4H0z" fill="#2F6BFF"/><path d="M10 6l6-9h4l-2 9zM10 10l6 9h4l-2-9z" fill="#4C82FF"/></g>';
   } else if (k === 'snow') {
     b = '<rect width="320" height="150" fill="#24427F"/><circle cx="40" cy="28" r="12" fill="#FFF4D6"/><circle cx="45" cy="25" r="11" fill="#24427F"/>' +
-      '<g fill="#fff" opacity=".85"><circle cx="90" cy="20" r="2"/><circle cx="130" cy="40" r="1.6"/><circle cx="170" cy="16" r="2"/><circle cx="300" cy="22" r="2"/><circle cx="250" cy="12" r="1.5"/><circle cx="20" cy="66" r="1.8"/><circle cx="110" cy="70" r="1.5"/><circle cx="300" cy="58" r="1.6"/></g>' +
-      '<path d="M18 128V78l24-14v14l24-14v14l24-14v64z" fill="#DCE6F7"/><rect x="74" y="44" width="10" height="30" fill="#C2CFE8"/>' +
+      '<g fill="#fff" opacity=".85"><circle cx="90" cy="20" r="2"/><circle cx="130" cy="40" r="1.6"/><circle cx="170" cy="16" r="2"/><circle cx="305" cy="22" r="2"/><circle cx="150" cy="70" r="1.5"/><circle cx="20" cy="66" r="1.8"/><circle cx="110" cy="62" r="1.5"/><circle cx="308" cy="74" r="1.6"/></g>' +
+      '<path d="M18 128V80l24-14v14l24-14v14l24-14v62z" fill="#DCE6F7"/><rect x="74" y="46" width="10" height="30" fill="#C2CFE8"/>' +
       '<g transform="translate(36 98)"><path d="M0 8q14-12 30 0q-16 12-30 0z" fill="#FF8A7A"/><path d="M30 8l8-6v12z" fill="#FF8A7A"/><circle cx="7" cy="6" r="1.6" fill="#24427F"/></g>' +
-      '<rect x="168" y="40" width="128" height="88" rx="6" fill="#FFE9A8" stroke="#F2C230" stroke-width="3"/><path d="M232 40v88" stroke="#F2C230" stroke-width="2" opacity=".5"/>' +
-      cdGirl(212, 78, '#E0567F', '') +
-      '<rect x="190" y="108" width="96" height="8" rx="2" fill="#B9874E"/><path d="M220 100l14-4 14 4v8h-28z" fill="#fff" stroke="#C9D3E6"/><path d="M234 96v12" stroke="#C9D3E6"/>' +
-      '<path d="M268 108V86M262 86h12l-6-8z" stroke="#7A5530" stroke-width="2" fill="#FFC93C"/>' +
+      '<rect x="172" y="34" width="128" height="94" rx="6" fill="#FFE9A8"/>' +
+      '<g transform="translate(270 44)"><path d="M0 26V8M-7 8h14l-7-8z" stroke="#7A5530" stroke-width="2" fill="#FFC93C" stroke-linejoin="round"/><circle cx="0" cy="12" r="10" fill="#FFF3C4" opacity=".55"/></g>' +
+      cdGirl(222, 82, '#E0567F', 0) +
+      '<rect x="176" y="112" width="120" height="16" fill="#B9874E"/><path d="M204 112l18-5 18 5z" fill="#fff" stroke="#C9D3E6" stroke-width="1"/><path d="M222 107v5" stroke="#C9D3E6"/>' +
+      '<rect x="172" y="34" width="128" height="94" rx="6" fill="none" stroke="#F2C230" stroke-width="3"/>' +
       '<path d="M0 132Q80 122 160 132T320 130V150H0z" fill="#fff"/>';
   } else {
-    b = '<rect width="320" height="150" fill="#F3F7FF"/><rect x="0" y="118" width="320" height="32" fill="#E1E8F7"/>' +
-      '<rect x="60" y="104" width="130" height="10" rx="3" fill="#B9874E"/><path d="M70 114v26M180 114v26" stroke="#9C6E3B" stroke-width="5"/>' +
-      '<path d="M116 104l6-22h34l-6 22z" fill="#5B6B95"/>' + cdGirl(98, 64, '#22A05E', '') +
+    b = '<rect width="320" height="150" fill="#F3F7FF"/><rect x="0" y="122" width="320" height="28" fill="#E1E8F7"/>' +
+      '<rect x="22" y="30" width="56" height="40" rx="4" fill="#fff" stroke="#D6DDEE"/><path d="M30 60l10-12 8 8 6-6 16 10z" fill="#BFE3C8"/>' +
+      cdGirl(104, 80, '#22A05E', 0) +
+      '<path d="M84 112l6-22h38l-6 22z" fill="#5B6B95"/><path d="M104 101l2-6" stroke="#9AA8CC" stroke-width="2" stroke-linecap="round"/>' +
+      '<rect x="44" y="112" width="130" height="15" rx="3" fill="#B9874E"/><path d="M54 127v20M164 127v20" stroke="#9C6E3B" stroke-width="5"/>' +
       '<g font-family="Be Vietnam Pro,Arial,sans-serif" font-weight="800" text-anchor="middle">' +
-      '<rect x="200" y="22" width="48" height="30" rx="12" fill="#fff" stroke="#2F6BFF" stroke-width="2"/><path d="M214 52l-4 9 12-9z" fill="#fff" stroke="#2F6BFF" stroke-width="2" stroke-linejoin="round"/><text x="224" y="42" font-size="14" fill="#2F6BFF">VN</text>' +
+      '<rect x="198" y="22" width="48" height="30" rx="12" fill="#fff" stroke="#2F6BFF" stroke-width="2"/><path d="M212 52l-4 9 12-9z" fill="#fff" stroke="#2F6BFF" stroke-width="2" stroke-linejoin="round"/><text x="222" y="42" font-size="14" fill="#2F6BFF">VN</text>' +
       '<rect x="262" y="48" width="48" height="30" rx="12" fill="#fff" stroke="#E0453A" stroke-width="2"/><path d="M296 78l4 9-12-9z" fill="#fff" stroke="#E0453A" stroke-width="2" stroke-linejoin="round"/><text x="286" y="68" font-size="14" fill="#E0453A">JP</text></g>' +
-      '<path d="M250 36q14 0 20 10" stroke="#7A8AB8" stroke-width="2" fill="none" marker-end="none"/><path d="M266 42l5 5 1-7" stroke="#7A8AB8" stroke-width="2" fill="none" stroke-linecap="round"/>' +
+      '<path d="M248 36q14 0 20 10" stroke="#7A8AB8" stroke-width="2" fill="none"/><path d="M264 42l5 5 1-7" stroke="#7A8AB8" stroke-width="2" fill="none" stroke-linecap="round"/>' +
       '<path d="M258 66q-12 0-18-10" stroke="#7A8AB8" stroke-width="2" fill="none"/><path d="M244 60l-5-5-1 7" stroke="#7A8AB8" stroke-width="2" fill="none" stroke-linecap="round"/>' +
-      '<rect x="214" y="96" width="70" height="20" rx="6" fill="#FFF8E6" stroke="#F2C230"/><text x="249" y="110" font-size="10" font-weight="700" text-anchor="middle" fill="#9A6400" font-family="Be Vietnam Pro,Arial,sans-serif">Giám đốc</text>';
+      '<rect x="212" y="98" width="74" height="20" rx="6" fill="#FFF8E6" stroke="#F2C230"/><text x="249" y="112" font-size="10" font-weight="700" text-anchor="middle" fill="#9A6400" font-family="Be Vietnam Pro,Arial,sans-serif">Giám đốc</text>';
   }
   return o + b + '</svg>';
+}
+/* Ga 6 · cây cầu mốc: nhịp 1 = ở JPC, trụ giữa = bay sang Nhật, nhịp 2 = ở Nhật. n1, n2 = số mốc mỗi nhịp (cờ đánh số). 320×140, hình phẳng. */
+function cdBridge(n1, n2) {
+  var C = '#2F6BFF', D2 = '#1C4FD8', Y = '#FFC93C', o = '';
+  function flags(n, x0, x1, start, col) {
+    var s = '', k = Math.min(n, 6), i, x;
+    for (i = 0; i < k; i++) {
+      x = k === 1 ? (x0 + x1) / 2 : x0 + (x1 - x0) * i / (k - 1);
+      s += '<g class="bflag" style="--d:' + (i * 0.08 + (start ? 0.35 : 0)) + 's"><path d="M' + x + ' 62V38" stroke="#5B6B95" stroke-width="1.6"/><path d="M' + x + ' 38h15l-4 5.5 4 5.5h-15z" fill="' + col + '"/>' +
+        '<text x="' + (x + 6.5) + '" y="46.6" font-size="8.5" font-weight="800" text-anchor="middle" fill="#fff" font-family="Be Vietnam Pro,Arial,sans-serif">' + (start + i + 1) + '</text></g>';
+    }
+    return s;
+  }
+  o += '<svg class="bridge" viewBox="0 0 320 140" role="img" aria-label="Cây cầu hai chặng: ở JPC và ở Nhật">' +
+    '<defs><linearGradient id="bsky" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#EEF3FF"/><stop offset="1" stop-color="#FFF1D6"/></linearGradient></defs>' +
+    '<rect width="320" height="140" rx="16" fill="url(#bsky)"/><circle cx="292" cy="30" r="15" fill="' + Y + '" opacity=".85"/>' +
+    '<path d="M0 108Q80 100 160 108T320 106V140H0z" fill="#CFE0FF"/><path d="M0 120Q90 112 170 120T320 118V140H0z" fill="#B7CFFA"/>' +
+    '<path d="M0 66h34v74H0z" fill="#9ED3AE"/><path d="M286 66h34v74h-34z" fill="#9ED3AE"/>' +
+    '<path d="M34 64Q97 118 160 64" fill="none" stroke="' + C + '" stroke-width="5" stroke-linecap="round"/>' +
+    '<path d="M160 64Q223 118 286 64" fill="none" stroke="' + D2 + '" stroke-width="5" stroke-linecap="round"/>' +
+    '<rect x="154" y="64" width="12" height="56" rx="3" fill="#5B6B95"/>' +
+    '<rect x="30" y="60" width="260" height="6" rx="3" fill="#18203F"/>' +
+    '<g transform="translate(148 14)"><path d="M0 9h17l5-4h3l-2 4 2 4h-3l-5-4H0z" fill="' + D2 + '"/><path d="M7 9l4-7h3l-1 7zM7 9l4 7h3l-1-7z" fill="#4C82FF"/></g>' +
+    '<g font-family="Be Vietnam Pro,Arial,sans-serif" font-weight="800" text-anchor="middle">' +
+    '<text x="17" y="88" font-size="10" fill="#1E6B3C">JPC</text><text x="303" y="88" font-size="10" fill="#1E6B3C">Nhật</text>' +
+    '<text x="97" y="132" font-size="9.5" fill="' + D2 + '">Chặng 1 · Ở JPC</text><text x="223" y="132" font-size="9.5" fill="' + D2 + '">Chặng 2 · Ở Nhật</text></g>' +
+    flags(n1, 52, 142, 0, C) + flags(n2, 178, 268, n1, D2) + '</svg>';
+  return o;
 }

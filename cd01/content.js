@@ -7,7 +7,7 @@
    - Senpai có cờ draft:1 = LỜI KỂ MẪU do Claude viết, cần thay bằng chuyện thật (ẩn danh) trước khi phát hành.
    ES5. */
 var CD_ID = 'cd01';
-var CD_VER = 'CD01.0.5';
+var CD_VER = 'CD01.0.8';
 var CD_TOTAL = 19;            /* Xuất phát (1) + 7 ga (18 chặng) */
 var CD_XP_ACT = 30, CD_XP_WARM = 10, CD_INS_WORDS = 20, CD_INS_FIELD = 5;
 var TIKME = 'https://tikme.com';
@@ -44,8 +44,11 @@ var STATIONS = [
     intro: 'Người đi trước đã đi con đường [Tên] sắp đi. Cùng nghe họ kể, rồi tập hỏi cho hay nhé.',
     done: 'Ô số 6 đã có Senpai và người dẫn đường của bạn.',
     word: { k: '対話', kana: 'たいわ', ro: 'taiwa', vn: 'trò chuyện' } },
-  { id: 's6', n: 6, vn: 'Ga Định Hướng', k: '道のり', kana: 'みちのり', ro: 'Michinori · Chặng đường', lc: '#0F9F98', ic: 'compass', card: 7,
-    sub: 'Kế hoạch ở JPC và ở Nhật', acts: ['a62', 'a63'] },
+  { id: 's6', n: 6, vn: 'Ga Định Hướng', k: '道のり', kana: 'みちのり', ro: 'Michinori · Chặng đường', lc: '#0F9F98', ic: 'compass', card: 7, ready: 1,
+    sub: 'Kế hoạch ở JPC và ở Nhật', acts: ['a62', 'a63'], warm: 'w6',
+    intro: 'Bạn đã có nghề và lộ trình. Giờ [Tên] chia thành 2 chặng: ở JPC và ở Nhật, rồi biến thành việc làm mỗi ngày.',
+    done: 'Ô số 7 đã có kế hoạch và 2 thói quen của bạn.',
+    word: { k: '道のり', kana: 'みちのり', ro: 'michinori', vn: 'chặng đường' } },
   { id: 's7', n: 7, vn: 'Ga Thử Thách', k: '挑戦', kana: 'ちょうせん', ro: 'Chōsen · Thử thách', lc: '#DE3F35', ic: 'flag', card: 8,
     sub: 'Chọn việc khó, viết cam kết', acts: ['a71', 'a72', 'a73'] }
 ];
@@ -322,7 +325,7 @@ var READY_OPTS = [['r', 'Sẵn sàng'], ['w', 'Còn lo'], ['u', 'Chưa biết']]
    Truyện tranh 3 khung: art = tên cảnh trong art.js (cdScene). Lời chị: chỉ dùng câu có trên Tikme. */
 var THUY = {
   who: 'Chị Trần Thị Thúy · Lâm Đồng · từng là thực tập sinh ngành Thủy sản',
-  url: '/cau-chuyen-thanh-cong/tran-thi-thuy', yt: 'https://www.youtube.com/watch?v=l79ZbJ8msWY',
+  url: '/cau-chuyen-thanh-cong/tran-thi-thuy', ytId: 'l79ZbJ8msWY', yt: 'https://www.youtube.com/watch?v=l79ZbJ8msWY',
   frames: [
     { art: 'home', y: '2011 · Ở quê', t: ['Chị tốt nghiệp Sư phạm Vật lý. Lương hơn 2 triệu một tháng.', 'Ba mẹ không ủng hộ. Chị vay tiền của cậu để đi, chưa biết tiếng Nhật.'] },
     { art: 'snow', y: '2012 · Nemuro, Hokkaido', t: ['Chị chế biến cá hồi, là thực tập sinh người Việt đầu tiên ở đây.', 'Thành phố nhỏ, mùa hè chỉ 15–20 độ. Ít chỗ vui chơi.'] },
@@ -331,14 +334,23 @@ var THUY = {
   quote: 'Đi Nhật không chỉ cho mình một khoản tiền tiết kiệm, mà quan trọng hơn là cho mình một nền tảng…',
   qsrc: 'Chị Trần Thị Thúy · trích từ Tikme'
 };
-/* Chuyện Đổi đời cùng ngành trên Tikme (/cau-chuyen-thanh-cong/<mã>), link mở thử 16/11/2026. Ngành chưa có: dùng trang danh sách. */
+/* Chuyện Đổi đời gợi ý theo ngành (tikme.com/cau-chuyen-thanh-cong/<mã>), đọc từng trang 16/11/2026.
+   Chỉ chọn anh chị đã đi Nhật (đã về nước hoặc đang ở lại làm lâu), có N1–N3 hoặc đang làm quản lý, giáo viên. KHÔNG chọn bạn còn N4, N5 (đang học, mới sang).
+   Ưu tiên có video, có nam có nữ. [mã, tên, giới (m/f), việc hiện nay, JLPT, có video]. Ngành có dưới 2 chuyện: thêm từ STORY_GEN (ghi "ngành khác"). */
 var STORY_IND = {
-  'co-khi': [['thach-phu-sang', 'Thạch Phú Sang'], ['pham-ngoc-hoai', 'Phạm Ngọc Hoài'], ['hoang-van-thieu', 'Hoàng Văn Thiệu']],
-  'thuc-pham': [['nguyen-thi-cam-vinh', 'Nguyễn Thị Cẩm Vinh'], ['tran-thi-thu-thao', 'Trần Thị Thu Thảo']],
-  'thuy-san': [['doan-hong-tham', 'Đoàn Hồng Thắm'], ['ho-ngoc-nhu', 'Hồ Ngọc Như']],
-  'in-an': [['nguyen-phan-xuan-thu', 'Nguyễn Phan Xuân Thu']],
-  'ky-su': [['nguyen-ngoc-trung-nguyen-ngoc-dung-nguyen-ngoc-hieu', 'Anh em Nguyễn Ngọc Trung, Dũng, Hiếu']]
+  'co-khi': [['hoang-van-thieu', 'Hoàng Văn Thiệu', 'm', 'Phó Giám đốc KATO MP Việt Nam', 'N2', 1], ['pham-ngoc-hoai', 'Phạm Ngọc Hoài', 'm', 'Xưởng trưởng KATZDEN Việt Nam', 'N2', 1], ['nguyen-ba-hoi', 'Nguyễn Bá Hợi', 'm', 'Giám đốc đại diện VMONO', '', 1]],
+  'thuc-pham': [['nguyen-thi-cam-vinh', 'Nguyễn Thị Cẩm Vinh', 'f', 'Giám đốc DORIANNA TP.HCM', 'N2', 1], ['tran-thi-thu-thao', 'Trần Thị Thu Thảo', 'f', 'Chủ tiệm bánh và trà GonGon', 'N2', 1], ['nguyen-thanh-tin', 'Nguyễn Thành Tín', 'm', 'Cựu thực tập sinh', 'N2', 0]],
+  'thuy-san': [['vo-thi-thanh-tuyen', 'Võ Thị Thanh Tuyền', 'f', 'Cựu thực tập sinh ở Hokkaido', 'N2', 0]],
+  'xay-dung': [['dang-hoai-son', 'Đặng Hoài Sơn', 'm', 'Quản lý tổ cốt thép ở Nhật', 'N2', 0]],
+  'han': [['kim-hoang-dung', 'Kim Hoàng Dũng', 'm', 'Cựu thực tập sinh ở Osaka', 'N2', 0]],
+  'in-an': [['vo-trong-quy', 'Võ Trọng Quý', 'm', 'Giáo viên tiếng Nhật online', 'N1', 0]],
+  'nong-nghiep': [['tran-nguyet-thu', 'Trần Nguyệt Thư', 'f', 'Cựu thực tập sinh', 'N2', 0]],
+  'ky-su': [['nguyen-ngoc-trung-nguyen-ngoc-dung-nguyen-ngoc-hieu', 'Anh em Nguyễn Ngọc Trung, Dũng, Hiếu', 'm', 'Cùng làm giám đốc công ty', 'N1', 1], ['nguyen-thuy-nhung', 'Nguyễn Thùy Nhung', 'f', 'Kỹ sư ở Hokkaido', 'N3', 1], ['bui-dong-hai', 'Bùi Đông Hải', 'm', 'Kỹ sư ở Tokyo', 'N2', 0]]
 };
+var STORY_GEN = [ /* gợi ý chung khi ngành chưa đủ chuyện: một nam, một nữ, có video */
+  ['hoang-van-thieu', 'Hoàng Văn Thiệu', 'm', 'Phó Giám đốc KATO MP Việt Nam', 'N2', 1, 'Cơ khí'],
+  ['nguyen-thi-son', 'Nguyễn Thị Son', 'f', 'Giáo viên tiếng Nhật', 'N1', 1, 'Thực phẩm']
+];
 var STORY_LIST = '/cau-chuyen-thanh-cong/danh-sach';
 
 /* ---------- Ga 5 · Trò chuyện với anh Minh (a53) · NHÂN VẬT GIẢ ĐỊNH, lời kể mẫu ----------
@@ -366,6 +378,265 @@ var MINH = {
     gen: { hard: 'Khó nhất là nghe không kịp hướng dẫn. Anh ghi từ mới, tối hỏi senpai. Hai tháng sau là theo kịp.', prep: 'Anh sẽ học tiếng Nhật chuyên ngành sớm hơn, tập đúng giờ ngay từ ký túc xá.' }
   },
   note: 'Câu có/không thường chỉ nhận một câu ngắn. Hỏi cụ thể “lúc nào, việc gì, làm thế nào” thì người kia kể nhiều hơn.'
+};
+
+/* ---------- Ga 6 · Kế hoạch 2 chặng (a62) · gợi ý chung ----------
+   Gợi ý theo TỪNG NGHỀ ở IND6 (bên dưới). jpcG/workG theo nhóm chỉ dùng dự phòng khi không có nghề.
+   [Nghề] được thay bằng tên nghề chính. Mọi gợi ý đều chọn được, có "Ý khác". Tiền: số học viên tự đặt, chỉ tham khảo. */
+var PLAN = {
+  /* Chặng 1 · ở JPC: việc muốn làm được trước khi bay (2 ý theo nhóm nghề đứng đầu) */
+  jpc: ['Tự giới thiệu, trả lời phỏng vấn bằng tiếng Nhật', 'Đúng giờ, 5S ở ký túc xá', 'Chưa hiểu là hỏi lại ngay', 'Tập thể lực 3 buổi mỗi tuần', 'Ngủ trước 23 giờ', 'Ghi chi tiêu mỗi tháng', 'Hỏi chuyện 1 anh chị đi trước'],
+  jpcG: {
+    sx: ['Học từ vựng chuyên ngành [Nghề]', 'Tập đọc bản vẽ, dùng thước đo'],
+    xd: ['Học từ vựng an toàn công trường', 'Tập thể lực, quen làm ngoài trời'],
+    nn: ['Tập dậy sớm 5 giờ 30', 'Học tên cây, dụng cụ bằng tiếng Nhật'],
+    kg: ['Học kính ngữ, câu hay nói với các cụ', 'Học cách giúp ăn, dìu đỡ cơ bản'],
+    dv: ['Luyện câu chào khách bằng kính ngữ', 'Tập làm theo quy trình, bảng kiểm'],
+    vs: ['Học tên hóa chất, dụng cụ vệ sinh', 'Tập làm kỹ theo bảng kiểm'],
+    ks: ['Ôn kiến thức chuyên ngành', 'Học tiếng Nhật công việc, kính ngữ'],
+    gen: ['Học từ vựng chuyên ngành [Nghề]', 'Tập làm theo quy trình từng bước']
+  },
+  /* Chặng 2 · ở Nhật: điều muốn đạt trong công việc */
+  work: ['Đậu thi tay nghề [Nghề]', 'Được giao việc khó hơn', 'Kèm, chỉ việc cho người mới', '@next'],
+  workC: ['Kèm, chỉ việc cho người mới', '@next'], /* đi sau IND6[nghề].work */
+  workG: {
+    sx: ['Thành thợ chính, vững tay', 'Đứng được máy khó hơn'],
+    xd: ['Thành thợ chính trong tổ', 'Đọc được bản vẽ thi công'],
+    nn: ['Tự lo một khu nhà màng, chuồng trại', 'Lái được máy nông nghiệp'],
+    kg: ['Tự chăm sóc các cụ, không cần kèm', 'Hướng tới chứng chỉ Kaigo Fukushishi'],
+    dv: ['Phục vụ khách tự tin bằng kính ngữ', 'Làm được thêm vị trí khác'],
+    vs: ['Chạy máy chà sàn, phủ wax thành thạo', 'Phụ trách một khu'],
+    ks: ['Làm được dự án riêng', 'Họp, báo cáo tự tin bằng tiếng Nhật'],
+    gen: ['Thành thợ chính, vững tay', 'Làm được việc khó hơn trong nghề']
+  },
+  joy: ['Du lịch các tỉnh của Nhật', 'Ngắm hoa anh đào, lá đỏ', 'Xem pháo hoa, lễ hội mùa hè', 'Kết bạn với người Nhật', 'Học nấu món Nhật', 'Chơi thể thao, câu lạc bộ', 'Chụp ảnh, quay video cuộc sống', 'Học thêm một kỹ năng'],
+  /* trình độ tiếng Nhật: [giá trị, nhãn, lời Shin sau khi chọn] */
+  lv1: [['N5', 'N5', 'Nhiều bạn bay với N5 rồi học tiếp ở Nhật. Sang đó vẫn cần học đều.'], ['N4', 'N4', 'N4 giúp bạn nghe hướng dẫn dễ hơn ngay tuần đầu.'],
+    ['N3', 'N3', 'N3 trước khi bay là mục tiêu cao. Cần học đều mỗi ngày.'], ['u', 'Chưa chắc', 'Hỏi thầy cô diện của bạn cần trình độ nào nhé.']],
+  lv2: [['N4', 'Giữ vững N4', 'Giữ vững cũng cần học đều. Nghe mỗi ngày ở chỗ làm sẽ giúp bạn.'], ['N3', 'N3', 'N3 giúp bạn hiểu chỉ thị, dễ được giao việc khó hơn.'],
+    ['N2', 'N2', 'Nhiều anh chị trong chuyện Đổi đời về nước với N2.'], ['u', 'Chưa chắc', 'Không sao. Sang năm thứ hai xem lại cũng được.']],
+  /* ghi chú theo diện (tóm từ VISA, tham khảo) */
+  lvNote: { tts: 'Thực tập sinh: thường học khoảng N5–N4 trước khi bay.', iku: 'Ikusei Shuro: nhập cảnh cần khoảng N5 (A1).', ssw: 'Kỹ năng đặc định: cần N4 hoặc JFT-Basic.', na: '' },
+  saveNote: 'Số bạn tự đặt, chỉ để tham khảo. Lương, chi phí mỗi nơi một khác. Số tham khảo có ở trang ngành trên Tikme.'
+};
+
+/* ---------- Ga 6 · Đo khoảng cách (a63) · [điều nghề cần, việc nhỏ gợi ý cho công thức “Khi… tôi sẽ…”] ---------- */
+var GAP_COMMON = [
+  ['Tiếng Nhật đủ nghe hướng dẫn, báo cáo', 'học 10 từ mới, nghe 1 bài 5 phút'],
+  ['Đúng giờ, giữ 5S chỗ ở, chỗ học', 'dọn chỗ của mình 5 phút'],
+  ['Sức khỏe để làm theo ca', 'tập thể dục 15 phút'],
+  ['Tự lo chi tiêu, sinh hoạt', 'ghi chi tiêu trong ngày']
+];
+var GAP_GRP = {
+  sx: [['Đọc bản vẽ, ký hiệu cơ bản', 'xem 1 bản vẽ mẫu, tra 3 ký hiệu'], ['Dùng dụng cụ đo', 'ôn cách đọc thước cặp 10 phút'], ['Ý thức an toàn trong xưởng', 'học 5 từ vựng an toàn lao động']],
+  tp: [['Vệ sinh an toàn thực phẩm', 'rửa tay đủ các bước trước bữa ăn'], ['Làm nhanh, đều tay', 'tập một thao tác tay 10 phút'], ['Đứng lâu không mỏi', 'giãn cơ chân 10 phút']],
+  xd: [['Làm ngoài trời, trên cao', 'tập thể lực 20 phút'], ['Đọc bản vẽ thi công cơ bản', 'tra 3 ký hiệu bản vẽ'], ['Ý thức an toàn công trường', 'học 5 từ vựng an toàn']],
+  nn: [['Dậy sớm, làm theo mùa vụ', 'đặt báo thức 5 giờ 30'], ['Biết tên cây, dụng cụ bằng tiếng Nhật', 'học 5 tên cây, dụng cụ'], ['Sức bền làm ngoài trời', 'đi bộ nhanh 20 phút']],
+  kg: [['Kính ngữ khi nói với các cụ', 'tập nói 3 câu kính ngữ'], ['Kiên nhẫn, nói nhẹ nhàng', 'hỏi thăm một người lớn tuổi trong nhà'], ['Biết các bước chăm sóc cơ bản', 'ôn 1 bước chăm sóc đã học']],
+  dv: [['Chào khách bằng kính ngữ', 'luyện 3 câu chào khách'], ['Làm đúng quy trình', 'dọn phòng mình theo bảng kiểm'], ['Giữ nhịp lúc đông khách', 'làm nhanh một việc nhà 10 phút']],
+  vs: [['Biết hóa chất, dụng cụ vệ sinh', 'học 5 tên dụng cụ, hóa chất'], ['Làm kỹ theo bảng kiểm', 'dọn phòng theo bảng kiểm 5 mục'], ['Quen làm sáng sớm', 'đặt báo thức 5 giờ 30']],
+  ks: [['Kiến thức chuyên ngành vững', 'ôn 1 bài chuyên ngành 20 phút'], ['Tiếng Nhật khoảng N3', 'làm 1 đề N3 ngắn'], ['Họp, báo cáo bằng tiếng Nhật', 'tập nói 3 câu báo cáo']],
+  gen: [['Làm theo quy trình từng bước', 'làm việc nhà theo danh sách'], ['Từ vựng chuyên ngành', 'học 5 từ chuyên ngành'], ['Ý thức an toàn lao động', 'học 5 từ vựng an toàn']]
+};
+var GAP_JOB = { 'thuc-pham': 'tp', 'thuy-san': 'tp' }; /* ngành dùng nhóm riêng thay nhóm grp */
+var GAP_OPTS = [['h', 'Đã có'], ['p', 'Đang có dần'], ['n', 'Chưa có']];
+var HABIT_WHEN = ['vừa thức dậy', 'đánh răng xong buổi sáng', 'trên đường đến lớp', 'học xong buổi chiều', 'ăn tối xong', 'trước khi ngủ'];
+
+/* ---------- Ga 6 · CÁ NHÂN HÓA THEO TỪNG NGHỀ (CD01.0.8) ----------
+   Tóm từ 17 trang ngành Tikme (tikme.com/nganh-nghe/<mã>), đối chiếu 16/11/2026. Tham khảo, viết gọn cho điện thoại.
+   Khóa = mã ngành trong INDS (như INDP). Không có nghề (Nghề khác, không chọn ngành gần) → dùng PLAN.jpcG/workG, GAP_GRP theo nhóm.
+   jpc: việc nên làm ở JPC (đứng đầu, rồi PLAN.jpc) · work: điều muốn đạt ở Nhật (đứng đầu, rồi PLAN.workC)
+   gap: [điều nghề cần, việc nhỏ cho “Khi… tôi sẽ…”] (+ r3 của INDP + GAP_COMMON)
+   lvs: câu theo nghề sau khi chọn trình độ tiếng Nhật trước khi bay · note: ghi chú trình độ (chuỗi, hoặc theo diện tts/iku/ssw/na)
+   w6: Senpai khởi động · save: Senpai để dành · [ai, lời] · lời kể mẫu
+   ivx: ví dụ trả lời phỏng vấn · ivt: 3 gợi ý cấu trúc · ivq: [câu hỏi thêm hay gặp, cách trả lời] */
+var IND6 = {
+  'co-khi': {
+    jpc: ['Học từ vựng cơ khí, ký hiệu bản vẽ', 'Tập đọc thước cặp, panme', 'Học 5S, an toàn trong xưởng'],
+    work: ['Đậu Ginou Kentei cơ khí cấp 3', 'Đứng máy CNC, gia công chính xác', 'Làm trưởng nhóm 5–10 người'],
+    gap: [['Đọc bản vẽ, ký hiệu dung sai', 'tra 3 ký hiệu bản vẽ'], ['Đo bằng thước cặp, panme', 'tập đọc thước cặp 10 phút'], ['Tỉ mỉ, tự kiểm hàng', 'tự kiểm lại bài trước khi nộp'], ['An toàn trong xưởng', 'học 5 từ vựng an toàn']],
+    lvs: 'Ở xưởng, bạn đọc bản vẽ và chỉ thị bằng tiếng Nhật.',
+    w6: ['Anh khóa trước · ngành cơ khí', 'Hồi ở JPC mình chỉ nghĩ đến đứng máy. Sang Nhật mình thêm mốc thi tay nghề cấp 3, từ đó học có đích hơn.'],
+    save: ['Anh khóa trước · ngành cơ khí', 'Năm đầu mình mua giày bảo hộ, đồ dùng nên để dành ít. Từ năm hai, tiền tăng ca mình để riêng.'],
+    ivx: 'Ví dụ: Em chọn cơ khí vì em thích làm ra chi tiết chính xác. 5 năm sau, em muốn đứng máy CNC vững, làm trưởng nhóm.',
+    ivt: ['Mở đầu: một lần bạn làm việc cần tỉ mỉ, chính xác.', 'Giữa: ở JPC bạn đang học bản vẽ, từ vựng cơ khí.', 'Cuối: 5 năm sau, thợ CNC vững tay hay trưởng nhóm?'],
+    ivq: ['Em đọc được bản vẽ chưa?', 'Nói thật mức hiện tại, rồi nói bạn đang học thế nào.'] },
+  'dien-tu': {
+    jpc: ['Học từ vựng điện tử, tên linh kiện', 'Tìm hiểu chống tĩnh điện, phòng sạch', 'Tập ngồi đúng tư thế, nghỉ mắt'],
+    work: ['Đậu Ginou Kentei lắp ráp điện tử cấp 3', 'Làm thợ chính, đo kiểm chức năng', 'Làm kỹ thuật viên kiểm tra'],
+    gap: [['Mắt tinh, phân biệt màu', 'nhìn xa 1 phút sau mỗi giờ học'], ['Tỉ mỉ với việc nhỏ', 'xếp đồ nhỏ theo loại 10 phút'], ['Đọc sơ đồ, ghi phiếu kiểm', 'tập ghi 1 phiếu kiểm mẫu'], ['Kỷ luật phòng sạch', 'giữ bàn học sạch, gọn mỗi tối']],
+    lvs: 'Ở xưởng điện tử, bạn đọc chỉ thị, ghi phiếu kiểm bằng tiếng Nhật.',
+    w6: ['Chị khóa trước · ngành điện tử', 'Lúc đầu mình chỉ định làm 3 năm. Biết đậu cấp 3 là đi tiếp được, mình đổi kế hoạch, học thi sớm hơn.'],
+    save: ['Chị khóa trước · ngành điện tử', 'Xưởng mình có ca đêm. Phụ cấp ca đêm mình để riêng, cuối năm thấy nhiều hơn mình nghĩ.'],
+    ivx: 'Ví dụ: Em chọn điện tử vì em kiên nhẫn, thích việc tỉ mỉ. 5 năm sau, em muốn làm kỹ thuật viên kiểm tra.',
+    ivt: ['Mở đầu: một việc tỉ mỉ bạn từng làm tốt.', 'Giữa: ở JPC bạn học tên linh kiện, tập nghỉ mắt.', 'Cuối: 5 năm sau, thợ chính hay kỹ thuật viên kiểm tra?'],
+    ivq: ['Em có phân biệt màu tốt không?', 'Trả lời thật. Nói thêm bạn giữ mắt khỏe thế nào.'] },
+  'han': {
+    jpc: ['Học ký hiệu hàn, từ vựng nghề hàn', 'Tập hàn ở xưởng thực hành (nếu có)', 'Tập thể lực, quen đứng lâu'],
+    work: ['Đậu thi kỹ năng hàn bậc chuyên môn', 'Hàn TIG, hàn mọi tư thế', 'Lấy chứng chỉ thợ hàn JIS'],
+    gap: [['Đọc ký hiệu mối hàn', 'tra 3 ký hiệu hàn'], ['Tay vững, mắt tinh', 'kẻ đường thẳng không thước 5 phút'], ['Tự kiểm mối hàn trước khi giao', 'tự kiểm lại bài trước khi nộp'], ['An toàn khói hàn, đồ bảo hộ', 'học 5 từ vựng an toàn']],
+    lvs: 'Ký hiệu, quy trình hàn đều bằng tiếng Nhật. Học sớm đỡ bỡ ngỡ.',
+    w6: ['Anh khóa trước · ngành hàn', 'Ở JPC mình chỉ đặt mốc ngày bay. Sang Nhật, tổ trưởng chỉ mình thi chứng chỉ JIS, mình thêm mốc đó vào kế hoạch.'],
+    save: ['Anh khóa trước · ngành hàn', 'Ngày nhận lương, mình chia luôn: gửi nhà, để dành, rồi mới tiêu. Tháng tăng ca nhiều thì để dành thêm.'],
+    ivx: 'Ví dụ: Em chọn nghề hàn vì em thích làm ra thứ chắc chắn. 5 năm sau, em muốn có chứng chỉ JIS, kèm người mới.',
+    ivt: ['Mở đầu: vì sao bạn hợp việc cần tay vững.', 'Giữa: ở JPC bạn học ký hiệu hàn, rèn thể lực.', 'Cuối: 5 năm sau, hàn TIG, chứng chỉ JIS hay tổ trưởng?'],
+    ivq: ['Em đã thử hàn bao giờ chưa?', 'Nói thật. Nhiều nơi có thi hàn thử khi phỏng vấn, nên nói bạn sẽ tập thế nào.'] },
+  'son': {
+    jpc: ['Học từ vựng sơn, tên dụng cụ', 'Học an toàn hóa chất, đọc nhãn', 'Rèn tính kiên nhẫn, làm kỹ từng bước'],
+    work: ['Đậu Ginou Kentei ngành sơn cấp 3', 'Phun sơn đều, làm thợ sơn chính', 'Pha màu, kiểm màng sơn'],
+    gap: [['Kiên nhẫn ở khâu chuẩn bị bề mặt', 'làm kỹ 1 việc nhà từ đầu đến cuối'], ['Mắt nhìn màu, lỗi bề mặt', 'so 2 màu gần giống nhau'], ['Đọc nhãn sơn, công thức pha', 'học 5 từ trên nhãn hóa chất'], ['Đứng, cúi nhiều', 'giãn cơ lưng 10 phút']],
+    lvs: 'Công thức, nhãn sơn đều bằng tiếng Nhật. Đọc được là an toàn hơn.',
+    w6: ['Anh khóa trước · ngành sơn', 'Mình tưởng sơn là phun cho đẹp. Sang Nhật mới biết chuẩn bị bề mặt quan trọng nhất, nên mình học kỹ khâu đó trước.'],
+    save: ['Anh khóa trước · ngành sơn', 'Năm đầu mình chưa quen chi tiêu nên để dành ít. Năm hai mình ghi chi tiêu mỗi tuần, để dành đều hẳn.'],
+    ivx: 'Ví dụ: Em chọn nghề sơn vì em thích thấy món đồ đẹp lên. 5 năm sau, em muốn pha màu, kèm người mới.',
+    ivt: ['Mở đầu: một lần bạn làm kỹ để có kết quả đẹp.', 'Giữa: ở JPC bạn học từ vựng, an toàn hóa chất.', 'Cuối: 5 năm sau, thợ sơn chính hay pha màu?'],
+    ivq: ['Em có ngại mùi sơn, làm trên cao không?', 'Nói thật. Nói thêm bạn biết đồ bảo hộ giúp gì.'] },
+  'duc-nhua': {
+    jpc: ['Học từ vựng ép nhựa, tên lỗi sản phẩm', 'Tập ghi số liệu gọn, rõ', 'Học biển báo an toàn máy'],
+    work: ['Đậu Ginou Kentei đúc nhựa cấp 3', 'Làm thợ chính đứng máy ép', 'Thay khuôn, chỉnh điều kiện đúc'],
+    gap: [['Nhận ra ba via, bọt khí, cong vênh', 'soi kỹ 1 đồ nhựa trong nhà'], ['Ghi thông số máy cẩn thận', 'ghi 3 số liệu trong ngày vào sổ'], ['Quen làm ca đêm', 'giữ giờ ngủ cố định cả tuần'], ['An toàn khi máy chạy', 'học 5 biển báo an toàn']],
+    lvs: 'Bảng thông số, chỉ dẫn an toàn đều bằng tiếng Nhật.',
+    w6: ['Chị khóa trước · ngành đúc nhựa', 'Kế hoạch đầu của mình chỉ có đi làm, gửi tiền về. Sau một năm, mình thêm mốc học thay khuôn và thấy việc vui hơn.'],
+    save: ['Chị khóa trước · ngành đúc nhựa', 'Ký túc xá gần xưởng nên mình đỡ tiền đi lại. Khoản đó mình để dành riêng.'],
+    ivx: 'Ví dụ: Em chọn đúc nhựa vì em cẩn thận, chịu được việc lặp lại. 5 năm sau, em muốn tự thay khuôn, làm tổ trưởng.',
+    ivt: ['Mở đầu: vì sao bạn hợp việc cẩn thận, đều tay.', 'Giữa: ở JPC bạn học từ vựng máy, tập ghi số liệu.', 'Cuối: 5 năm sau, thay khuôn hay làm tổ trưởng?'],
+    ivq: ['Em làm ca đêm được không?', 'Nói thật. Kể bạn giữ giờ ngủ, sức khỏe thế nào.'] },
+  'dong-goi-cong-nghiep': {
+    jpc: ['Học từ vựng đóng gói, ký hiệu vận chuyển', 'Tập đo, ghi kích thước chính xác', 'Học an toàn khi nâng hạ'],
+    work: ['Đậu Ginou Kentei đóng gói cấp 3', 'Lấy chứng chỉ lái xe nâng', 'Làm thợ chính khung gỗ, chống gỉ'],
+    gap: [['Đo, cân, ghi kích thước chính xác', 'đo 3 đồ vật, ghi vào sổ'], ['Đọc phiếu đóng gói, ký hiệu', 'học 5 ký hiệu vận chuyển'], ['Nâng hạ đúng cách', 'tập thể lực 20 phút'], ['Làm đúng mẫu, không bỏ bước', 'làm việc nhà theo danh sách']],
+    lvs: 'Phiếu đóng gói, ký hiệu vận chuyển đều bằng tiếng Nhật. Đọc được sẽ ít sai.',
+    w6: ['Anh khóa trước · ngành đóng gói', 'Mình chưa từng nghĩ tới xe nâng. Xưởng hỗ trợ thi, mình thêm mốc đó và được giao việc mới.'],
+    save: ['Anh khóa trước · ngành đóng gói', 'Cuối năm tăng ca nhiều, lương cũng nhiều hơn. Mình không tiêu thêm, để dành hết phần đó.'],
+    ivx: 'Ví dụ: Em chọn đóng gói vì em cẩn thận, thích làm gọn gàng. 5 năm sau, em muốn làm tổ trưởng.',
+    ivt: ['Mở đầu: một lần bạn sắp xếp, làm gọn gàng.', 'Giữa: ở JPC bạn học ký hiệu, tập đo và ghi.', 'Cuối: 5 năm sau, thợ chính hay tổ trưởng?'],
+    ivq: ['Mùa cao điểm tăng ca nhiều, em thấy sao?', 'Nói thật. Kể bạn giữ sức khỏe thế nào.'] },
+  'in-an': {
+    jpc: ['Học từ vựng nghề in, tên màu', 'Tìm hiểu CMYK, cách đọc tệp in', 'Rèn làm đúng ngay từ đầu'],
+    work: ['Đậu Ginou Kentei nghề in cấp 3', 'Đứng máy, tự so màu', 'Làm thợ in chính, phụ trách máy'],
+    gap: [['Mắt phân biệt màu tốt', 'so 2 màu gần giống nhau'], ['Làm đúng ngay từ đầu', 'kiểm lại bài 1 lần trước khi nộp'], ['Hiểu màu cơ bản (CMYK)', 'tìm hiểu CMYK 10 phút'], ['Đọc phiếu lệnh, bảng thông số', 'học 5 từ vựng nghề in']],
+    lvs: 'Phiếu lệnh, phiếu kiểm ở nhà in đều bằng tiếng Nhật.',
+    w6: ['Chị khóa trước · ngành in ấn', 'Lúc đầu mình không biết in offset và in ống đồng có thời hạn khác nhau. Mình hỏi kỹ rồi sửa kế hoạch cho đúng.'],
+    save: ['Chị khóa trước · ngành in ấn', 'Mình nấu ăn chung với bạn cùng phòng. Đỡ tiền ăn, mỗi tháng để dành thêm được một ít.'],
+    ivx: 'Ví dụ: Em chọn nghề in vì em thích màu sắc, làm tỉ mỉ. 5 năm sau, em muốn là thợ in chính.',
+    ivt: ['Mở đầu: vì sao bạn thích màu sắc, việc tỉ mỉ.', 'Giữa: ở JPC bạn học từ vựng, tìm hiểu CMYK.', 'Cuối: 5 năm sau, thợ in chính hay trưởng ca?'],
+    ivq: ['Em có nhìn màu tốt không?', 'Trả lời thật. Nói thêm bạn rèn mắt nhìn màu thế nào.'] },
+  'may-mac': {
+    jpc: ['Học tên công đoạn may bằng tiếng Nhật', 'Tập may cơ bản nếu có máy', 'Tập ngồi thẳng lưng, nghỉ mắt'],
+    work: ['Đậu Ginou Kentei nghề may cấp 3', 'Theo kịp năng suất chuẩn của chuyền', 'Làm QC hoặc kỹ thuật rập'],
+    gap: [['Đường may thẳng, đều tay', 'tập một thao tác tay 10 phút'], ['Mắt soi lỗi đường chỉ', 'soi đường may 1 áo của mình'], ['Ngồi lâu, giữ lưng thẳng', 'giãn cơ lưng 10 phút'], ['Tên công đoạn, hiệu lệnh máy', 'học 5 từ công đoạn may']],
+    lvs: 'Ở chuyền may, tên công đoạn, hiệu lệnh máy đều bằng tiếng Nhật.',
+    w6: ['Chị khóa trước · ngành may mặc', 'Kế hoạch đầu của mình chỉ là may cho nhanh. Sang Nhật mình thêm mốc học kiểm hàng, giờ mình làm QC.'],
+    save: ['Chị khóa trước · ngành may mặc', 'Xưởng làm giờ hành chính, tối mình rảnh. Mình tự nấu ăn, ít ra ngoài, để dành đều mỗi tháng.'],
+    ivx: 'Ví dụ: Em chọn may mặc vì em khéo tay, kiên nhẫn. 5 năm sau, em muốn làm QC trong xưởng may.',
+    ivt: ['Mở đầu: một món đồ bạn từng tự may, tự sửa.', 'Giữa: ở JPC bạn học tên công đoạn, tập ngồi đúng.', 'Cuối: 5 năm sau, thợ chính, QC hay kỹ thuật rập?'],
+    ivq: ['Em đã may máy bao giờ chưa?', 'Nói thật. Chưa thì nói bạn sẽ tập thế nào.'] },
+  'xay-dung': {
+    jpc: ['Học hiệu lệnh, từ vựng an toàn công trường', 'Tập thể lực, quen làm ngoài trời', 'Học đọc bản vẽ thi công cơ bản'],
+    work: ['Đậu Ginou Kentei xây dựng', 'Làm thợ chính một nhánh nghề', 'Làm trưởng nhóm 3–5 người'],
+    gap: [['Sức bền, mang vác vật liệu', 'tập thể lực 20 phút'], ['Nghe hiệu lệnh an toàn', 'học 5 từ hiệu lệnh an toàn'], ['Đọc bản vẽ thi công', 'tra 3 ký hiệu bản vẽ'], ['Làm theo nhóm, báo lại việc', 'báo lại việc đã làm với bạn cùng phòng']],
+    lvs: 'Ở công trường, hiệu lệnh an toàn bằng tiếng Nhật. Có N4 trở lên là lợi thế.',
+    w6: ['Anh khóa trước · ngành xây dựng', 'Năm đầu mình chỉ phụ việc. Tổ trưởng hỏi muốn theo nhánh nào, mình chọn cốt thép và kế hoạch rõ hơn từ đó.'],
+    save: ['Anh khóa trước · ngành xây dựng', 'Vùng mình có tuyết, mùa đông ít việc ngoài trời hơn. Mình để dành từ mùa hè để mùa đông vẫn yên tâm.'],
+    ivx: 'Ví dụ: Em chọn xây dựng vì em khỏe, thích thấy công trình lên từng tầng. 5 năm sau, em muốn làm trưởng nhóm.',
+    ivt: ['Mở đầu: một việc nặng, làm theo nhóm bạn từng làm.', 'Giữa: ở JPC bạn học hiệu lệnh an toàn, rèn thể lực.', 'Cuối: 5 năm sau, thợ chính hay trưởng nhóm?'],
+    ivq: ['Em làm việc gì liên quan xây dựng chưa?', 'Có thì kể ngắn. Chưa thì kể việc nặng, làm nhóm bạn từng làm.'] },
+  'o-to': {
+    jpc: ['Học từ vựng ô tô, tên phụ tùng', 'Ôn nền cơ khí động lực, điện ô tô', 'Tập làm đúng danh mục, ghi báo cáo'],
+    work: ['Đậu Ginou Kentei bảo dưỡng ô tô cấp 3', 'Chẩn đoán lỗi, làm hạng mục khó', 'Hướng tới chứng chỉ Seibishi'],
+    gap: [['Hiểu động cơ, gầm, điện ô tô', 'ôn 1 bộ phận xe 15 phút'], ['Làm đúng danh mục, không bỏ bước', 'làm việc nhà theo danh sách'], ['Dùng dụng cụ đo, máy chẩn đoán', 'học tên 5 dụng cụ đo'], ['Ghi báo cáo kỹ thuật', 'ghi 3 dòng việc đã làm trong ngày']],
+    lvs: 'Tài liệu hãng, báo cáo kỹ thuật bằng tiếng Nhật. Nhắm Kỹ năng đặc định thì nên có N4.',
+    w6: ['Anh khóa trước · ngành ô tô', 'Mình định làm 3 năm rồi về. Biết đậu cấp 3 là đi tiếp được, mình thêm 2 năm để học chẩn đoán xe hybrid.'],
+    save: ['Anh khóa trước · ngành ô tô', 'Mùa đăng kiểm tăng ca nhiều. Tiền tăng ca mùa đó mình để riêng, thành khoản để dành lớn nhất năm.'],
+    ivx: 'Ví dụ: Em chọn ô tô vì em hay sửa xe máy cùng ba. 5 năm sau, em muốn tự chẩn đoán lỗi, làm tổ trưởng.',
+    ivt: ['Mở đầu: một lần bạn sửa xe, tìm ra lỗi.', 'Giữa: ở JPC bạn học tên phụ tùng, ôn cơ khí.', 'Cuối: 5 năm sau, thợ chính, tổ trưởng hay Seibishi?'],
+    ivq: ['Em có bằng lái xe chưa?', 'Có thì nói. Chưa thì nói bạn có định học không.'] },
+  'nong-nghiep': {
+    jpc: ['Chọn nhánh trồng trọt hoặc chăn nuôi', 'Học tên cây, con vật, dụng cụ tiếng Nhật', 'Tập dậy sớm 5 giờ 30'],
+    work: ['Đậu thi kỹ năng nông nghiệp bậc chuyên môn', 'Thạo trọn vụ mùa, lái máy nông nghiệp', 'Phụ trách một khu nhà màng'],
+    gap: [['Biết tên cây, con vật, dụng cụ', 'học 5 tên cây, dụng cụ'], ['Sức bền làm cả ngày', 'đi bộ nhanh 20 phút ngoài trời'], ['Ghi nhật ký cây trồng, vật nuôi', 'ghi 3 dòng nhật ký mỗi tối'], ['Đọc lịch thời vụ, nhãn phân thuốc', 'học 5 từ trên nhãn phân bón']],
+    lvs: 'Trang trại nhỏ nói chuyện với chủ mỗi ngày. Tiếng Nhật lên nhanh, sống dễ hơn.',
+    w6: ['Anh khóa trước · ngành nông nghiệp', 'Lúc đầu mình chưa biết trồng trọt và chăn nuôi thi hai đề khác. Hỏi kỹ rồi, mình chọn nhà màng và sửa kế hoạch.'],
+    save: ['Anh khóa trước · ngành nông nghiệp', 'Ở quê Nhật ít chỗ tiêu tiền. Mình để dành đều, cuối tuần đạp xe quanh làng.'],
+    ivx: 'Ví dụ: Em chọn nông nghiệp vì nhà em làm vườn. 5 năm sau, em muốn phụ trách một khu nhà màng.',
+    ivt: ['Mở đầu: việc đồng áng, chăn nuôi bạn từng làm.', 'Giữa: ở JPC bạn học tên cây, tập dậy sớm.', 'Cuối: 5 năm sau, thạo vụ mùa hay phụ trách nhà màng?'],
+    ivq: ['Em chịu lạnh, sống ở vùng quê được không?', 'Nói thật. Kể bạn chuẩn bị sức khỏe thế nào.'] },
+  'thuy-san': {
+    jpc: ['Học từ vựng thủy sản, tên các loại cá', 'Tìm hiểu vệ sinh HACCP cơ bản', 'Rèn sức bền, quen đứng lâu'],
+    work: ['Đậu Ginou Kentei chế biến thủy sản', 'Làm thợ chính, vận hành dây chuyền', 'Làm trưởng ca, kiêm QC'],
+    gap: [['Tay dao nhanh, đều', 'tập một thao tác tay 10 phút'], ['Vệ sinh theo HACCP', 'rửa tay đủ các bước trước bữa ăn'], ['Giữ nhịp nhanh mùa cao điểm', 'làm nhanh một việc nhà 10 phút'], ['Ghi chép số lô cẩn thận', 'ghi 3 dòng việc đã làm trong ngày']],
+    lvs: 'Hiệu lệnh trong xưởng thủy sản dùng tiếng Nhật nhiều.',
+    w6: ['Chị khóa trước · ngành thủy sản', 'Mình tưởng làm thủy sản là ra biển. Hỏi kỹ mới biết làm trong xưởng lạnh, nên mình chuẩn bị đồ giữ ấm từ sớm.'],
+    save: ['Chị khóa trước · ngành thủy sản', 'Mùa cá hồi tăng ca nhiều. Mình để dành phần tăng ca, mùa ít việc vẫn yên tâm.'],
+    ivx: 'Ví dụ: Em chọn thủy sản vì nhà em ở vùng biển, em quen làm cá. 5 năm sau, em muốn làm trưởng ca.',
+    ivt: ['Mở đầu: lần bạn làm cá, làm bếp với gia đình.', 'Giữa: ở JPC bạn học từ vựng, tìm hiểu HACCP.', 'Cuối: 5 năm sau, thợ chính hay trưởng ca?'],
+    ivq: ['Em làm trong xưởng lạnh cả ngày được không?', 'Nói thật. Kể bạn giữ sức khỏe, giữ ấm thế nào.'] },
+  'thuc-pham': {
+    jpc: ['Học từ vựng vệ sinh, nhiệt độ, ca làm', 'Rửa tay đủ bước, giữ vệ sinh cá nhân', 'Tập cân đong chính xác đến gam'],
+    work: ['Đậu Ginou Kentei ngành thực phẩm', 'Làm thợ chính của chuyền', 'Làm trưởng ca sản xuất'],
+    gap: [['Quen ca xoay, ca đêm', 'giữ giờ ngủ cố định cả tuần'], ['Cân đong chính xác', 'cân 3 món khi nấu ăn'], ['Tập trung lâu với việc lặp lại', 'học tập trung 25 phút không điện thoại'], ['Đọc nhãn nhiệt độ, bảng ca', 'học 5 từ vựng vệ sinh']],
+    lvs: 'Hiệu lệnh vệ sinh, nhãn nhiệt độ, bảng ca đều bằng tiếng Nhật.',
+    w6: ['Chị khóa trước · ngành thực phẩm', 'Mình chưa nghĩ tới ca xoay. Sang đó mình sửa giờ học tiếng Nhật theo ca, nhờ vậy vẫn học đều.'],
+    save: ['Anh khóa trước · ngành thực phẩm', 'Năm đầu mình để dành ít vì còn mua đồ dùng. Từ năm hai, nhận lương là mình chia phần để dành trước.'],
+    ivx: 'Ví dụ: Em chọn thực phẩm vì em thích nấu ăn, làm sạch sẽ. 5 năm sau, em muốn làm trưởng ca.',
+    ivt: ['Mở đầu: một việc bếp núc, sạch sẽ bạn làm tốt.', 'Giữa: ở JPC bạn học từ vựng vệ sinh, tập cân đong.', 'Cuối: 5 năm sau, thợ chính hay trưởng ca?'],
+    ivq: ['Em giữ vệ sinh cá nhân thế nào?', 'Kể việc cụ thể bạn làm mỗi ngày.'] },
+  'dieu-duong': {
+    jpc: ['Học kính ngữ, câu hay nói với các cụ', 'Học từ vựng chăm sóc, bộ phận cơ thể', 'Trò chuyện với người lớn tuổi mỗi tuần'],
+    work: ['Tự chăm sóc các cụ, không cần kèm', 'Học khóa thực hành Jitsumusha Kenshu', 'Hướng tới chứng chỉ Kaigo Fukushishi'],
+    gap: [['Kính ngữ khi nói với các cụ', 'tập nói 3 câu kính ngữ'], ['Kiên nhẫn, biết quan sát', 'hỏi thăm một người lớn tuổi trong nhà'], ['Biết các bước chăm sóc cơ bản', 'ôn 1 bước chăm sóc đã học'], ['Ghi hồ sơ, bàn giao ca', 'ghi 3 dòng việc trong ngày']],
+    lvs: 'Kaigo nói chuyện với các cụ cả ngày. Tiếng Nhật càng tốt, các cụ càng tin bạn.',
+    note: { tts: 'Thực tập sinh kaigo: cần N4 khi nhập cảnh.', ssw: 'Kỹ năng đặc định kaigo: N4 hoặc JFT-Basic, thêm bài thi tiếng Nhật kaigo.', na: 'Thực tập sinh kaigo cần N4 khi nhập cảnh.' },
+    w6: ['Chị khóa trước · ngành kaigo', 'Hồi ở JPC mình nghĩ N4 là đủ. Sang Nhật mới thấy cần N3 để hiểu các cụ, nên mình dời mốc N3 lên sớm hơn.'],
+    save: ['Chị khóa trước · ngành kaigo', 'Năm đầu mình tập trung học việc, để dành ít thôi. Từ năm hai mình để dành đều, còn dành tiền học khóa thực hành.'],
+    ivx: 'Ví dụ: Em chọn kaigo vì em từng chăm bà nội. 5 năm sau, em muốn đậu Kaigo Fukushishi.',
+    ivt: ['Mở đầu: một lần bạn chăm sóc người thân.', 'Giữa: ở JPC bạn học kính ngữ, từ vựng chăm sóc.', 'Cuối: 5 năm sau, chăm sóc chính hay Kaigo Fukushishi?'],
+    ivq: ['Nếu cụ không chịu ăn, em sẽ làm gì?', 'Không có một đáp án. Nói cách bạn hỏi han, kiên nhẫn, báo người phụ trách.'] },
+  'nha-hang': {
+    jpc: ['Luyện câu chào khách bằng kính ngữ', 'Chọn nhánh nhà hàng hoặc khách sạn', 'Tập tác phong gọn gàng, đúng giờ'],
+    work: ['Đậu thi kỹ năng nhà hàng hoặc khách sạn', 'Phục vụ khách tự tin bằng kính ngữ', 'Làm trưởng ca, phụ trách khu vực'],
+    gap: [['Kính ngữ với khách', 'luyện 3 câu chào khách'], ['Làm đúng sổ hướng dẫn', 'dọn phòng mình theo bảng kiểm'], ['Tác phong gọn gàng, tươi tắn', 'chào mọi người trong lớp mỗi sáng'], ['Đứng, đi lại nhiều cả ca', 'đi bộ nhanh 20 phút']],
+    lvs: 'Lễ tân, phục vụ dùng kính ngữ nhiều. Học sớm, bạn sẽ tự tin hơn.',
+    w6: ['Chị khóa trước · ngành nhà hàng', 'Mình định làm phục vụ mãi. Sau một năm mình muốn thử lễ tân, nên thêm mốc học kính ngữ khó hơn.'],
+    save: ['Chị khóa trước · ngành nhà hàng', 'Ở Nhật ít tiền tip, thu nhập chủ yếu là lương. Mình đặt số để dành trước, tiêu phần còn lại.'],
+    ivx: 'Ví dụ: Em chọn nhà hàng vì em thích làm khách vui. 5 năm sau, em muốn làm trưởng ca.',
+    ivt: ['Mở đầu: một lần bạn làm ai đó hài lòng.', 'Giữa: ở JPC bạn luyện kính ngữ, tác phong.', 'Cuối: 5 năm sau, nhân viên chính hay trưởng ca?'],
+    ivq: ['Khách phàn nàn, em sẽ làm gì?', 'Không có một đáp án. Nói cách bạn lắng nghe, xin lỗi, báo người phụ trách.'] },
+  've-sinh-toa-nha': {
+    jpc: ['Học tên hóa chất, dụng cụ vệ sinh', 'Tập đúng giờ, ngăn nắp mỗi ngày', 'Học lễ nghi chào hỏi'],
+    work: ['Đậu Ginou Kentei vệ sinh tòa nhà cấp 3', 'Chạy máy chà sàn, phủ wax, lau kính', 'Làm tổ trưởng ca, kiểm tra bàn giao'],
+    gap: [['Chọn hóa chất đúng loại bề mặt', 'học 5 tên hóa chất, dụng cụ'], ['Làm kỹ theo bảng kiểm', 'dọn phòng theo bảng kiểm 5 mục'], ['Dùng thang, máy móc an toàn', 'học 5 biển báo an toàn'], ['Lễ nghi với người trong tòa nhà', 'chào mọi người trong lớp mỗi sáng']],
+    lvs: 'Nhãn hóa chất, phiếu bàn giao bằng tiếng Nhật. Đọc sai dễ làm hỏng bề mặt.',
+    w6: ['Anh khóa trước · ngành vệ sinh tòa nhà', 'Lúc đầu mình nghĩ việc này đơn giản. Học rồi mới biết mỗi sàn dùng hóa chất khác, nên mình thêm mốc thi tay nghề.'],
+    save: ['Anh khóa trước · ngành vệ sinh tòa nhà', 'Mình làm sáng sớm, chiều học tiếng Nhật ở nhà. Ít đi chơi nên để dành được đều.'],
+    ivx: 'Ví dụ: Em chọn vệ sinh tòa nhà vì em ngăn nắp, đúng giờ. 5 năm sau, em muốn làm tổ trưởng ca.',
+    ivt: ['Mở đầu: thói quen ngăn nắp, đúng giờ của bạn.', 'Giữa: ở JPC bạn học tên hóa chất, lễ nghi.', 'Cuối: 5 năm sau, thợ chính hay tổ trưởng ca?'],
+    ivq: ['Em làm sáng sớm hoặc buổi tối được không?', 'Nói thật. Kể bạn giữ giờ giấc thế nào.'] },
+  'ky-su': {
+    jpc: ['Học tiếng Nhật kỹ thuật chuyên ngành', 'Ôn kiến thức chuyên ngành đã học', 'Tập báo cáo công việc bằng tiếng Nhật'],
+    work: ['Làm đúng chuyên ngành đã học', 'Họp, báo cáo tự tin bằng tiếng Nhật', 'Lên N2, làm được dự án riêng'],
+    gap: [['Kiến thức chuyên ngành vững', 'ôn 1 bài chuyên ngành 20 phút'], ['Tiếng Nhật khoảng N3', 'làm 1 đề N3 ngắn'], ['Phần mềm, công cụ chuyên ngành', 'dùng 1 phần mềm chuyên ngành 20 phút'], ['Hiểu sản phẩm, thị trường', 'đọc 1 tin công nghệ Nhật']],
+    lvs: 'Họp, báo cáo đều bằng tiếng Nhật. N3 là mức thường cần khi tuyển.',
+    note: 'Kỹ sư: thường cần N3 trở lên và bằng đúng chuyên ngành.',
+    w6: ['Anh khóa trước · kỹ sư cơ khí', 'Mình định học xong N3 rồi mới ôn chuyên ngành. Thầy cô khuyên làm song song, nhờ vậy mình phỏng vấn tự tin hơn.'],
+    save: ['Anh khóa trước · kỹ sư cơ khí', 'Mình thuê nhà riêng nên chi nhiều hơn. Mình vẫn ghi chi tiêu và để dành trước mỗi tháng.'],
+    ivx: 'Ví dụ: Em chọn ngành này vì em học cơ khí, thích thiết kế. 5 năm sau, em muốn làm dự án riêng.',
+    ivt: ['Mở đầu: chuyên ngành bạn học, một đồ án bạn thích.', 'Giữa: ở JPC bạn học N3, ôn chuyên ngành.', 'Cuối: 5 năm sau, chuyên gia hay quản lý nhóm?'],
+    ivq: ['Đồ án tốt nghiệp của em là gì?', 'Kể ngắn: làm gì, khó ở đâu, bạn học được gì.'] }
+};
+
+/* ---------- Ga 6 · Phỏng vấn 60 giây (a63) ---------- */
+var IV6_GEN = { /* dự phòng khi không có nghề */
+  w6: ['Senpai khóa trước', 'Hồi ở JPC, kế hoạch của mình rõ chừng 3 phần. Sang Nhật mình sửa mốc N3 hai lần. Có kế hoạch để sửa vẫn hơn không có.'],
+  save: ['Anh khóa trước · ngành thực phẩm', 'Năm đầu mình để dành ít vì còn mua đồ dùng. Từ năm hai, nhận lương là mình chia phần để dành trước.'],
+  ivt: ['Mở đầu: vì sao chọn nghề, kể một chuyện thật.', 'Giữa: ở JPC bạn đang chuẩn bị gì.', 'Cuối: 5 năm sau bạn muốn làm gì.']
+};
+var IV = {
+  more: 'Người phỏng vấn ngành [Nghề] hay hỏi thêm',
+  q: 'Vì sao em chọn nghề này? 5 năm sau em muốn làm gì?',
+  secs: 60, wps: 2.5, /* tốc độ đọc to ước lượng: khoảng 2,5 từ mỗi giây */
+  done: 'Hết 60 giây! Nói đủ ý chưa? Thiếu thì sửa bài rồi tập lại nhé.',
+  stop: 'Bạn nói trong [s] giây. Tập thêm lần nữa cũng được.'
 };
 
 /* ---------- Lời Shin, chữ giao diện ---------- */
@@ -588,9 +859,9 @@ var ACTS = {
       { k: 'persp', key: 'a51.help', q: 'Theo bạn, điều gì giúp chị đi xa như vậy?', sub: 'Chọn 1–3 ý. Ý nào cũng là một góc nhìn.', min: 1, max: 3, own: 'Ý khác',
         opts: ['Tiếng Nhật đến N2', 'Dám đi dù chưa được ủng hộ', 'Tác phong làm việc kiểu Nhật', 'Dùng giờ rảnh để học', 'Được công ty tin', 'Gặp may'],
         fields: [{ key: 'a51.bring', l: 'Ngoài tiền, 3–5 năm ở Nhật bạn muốn mang về gì?', starter: 'Ngoài tiền, mình muốn mang về ', ph: 'Ví dụ: tay nghề [Nghề] vững, tiếng Nhật N3', min: 10, rows: 3 }] },
-      { k: 'tik', key: 'a51.open', dyn: 'story', btn: 'Mở danh sách chuyện Đổi đời',
-        t: 'Tikme có hơn 150 chuyện Đổi đời. Chọn một chuyện, nhất là ngành [Nghề], đọc rồi quay lại nhé.',
-        tips: ['Đọc phần họ bắt đầu thế nào và lúc khó nhất.', 'Ngành của bạn chưa có chuyện? Chọn chuyện bạn thấy gần mình.'] },
+      { k: 'tik', key: 'a51.open', dyn: 'story', btn: 'Xem thêm chuyện trên Tikme',
+        t: 'Chọn một anh chị đi trước, nhất là ngành [Nghề]. Đọc hoặc xem video, rồi quay lại nhé.',
+        tips: ['Để ý họ bắt đầu thế nào và lúc khó nhất.', 'Muốn tìm thêm? Mở danh sách, chọn anh chị có N3 trở lên.'] },
       { k: 'write', q: 'Chuyện bạn vừa đọc', sub: 'Viết ngắn, mỗi ô một ý.',
         fields: [
           { key: 'a51.who', l: 'Chuyện của ai, ngành gì?', ph: '@who', min: 4, rows: 1, noIns: 1 },
@@ -609,17 +880,52 @@ var ACTS = {
           { key: 'a53.q2', l: 'Câu hỏi 2', ph: 'Ví dụ: Em nên luyện thói quen nào từ bây giờ?', min: 10, rows: 2, noIns: 1 }
         ],
         tips: ['Hỏi cụ thể: lúc nào, việc gì, làm thế nào.', 'Tránh câu chỉ trả lời có hoặc không.', 'Hỏi để biết mình nên làm gì từ hôm nay.'] }
+    ] },
+
+  /* ===== GA 6 · ĐỊNH HƯỚNG (gợi ý theo từng nghề: IND6; dự phòng PLAN, GAP_GRP, IV6_GEN) ===== */
+  w6: { t: 'Khởi động · Rõ mấy phần?', mins: 1, st: 's6', warm: 1,
+    steps: [
+      { k: 'slide', sl: { key: 'w6.clear', min: 0, max: 10, step: 1, def: 5, unit: 'part', lo: 'Chưa có gì', hi: 'Rõ từng tháng' },
+        q: 'Kế hoạch đi Nhật của bạn rõ được mấy phần?', sub: 'Kéo thanh trượt. Không có đúng sai.',
+        senpai: '@w6' }
+    ] },
+  a62: { t: 'Kế hoạch 2 chặng', mins: 5, st: 's6', d: 'Chia lộ trình thành 2 chặng: ở JPC và ở Nhật.',
+    steps: [
+      { k: 'bridge', q: 'Cây cầu của bạn', sub: 'Các mốc bạn vẽ ở Ga 4, chia làm 2 chặng.' },
+      { k: 'plan', lv: { key: 'a62.jp1', q: 'Trước khi bay, bạn muốn tiếng Nhật đến đâu?', opts: 'lv1', note: 1 },
+        key: 'a62.do1', dyn: 'jpc', q: 'Ở JPC, bạn muốn làm được gì?', sub: 'Chọn 2–4 việc.', min: 2, max: 4, own: 'Việc khác' },
+      { k: 'plan', lv: { key: 'a62.jp2', q: 'Ở Nhật, tiếng Nhật của bạn đến đâu?', opts: 'lv2' },
+        key: 'a62.work', dyn: 'work', q: 'Trong công việc, bạn muốn đạt gì?', sub: 'Chọn 1–3 điều.', min: 1, max: 3, own: 'Điều khác' },
+      { k: 'slide', sl: { key: 'a62.save', min: 0, max: 400, step: 10, def: 100, unit: 'money', lo: '0', hi: '400 triệu', skip: 'Mình chưa tính được' },
+        q: 'Mỗi năm ở Nhật, bạn muốn để dành khoảng bao nhiêu?', sub: 'Kéo để đặt số của bạn.', note: PLAN.saveNote,
+        senpai: '@save',
+        key: 'a62.joy', opts: PLAN.joy, cq: 'Ngoài giờ làm, bạn muốn trải nghiệm gì?', csub: 'Chọn 1–3. Vui cũng là một phần kế hoạch.', min: 1, max: 3, own: 'Ý khác' },
+      { k: 'write', q: 'Kế hoạch của bạn', sub: 'Mỗi chặng một câu. Gợi ý nhỏ ghép từ lựa chọn của bạn.',
+        fields: [
+          { key: 'a62.p1', l: 'Chặng 1 · Ở JPC', starter: 'Ở JPC, mình sẽ ', ph: 'Ví dụ: đạt N4, học từ vựng [Nghề] mỗi tuần', min: 12, rows: 3 },
+          { key: 'a62.p2', l: 'Chặng 2 · Ở Nhật', starter: 'Ở Nhật, mình sẽ ', ph: 'Ví dụ: đậu thi tay nghề, lên N3', min: 12, rows: 3 }
+        ],
+        tips: '@plan' }
+    ] },
+  a63: { t: 'Đo khoảng cách', mins: 5, st: 's6', d: 'Nghề cần gì, bạn có gì. Rồi tập trả lời phỏng vấn 60 giây.',
+    steps: [
+      { k: 'gap', key: 'a63.gap', q: 'Nghề [Nghề] cần những điều này. Bạn có đến đâu?', sub: 'Chọn thật. Chưa có là bình thường.' },
+      { k: 'habit', q: 'Biến điều còn thiếu thành thói quen', sub: 'Viết 2 công thức “Khi… tôi sẽ…”. Bắt đầu từ tuần này.' },
+      { k: 'iv', q: IV.q, sub: 'Viết như đang nói. Khoảng 4–6 câu là vừa 60 giây.',
+        fields: [{ key: 'a63.iv', l: 'Câu trả lời của bạn', starter: 'Em chọn nghề này vì ', ph: '@iv', min: 40, rows: 6 }],
+        tips: '@ivt' },
+      { k: 'say', mood: 'cheer', card: 7, t: 'Ô số 7 sắp có chữ của bạn. Bấm <b>Đóng dấu</b> nhé.' }
     ] }
 };
 
 /* Thứ tự học (chặng chính). Ga chưa có hoạt động (ready:0) hiện "Đang xây". */
-var ORDER = ['x1', 'a11', 'a13', 'a21', 'a22', 'a23', 'a31', 'a32', 'a33', 'a42', 'a44', 'a43', 'a51', 'a53'];
+var ORDER = ['x1', 'a11', 'a13', 'a21', 'a22', 'a23', 'a31', 'a32', 'a33', 'a42', 'a44', 'a43', 'a51', 'a53', 'a62', 'a63'];
 
-/* ---------- Bản demo giáo viên: học viên giả đã xong Sân ga đến Ga 5 ---------- */
+/* ---------- Bản demo giáo viên: học viên giả đã xong Sân ga đến Ga 6 ---------- */
 var DEMO_DATA = {
   prof: { name: 'Nguyễn Văn An', by: '2005', sid: 'HV2026-0123', cls: 'E696', path: 'Ikusei Shuro' },
   intro: 1,
-  done: { x1: 1763260000000, w1: 1763260000000, a11: 1763260000000, a13: 1763260000000, a21: 1763260000000, a22: 1763260000000, a23: 1763260000000, a31: 1763260000000, a32: 1763260000000, a33: 1763260000000, w4: 1763260000000, a42: 1763260000000, a44: 1763260000000, a43: 1763260000000, a51: 1763260000000, a53: 1763260000000 },
+  done: { x1: 1763260000000, w1: 1763260000000, a11: 1763260000000, a13: 1763260000000, a21: 1763260000000, a22: 1763260000000, a23: 1763260000000, a31: 1763260000000, a32: 1763260000000, a33: 1763260000000, w4: 1763260000000, a42: 1763260000000, a44: 1763260000000, a43: 1763260000000, a51: 1763260000000, a53: 1763260000000, w6: 1763260000000, a62: 1763260000000, a63: 1763260000000 },
   d: {
     'x1.now': '2', 'x1.notice': ['Hoàn cảnh giống mình', 'Học tiếng Nhật bền bỉ'],
     'x1.goal': 'Mình muốn biết mình hợp nghề cơ khí hay nghề hàn hơn, và có kế hoạch học tiếng Nhật rõ ràng.',
@@ -655,14 +961,25 @@ var DEMO_DATA = {
     'a44.next': 'Mốc gần nhất của mình là N5 vào cuối năm nay. Mỗi tối mình học 20 từ và Chủ nhật làm một đề.',
     'a43.r': { 0: 'r', 1: 'w', 2: 'u', 3: 'r', 4: 'r', 5: 'r', 6: 'w', 7: 'u' }, 'a43.top': '1',
     'a43.why': 'Mình vẫn muốn đi vì muốn có nghề cơ khí vững tay và sửa lại nhà cho ba mẹ.',
-    'a51.c1': 2, 'a51.free': '1', 'a51.c2': 1, 'a51.help': ['Tiếng Nhật đến N2', 'Dùng giờ rảnh để học', 'Tác phong làm việc kiểu Nhật'],
+    'a51.c1': 2, 'a51.free': '1', 'a51.c2': 1, 'a51.vid': 1, 'a51.help': ['Tiếng Nhật đến N2', 'Dùng giờ rảnh để học', 'Tác phong làm việc kiểu Nhật'],
     'a51.bring': 'Ngoài tiền, mình muốn mang về tay nghề CNC vững, tiếng Nhật N3 và thói quen báo cáo đúng giờ.',
-    'a51.open': 1, 'a51.who': 'Anh Thạch Phú Sang, ngành cơ khí',
-    'a51.turn': 'Mới 18 tuổi, anh dám chọn đi Nhật làm bảo dưỡng đường sắt.',
-    'a51.learn': 'Mình muốn học theo cách anh dám bắt đầu sớm, không chờ đủ tự tin mới đi.',
+    'a51.open': 1, 'a51.who': 'Anh Hoàng Văn Thiệu, ngành cơ khí',
+    'a51.turn': 'Anh làm 5 năm ở Toyama, về nước với N2 rồi lên Phó Giám đốc.',
+    'a51.learn': 'Mình muốn học theo cách anh vừa đi làm vừa học tiếng Nhật đến N2.',
     'a53.ask': [1, 2, 0, 4], 'a53.best': '1',
     'a53.guide': 'Anh họ mình đang làm cơ khí ở Nhật năm thứ 2.',
     'a53.q1': 'Tháng đầu làm cơ khí ở Nhật, anh thấy khó nhất là gì?',
-    'a53.q2': 'Em nên luyện thói quen nào từ bây giờ để sang đó đỡ bỡ ngỡ?'
+    'a53.q2': 'Em nên luyện thói quen nào từ bây giờ để sang đó đỡ bỡ ngỡ?',
+    'w6.clear': 4,
+    'a62.jp1': 'N4', 'a62.do1': ['Học từ vựng cơ khí, ký hiệu bản vẽ', 'Tập đọc thước cặp, panme', 'Ngủ trước 23 giờ'],
+    'a62.jp2': 'N3', 'a62.work': ['Đậu Ginou Kentei cơ khí cấp 3', 'Đứng máy CNC, gia công chính xác', 'Lên Kỹ năng đặc định 1'],
+    'a62.save': 120, 'a62.joy': ['Du lịch các tỉnh của Nhật', 'Kết bạn với người Nhật'],
+    'a62.p1': 'Ở JPC, mình sẽ đạt N4 trước khi bay, học 20 từ chuyên ngành cơ khí mỗi tuần và ngủ trước 23 giờ.',
+    'a62.p2': 'Ở Nhật, mình sẽ đậu Ginou Kentei cơ khí cấp 3, đứng máy CNC vững, lên N3 và để dành đều mỗi tháng.',
+    'a63.gap': { 'Đọc bản vẽ, ký hiệu dung sai': 'n', 'Đo bằng thước cặp, panme': 'p', 'Tỉ mỉ, tự kiểm hàng': 'p', 'An toàn trong xưởng': 'h', 'Quen với: đứng máy cả ca, có tiếng ồn, bụi kim loại': 'n',
+      'Tiếng Nhật đủ nghe hướng dẫn, báo cáo': 'p', 'Đúng giờ, giữ 5S chỗ ở, chỗ học': 'h', 'Sức khỏe để làm theo ca': 'h', 'Tự lo chi tiêu, sinh hoạt': 'n' },
+    'a63.h1w': '4', 'a63.h1d': 'tra 3 ký hiệu bản vẽ', 'a63.h2w': '5', 'a63.h2d': 'ghi chi tiêu trong ngày',
+    'a63.iv': 'Em chọn nghề này vì từ nhỏ em hay cùng chú sửa máy, em thích làm ra chi tiết chính xác. Ở JPC em đang học N4 và tập đọc bản vẽ mỗi tuần. Sang Nhật, em muốn đậu Ginou Kentei cấp 3 và lên N3. 5 năm sau, em muốn là thợ CNC vững tay, kèm được người mới và lo cho ba mẹ.',
+    'a63.ivn': 2
   }
 };
