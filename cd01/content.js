@@ -7,8 +7,8 @@
    - Senpai có cờ draft:1 = LỜI KỂ MẪU do Claude viết, cần thay bằng chuyện thật (ẩn danh) trước khi phát hành.
    ES5. */
 var CD_ID = 'cd01';
-var CD_VER = 'CD01.0.9';
-var CD_TOTAL = 18;            /* Xuất phát (1) + 7 ga (17 chặng) */
+var CD_VER = 'CD01.1.0';
+var CD_TOTAL = 18;            /* Xuất phát (1) + 7 ga (17 chặng). Ga Ước Mơ (3 chặng nghi thức, FIN_ORDER) không tính vào 18 */
 var CD_XP_ACT = 30, CD_XP_WARM = 10, CD_INS_WORDS = 20, CD_INS_FIELD = 5;
 var TIKME = 'https://tikme.com';
 
@@ -55,8 +55,11 @@ var STATIONS = [
     done: 'Ô số 8 đã điền. Bản Career Design của bạn đủ 8 ô rồi!',
     word: { k: '挑戦', kana: 'ちょうせん', ro: 'chōsen', vn: 'thử thách' } }
 ];
-var FINAL = { id: 's8', n: 8, vn: 'Ga Ước Mơ', k: '夢', kana: 'ゆめ', ro: 'Yume · Ước mơ', lc: '#F2A20F', ic: 'star',
-  sub: 'Nhận Bản Career Design 1 trang' };
+var FINAL = { id: 's8', n: 8, vn: 'Ga Ước Mơ', k: '夢', kana: 'ゆめ', ro: 'Yume · Ước mơ', lc: '#F2A20F', ic: 'star', ready: 1,
+  sub: 'Soát vé, viết lời hứa, nhận Bản Career Design 1 trang', acts: ['a80', 'a81', 'a82'],
+  intro: 'Chặng cuối rồi, [Tên]! Qua cổng soát vé, viết lời hứa với mình, rồi nhận Bản Career Design 1 trang nhé.',
+  done: 'Bạn đã về đích Career Design 01!',
+  word: { k: '夢', kana: 'ゆめ', ro: 'yume', vn: 'ước mơ' } };
 
 /* ---------- Bản Career Design: 8 ô, mỗi ga điền một ô ---------- */
 var CARDS = [
@@ -891,6 +894,86 @@ var RES7 = [['y', 'Làm được', 'Bạn vừa làm được một việc ở v
   ['p', 'Làm một phần', 'Làm một phần cũng là bước ra rồi. Phần còn lại, bạn muốn thử lại khi nào?'],
   ['n', 'Chưa làm', 'Chưa làm cũng không sao. Điều gì cản bạn? Chọn một việc nhỏ hơn cũng được.']];
 
+/* ---------- GA ƯỚC MƠ (FINAL, s8) · CD01.1.0 ----------
+   Không phải bài kiểm tra: cổng soát vé chỉ GỢI Ý bổ sung, luôn cho đi tiếp.
+   GATE8: ô viết của từng ô Bản Career Design để soát [mã ô viết, tên ngắn, số từ tối thiểu].
+   Ô "sơ sài" = ít hơn số từ tối thiểu (không tính câu mở sẵn) hoặc còn nguyên câu gợi ý chưa sửa. Lựa chọn "Chưa chắc" không tính là sơ sài. */
+var GATE8 = {
+  1: [['x1.goal', 'Mục tiêu khi lên tàu', 6]],
+  2: [['a13.me', 'Bạn muốn trở thành ai', 6]],
+  3: [['a21.flow', 'Lúc bạn quên cả giờ', 8], ['a22.praise', 'Lần bạn được khen', 8], ['a23.inter', 'Nghề bạn nghĩ tới', 4]],
+  4: [['a33.why', 'Vì sao chọn nghề này', 8]],
+  5: [['a42.like', 'Điều bạn thích ở nghề', 4], ['a43.why', 'Vì sao vẫn muốn đi', 6], ['a44.next', 'Cách bắt đầu mốc gần nhất', 6]],
+  6: [['a51.bring', 'Ngoài tiền, muốn mang về', 5], ['a51.learn', 'Điều muốn học theo', 5]],
+  7: [['a62.p1', 'Kế hoạch ở JPC', 8], ['a62.p2', 'Kế hoạch ở Nhật', 8], ['a63.iv', 'Trả lời phỏng vấn 60 giây', 25]],
+  8: [['a71.note', 'Câu nhắn cho mình', 6], ['a72.if', 'Nếu ngại, mình sẽ…', 5]]
+};
+var GATE_TXT = {
+  t: 'Trước khi về đích, mời [Tên] qua cổng soát vé. Máy soát 8 ô của bạn.',
+  ok: '8 ô đều có chữ của bạn. Mời [Tên] qua cổng!',
+  thin: '[Ô] còn ngắn. Muốn thêm chút cho trọn không?',
+  keep: 'Giữ vậy cũng được. Bấm <b>Qua cổng</b> để đi tiếp.',
+  short: 'còn ngắn', tip: 'còn nguyên câu gợi ý',
+  fixing: 'Bạn đang bổ sung cho cổng soát vé. Chữ tự lưu.', back: 'Xong, quay lại cổng'
+};
+/* Nhìn lại: hỏi lại câu x1.now của Sân ga */
+var NOW8 = {
+  up: 'Bạn đi thêm [D] bậc rồi. Đó là nhờ chính bạn nghĩ kỹ ở 7 ga.',
+  same: 'Vẫn mức cũ cũng không sao. Có khi bạn đã nghĩ kỹ hơn, chỉ chưa đổi mức.',
+  down: 'Lùi một chút cũng là nghĩ kỹ hơn. Biết mình chưa rõ chỗ nào là bước đầu để rõ.',
+  help: ['Trắc nghiệm RIASEC', 'Đọc ngành nghề trên Tikme', 'Chuyện Senpai, chị Thúy', 'Trò chuyện với anh Minh', 'Lên kế hoạch 2 chặng', 'Tập dượt tuần đầu ở Nhật', 'Nghĩ về điều mình coi trọng']
+};
+/* Thư gửi mình 5 năm sau: gợi ý ghép từ bài của học viên. Bỏ câu nào thiếu dữ liệu.
+   [Me] a13.me · [Hard] việc khó a72 · [Habit] thói quen a63 · [Why] a43.why · [Dream] 5 năm sau theo nghề (IND6.ivx) · [Note] a71.note */
+var LETTER8 = [
+  'Gửi mình 5 năm sau, mong là giờ bạn đã là người [Me] Mình bắt đầu từ việc khó “[Hard]”. Nhớ giữ thói quen: [Habit]',
+  'Gửi mình 5 năm sau, chắc giờ bạn đã quen nghề [Nghề]. Đừng quên lý do mình đi: [Why] Hôm nay mình hứa: [Habit]',
+  'Gửi mình 5 năm sau, mong là giờ bạn đã [Dream]. Lúc mệt, nhớ câu này: “[Note]”'
+];
+var SEAL8 = { hint: 'Nhấn giữ con dấu 2 giây để đóng dấu lời hứa', done: 'Lời hứa đã đóng dấu. Shin cất giữ giúp bạn nhé.', redo: 'Bạn vừa sửa thư. Nhấn giữ để đóng dấu lại nhé.' };
+
+/* Hướng đi sau 5 năm theo TỪNG NGHỀ (gợi ý để nghĩ tiếp ở CD02, không phải cam kết tuyển dụng) + lời chúc Senpai (lời kể mẫu).
+   Khóa = mã ngành trong INDS. Không có nghề → gen. */
+var IND8 = {
+  'co-khi': { far: ['Thợ CNC chính, tự lập trình máy', 'Tổ trưởng, kèm người mới', 'Về Việt Nam làm kỹ thuật cho công ty Nhật'],
+    sp: ['Anh khóa trước · ngành cơ khí', 'Lời hứa hồi ở JPC của mình là mỗi tối 10 từ vựng. Năm thứ ba, mình đọc bản vẽ không cần hỏi ai.'] },
+  'dien-tu': { far: ['Kỹ thuật viên kiểm tra chất lượng', 'Tổ trưởng chuyền lắp ráp', 'Về Việt Nam làm QC cho nhà máy Nhật'],
+    sp: ['Chị khóa trước · ngành điện tử', 'Mình dán lời hứa ở đầu giường ký túc xá. Tháng nào mệt, đọc lại là có sức đi tiếp.'] },
+  'han': { far: ['Thợ hàn chính có chứng chỉ JIS', 'Phụ trách tổ hàn, kèm người mới', 'Về Việt Nam làm thợ hàn kỹ thuật cao'],
+    sp: ['Anh khóa trước · ngành hàn', 'Năm đầu mình bị bảo hàn lại nhiều lắm. Nhớ lời hứa “không bỏ cuộc”, năm ba mình đậu thi tay nghề.'] },
+  'son': { far: ['Thợ sơn chính, phụ trách pha màu', 'Kiểm tra chất lượng màng sơn', 'Về Việt Nam làm sơn cho xưởng ô tô, cơ khí'],
+    sp: ['Anh khóa trước · ngành sơn', 'Mình hứa tự kiểm từng góc trước khi giao. Giữ được vậy, tổ trưởng giao mình pha màu.'] },
+  'duc-nhua': { far: ['Tự thay khuôn, chỉnh máy ép', 'Tổ trưởng ca, kèm người mới', 'Về Việt Nam làm kỹ thuật máy ép nhựa'],
+    sp: ['Chị khóa trước · ngành đúc nhựa', 'Lời hứa của mình rất nhỏ: chưa chắc thì hỏi ngay. Nhờ vậy năm hai mình được dạy thay khuôn.'] },
+  'dong-goi-cong-nghiep': { far: ['Tổ trưởng khu đóng gói', 'Lái xe nâng, phụ trách kho', 'Về Việt Nam làm quản lý kho, xuất hàng'],
+    sp: ['Anh khóa trước · ngành đóng gói', 'Mình hứa đếm lại hàng trước khi đóng thùng. Thói quen nhỏ đó giúp mình được tin tưởng hơn.'] },
+  'in-an': { far: ['Thợ in chính, phụ trách máy', 'Chuyên so màu, kiểm bản in', 'Về Việt Nam làm cho xưởng in, bao bì'],
+    sp: ['Anh khóa trước · ngành in ấn', 'Mình hứa mỗi tuần học 10 từ về màu, về máy in. Năm hai mình tự so màu được.'] },
+  'may-mac': { far: ['QC xưởng may', 'Kỹ thuật rập, làm mẫu', 'Về Việt Nam làm chuyền trưởng, QC'],
+    sp: ['Chị khóa trước · ngành may mặc', 'Lúc chưa theo kịp chuyền, mình đọc lại lời hứa ở JPC. Mình tập thêm 15 phút mỗi tối, rồi cũng theo kịp.'] },
+  'xay-dung': { far: ['Thợ chính, rồi trưởng nhóm', 'Học đọc bản vẽ, phụ giám sát', 'Về Việt Nam làm cho công trình vốn Nhật'],
+    sp: ['Anh khóa trước · ngành xây dựng', 'Mùa hè công trường nóng, có lúc mình muốn về. Mình nhớ lời hứa với ba mẹ và đi đủ chặng đã định.'] },
+  'o-to': { far: ['Thợ chính, tự chẩn đoán lỗi', 'Thi chứng chỉ Seibishi', 'Về Việt Nam làm cho gara, hãng xe Nhật'],
+    sp: ['Anh khóa trước · ngành ô tô', 'Mình hứa ghi sổ mỗi lỗi xe gặp được. Năm ba, cuốn sổ đó giúp mình tự chẩn đoán lỗi.'] },
+  'nong-nghiep': { far: ['Phụ trách một khu nhà màng', 'Thạo máy, thạo trọn vụ mùa', 'Về Việt Nam làm nông nghiệp công nghệ cao'],
+    sp: ['Chị khóa trước · ngành nông nghiệp', 'Mình hứa để dành đều và học cách trồng của người Nhật. Giờ mình đang làm vườn rau ở quê.'] },
+  'thuy-san': { far: ['Trưởng ca, kiêm QC', 'Thợ chính, vận hành dây chuyền', 'Về Việt Nam làm QC cho nhà máy xuất khẩu'],
+    sp: ['Chị khóa trước · ngành thủy sản', 'Xưởng lạnh, việc lặp lại, có lúc mình nản. Lời hứa học tiếng Nhật mỗi tối giúp mình đi tiếp.'] },
+  'thuc-pham': { far: ['Trưởng ca sản xuất', 'Phụ trách vệ sinh, an toàn thực phẩm', 'Về Việt Nam mở tiệm hoặc làm QC thực phẩm'],
+    sp: ['Chị khóa trước · ngành thực phẩm', 'Mình hứa giữ sạch như người Nhật, cả ở ký túc xá. Năm hai, mình được giao kiểm vệ sinh của chuyền.'] },
+  'dieu-duong': { far: ['Đậu Kaigo Fukushishi, làm lâu dài', 'Trưởng nhóm chăm sóc ở cơ sở', 'Về Việt Nam làm dưỡng lão, đào tạo kaigo'],
+    sp: ['Chị khóa trước · ngành kaigo', 'Mình hứa mỗi ngày học 5 từ kaigo. Nhờ vậy mình viết được sổ ghi chép, các cụ cũng tin mình hơn.'] },
+  'nha-hang': { far: ['Trưởng ca, phụ trách khu vực', 'Bếp chính, hoặc lễ tân giỏi kính ngữ', 'Về Việt Nam làm nhà hàng, khách sạn Nhật'],
+    sp: ['Anh khóa trước · ngành nhà hàng', 'Mình hứa mỗi ngày tập một câu kính ngữ. Giờ khách quen gọi tên mình khi đến quán.'] },
+  've-sinh-toa-nha': { far: ['Tổ trưởng ca, kiểm tra bàn giao', 'Thạo chà sàn, phủ wax, lau kính', 'Về Việt Nam làm quản lý vệ sinh tòa nhà'],
+    sp: ['Chị khóa trước · ngành vệ sinh tòa nhà', 'Mình hứa đến sớm 10 phút mỗi ca. Tổ trưởng thấy vậy, giao mình kiểm tra bàn giao.'] },
+  'ky-su': { far: ['Làm dự án riêng, lên N2–N1', 'Làm cầu nối Nhật – Việt', 'Về Việt Nam làm cho công ty Nhật'],
+    sp: ['Anh khóa trước · kỹ sư', 'Mình hứa mỗi tuần báo cáo một lần bằng tiếng Nhật, dù còn sai. Năm ba mình được giao dự án riêng.'] },
+  gen: { far: ['Thợ chính, vững tay nghề', 'Trưởng nhóm, kèm người mới', 'Về Việt Nam dùng nghề và tiếng Nhật'],
+    sp: ['Anh khóa trước', 'Lời hứa của mình rất nhỏ: mỗi ngày một việc. Nhỏ nhưng đều, 5 năm sau nhìn lại mới thấy xa.'] }
+};
+var STAMP8 = ['出発', '未来', '自分', '性格', '仕事', '対話', '道のり', '挑戦']; /* con dấu 8 ga trên vé hoàn thành */
+
 /* ---------- Lời Shin, chữ giao diện ---------- */
 var SHIN_NAMES = ['Shin trứng', 'Shin gà con', 'Shin gà rừng', 'Shin đại bàng'];
 var TXT = {
@@ -899,7 +982,10 @@ var TXT = {
   introBtn: 'Chào Shin! Mình bắt đầu nhé',
   gateToast: 'Chính xác! Shin mê Oden lắm. Lên tàu thôi!',
   homeHi: ['Chào [Tên]! Hôm nay đi tiếp một ga nhé.', 'Chào [Tên]! Mỗi ga chỉ khoảng 15 phút thôi.', 'Chào [Tên]! Bản Career Design của bạn đang lớn dần đó.'],
-  homeWait: '[Tên] đã đủ 8 ô rồi! Ga Ước Mơ đang được xây, chờ Shin chút nhé.',
+  homeWait: '[Tên] đã đủ 8 ô rồi! Ga Ước Mơ đang chờ bạn về đích.',
+  homeDone: '[Tên] đã về đích! Giữ lời hứa và việc khó nhé. Hẹn gặp ở CD02.',
+  finThanks: '[Tên] ơi, cảm ơn bạn đã đi cùng Shin hết chuyến tàu. Chuyến tàu khép lại, hành trình của bạn mới bắt đầu.',
+  sheetBtn: 'Xem Bản Career Design 1 trang',
   warmT: 'Khởi động 30 giây', warmSub: 'Không bắt buộc · +10 XP',
   stampBtn: 'Đóng dấu',
   redo: 'Bạn đang xem lại bài đã làm. Sửa chỗ nào cũng được.',
@@ -907,7 +993,9 @@ var TXT = {
   noScore: 'Không có đúng sai',
   senpaiDraft: 'lời kể mẫu',
   reportT: 'Báo cáo tiến độ',
-  reportSub: 'Gửi thầy cô 4 ô đầu của bạn. Thầy cô đọc để hiểu bạn, không chấm điểm.'
+  reportSub: 'Gửi thầy cô 4 ô đầu của bạn. Thầy cô đọc để hiểu bạn, không chấm điểm.',
+  reportEndT: 'Báo cáo về đích',
+  reportEndSub: 'Gửi thầy cô Bản Career Design của bạn. Thầy cô đọc để hiểu bạn, không chấm điểm.'
 };
 
 /* ---------- HOẠT ĐỘNG ---------- */
@@ -1188,13 +1276,39 @@ var ACTS = {
         fields: [{ key: 'a72.if', l: 'Lúc ngại, bạn sẽ làm gì?', starter: 'Nếu ngại, mình sẽ ', ph: 'Ví dụ: làm thử 5 phút trước, rồi tính tiếp', min: 10, rows: 3 }],
         tips: ['Nếu ngại, mình sẽ làm thử 5 phút trước, rồi tính tiếp.', 'Nếu ngại, mình sẽ nhắn người cùng biết để có người nhắc.', 'Nếu ngại, mình sẽ nhớ lý do mình muốn đi Nhật.'] },
       { k: 'say', mood: 'cheer', card: 8, t: 'Ô số 8 sắp có chữ của bạn. Hết hạn, Shin sẽ hỏi bạn làm thế nào nhé. Bấm <b>Đóng dấu</b>!' }
+    ] },
+
+  /* ===== GA ƯỚC MƠ (FINAL) · nghi thức về đích: soát vé → lời hứa → Bản Career Design 1 trang ===== */
+  a80: { t: 'Cổng soát vé', mins: 2, st: 's8', d: 'Máy soát 8 ô. Ô nào còn ngắn, bạn bổ sung nếu muốn.', btn: 'Qua cổng',
+    steps: [
+      { k: 'gate' }
+    ] },
+  a81: { t: 'Lời hứa với mình', mins: 5, st: 's8', d: 'Nhìn lại chuyến tàu, viết thư cho mình 5 năm sau.', btn: 'Cất lời hứa',
+    steps: [
+      { k: 'now8', key: 'a81.now', q: 'Bây giờ, bạn đã rõ nghề mình muốn làm chưa?', sub: 'Lúc lên tàu, bạn cũng trả lời câu này.',
+        hkey: 'a81.help', hq: 'Điều gì giúp bạn nhiều nhất?', hsub: 'Chọn 1–2 điều.', max: 2, own: 'Ý khác' },
+      { k: 'write', q: 'Thư gửi mình năm [Năm5]', sub: 'Viết như đang nói với chính mình. 3–5 câu là đủ.',
+        fields: [
+          { key: 'a81.letter', l: 'Thư của bạn', starter: 'Gửi mình 5 năm sau, ', ph: '@lx', min: 30, rows: 6 },
+          { key: 'a81.motto', l: 'Gói lời hứa trong 1 câu ngắn', ph: 'Ví dụ: Chậm mà chắc, đi là tới.', min: 4, rows: 2, noIns: 1 }
+        ],
+        tips: '@letter' },
+      { k: 'seal8', key: 'a81.seal' }
+    ] },
+  a82: { t: 'Bản Career Design 1 trang', mins: 4, st: 's8', d: 'Lưu bản 1 trang, gửi thầy cô, xem bước tiếp theo.', btn: 'Về đích',
+    steps: [
+      { k: 'sheet8' },
+      { k: 'send8' },
+      { k: 'next8', key: 'a82.far', q: '5 năm nữa, bạn tò mò hướng nào nhất?', sub: 'Gợi ý theo nghề [Nghề]. CD02 sẽ cùng bạn nghĩ tiếp.' }
     ] }
 };
 
 /* Thứ tự học (chặng chính). Ga chưa có hoạt động (ready:0) hiện "Đang xây". */
 var ORDER = ['x1', 'a11', 'a13', 'a21', 'a22', 'a23', 'a31', 'a32', 'a33', 'a42', 'a44', 'a43', 'a51', 'a53', 'a62', 'a63', 'a71', 'a72'];
+/* Ga Ước Mơ: mở khi xong 18 chặng trên, đi lần lượt */
+var FIN_ORDER = ['a80', 'a81', 'a82'];
 
-/* ---------- Bản demo giáo viên: học viên giả đã xong Sân ga đến Ga 7 (hạn việc khó đặt là hôm qua để thấy lời Shin hỏi kết quả) ---------- */
+/* ---------- Bản demo giáo viên: học viên giả đã xong Sân ga đến Ga 7, Ga Ước Mơ đang chờ (hạn việc khó đặt là hôm qua để thấy lời Shin hỏi kết quả; ô 3 cố ý ngắn để thấy cổng soát vé) ---------- */
 var DEMO_DATA = {
   prof: { name: 'Nguyễn Văn An', by: '2005', sid: 'HV2026-0123', cls: 'E696', path: 'Ikusei Shuro' },
   intro: 1,
@@ -1213,7 +1327,7 @@ var DEMO_DATA = {
     'a13.me': '5 năm sau, mình muốn là người thợ cơ khí vững tay, nói tiếng Nhật tự tin và lo được cho ba mẹ.',
     'a13.first': 'Tắt điện thoại lúc 23 giờ, trước đó học 10 từ vựng.',
     'a21.sel': ['Sửa chữa đồ đạc', 'Lắp ráp, tháo lắp', 'Nấu ăn', 'Thể thao, vận động'],
-    'a21.flow': 'Mình tháo cái quạt hỏng ra sửa, ngồi cả buổi chiều mà không thấy mệt.',
+    'a21.flow': 'Sửa quạt cả buổi chiều.', /* cố ý ngắn: để demo thấy cổng soát vé gợi ý bổ sung ô 3 */
     'a22.sel': ['Kiên nhẫn', 'Khéo tay', 'Cẩn thận, tỉ mỉ', 'Sửa chữa, lắp ráp'],
     'a22.praise': 'Thầy chủ nhiệm khen mình lắp lại xe đạp cho bạn mà không sót con ốc nào.',
     'a23.rank': ['Gia đình', 'Học hỏi, phát triển', 'Thu nhập tốt'],

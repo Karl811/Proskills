@@ -5,6 +5,19 @@ Quy ước số phiên bản: **PS a.b.c**
 - b: giai đoạn / thêm module hoặc tính năng lớn
 - c: sửa nhỏ trong giai đoạn đó
 
+## PS1.3.10 · 16/11/2026 · CD01: Ga Ước Mơ (Ga 8, về đích) · CD01.1.0
+- Ga Ước Mơ mở khi xong 18 chặng. 3 chặng nghi thức (`FIN_ORDER`: a80, a81, a82), không tính vào 18. Đi liền một mạch: xong chặng nào mở luôn chặng sau.
+- a80 Cổng soát vé: máy soát 8 ô (tia quét, ô sáng lần lượt). Ô sơ sài (ít từ hơn mức trong `GATE8`, hoặc còn nguyên câu gợi ý) hiện vàng + Shin “Ô 3 còn ngắn. Muốn thêm chút cho trọn không?”. Nút **Bổ sung** mở đúng ô viết (thanh “Xong, quay lại cổng”, Insight tính lại). Luôn qua cổng được. Lưu `a80.thin`.
+- a81 Lời hứa với mình: hỏi lại câu “rõ nghề chưa” của Sân ga, hình lúc lên tàu → bây giờ (lùi cũng có lời Shin tích cực) + chọn điều giúp mình nhiều nhất · thư gửi “mình năm [năm nay + 5]” (3 gợi ý ghép từ bài của học viên: câu ô 2, việc khó, thói quen, lý do đi, 5 năm sau theo nghề, câu nhắn tuần đầu) + 1 câu ngắn làm chữ ký · **nhấn giữ 2 giây để đóng dấu** 約束 (sửa thư thì đóng dấu lại).
+- a82 Bản Career Design 1 trang: 8 ô + câu trả lời phỏng vấn 60 giây + lời hứa và chữ ký có con dấu · **Lưu ảnh** (vẽ bằng canvas, không cần mạng, ảnh 1080px) · **In / Lưu PDF** (chỉ in bản 1 trang, khổ A4) · Báo cáo về đích gửi thầy cô (Teams, chép tin nhắn) · Tikme đọc thêm theo nghề (trang ngành, diện, chuyện cùng ngành) · chọn hướng 5 năm tới theo TỪNG NGHỀ (`IND8.far`, 17 nghề + gen) + Senpai chúc (lời kể mẫu) + hẹn CD02.
+- Vé hoàn thành (vàng, 8 con dấu ga, câu chữ ký) khi về đích; mở lại ở trang Ga Ước Mơ. Trang chủ: nút “Xem Bản Career Design 1 trang”, cuống vé ghi “Về đích + ngày”. Sổ tay có nút mở bản 1 trang.
+- Dữ liệu cho CD02 thêm: thin, now2, help8, letter, motto, sealAt, far, endAt.
+- Demo giáo viên: vẫn xong đến Ga 7, Ga Ước Mơ đang chờ; ô 3 (a21.flow) cố ý ngắn để thấy cổng soát vé gợi ý bổ sung.
+- Kiểm 390/360/1280, giảm chuyển động; đủ 17 nghề + Nghề khác (có/không ngành gần); ES5 đạt; không lỗi console; không tràn ngang; lưu bài thật báo về trang chủ đúng.
+- config: cd01 `ver: 'CD01.1.0'`.
+
+File cần xóa trên GitHub: không có.
+
 ## PS1.3.9 · 16/11/2026 · CD01: Ga 7 Thử Thách (2 chặng, theo TỪNG NGHỀ)
 - Ga 7 còn 2 chặng (bỏ a73). Toàn khóa: Sân ga + 17 chặng = 18. Lời cam kết và soát vé chuyển sang Ga Ước Mơ.
 - a71 Tuần đầu ở Nhật: lịch tuần mini, mở 2 ngày. Thứ Ba: tình huống riêng nghề (`IND7[mã ngành].sc`, 17 nghề + `gen`). Thứ Năm: tình huống từ điều lo nhất ở Ga 4 (`WORRY7`, 8 thẻ; thẻ 4 dùng điều vất vả riêng nghề; điều tự viết dùng `WORRY7_OWN`). 3 cách đều có được/mất + “Mình làm khác” → “Điều có thể xảy ra” + Senpai kể. Cuối: chọn 1–2 việc chuẩn bị + một câu nhắn cho mình của tuần đầu.
