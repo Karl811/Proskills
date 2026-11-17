@@ -8,7 +8,7 @@
    ========================================================= */
 var PS_CONFIG = {
   APP: 'Proskills',
-  APP_VER: 'PS1.3.20',
+  APP_VER: 'PS1.3.22',
   ORG: 'Khoa Kỹ năng · JPC · Proskills',
 
   /* Mật khẩu bản demo giáo viên, dùng chung cho MỌI module (phân biệt hoa thường).
@@ -48,7 +48,7 @@ var PS_CONFIG = {
     { id: 'tk', code: 'HP05', title: 'Nhật Bản Du Ký', sub: 'Kiến thức quy định: luật Nhật, luật cư trú, luật Việt Nam',
       icon: 'scroll', color: '#2F4BD8', state: 'ready', gateQ: 'Ngộ Không thích ăn quả gì nhất?', pass: ['dao'], total: 26, ver: 'TK15' },
     { id: 'tc01', code: 'TC01', title: 'Huấn luyện thể chất', sub: 'Phòng tập HLV Shin: động tác đúng, dinh dưỡng, sức khỏe theo nghề',
-      icon: 'dumbbell', color: '#348A5F', state: 'ready', gateQ: 'Bài thể dục buổi sáng của người Nhật tên là gì?', pass: ['radio taiso', 'rajio taiso', 'radio taisou', 'rajio taisou', 'radiotaiso', 'ラジオ体操', 'radio'], total: 36, ver: 'TC01.0.4' },
+      icon: 'dumbbell', color: '#348A5F', state: 'ready', gateQ: 'Bài thể dục buổi sáng của người Nhật tên là gì?', pass: ['radio taiso', 'rajio taiso', 'radio taisou', 'rajio taisou', 'radiotaiso', 'ラジオ体操', 'radio'], total: 54, ver: 'TC01.0.6' },
     { id: 'mau', code: 'MẪU', title: 'Module mẫu', sub: 'Dùng để thử khung và làm mẫu cho module mới',
       icon: 'spark', color: '#E8834A', state: 'hidden', gateQ: 'Mật khẩu thử là gì?', pass: ['mau'], total: 3, ver: '1.0.0' }
   ],

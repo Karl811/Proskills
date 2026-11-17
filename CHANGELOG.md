@@ -5,6 +5,31 @@ Quy ước số phiên bản: **PS a.b.c**
 - b: giai đoạn / thêm module hoặc tính năng lớn
 - c: sửa nhỏ trong giai đoạn đó
 
+## PS1.3.22 · 17/11/2026 · TC01 Góc nghề, đợt 2 (Phiên 3, phần 2) · TC01.0.6
+TC01 · Góc nghề đủ 6 bài (thầy đã duyệt dàn bài). Đợt 2 dựng 3 bài × 3 hoạt động:
+- **Khởi động trước ca**: Xem 5 động tác (cổ · vai · cổ tay · hông · gối – cổ chân; hình mới) · Xếp thứ tự (từ trên xuống) · **Tập theo Shin 3 phút** (dạng mới flow: Shin đếm 30 giây mỗi động tác, có Tạm dừng, Động tác tiếp; xong hỏi "Người bạn thấy thế nào?", chọn "Có chỗ bị đau" thì Shin nhắc dừng và báo thầy cô).
+- **Đứng lâu, ngồi lâu, làm lặp lại**: **Một ca của nhóm mình** (dạng mới ca: ca 8–17 giờ minh họa theo 5 nhóm, chạm 2 giờ nghĩ là hay mỏi rồi xem giờ hay mỏi + mẹo; sau đó chọn tiết ngồi lâu nhất trong **ngày học ở trường 8–17 giờ**: tiết 1–2, 3–4, 5–6, 7–8) · Giãn 2 phút giữa ca (flow, 5 động tác × 24 giây: cổ, vai, cổ tay, lưng, bắp chân) · **Chọn 1 thói quen** (dạng mới habit: 3 thói quen chung + 1 theo nhóm, hoặc tự đặt; viết lời hẹn "Khi…, mình sẽ…").
+- **Bài bổ trợ cho nghề**: 3 động tác của nhóm mình (mỗi nhóm cơ một động tác, theo lớp Kiến thức nghề: nam 20 cái × 2 hiệp, nữ 15 cái × 2 hiệp) · Tập thử, ghi số · **Lịch tập tuần** (dạng mới week: chọn 2–3 ngày, giờ tập, hiện lịch Sàn tập để xen kẽ; nút video thầy cô GDTC).
+- Động tác mới (EX): preshift, midstretch, dip (hít đất ngược trên ghế), crunch (gập bụng trên), sidelunge (bước ngang), hinge (gập hông lưng thẳng). 14 tư thế mới trong POSES; ghế vẽ dưới người tập (`TC_MARK.chair`, khung hình nhận `mu`, `fig()` nhận `under`). Hoạt động how/try nhận `exBy` (bộ động tác theo nhóm, nữ tự đổi chống đẩy → khuỵu gối). EX có `s` = tên ngắn cho nút chọn; hàng nút động tác tự xuống dòng.
+- Lưu `S.nghe.fl`, `ca`, `habit`, `week`; báo về trang chủ `extra.nghe` (flow, school, habit, week). Sổ tay "Góc nghề của mình" thêm số lần tập theo Shin, tiết ngồi lâu nhất, lịch bài bổ trợ, thói quen chống mỏi. Demo GV có sẵn n2a, n4a.
+- Mẫu "Ngày học ở trường 8–17 giờ" ở Bếp (giờ ăn theo ca) giữ nguyên (thầy xác nhận đúng).
+- Tổng hoạt động TC01: 54. Kiểm 390 (Nhà xưởng/Cơ khí, Dịch vụ/Kaigo nữ, Dây chuyền/Thực phẩm nữ, Văn phòng/Kỹ sư) và 1280 (Ngoài trời/Xây dựng), demo, trang chủ, ES5; không lỗi console.
+
+Tệp đổi: config.js, sw.js, index.html, cd01/index.html, tk/index.html, mau/index.html (số phiên bản), tc01/index.html, tc01/content.js, tc01/engine.js, tc01/art.js, tc01/tc01.css, CHANGELOG.md, AGENTS.md.
+File cần xóa trên GitHub: không có.
+
+## PS1.3.21 · 17/11/2026 · TC01 Góc nghề, đợt 1 (Phiên 3, phần 1) · TC01.0.5
+TC01 · khu Góc nghề mở (Phương án A "Một ca làm của mình", thầy đã duyệt). 6 bài; đợt 1 dựng 3 bài × 3 hoạt động, 3 bài còn lại "Sắp mở" (Khởi động trước ca · Đứng lâu, ngồi lâu, làm lặp lại · Bài bổ trợ cho nghề).
+- **Cơ thể của nghề mình**: Bản đồ cơ thể (chạm 3 chỗ nghề mình dùng nhiều, rồi so với nghề/nhóm; không chấm đúng sai) · Mình đang ở mức nào? (tự xếp 4 nhóm cơ theo 4 mức, hiện kỷ lục Sàn tập nếu có; nghề cần nhóm nào còn yếu thì có nút mở bài Sàn tập tương ứng) · Trước khi bay, mình cần… (viết; câu gợi ý theo kết quả của chính học viên).
+- **Nâng, bưng, đẩy đúng cách**: Xem 3 bước nâng vật (hình mới: hạ hông nâng thùng, ôm sát người) · Tìm điểm chưa đúng (2 hình: cúi gập lưng nhấc thùng; bê thùng che mắt qua sàn ướt) · Nặng quá thì làm sao? (thẻ "Mức nâng tham khảo của bạn" tính từ cân nặng ở thẻ hội viên: nam khoảng 40% cân nặng, nữ khoảng 60% mức của nam, ghi nguồn 職場における腰痛予防対策指針 2013; 3 câu, câu 3 riêng theo nhóm và theo nghề Kaigo, Thực phẩm, Ô tô).
+- **An toàn kiểu Nhật**: Tìm 4 nguy hiểm trong kho (hình vẽ mới) · Ghép 6 từ an toàn tiếng Nhật (危ない, 止めて, 注意, 立入禁止, ヨシ, ヒヤリハット) · Senpai kể: đôi giày bảo hộ (dựa trên chuyện đã từng xảy ra, gộp và ẩn danh; 3 câu hỏi dồn "vì sao"; viết "Nếu là anh T., mình sẽ…").
+- HLV Shin ở Góc nghề đội mũ bảo hộ kem cát. Thẻ hội viên có dải dấu thứ 3 "Nghề"; Gợi ý hôm nay xoay 3 khu; Sổ tay thêm ô Dấu Góc nghề và mục "Góc nghề của mình". Báo về trang chủ `extra.nghe` (body, lad).
+- Dạng hoạt động mới: body, ladder, story. pick: `rounds` + `byGroup`/`byJob` thay câu cuối, `kg` hiện thẻ mức nâng, `[KG]` trong câu hỏi. match: `sel`, `no`, `end` lấy chữ từ NGHE_TXT. spot và how nhận `mk` (vật vẽ thêm trong TC_MARK).
+- Tổng hoạt động TC01: 45. Kiểm 390 (Nhà xưởng/Cơ khí, Dịch vụ/Kaigo, Dây chuyền/Thực phẩm, Văn phòng/Kỹ sư) và 1280 (Ngoài trời/Xây dựng), demo, ES5; không lỗi console. Đáp án đúng có vị trí xáo; mỗi câu có đáp án sai dài bằng hoặc hơn đáp án đúng.
+
+Tệp đổi: config.js, sw.js, index.html, cd01/index.html, tk/index.html, mau/index.html (số phiên bản), tc01/index.html, tc01/content.js, tc01/engine.js, tc01/art.js, tc01/tc01.css, CHANGELOG.md, AGENTS.md.
+File cần xóa trên GitHub: không có.
+
 ## PS1.3.20 · 17/11/2026 · Mở TC01 trên trang chủ để thử trên GitHub · TC01.0.4
 - **TC01 · Huấn luyện thể chất hiện trên trang chủ** cho mọi người (config.js `state: 'ready'`), không cần `?thu=1`. Vào khóa vẫn qua cổng mật khẩu: câu hỏi "Bài thể dục buổi sáng của người Nhật tên là gì?", mật khẩu **Radio Taiso** (gõ "rajio taiso", "ラジオ体操" cũng được).
 - Nội dung TC01 không đổi so với PS1.3.19 (Sàn tập 6 bài, Bếp dinh dưỡng 6 bài; 4 khu còn lại hiện "Sắp mở").

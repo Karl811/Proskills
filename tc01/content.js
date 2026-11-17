@@ -4,7 +4,7 @@
    Nguồn nội dung: Sổ quản lý học tập GDTC v10.1, chương trình GDTC TTS/Kỹ sư, tiêu chí đo lường theo nghề (KTN),
    Sổ tay sức khỏe 2.0. Kỹ thuật động tác do GV GDTC duyệt lại. Mốc thể lực: bảng thành tích Sổ quản lý v10.1.
    ========================================================= */
-var TC_VER = 'TC01.0.4';
+var TC_VER = 'TC01.0.6';
 var TC_YT = 'https://www.youtube.com/@THECHAT_SUCKHOE/shorts'; /* kênh video động tác của thầy cô GDTC */
 var TC_RADIO = 'https://www.youtube.com/watch?v=0xfDmrcI7OI';
 
@@ -46,7 +46,7 @@ var KHU = [
   { id: 'san',   t: 'Sàn tập',        jp: '筋トレ', kana: 'きんトレ', ic: 'dumbbell', sub: 'Động tác đúng kỹ thuật, tự tập ở nhà', ready: 1 },
   { id: 'radio', t: 'Radio Taiso',    jp: '体操', kana: 'たいそう', ic: 'radio',    sub: '13 động tác buổi sáng của người Nhật' },
   { id: 'bep',   t: 'Bếp dinh dưỡng', jp: '栄養', kana: 'えいよう', ic: 'bowl',     sub: 'Ăn vậy đủ chưa? Món Việt, món Nhật', ready: 1 },
-  { id: 'nghe',  t: 'Góc nghề',       jp: '仕事', kana: 'しごと',   ic: 'helmet',   sub: 'Sức khỏe theo nơi làm việc của bạn' },
+  { id: 'nghe',  t: 'Góc nghề',       jp: '仕事', kana: 'しごと',   ic: 'helmet',   sub: 'Thân thể cho nghề, nâng vật đúng, an toàn', ready: 1 },
   { id: 'yte',   t: 'Phòng y tế',     jp: '保健室', kana: 'ほけんしつ', ic: 'cross', sub: 'Choáng, say nắng, cảm lạnh, đau lưng' },
   { id: 'test',  t: 'Phòng test',     jp: '測定', kana: 'そくてい', ic: 'gauge',    sub: 'Test thử lý thuyết, tự test thể lực' }
 ];
@@ -93,7 +93,7 @@ var TXT = {
 
 /* ---------- động tác ----------
    frames: các khoảnh khắc chính (p = tên tư thế trong art.js, t = lời hướng dẫn, g = đường gióng [x1,y1,x2,y2], a = mũi tên)
-   keys: 3 điểm chính · yt: link video riêng (để trống thì mở kênh video của thầy cô GDTC) */
+   keys: 3 điểm chính · s: tên ngắn cho nút chọn (không bắt buộc) · yt: link video riêng (để trống thì mở kênh video của thầy cô GDTC) */
 var EX = {
   pushup: { n: 'Chống đẩy cơ bản', who: 'Nam · mốc giữa kỳ', yt: '',
     frames: [
@@ -130,6 +130,13 @@ var EX = {
       { p: 'supRest', t: 'Hạ xuống chậm. Mắt nhìn sàn, cổ thẳng theo lưng.' }
     ],
     keys: ['Nâng chậm, không giật', 'Cổ thẳng theo lưng', 'Giữ 1–2 giây rồi hạ'] },
+  lift: { n: 'Nâng vật đúng cách', who: 'Lưng, chân, hông', yt: '',
+    frames: [
+      { p: 'liftLow', mk: 'boxLow', t: 'Đứng sát vật, hai chân rộng bằng vai. Hạ hông xuống, giữ lưng thẳng.', g: [96, 128, 127, 91] },
+      { p: 'liftUp', mk: 'boxUp', t: 'Ôm vật sát bụng. Đứng lên bằng sức chân, không giật lưng.', a: [[96, 150], [96, 108]] },
+      { p: 'liftUp', mk: 'boxUp', t: 'Muốn đổi hướng thì bước cả bàn chân theo. Không vặn lưng khi đang ôm vật.', arc: [[126, 156, 12]] }
+    ],
+    keys: ['Lưng thẳng, hạ hông bằng chân', 'Ôm vật sát người', 'Đổi hướng bằng bước chân, không vặn lưng'] },
   squat: { n: 'Squat', who: 'Chân, hông', yt: '',
     frames: [
       { p: 'standArms', t: 'Chân rộng bằng vai, mũi chân hơi mở ra. Tay đưa ra trước.' },
@@ -174,7 +181,55 @@ var EX = {
       { p: 'triceps', t: 'Kéo dãn tay sau: gập tay qua đầu, tay kia đẩy nhẹ khuỷu. Đổi bên.' },
       { p: 'sideBend', t: 'Nghiêng lườn: một tay lên cao, nghiêng người sang bên. Đổi bên.' }
     ],
-    keys: ['Giữ 15–30 giây mỗi bên', 'Căng nhẹ là đủ, không đau', 'Thở đều, không nhún giật'] }
+    keys: ['Giữ 15–30 giây mỗi bên', 'Căng nhẹ là đủ, không đau', 'Thở đều, không nhún giật'] },
+  /* Góc nghề đợt 2 (TC01.0.6): khởi động trước ca, giãn giữa ca (dùng cho dạng flow: c = lời ngắn khi tập theo Shin) */
+  preshift: { n: 'Khởi động trước ca', who: 'Khoảng 3 phút · đứng tại chỗ, không cần dụng cụ', yt: '',
+    frames: [
+      { p: 'neckSide', c: 'Cổ: nghiêng, cúi, ngửa', t: 'Cổ: nghiêng đầu sang trái, sang phải, rồi cúi xuống, ngửa nhẹ. Mỗi hướng 4 nhịp.' },
+      { p: 'handsShoulder', c: 'Vai: xoay khuỷu tay', t: 'Vai: đặt các ngón tay lên vai, xoay khuỷu tay ra trước 8 vòng, ra sau 8 vòng.', arc: [[78, 52, 9], [162, 52, 9]] },
+      { p: 'standArms', c: 'Cổ tay: xoay, nắm – xòe', t: 'Cổ tay: duỗi tay ra trước, xoay cổ tay hai chiều. Rồi nắm chặt, xòe bàn tay 10 lần.', arc: [[184, 39, 9]] },
+      { p: 'handsHip', c: 'Hông: xoay vòng', t: 'Hông: chống tay vào hông, xoay hông thành vòng tròn. Mỗi chiều 8 vòng.', arc: [[120, 100, 13]] },
+      { p: 'stand', c: 'Gối, cổ chân: xoay nhẹ', t: 'Gối, cổ chân: hơi chùng gối, xoay gối nhẹ. Rồi nhấc từng chân, xoay cổ chân. Mỗi bên 8 nhịp.', arc: [[121, 132, 10], [126, 163, 7]] }
+    ],
+    keys: ['Đi từ trên xuống: cổ, vai, cổ tay, hông, gối – cổ chân', 'Xoay chậm, đều, không giật mạnh', 'Làm trước giờ vào ca và sau giờ nghỉ trưa'] },
+  midstretch: { n: 'Giãn 2 phút giữa ca', who: 'Đứng tại chỗ · làm trong giờ nghỉ', yt: '',
+    frames: [
+      { p: 'neckSide', c: 'Cổ: nghiêng, giữ 10 giây', t: 'Cổ: nghiêng đầu sang một bên, giữ 10 giây. Đổi bên.' },
+      { p: 'armCross', c: 'Vai: kéo tay ngang ngực', t: 'Vai: kéo một tay ngang ngực, giữ 10 giây. Đổi bên.' },
+      { p: 'wristPull', c: 'Cổ tay: kéo ngón tay về', t: 'Cổ tay: duỗi tay ra trước, tay kia kéo nhẹ các ngón tay về phía mình. Giữ 10 giây, đổi tay.', a: [[192, 30], [178, 44]] },
+      { p: 'handsBack', c: 'Lưng: chống tay, ưỡn nhẹ', t: 'Lưng: hai tay chống sau thắt lưng, ưỡn nhẹ người ra sau. Giữ 5 giây, làm 3 lần.' },
+      { p: 'tiptoe', c: 'Bắp chân: kiễng gót', t: 'Bắp chân: kiễng gót lên rồi hạ xuống chậm, 15 lần. Đang ngồi thì nhấc mũi chân lên xuống.', a: [[96, 166], [96, 140]] }
+    ],
+    keys: ['Căng nhẹ là đủ, không đau', 'Thở đều, không nín thở', 'Đứng hay ngồi đều làm được'] },
+  /* bài bổ trợ lớp Kiến thức nghề (không dụng cụ) */
+  dip: { n: 'Hít đất ngược trên ghế', s: 'Hít đất ngược', who: 'Tay sau, vai · cần 1 ghế chắc', yt: '',
+    frames: [
+      { p: 'dipUp', mu: 'chair', t: 'Ngồi mép ghế, hai tay chống mép ghế sát hông. Trượt mông ra khỏi ghế, chân duỗi về trước.' },
+      { p: 'dipDown', mu: 'chair', t: 'Hít vào, gập khuỷu tay, hạ người xuống đến khi khuỷu gần vuông góc.', a: [[126, 96], [126, 124]] },
+      { p: 'dipUp', mu: 'chair', t: 'Thở ra, đẩy tay thẳng lên. Lưng đi sát mép ghế.', a: [[126, 124], [126, 96]] }
+    ],
+    keys: ['Ghế chắc, kê sát tường cho khỏi trượt', 'Khuỷu tay chĩa ra sau, không bè ra hai bên', 'Hạ vừa sức, thấy đau vai thì dừng'] },
+  crunch: { n: 'Gập bụng trên', who: 'Bụng trên', yt: '',
+    frames: [
+      { p: 'crunchDown', t: 'Nằm ngửa, co gối, bàn chân đặt trên sàn. Hai tay chéo trước ngực.' },
+      { p: 'crunchUp', t: 'Thở ra, siết bụng, nâng đầu và vai khỏi sàn. Lưng dưới vẫn áp sàn.', a: [[184, 160], [184, 134]] },
+      { p: 'crunchDown', t: 'Hít vào, hạ xuống chậm. Vai vừa chạm sàn thì lên tiếp.' }
+    ],
+    keys: ['Siết bụng để nâng, không dùng tay kéo cổ', 'Lưng dưới luôn áp sàn', 'Lên xuống chậm, thở đều'] },
+  sidelunge: { n: 'Bước ngang (side lunge)', s: 'Bước ngang', who: 'Chân, hông, đùi trong', yt: '',
+    frames: [
+      { p: 'wideStand', t: 'Đứng chân rộng khoảng gấp đôi vai, mũi chân hơi mở. Tay chắp trước ngực.' },
+      { p: 'sideLunge', t: 'Dồn người sang một bên: gập gối bên đó, đẩy hông ra sau. Chân kia duỗi thẳng.', a: [[126, 102], [96, 102]] },
+      { p: 'wideStand', t: 'Đạp gót đẩy người về giữa. Đổi bên. Mỗi bên tính 1 cái.' }
+    ],
+    keys: ['Gối gập hướng theo mũi chân', 'Lưng thẳng, ngực mở', 'Hai bàn chân luôn chạm sàn'] },
+  hinge: { n: 'Gập hông lưng thẳng', s: 'Gập hông', who: 'Lưng, mông, sau đùi · nền của nâng vật đúng', yt: '',
+    frames: [
+      { p: 'hingeUp', t: 'Đứng chân rộng bằng vai, tay chéo trước ngực. Gối hơi chùng.' },
+      { p: 'hingeDown', t: 'Đẩy hông ra sau, thân đổ về trước. Thấy căng sau đùi là đủ. Lưng luôn thẳng.', g: [92, 94, 154, 50] },
+      { p: 'hingeUp', t: 'Siết mông, đẩy hông về trước để đứng thẳng lên.', a: [[84, 92], [104, 92]] }
+    ],
+    keys: ['Lưng thẳng từ đầu đến hông', 'Hông đẩy ra sau, không cúi gập lưng', 'Gối hơi chùng, không ngồi xuống'] }
 };
 
 /* ---------- mốc thể lực của lớp (Sổ quản lý học tập GDTC v10.1) ----------
@@ -188,7 +243,12 @@ var MOC = {
   squat:    { u: 'rep', note: 'Trên lớp, squat tính theo set: 15 cái + giữ 10 giây = 1 set. Mốc giữa kỳ: nam 3 · 4 · 5 set, nữ 2 · 3 · 4 set.' },
   lunge:    { u: 'rep' },
   jj:       { u: 's', nam: [60, 90, 105], nu: [50, 60, 75], src: 'Jumping jack · giữa kỳ' },
-  kneehigh: { u: 's', nam: [45, 60, 70], nu: [30, 45, 60], src: 'Nâng cao đùi · đầu vào' }
+  kneehigh: { u: 's', nam: [45, 60, 70], nu: [30, 45, 60], src: 'Nâng cao đùi · đầu vào' },
+  /* bài bổ trợ lớp Kiến thức nghề: chưa có mốc lớp, ghi yêu cầu số lần */
+  dip:       { u: 'rep', note: 'Lớp Kiến thức nghề: nam 20 cái × 2 hiệp, nữ 15 cái × 2 hiệp.' },
+  crunch:    { u: 'rep', note: 'Lớp Kiến thức nghề: nam 20 cái × 2 hiệp, nữ 15 cái × 2 hiệp.' },
+  sidelunge: { u: 'rep', note: 'Lớp Kiến thức nghề: nam 20 cái × 2 hiệp, nữ 15 cái × 2 hiệp (mỗi bên tính 1 cái).' },
+  hinge:     { u: 'rep', note: 'Lớp Kiến thức nghề: nam 20 cái × 2 hiệp, nữ 15 cái × 2 hiệp.' }
 };
 var MOC_LAB = ['Yếu', 'Trung bình', 'Tốt'];
 
@@ -777,6 +837,342 @@ var BAI_BEP = [
       vp: 'Sống chung phòng: giữ tủ lạnh sạch là tôn trọng người cùng phòng.' } }
 ];
 
+/* =========================================================
+   GÓC NGHỀ (khu 'nghe') · TC01.0.5 đợt 1: n1, n3, n5 · TC01.0.6 đợt 2: n2, n4, n6 (đủ 6 bài)
+   Nguồn: bài giảng lớp Kiến thức nghề (cơ khí, thực phẩm & nông nghiệp, vệ sinh tòa nhà, đóng gói – in ấn, may mặc),
+   tiêu chí đo lường nhóm nghề (phần tư thế làm việc), casestudy Koka (gộp, ẩn danh),
+   職場における腰痛予防対策指針 (Bộ Y tế, Lao động và Phúc lợi Nhật Bản, 2013) cho mức nâng tham khảo.
+   Ranh giới: Góc nghề = phòng ngừa khi làm việc. Đã đau, ốm → Phòng y tế.
+   Câu riêng theo nghề: BODY_NEED, LAD_NEED và pick.byJob dùng mã nghề (JOBS[].s); không có thì theo nhóm.
+   ========================================================= */
+var NGHE_TXT = {
+  khuSay: 'Ở Góc nghề, Shin đội mũ bảo hộ. Giữ thân thể lành lặn là giữ được việc làm, giữ được chữ tín với công ty.',
+  bodyQ: 'Ca làm của nghề bạn dùng chỗ nào nhiều nhất?', bodySub: 'Chạm 3 chỗ trên hình hoặc ở danh sách. Không có đúng sai: Shin muốn biết bạn nghĩ gì.',
+  bodySee: 'Xem nghề mình hay mỏi ở đâu', bodyRes: 'Nghề của bạn hay mỏi, hay gặp vấn đề ở:', bodyMatch: 'Bạn đoán trúng [N]/3 chỗ.',
+  bodyEnd: 'Biết chỗ nào làm việc nhiều thì tập cho chỗ đó khỏe trước khi bay. Đó là chuẩn bị cho nghề.',
+  ladQ: 'Bạn tự xếp mình ở mức nào?', ladSub: 'Thật lòng thôi, không ai chấm điểm. Có kỷ lục ở Sàn tập thì Shin hiện ra để bạn so.',
+  ladLv: ['Còn yếu', 'Tạm được', 'Khá', 'Vững'], ladSee: 'Xem nghề mình cần gì',
+  ladNeed: 'Nghề của bạn cần nhất:', ladGap: 'Ưu tiên tập: [Nhóm]. Mở bài [Bài] ở Sàn tập.', ladOk: 'Nhóm cơ nghề bạn cần đã khá. Giữ nhịp tập nhé!',
+  ladRec: 'Kỷ lục của bạn: ',
+  kgCard: 'Mức nâng tham khảo của bạn', kgNo: 'Nhập cân nặng ở thẻ hội viên để Shin tính mức của bạn.',
+  kgNam: 'Nam: khoảng 40% cân nặng.', kgNu: 'Nữ: khoảng 60% mức của nam (khoảng 24% cân nặng).',
+  kgSrc: 'Nguồn: 職場における腰痛予防対策指針, Bộ Y tế, Lao động và Phúc lợi Nhật Bản (2013). Mức làm bằng tay, không có máy hỗ trợ.',
+  kgRule: 'Thấy nặng quá sức thì nhờ người, dùng xe đẩy (台車). Đó là làm đúng, không phải yếu.',
+  storyLab: 'Dựa trên chuyện đã từng xảy ra', storyW: 'Nếu là anh T., mình sẽ…', storySub: 'Viết từ 10 chữ trở lên được thêm Insight.',
+  kwSel: 'Đã chọn [Món]. Giờ chạm chữ Nhật hợp với nó.', kwNo: 'Thử lại nhé. Đọc cách đọc nhỏ bên dưới rồi chọn lại.',
+  kwEnd: 'Ở nhiều chỗ làm tại Nhật, người ta chỉ tay vào chỗ cần kiểm tra rồi nói to 「ヨシ！」. Thử làm một lần trước khi rời bàn học hôm nay.'
+};
+/* bản đồ cơ thể: tọa độ trên hình đứng thẳng nhìn trước (jjClose, hệ 240×180) */
+var BODY_Z = [
+  { k: 'mat', n: 'Mắt, tai', pts: [[120, 21]] },
+  { k: 'co', n: 'Cổ, vai', pts: [[120, 41]] },
+  { k: 'tay', n: 'Cổ tay, bàn tay', pts: [[101, 96], [139, 96]] },
+  { k: 'lung', n: 'Lưng dưới', pts: [[120, 74]] },
+  { k: 'goi', n: 'Đầu gối', pts: [[113, 125], [127, 125]] },
+  { k: 'chan', n: 'Bắp chân, bàn chân', pts: [[113, 152], [127, 152]] }
+];
+var BODY_NEED = {
+  xuong: [['lung', 'Nhấc chi tiết, cúi đặt hàng: sai tư thế lâu ngày dễ đau lưng.'], ['tay', 'Cầm dụng cụ, chi tiết cả ca: cổ tay dễ mỏi, dễ trầy vì cạnh sắc.'], ['mat', 'Phôi bắn, ánh hàn, tiếng ồn: cần kính, nút tai bảo hộ.']],
+  chuyen: [['tay', 'Một động tác lặp cả ca: cổ tay dễ đau, dễ viêm gân.'], ['chan', 'Đứng 8–10 tiếng: bắp chân căng, mỏi.'], ['co', 'Cúi nhìn băng chuyền lâu: cổ, vai gáy dễ mỏi.']],
+  troi: [['lung', 'Mang vác, cúi, đào: lưng chịu sức nặng nhiều nhất.'], ['goi', 'Ngồi xổm, lên xuống giàn: đầu gối làm việc nhiều.'], ['co', 'Vác vật trên vai, ngửa cổ làm trên cao: cổ vai dễ mỏi.']],
+  dv: [['lung', 'Đỡ người, cúi lau, bưng bê: lưng dưới dễ đau.'], ['goi', 'Cúi, quỳ lau sàn, lên xuống cầu thang: gối làm việc nhiều.'], ['chan', 'Đi lại, đứng cả ngày: bắp chân, bàn chân mỏi.']],
+  vp: [['co', 'Nhìn màn hình lâu: cổ, vai gáy mỏi.'], ['mat', 'Nhìn màn hình nhiều giờ: mắt khô, mỏi.'], ['lung', 'Ngồi lâu, ít đứng dậy: lưng dưới dễ đau.']],
+  'dieu-duong': [['lung', 'Đỡ người từ giường sang xe lăn: lưng dưới chịu nhiều nhất.'], ['tay', 'Đỡ, nâng, đẩy xe lăn: cổ tay, cánh tay làm việc nhiều.'], ['chan', 'Đi lại cả ca, có ca đêm: chân mỏi.']],
+  'xay-dung': [['lung', 'Mang vác vật liệu, cúi buộc thép: lưng chịu nhiều nhất.'], ['co', 'Vác vật trên vai, ngửa cổ làm trên cao: cổ vai dễ mỏi.'], ['chan', 'Đi lại trên công trường: bàn chân cần giày bảo hộ đúng chuẩn.']],
+  'thuc-pham': [['chan', 'Đứng 8–10 tiếng: bắp chân căng, mỏi.'], ['tay', 'Trộn, khuấy, múc lặp lại: cổ tay dễ đau.'], ['lung', 'Bưng bột, gạo, nồi lớn: lưng dễ đau nếu sai tư thế.']],
+  'o-to': [['lung', 'Bưng lốp, cúi vào khoang máy: lưng chịu nhiều.'], ['tay', 'Siết ốc, cầm dụng cụ cả ca: cổ tay dễ mỏi.'], ['co', 'Ngửa cổ làm dưới gầm xe: cổ, vai gáy mỏi.']],
+  'may-mac': [['lung', 'Ngồi hoặc đứng lâu: lưng dưới dễ đau.'], ['co', 'Cúi nhìn đường may lâu: cổ, vai gáy mỏi.'], ['tay', 'Cắt, may, ủi lặp lại: cổ tay dễ đau.']],
+  've-sinh-toa-nha': [['tay', 'Lau chùi lặp lại, chạm chất tẩy rửa: cổ tay, da tay dễ tổn thương.'], ['lung', 'Cúi lau, xách xô nước: lưng dưới dễ đau.'], ['goi', 'Quỳ lau, lên xuống cầu thang: gối làm việc nhiều.']]
+};
+/* thang tự định vị 4 nhóm cơ */
+var LAD_G = [
+  { k: 'nvt', n: 'Ngực – vai – tay', d: 'Bưng, đẩy, nâng', ex: 'pushup', bai: 'b2' },
+  { k: 'bl', n: 'Bụng – lưng', d: 'Giữ lưng thẳng khi cúi, khi xoay', ex: 'plank', bai: 'b3' },
+  { k: 'ch', n: 'Chân – hông', d: 'Đứng lâu, ngồi xuống đứng lên', ex: 'squat', bai: 'b4' },
+  { k: 'tm', n: 'Sức bền', d: 'Làm hết ca không đuối', ex: 'jj', bai: 'b5' }
+];
+var LAD_NEED = { xuong: ['nvt', 'ch'], chuyen: ['ch', 'bl'], troi: ['nvt', 'bl'], dv: ['bl', 'ch'], vp: ['bl', 'tm'],
+  'dieu-duong': ['bl', 'ch'], 'xay-dung': ['nvt', 'bl'], 'thuc-pham': ['ch', 'nvt'], 'o-to': ['nvt', 'bl'], 've-sinh-toa-nha': ['bl', 'ch'] };
+
+/* ---------- Góc nghề đợt 2 (TC01.0.6): n2, n4, n6 ----------
+   flow: tập theo Shin, đếm giờ từng động tác (EX[fx].frames, sec giây mỗi động tác)
+   ca: một ca 8 giờ của nhóm (CA_DAY) + ngày học ở trường 8–17 giờ (SCHOOL_DAY, lịch tiết JPC)
+   habit: chọn 1 thói quen (NHABITS) · week: lịch tập bài bổ trợ (N6_SET) */
+var NGHE2_TXT = {
+  flIntro: 'Đứng chỗ rộng, cách bàn ghế một sải tay. Shin đếm giờ, bạn làm theo hình.',
+  flJp: 'Nhiều chỗ làm ở Nhật cho cả nhóm tập thể dục trước giờ làm. Bài này để bạn tự làm thêm, ở đâu cũng được.',
+  flStart: 'Bắt đầu cùng Shin', flPause: 'Tạm dừng', flGo: 'Tiếp tục', flSkip: 'Động tác tiếp',
+  flCheer: ['Nhẹ nhàng thôi, thở đều.', 'Tốt lắm, giữ nhịp nhé.', 'Chậm và đều, đừng giật.', 'Căng nhẹ là đủ.', 'Sắp xong rồi!'],
+  flDone: 'Xong rồi! Người bạn thấy thế nào?',
+  flFeel: ['Người ấm hơn', 'Như cũ', 'Có chỗ bị đau'],
+  flSay: ['Đúng vậy. Khớp ấm, cơ mềm thì vào việc an toàn hơn.', 'Lần sau làm chậm hơn, xoay rộng hơn một chút nhé.', 'Dừng động tác làm đau. Đau không đỡ thì báo thầy cô hoặc người phụ trách.'],
+  caQ: 'Một ca 8 giờ của nhóm [Nhóm]. Giờ nào bạn nghĩ hay mỏi nhất?', caSub: 'Chạm 2 mốc giờ. Không có đúng sai.',
+  caSee: 'Xem giờ hay mỏi', caMatch: 'Bạn đoán trúng [N]/2.', caHot: 'Hay mỏi', caLunch: 'Nghỉ trưa',
+  caNote: 'Lịch minh họa một ca ngày. Mỗi công ty có giờ làm, giờ nghỉ riêng.',
+  schQ: 'Ngày học ở trường của bạn cũng từ 8 đến 17 giờ. Tiết nào bạn ngồi lâu, mỏi nhất?',
+  schSay: 'Giờ ra chơi sau [Tiết], đứng dậy làm bài Giãn 2 phút. Tập từ bây giờ, sang Nhật đã thành thói quen.',
+  habQ: 'Chọn 1 việc nhỏ bạn sẽ làm mỗi ngày', habOwn: 'Mình tự đặt thói quen khác',
+  habSay: 'Một việc nhỏ làm mỗi ngày có ích hơn mười việc lớn làm một lần. Bắt đầu ngay ở trường hôm nay.',
+  habW: 'Viết lời hẹn: “Khi …, mình sẽ …”', habSub: 'Gắn với một việc bạn làm mỗi ngày ở trường. Từ 10 chữ trở lên được thêm Insight.',
+  n6Intro: 'Bài của nhóm [Nhóm]: mỗi nhóm cơ một động tác (ngực – vai – tay · bụng – lưng · chân – hông).',
+  wkQ: '3 động tác bổ trợ của bạn', wkNam: '20 cái × 2 hiệp', wkNu: '15 cái × 2 hiệp', wkHold: 'giữ theo sức × 2 hiệp',
+  wkKtn: 'Ở lớp Kiến thức nghề, mỗi tuần bạn quay video 3 động tác bổ trợ để nộp thầy cô. Tập trước từ bây giờ.',
+  wkDays: 'Tuần này bạn tập bổ trợ vào ngày nào?', wkDaysSub: 'Chọn 2–3 ngày, xen ngày nghỉ để cơ hồi lại.', wkSan: 'Lịch Sàn tập của bạn: ',
+  wkSlot: 'Giờ nào?', wkW: 'Viết lời hẹn: “Khi …, mình sẽ …”', wkSub: 'Viết cụ thể ngày, giờ, chỗ tập. Từ 10 chữ trở lên được thêm Insight.',
+  wkTips: ['Khi học xong buổi chiều thứ Ba và thứ Năm, mình sẽ tập 3 động tác bổ trợ trước khi tắm']
+};
+/* một ca ngày 8–17 giờ, nghỉ trưa 12–13 giờ (minh họa). slots: 8, 9, 10, 11, 13, 14, 15, 16 giờ. hot[chỉ số] = [vì sao mỏi, mẹo] */
+var CA_H = [8, 9, 10, 11, 13, 14, 15, 16];
+var CA_DAY = {
+  xuong: { s: ['Họp đầu ca, kiểm tra máy', 'Đứng máy, đưa chi tiết vào máy', 'Đứng máy, nhấc chi tiết ra kiểm tra', 'Đứng máy liền 3 tiếng', 'Vào ca chiều sau bữa trưa', 'Đứng máy, chỉnh máy', 'Xếp chi tiết vào thùng, lặp lại', 'Dọn máy, 5S cuối ca'],
+    hot: { 3: ['Đứng một chỗ 3 tiếng: bắp chân, lưng dưới bắt đầu mỏi.', 'Lúc máy dừng hoặc giờ nghỉ: kiễng gót 15 lần, chống tay ưỡn nhẹ.'],
+      6: ['Cuối chiều, cổ tay và vai mỏi vì lặp lại.', 'Giờ nghỉ: giãn cổ tay, kéo tay ngang ngực.'] } },
+  chuyen: { s: ['Họp đầu ca, rửa tay, mặc đồ bảo hộ', 'Đứng dây chuyền, xếp hàng vào khay', 'Lặp một động tác theo nhịp băng chuyền', 'Đứng một chỗ trong xưởng lạnh', 'Vào ca chiều sau bữa trưa', 'Đứng dây chuyền, kiểm hàng', 'Cổ tay lặp động tác cả buổi', 'Vệ sinh dây chuyền cuối ca'],
+    hot: { 3: ['Đứng một chỗ 3 tiếng trong xưởng lạnh: bắp chân căng, tay lạnh cứng.', 'Giờ nghỉ: kiễng gót, nắm – xòe bàn tay cho ấm.'],
+      6: ['Cổ tay đã lặp một động tác rất nhiều lần.', 'Giờ nghỉ: giãn cổ tay, xoay vai 1 phút.'] } },
+  troi: { s: ['Họp đầu ca, tập thể dục, kiểm tra đồ bảo hộ', 'Mang vác vật liệu', 'Cúi buộc, đào, lắp đặt', 'Làm trên giàn, ngửa cổ', 'Vào ca chiều, trời nắng nhất', 'Mang vác, cúi làm dưới nắng', 'Lắp đặt, dọn vật liệu', 'Dọn công trường, kiểm tra cuối ngày'],
+    hot: { 2: ['Cúi lâu một tư thế: lưng dưới mỏi nhiều nhất.', 'Xong một đoạn việc: đứng thẳng, chống tay sau lưng, ưỡn nhẹ.'],
+      5: ['Đầu giờ chiều nắng nóng: mỏi nhanh, dễ mất nước.', 'Uống nước theo giờ, nghỉ trong bóng râm theo lịch của đội.'] } },
+  dv: { s: ['Họp đầu ca, nghe giao việc', 'Đi lại, đỡ người hoặc bưng bê', 'Cúi lau, dọn phòng', 'Phục vụ giờ ăn trưa', 'Vào ca chiều sau bữa trưa', 'Đi lại, chạy việc cả buổi', 'Đã đứng, đi lại 6 tiếng', 'Ghi sổ, bàn giao ca'],
+    hot: { 2: ['Cúi lau, cúi dọn nhiều lần: lưng dưới và gối mỏi.', 'Hạ hông thay vì cúi gập lưng. Xong mỗi phòng, đứng thẳng ưỡn nhẹ.'],
+      6: ['Đi lại, đứng cả ngày: bắp chân, bàn chân mỏi.', 'Giờ nghỉ: kiễng gót, xoay cổ chân. Tối về gác chân cao.'] } },
+  vp: { s: ['Họp đầu ngày, xem việc', 'Ngồi máy tính', 'Ngồi máy tính, gõ phím liên tục', 'Ngồi 3 tiếng gần như không đứng dậy', 'Sau bữa trưa, dễ buồn ngủ', 'Họp, ngồi máy tính', 'Nhìn màn hình cả buổi chiều', 'Gửi báo cáo cuối ngày'],
+    hot: { 3: ['Ngồi lâu không đứng dậy: lưng dưới, cổ vai mỏi.', 'Cứ 1 giờ đứng dậy 1–2 phút: đi lấy nước, giãn vai.'],
+      6: ['Nhìn màn hình nhiều giờ: mắt khô, cổ mỏi.', 'Nhìn ra xa 20 giây, chớp mắt. Kéo màn hình ngang tầm mắt.'] } }
+};
+/* ngày học ở trường 8–17 giờ (lịch tiết JPC, thứ Hai – thứ Sáu) */
+var SCHOOL_DAY = [['Tiết 1–2', '8:00–9:30'], ['Tiết 3–4', '10:00–11:30'], ['Tiết 5–6', '13:15–14:45'], ['Tiết 7–8', '15:15–16:45']];
+/* thói quen chống mỏi: 3 chung + 1 theo nhóm */
+var NHABITS = {
+  all: [
+    { t: 'Cứ 1 giờ, đứng dậy hoặc đổi tư thế 1–2 phút', tip: 'Khi hết một tiết học, mình sẽ đứng dậy giãn vai 1 phút trước khi ngồi lại' },
+    { t: 'Giờ nghỉ: giãn cổ tay, xoay vai 1 phút', tip: 'Khi chuông giờ nghỉ reo, mình sẽ giãn cổ tay và xoay vai trước khi ra ngoài' },
+    { t: 'Tối về: gác chân cao 10 phút, giãn bắp chân', tip: 'Khi tắm xong buổi tối, mình sẽ gác chân lên tường 10 phút rồi giãn bắp chân' }
+  ],
+  xuong: { t: 'Đứng lâu: đổi chân trụ, kiễng gót lúc máy dừng', tip: 'Khi đứng một chỗ quá 30 phút, mình sẽ đổi chân trụ và kiễng gót 10 lần lúc nghỉ tay' },
+  chuyen: { t: 'Lặp động tác: nắm – xòe bàn tay mỗi giờ nghỉ', tip: 'Khi chuông giờ nghỉ reo, mình sẽ nắm – xòe bàn tay 10 lần rồi giãn cổ tay' },
+  troi: { t: 'Cúi làm lâu: đứng thẳng ưỡn nhẹ sau mỗi đoạn việc', tip: 'Khi xong một đoạn việc, mình sẽ đứng thẳng, chống tay sau lưng, ưỡn nhẹ 3 lần' },
+  dv: { t: 'Cúi lau: hạ hông, không cúi gập lưng', tip: 'Khi lau dọn phòng ở hay lớp học, mình sẽ hạ hông, một gối chạm sàn thay vì cúi gập lưng' },
+  vp: { t: 'Ngồi máy tính: nhìn xa 20 giây mỗi giờ', tip: 'Khi làm xong một việc trên điện thoại hay máy tính, mình sẽ nhìn ra xa 20 giây và đứng dậy' }
+};
+/* bài bổ trợ theo nhóm: [ngực – vai – tay, bụng – lưng, chân – hông]; nữ: pushup → kneepush (engine tự đổi) */
+var N6_SET = {
+  xuong: ['dip', 'plank', 'squat'],
+  chuyen: ['pushup', 'superman', 'sidelunge'],
+  troi: ['pushup', 'superman', 'hinge'],
+  dv: ['dip', 'crunch', 'sidelunge'],
+  vp: ['dip', 'superman', 'squat']
+};
+
+var BAI_NGHE = [
+  { id: 'n1', t: 'Cơ thể của nghề mình', ic: 'core', sub: 'Nghề mình dùng chỗ nào nhiều? Mình đang ở mức nào?', min: 11,
+    acts: [
+      { id: 'n1a', k: 'body', t: 'Bản đồ cơ thể', min: 3, xp: 10 },
+      { id: 'n1b', k: 'ladder', t: 'Mình đang ở mức nào?', min: 4, xp: 10 },
+      { id: 'n1c', k: 'write', t: 'Trước khi bay, mình cần…', min: 4, xp: 15, dyn: 'nghe',
+        say: 'Nghề nào cũng cần thân thể khỏe. Biết mình thiếu gì thì mới tập đúng chỗ.',
+        q: 'Trước khi bay, bạn cần khỏe thêm ở đâu? Vì sao?', sub: 'Viết cụ thể: chỗ nào, vì nghề mình phải làm gì. Từ 10 chữ trở lên được thêm Insight.',
+        tips: ['Trước khi bay mình cần khỏe thêm chân và hông, vì nghề mình phải đứng cả ca'] }
+    ],
+    gtip: {
+      xuong: 'Nhà xưởng cần tay, vai khỏe để nhấc chi tiết, và chân vững để đứng máy cả ca.',
+      chuyen: 'Dây chuyền cần chân bền để đứng lâu, cổ tay dẻo để làm một động tác cả ngày.',
+      troi: 'Ngoài trời cần lưng, vai khỏe để mang vác, và sức bền khi trời nóng hoặc rét.',
+      dv: 'Dịch vụ cần bụng, lưng vững để đỡ người, bưng bê mà không đau lưng.',
+      vp: 'Văn phòng ít vận động: cần lưng khỏe và thói quen đứng dậy giữa giờ.' } },
+
+  { id: 'n2', t: 'Khởi động trước ca', ic: 'warm', sub: '5 động tác, 3 phút trước khi vào việc', min: 9,
+    acts: [
+      { id: 'n2a', k: 'how', t: 'Xem 5 động tác', min: 3, xp: 10, ex: ['preshift'] },
+      { id: 'n2b', k: 'order', t: 'Xếp thứ tự', min: 2, xp: 10,
+        q: 'Xếp 5 động tác khởi động trước ca theo thứ tự.', sub: 'Chạm lần lượt từ động tác làm trước đến làm sau.',
+        items: ['Cổ: nghiêng, cúi, ngửa', 'Vai: xoay khuỷu tay', 'Cổ tay: xoay, nắm – xòe', 'Hông: xoay vòng', 'Gối, cổ chân: xoay nhẹ'],
+        hint: 'Gợi ý: đi từ trên đầu xuống dưới chân.',
+        ok: 'Đi từ trên xuống thì không bỏ sót khớp nào. Dễ nhớ, làm ở đâu cũng được.' },
+      { id: 'n2c', k: 'flow', t: 'Tập theo Shin 3 phút', min: 3, xp: 15, fx: 'preshift', sec: 30 }
+    ],
+    gtip: {
+      xuong: 'Trước khi đứng máy: khởi động kỹ cổ tay, vai. Tay ấm thì cầm dụng cụ chắc hơn.',
+      chuyen: 'Dây chuyền chạy là phải làm ngay: khởi động ở phòng thay đồ trước giờ vào ca.',
+      troi: 'Sáng mùa đông ở công trường rất lạnh: khởi động lâu hơn, đến khi người ấm lên.',
+      dv: 'Trước ca đỡ người, bưng bê: khởi động kỹ hông, gối.',
+      vp: 'Ngồi máy tính cả ngày: khởi động cổ, vai, cổ tay trước giờ làm và sau giờ nghỉ trưa.' } },
+
+  { id: 'n3', t: 'Nâng, bưng, đẩy đúng cách', ic: 'arm', sub: 'Hạ hông, ôm sát người, nặng quá thì nhờ người', min: 12,
+    acts: [
+      { id: 'n3a', k: 'how', t: 'Nâng vật đúng cách', min: 3, xp: 10, ex: ['lift'] },
+      { id: 'n3b', k: 'spot', t: 'Tìm điểm chưa đúng', min: 4, xp: 10,
+        rounds: [
+          { p: 'liftBad', mk: 'boxBad', q: 'Bạn này nhấc thùng. Chạm 3 chỗ chưa đúng.',
+            hs: [
+              { x: 136, y: 80, r: 16, t: 'Lưng cong gập xuống', why: 'Cúi gập lưng để nhấc là cách dễ đau lưng nhất. Hạ hông xuống, giữ lưng thẳng.' },
+              { x: 118, y: 128, r: 14, t: 'Chân thẳng, không hạ hông', why: 'Sức nâng phải đến từ chân. Gập gối, hạ hông như ngồi xuống ghế.' },
+              { x: 184, y: 154, r: 18, t: 'Vật ở xa người', why: 'Vật càng xa người, lưng càng phải gánh nặng. Bước lại sát vật trước khi nhấc.' }
+            ] },
+          { p: 'carryHigh', mk: 'boxHigh', q: 'Bạn này bê thùng đi qua xưởng. Chạm 2 chỗ chưa ổn.',
+            hs: [
+              { x: 147, y: 24, r: 20, t: 'Thùng cao che mắt', why: 'Không nhìn thấy đường thì dễ vấp, dễ té. Bê thấp ngang bụng hoặc chia nhỏ ra.' },
+              { x: 158, y: 170, r: 15, t: 'Sàn ướt trên lối đi', why: 'Sàn ướt rất dễ trượt khi đang bê đồ. Báo lau khô hoặc đi đường khác.' }
+            ] }
+        ] },
+      { id: 'n3c', k: 'pick', t: 'Nặng quá thì làm sao?', min: 4, xp: 10, kg: 1,
+        rounds: [
+          { q: 'Một thùng hàng to, bạn chưa biết nặng bao nhiêu. Làm gì trước?',
+            opts: [
+              { t: 'Cúi xuống nhấc mạnh lên luôn cho nhanh, thấy nặng quá thì thả xuống', why: 'Nhấc mạnh bất ngờ khi chưa biết nặng nhẹ là lúc lưng dễ bị đau nhất.' },
+              { t: 'Đẩy thử một góc xem nặng không, nhìn đường đi có vướng gì không', ok: 1, why: 'Đúng rồi! Biết vật nặng cỡ nào, đường đi có trống không rồi mới nhấc.' },
+              { t: 'Nhờ bạn đưa lên vai mình rồi vác một mình cho nhanh', why: 'Chưa biết nặng nhẹ mà vác lên vai một mình rất dễ mất thăng bằng.' }
+            ] },
+          { q: 'Thùng này nặng 30 kg. [KG] Bạn làm gì?',
+            opts: [
+              { t: 'Cố bê một mình, mình còn trẻ khỏe mà, đừng làm phiền ai', why: 'Cố quá sức một lần có thể đau lưng cả tháng. Lúc đó mới thật sự làm phiền mọi người.' },
+              { t: 'Bê một mình nhưng đi thật nhanh cho đỡ mỏi tay', why: 'Đi nhanh khi đang bê nặng dễ vấp, dễ té.' },
+              { t: 'Nhờ người khiêng cùng hoặc dùng xe đẩy (台車)', ok: 1, why: 'Đúng rồi! Thấy nặng quá sức thì nhờ người, dùng xe đẩy. Đó là làm đúng, không phải yếu.' }
+            ] },
+          { q: 'Thùng chi tiết kim loại có cạnh sắc, khá nặng. Bạn bê thế nào?',
+            opts: [
+              { t: 'Bê bằng tay không cho dễ cầm, lúc đặt xuống thì buông tay thả rơi cho nhanh', why: 'Cạnh sắc dễ làm đứt tay; thả rơi dễ làm hỏng hàng, dập chân.' },
+              { t: 'Kê lên đùi rồi xoay người đặt lên kệ bên cạnh', why: 'Vặn lưng khi đang bê nặng rất dễ đau lưng. Xoay bằng bước chân.' },
+              { t: 'Đeo găng tay bảo hộ, hạ hông, ôm sát người; nặng quá thì dùng xe đẩy', ok: 1, why: 'Đúng rồi! Găng tay giữ tay khỏi cạnh sắc, ôm sát người giữ lưng khỏi đau.' }
+            ] }
+        ],
+        byGroup: {
+          chuyen: { q: 'Đồ nặng trên kệ cao ở kho của dây chuyền. Lấy thế nào?',
+            opts: [
+              { t: 'Dùng bục hoặc thang có người giữ; đồ nặng nên xếp ở ngăn thấp', ok: 1, why: 'Đúng rồi! Đồ nặng để ngăn thấp. Lấy trên cao thì đứng vững, có người giữ thang.' },
+              { t: 'Kiễng chân, với tay kéo thùng xuống cho nhanh', why: 'Kéo đồ nặng từ trên cao xuống dễ rơi trúng người.' },
+              { t: 'Trèo lên kệ hàng đứng lấy cho tiện, không cần làm phiền ai giữ thang', why: 'Kệ không phải chỗ đứng. Rất dễ té, dễ đổ kệ.' }
+            ] },
+          troi: { q: 'Bao xi măng 25 kg trên công trường. Bạn chuyển thế nào?',
+            opts: [
+              { t: 'Hạ hông, ôm sát, đứng lên bằng chân; nhiều bao thì dùng xe đẩy', ok: 1, why: 'Đúng rồi! Lực từ chân, vật sát người. Nhiều bao thì để xe làm thay lưng.' },
+              { t: 'Cúi lưng nhấc bao lên, vác lên vai rồi xoay người đi tiếp cho nhanh', why: 'Cúi gập lưng và vặn người khi đang vác là hai điều dễ đau lưng nhất.' },
+              { t: 'Kéo lê bao trên đất bằng một tay cho nhanh', why: 'Kéo một tay làm lệch người, dễ đau vai, đau lưng; bao dễ rách.' }
+            ] },
+          dv: { q: 'Xô nước lau sàn đầy, bạn cần mang xuống cầu thang. Làm thế nào?',
+            opts: [
+              { t: 'Xách xô đầy bằng một tay, chạy thật nhanh xuống cầu thang cho kịp giờ', why: 'Xô đầy làm lệch người; chạy trên cầu thang dễ trượt, té.' },
+              { t: 'Đổ bớt nước, xách sát người, tay kia vịn tay vịn cầu thang', ok: 1, why: 'Đúng rồi! Nhẹ hơn, vững hơn. Xuống cầu thang luôn giữ một tay vịn.' },
+              { t: 'Ôm xô trước bụng, không vịn, bước hai bậc một lần', why: 'Ôm trước bụng che mất bậc thang dưới chân. Rất dễ hụt chân.' }
+            ] },
+          vp: { q: 'Làm thêm ở kho, bạn chuyển nhiều thùng giấy nặng. Làm thế nào?',
+            opts: [
+              { t: 'Hạ hông, ôm sát, nhìn đường đi; nhiều thùng thì dùng xe đẩy', ok: 1, why: 'Đúng rồi! Ngồi nhiều thì lưng càng cần được bảo vệ khi bê.' },
+              { t: 'Chồng ba thùng lên nhau rồi bê một lần cho nhanh', why: 'Thùng cao che mắt, quá nặng. Dễ té, dễ đau lưng.' },
+              { t: 'Cúi gập lưng nhấc thùng, mình ngồi cả ngày nên cần vận động', why: 'Cúi gập lưng nhấc nặng dễ đau lưng, nhất là khi ít tập.' }
+            ] }
+        },
+        byJob: {
+          'dieu-duong': { q: 'Cần đỡ cụ ông từ giường sang xe lăn. Bạn làm thế nào?',
+            opts: [
+              { t: 'Bế bổng cụ lên một mình cho nhanh gọn, cụ đỡ phải chờ, đỡ ngại người khác', why: 'Bế người một mình rất dễ đau lưng cho bạn và nguy hiểm cho cụ.' },
+              { t: 'Cúi gập lưng kéo tay cụ dậy thật nhanh cho xong việc', why: 'Kéo tay dễ làm cụ đau, cụ ngã; cúi gập lưng làm bạn đau lưng.' },
+              { t: 'Dùng dụng cụ hỗ trợ theo hướng dẫn, nhờ thêm người, không tự bế một mình', ok: 1, why: 'Đúng rồi! Hướng dẫn phòng đau lưng của Nhật khuyên không bế người chỉ bằng sức mình, mà dùng dụng cụ hỗ trợ.' }
+            ] },
+          'thuc-pham': { q: 'Bao bột 25 kg cần đổ vào máy trộn. Bạn làm thế nào?',
+            opts: [
+              { t: 'Hai người cùng nâng hoặc dùng xe đẩy, giữ lưng thẳng khi đổ', ok: 1, why: 'Đúng rồi! Bao nặng thì chia sức hai người hoặc để máy làm thay.' },
+              { t: 'Một mình vác bao lên vai rồi nghiêng người đổ vào máy cho nhanh', why: 'Vác nặng một mình rồi nghiêng người là dễ đau lưng nhất.' },
+              { t: 'Cúi gập lưng ôm bao lên, cố một lần là xong', why: 'Cúi gập lưng nhấc nặng dễ đau lưng. Hạ hông, hoặc nhờ người.' }
+            ] },
+          'o-to': { q: 'Bạn cần đưa lốp xe từ kho ra xưởng. Làm thế nào?',
+            opts: [
+              { t: 'Ôm lốp lên ngang ngực rồi vặn người đặt luôn lên kệ cho nhanh gọn', why: 'Vặn người khi đang ôm vật nặng rất dễ đau lưng.' },
+              { t: 'Kéo lê lốp trên sàn bằng một tay cho đỡ mỏi lưng', why: 'Kéo một tay làm lệch người, dễ đau vai, đau lưng.' },
+              { t: 'Lăn lốp hoặc dùng xe đẩy; khi nhấc thì hạ hông, giữ sát người', ok: 1, why: 'Đúng rồi! Lốp nặng mà tròn: lăn hoặc dùng xe là nhẹ nhất cho lưng.' }
+            ] }
+        } }
+    ],
+    gtip: {
+      xuong: 'Chi tiết kim loại vừa nặng vừa sắc: găng tay, hạ hông, ôm sát người.',
+      chuyen: 'Kho của dây chuyền nhiều kệ cao: đồ nặng xếp ngăn thấp.',
+      troi: 'Vật liệu công trường rất nặng: dùng xe, chia sức hai người.',
+      dv: 'Đỡ người, xách xô nước: lưng thẳng, nhờ thêm người, dùng dụng cụ.',
+      vp: 'Ít bê vác nên càng dễ đau lưng khi bất ngờ phải bê. Học tư thế ngay từ giờ.' } },
+
+  { id: 'n4', t: 'Đứng lâu, ngồi lâu, làm lặp lại', ic: 'timer', sub: 'Giờ nào hay mỏi, giãn 2 phút giữa ca', min: 10,
+    acts: [
+      { id: 'n4a', k: 'ca', t: 'Một ca của nhóm mình', min: 4, xp: 10 },
+      { id: 'n4b', k: 'flow', t: 'Giãn 2 phút giữa ca', min: 3, xp: 10, fx: 'midstretch', sec: 24 },
+      { id: 'n4c', k: 'habit', t: 'Chọn 1 thói quen', min: 3, xp: 15 }
+    ],
+    gtip: {
+      xuong: 'Đứng máy cả ca: đổi chân trụ, đi giày vừa chân, giãn bắp chân giờ nghỉ.',
+      chuyen: 'Lặp một động tác cả ca: cổ tay, vai cần được giãn mỗi giờ nghỉ.',
+      troi: 'Cúi, đào lâu: đứng thẳng, ưỡn nhẹ sau mỗi đoạn việc.',
+      dv: 'Đi lại, cúi lau cả ngày: hạ hông khi cúi, tối về gác chân cao.',
+      vp: 'Ngồi lâu: cứ 1 giờ đứng dậy, nhìn xa, giãn vai.' } },
+
+  { id: 'n5', t: 'An toàn kiểu Nhật', ic: 'helmet', sub: 'Tìm nguy hiểm, vài từ tiếng Nhật, Senpai kể', min: 12,
+    acts: [
+      { id: 'n5a', k: 'spot', t: 'Tìm nguy hiểm trong kho', min: 4, xp: 10,
+        rounds: [
+          { art: 'kho', q: 'Đây là góc kho của một xưởng. Chạm 4 chỗ có thể gây tai nạn.',
+            hs: [
+              { x: 66, y: 22, r: 17, t: 'Thùng nặng để trên kệ cao', why: 'Đồ nặng trên cao dễ rơi trúng người. Đồ nặng xếp ngăn thấp.' },
+              { x: 150, y: 50, r: 22, t: 'Xe đẩy chất thùng quá cao', why: 'Thùng cao che mắt người đẩy, dễ đổ khi xe rung.' },
+              { x: 112, y: 164, r: 17, t: 'Dây điện vắt ngang lối đi', why: 'Dễ vấp ngã. Dây điện đi sát tường hoặc có nắp che.' },
+              { x: 202, y: 168, r: 17, t: 'Vũng nước trên sàn', why: 'Sàn ướt dễ trượt. Thấy thì báo, lau khô hoặc đặt biển cảnh báo.' }
+            ] }
+        ] },
+      { id: 'n5b', k: 'match', t: 'Vài từ an toàn bằng tiếng Nhật', min: 3, xp: 10,
+        q: 'Ghép nghĩa tiếng Việt với chữ Nhật.', sub: 'Chạm một nghĩa, rồi chạm chữ Nhật hợp với nó.',
+        sel: 'kwSel', no: 'kwNo', end: 'kwEnd',
+        pairs: [
+          { v: 'Nguy hiểm!', j: '危ない！', k: 'あぶない', r: 'abunai', why: 'Thấy nguy hiểm cho người khác thì nói to ngay.' },
+          { v: 'Dừng lại!', j: '止めて！', k: 'とめて', r: 'tomete', why: 'Dùng khi cần ai đó dừng máy, dừng tay ngay.' },
+          { v: 'Chú ý', j: '注意', k: 'ちゅうい', r: 'chūi', why: 'Hay gặp trên biển báo trong xưởng.' },
+          { v: 'Cấm vào', j: '立入禁止', k: 'たちいりきんし', r: 'tachiiri kinshi', why: 'Thấy biển này thì không bước vào, kể cả khi đi tắt.' },
+          { v: 'Đã kiểm tra, an toàn', j: 'ヨシ！', r: 'yoshi', why: 'Chỉ tay vào chỗ cần kiểm tra rồi nói to 「ヨシ！」 (指差し呼称).' },
+          { v: 'Suýt xảy ra tai nạn', j: 'ヒヤリハット', r: 'hiyari hatto', why: 'Chuyện suýt xảy ra cũng phải báo, để lần sau không thành tai nạn thật.' }
+        ] },
+      { id: 'n5c', k: 'story', t: 'Senpai kể: đôi giày bảo hộ', min: 5, xp: 15,
+        story: ['Anh T. sang Nhật làm xây dựng được 3 tháng.', 'Giày bảo hộ công ty phát nặng và cứng. Anh thấy đau chân, nhưng ngại nói với ai.', 'Anh ra cửa hàng mua đôi giày thể thao nhẹ, rẻ để đi làm. Anh nghĩ: “Mình cẩn thận là được.”', 'Một chiều cuối ca, mệt và vội, anh để vật nặng rơi trúng chân. Giày thường không đỡ được. Anh phải nghỉ làm gần hai tháng.', 'Quản lý của anh cũng bị công ty nhắc nhở vì đã không kiểm tra.'],
+        end: 'Đồ bảo hộ không phải để đối phó khi có người kiểm tra. Nó giữ đôi chân, đôi tay để bạn làm trọn hợp đồng và về nhà lành lặn.',
+        tips: ['Nếu là anh T., mình sẽ báo người phụ trách ngay khi giày làm đau chân để được đổi cỡ', 'Nếu là anh T., mình sẽ luôn đi giày bảo hộ, kể cả khi không ai kiểm tra'],
+        rounds: [
+          { q: 'Vì sao chân anh T. bị thương nặng như vậy?',
+            opts: [
+              { t: 'Vì vật rơi quá nặng, ai đi giày gì cũng sẽ bị như vậy thôi', why: 'Giày bảo hộ được làm ra chính để đỡ những lúc như vậy.' },
+              { t: 'Vì công ty phát giày nặng nên anh mới phải đổi giày', why: 'Giày nặng là thật, nhưng chọn đổi giày mà không báo là quyết định của anh.' },
+              { t: 'Vì anh không đi giày bảo hộ đúng chuẩn', ok: 1, why: 'Đúng rồi! Giày bảo hộ có mũi cứng để đỡ vật rơi. Giày thường thì không.' }
+            ] },
+          { q: 'Vì sao anh T. bỏ giày bảo hộ?',
+            opts: [
+              { t: 'Vì công ty không có quy định nào bắt phải đi giày bảo hộ khi làm việc', why: 'Công ty có quy định và đã phát giày. Anh biết điều đó.' },
+              { t: 'Vì thấy đau, bất tiện mà không nói với ai, tự xử lý một mình', ok: 1, why: 'Đúng rồi! Gốc của chuyện là không báo. Có báo thì đã được đổi cỡ, lót thêm.' },
+              { t: 'Vì giày bảo hộ chỉ cần khi có người kiểm tra thôi', why: 'Tai nạn không chờ lúc có người kiểm tra.' }
+            ] },
+          { q: 'Đáng lẽ anh T. nên làm gì khi giày làm đau chân?',
+            opts: [
+              { t: 'Chịu đau đi tiếp, không nói gì cho khỏi bị nghĩ là mình yếu', why: 'Chịu đau lâu ngày sẽ thành chấn thương khác. Báo sớm không phải là yếu.' },
+              { t: 'Đi giày thường, khi nào có người kiểm tra thì đổi lại giày bảo hộ', why: 'Đó chính là điều đã dẫn đến tai nạn của anh T.' },
+              { t: 'Báo người phụ trách để đổi cỡ hoặc lót thêm, vẫn đi giày bảo hộ', ok: 1, why: 'Đúng rồi! Đó là Hō-Ren-Sō: báo sớm, bàn cách, vẫn giữ an toàn.' }
+            ] }
+        ] }
+    ],
+    gtip: {
+      xuong: 'Nhà xưởng nhiều máy chạy: không đeo trang sức, tóc dài buộc gọn, đủ kính và găng tay.',
+      chuyen: 'Dây chuyền chạy liên tục: tay bị kẹt thì nói ngay 「止めて！」, không tự thò tay gỡ.',
+      troi: 'Công trường: mũ bảo hộ, giày bảo hộ, làm trên cao thì móc dây an toàn.',
+      dv: 'Sàn nhà hàng, nhà vệ sinh hay ướt: đi chậm, đặt biển cảnh báo khi lau.',
+      vp: 'Làm thêm ở kho, ở bếp: đồ bảo hộ cũng quan trọng như nhân viên chính thức.' } },
+
+  { id: 'n6', t: 'Bài bổ trợ cho nghề', ic: 'stretch', sub: '3 động tác của lớp Kiến thức nghề, lịch tập tuần', min: 13,
+    acts: [
+      { id: 'n6a', k: 'how', t: '3 động tác của nhóm mình', min: 4, xp: 10, exBy: N6_SET,
+        more: 'Mỗi động tác: nam 20 cái × 2 hiệp, nữ 15 cái × 2 hiệp (yêu cầu của lớp Kiến thức nghề). Plank thì giữ theo sức.' },
+      { id: 'n6b', k: 'try', t: 'Tập thử, ghi số', min: 5, xp: 15, exBy: N6_SET },
+      { id: 'n6c', k: 'week', t: 'Lịch tập tuần của mình', min: 4, xp: 15 }
+    ],
+    gtip: {
+      xuong: 'Nhà xưởng: tay sau khỏe để nhấc chi tiết, chân khỏe để đứng máy cả ca.',
+      chuyen: 'Dây chuyền: lưng khỏe đỡ mỏi khi đứng lâu, chân linh hoạt khi đổi tư thế.',
+      troi: 'Ngoài trời: gập hông lưng thẳng là nền của mọi lần nâng vật.',
+      dv: 'Dịch vụ: bước ngang giống lúc đỡ người, lau sàn; bụng khỏe đỡ cho lưng.',
+      vp: 'Văn phòng: tay, lưng, chân khỏe giúp ngồi thẳng, đỡ đau lưng.' } }
+];
+
 /* ---------- bản demo giáo viên ---------- */
 var DEMO = {
   mem: { job: 'co-khi', g: 'xuong', sex: 'nam', inj: 0, goal: 'Chống đẩy được 30 cái liên tục trước khi bay', h: 168, w: 60, at: 0 },
@@ -784,7 +1180,8 @@ var DEMO = {
   log: { pushup: [{ n: 18, f: 2 }, { n: 22, f: 2 }], squat: [{ n: 30, f: 1 }] },
   refl: { b2c: 'Lần tới mình sẽ siết bụng, siết mông từ đầu đến cuối, không để hông võng xuống.',
     d1c: 'Bữa sáng mai mình sẽ ăn thêm một quả trứng và uống sữa thay cà phê.' },
-  bepDone: ['d1a', 'd1b', 'd1c', 'd2a', 'd3a', 'd5b'],
+  bepDone: ['d1a', 'd1b', 'd1c', 'd2a', 'd3a', 'd5b', 'n1a', 'n1b', 'n2a', 'n4a'],
+  nghe: { body: ['lung', 'tay', 'chan'], lad: { nvt: 1, bl: 2, ch: 1, tm: 2 }, ca: { g: 'xuong', sel: [3, 5], sch: 1 } },
   food: { meal: { sang: ['Bánh mì không'], trua: ['Cơm', 'Cá', 'Canh rau'], toi: ['Mì gói'], skip: {} },
     calc: { h: 168, w: 60, age: 20, sex: 'nam', lv: 2 },
     shift: { s: 8, l: 9, pre: 0 },
