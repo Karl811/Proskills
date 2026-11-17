@@ -7,7 +7,7 @@
    - Senpai có cờ draft:1 = LỜI KỂ MẪU do Claude viết, cần thay bằng chuyện thật (ẩn danh) trước khi phát hành.
    ES5. */
 var CD_ID = 'cd01';
-var CD_VER = 'CD01.1.2';
+var CD_VER = 'CD01.1.4';
 var CD_TOTAL = 18;            /* Xuất phát (1) + 7 ga (17 chặng). Ga Ước Mơ (3 chặng nghi thức, FIN_ORDER) không tính vào 18 */
 var CD_XP_ACT = 30, CD_XP_WARM = 10, CD_INS_WORDS = 20, CD_INS_FIELD = 5;
 var TIKME = 'https://tikme.com';
@@ -20,7 +20,6 @@ var START = { id: 's0', n: 0, vn: 'Sân ga Xuất phát', k: '出発', kana: '�
 var STATIONS = [
   { id: 's1', n: 1, vn: 'Ga Nhìn Xa', k: '未来', kana: 'みらい', ro: 'Mirai · Tương lai', lc: '#F07F1E', ic: 'mount', card: 2, ready: 1,
     sub: 'Nhìn mình của 5 năm sau', acts: ['a11', 'a13'], warm: 'w1',
-    quote: { t: '5 năm là đơn vị thời gian tối thiểu cần thiết để thực hiện một việc gì đó.', by: 'Thầy Lê Long Sơn', src: 'TD – 07.01.2014' },
     intro: '5 năm nữa, [Tên] đang ở đâu, làm gì? Cùng nhìn từ chính ngày thường của bạn nhé.',
     done: 'Ô số 2 đã có chữ của bạn.',
     word: { k: '未来', kana: 'みらい', ro: 'mirai', vn: 'tương lai' } },
@@ -290,6 +289,184 @@ var RQ_ALL = RQ.concat(RQ2);
 /* ---------- Ga 4 · Diện đi Nhật (a44) · TÓM TẮT THAM KHẢO, đối chiếu 16/11/2026 ----------
    Nguồn: tikme.com/visa/* và Cơ quan Quản lý Xuất nhập cảnh Nhật (ISA). Quy định có thể thay đổi: soát lại trước mỗi đợt phát hành.
    p = khớp với hồ sơ (PS_CONFIG.PATHS) */
+/* ---------- "Một ngày của bạn TTS" (a42 bước 1, PS1.3.15) · theo từng nghề ----------
+   9 mốc: 6 việc thật (theo trang ngành Tikme, tóm gọn) + 3 việc lạc sang ngành khác (mức 1 dễ, 2 vừa, 3 khó).
+   Mốc thật: [giờ, việc, "Việc này có thật: …"] · Mốc lạc: [giờ, việc, 0, mã ngành của việc đó, mức].
+   pref: tỉnh nơi làm (MINH HỌA, không phải nơi tuyển thật) · who: diện của nhân vật. Giờ giấc là minh họa.
+   Nhà hàng: TTS chỉ có ở nhánh khách sạn, ryokan (theo Tikme 17/11/2026) nên kể ngày ở khách sạn. Vệ sinh tòa nhà: có diện TTS (theo Tikme). Thầy soát. */
+var DAYJOB = {
+  'co-khi': { pref: 'Aichi', where: 'Xưởng cơ khí', items: [
+    ['7:30', 'Họp đầu ca, nhắc an toàn', 'Ca nào cũng mở đầu bằng vài phút họp an toàn.'],
+    ['8:00', 'Bón phân cho luống rau', 0, 'nong-nghiep', 1],
+    ['9:30', 'Đọc bản vẽ, gá phôi lên máy', 'Đọc bản vẽ là việc hằng ngày của thợ cơ khí.'],
+    ['10:00', 'Đo chi tiết bằng thước cặp, panme', 'Người mới thường đo hàng trước khi đứng máy.'],
+    ['11:00', 'Chạy máy CNC theo chương trình', 'Đứng máy CNC thường đến sau, có senpai kèm.'],
+    ['13:00', 'Hàn nối hai tấm thép', 0, 'han', 3],
+    ['14:00', 'Kiểm tra chi tiết trước khi giao', 'Chi tiết đúng kích thước mới được chuyển đi.'],
+    ['15:30', 'Phun sơn lớp phủ trong buồng sơn', 0, 'son', 2],
+    ['16:45', 'Lau máy, dọn 5S cuối ca', 'Cuối ca lau máy, xếp dụng cụ đúng chỗ.']] },
+  'dien-tu': { pref: 'Shizuoka', where: 'Xưởng điện tử', items: [
+    ['8:00', 'Mặc đồ chống tĩnh điện', 'Tĩnh điện có thể làm hỏng linh kiện nhỏ.'],
+    ['8:30', 'Gắn linh kiện lên bo mạch', 'Việc người mới thường làm trước.'],
+    ['9:30', 'Giúp cụ ông tắm', 0, 'dieu-duong', 1],
+    ['10:30', 'Hàn thiếc chân linh kiện', 'Hàn thiếc bằng tay là việc hay gặp.'],
+    ['11:00', 'Gá phôi, hàn khung thép', 0, 'han', 3],
+    ['13:00', 'Soi bo mạch bằng kính lúp', 'Cần mắt tinh, làm chậm mà chắc.'],
+    ['14:00', 'Lấy sản phẩm ra khỏi máy ép nhựa', 0, 'duc-nhua', 2],
+    ['15:00', 'Đo bằng đồng hồ vạn năng', 'Đo kiểm chức năng thường học sau.'],
+    ['16:30', 'Ghi kết quả kiểm tra', 'Ghi đúng, đủ là một phần của chất lượng.']] },
+  'han': { pref: 'Hiroshima', where: 'Xưởng hàn', items: [
+    ['8:00', 'Mặc đồ bảo hộ, đeo mặt nạ hàn', 'Đồ kín giúp tránh tia hồ quang, xỉ nóng.'],
+    ['8:30', 'Ghi món cho khách', 0, 'nha-hang', 1],
+    ['9:30', 'Vát mép, gá phôi', 'Người mới thường làm việc chuẩn bị này trước.'],
+    ['10:00', 'Chạy máy tiện CNC', 0, 'co-khi', 3],
+    ['11:00', 'Hàn bán tự động khung thép', 'Việc chính hằng ngày của thợ hàn.'],
+    ['13:00', 'Mài mối hàn cho phẳng', 'Mài, làm sạch mối hàn là việc hay gặp.'],
+    ['14:00', 'Pha màu, phun sơn lót', 0, 'son', 2],
+    ['15:00', 'Đọc ký hiệu hàn trên bản vẽ', 'Ký hiệu cho biết hàn chỗ nào, kiểu gì.'],
+    ['16:30', 'Tự kiểm mối hàn', 'Thợ hàn tự kiểm rồi mới giao công đoạn sau.']] },
+  'son': { pref: 'Gunma', where: 'Xưởng sơn', items: [
+    ['8:00', 'Tẩy dầu, chà nhám bề mặt', 'Chuẩn bị bề mặt thường lâu hơn phun sơn.'],
+    ['9:00', 'Dán băng che chỗ không sơn', 'Che kỹ thì đường sơn mới sắc nét.'],
+    ['9:30', 'Đeo mặt nạ lọc, phun lớp lót', 'Phun trong buồng sơn, luôn đeo mặt nạ lọc.'],
+    ['10:30', 'Thay ga giường phòng khách', 0, 'nha-hang', 1],
+    ['11:30', 'Pha màu theo mẫu', 'Pha đúng màu cần mắt tinh, cẩn thận.'],
+    ['13:00', 'Mài mối hàn cho phẳng', 0, 'han', 3],
+    ['14:00', 'Phun lớp phủ, đưa vào sấy', 'Phun lớp phủ chính thường học sau.'],
+    ['15:00', 'Cắt vải theo rập', 0, 'may-mac', 2],
+    ['16:30', 'Đo độ dày lớp sơn', 'Đo để chắc lớp sơn đều, đủ dày.']] },
+  'duc-nhua': { pref: 'Shiga', where: 'Xưởng ép nhựa', items: [
+    ['8:00', 'Họp đầu ca, xem kế hoạch', 'Đầu ca nắm mã hàng, số lượng cần làm.'],
+    ['8:30', 'Lấy sản phẩm ra khỏi máy ép', 'Việc người mới thường làm trước.'],
+    ['9:30', 'Tỉa cành cà chua trong nhà kính', 0, 'nong-nghiep', 1],
+    ['10:00', 'Cắt ba via, soi bằng mắt', 'Ba via là phần nhựa thừa ở mép sản phẩm.'],
+    ['11:00', 'Ghi nhiệt độ, áp suất máy', 'Theo dõi thông số giúp ít hàng lỗi.'],
+    ['13:00', 'Đóng khung gỗ cho kiện hàng', 0, 'dong-goi-cong-nghiep', 3],
+    ['14:00', 'Gắn linh kiện lên bo mạch', 0, 'dien-tu', 2],
+    ['15:00', 'Cùng tổ thay khuôn', 'Thay khuôn thường học sau, làm theo tổ.'],
+    ['16:30', 'Đóng gói, ghi số lượng', 'Cuối ca đếm và ghi số hàng đạt.']] },
+  'dong-goi-cong-nghiep': { pref: 'Ibaraki', where: 'Xưởng đóng gói', items: [
+    ['8:00', 'Họp đầu ca, xem lịch xuất hàng', 'Đầu ca biết hôm nay phải xong kiện nào.'],
+    ['8:30', 'Đo huyết áp cho cụ', 0, 'dieu-duong', 1],
+    ['9:30', 'Bọc hàng, dán nhãn theo mẫu', 'Việc người mới thường làm trước.'],
+    ['10:00', 'Đo, cân kiện hàng', 'Kích thước, cân nặng ghi lên phiếu xuất.'],
+    ['11:00', 'Xếp cơm hộp vào khay', 0, 'thuc-pham', 3],
+    ['13:00', 'Đóng khung gỗ cho hàng lớn', 'Máy móc lớn cần khung gỗ chắc chắn.'],
+    ['14:00', 'Quấn màng pallet, đóng đai', 'Giữ hàng không xê dịch khi chở đi.'],
+    ['15:00', 'Buộc cốt thép ở công trường', 0, 'xay-dung', 2],
+    ['16:30', 'Kiểm đếm hàng trước khi xuất', 'Đếm khớp phiếu rồi mới giao xe.']] },
+  'in-an': { pref: 'Saitama', where: 'Nhà in', items: [
+    ['8:00', 'Chuẩn bị giấy, pha mực', 'Chuẩn bị đủ, đúng loại trước khi chạy máy.'],
+    ['9:00', 'Lắp bản kẽm lên máy in', 'Bản kẽm mang hình cần in lên giấy.'],
+    ['9:30', 'Thu hoạch dâu tây', 0, 'nong-nghiep', 1],
+    ['10:30', 'Phun sơn khung xe', 0, 'son', 3],
+    ['11:00', 'So màu tờ in với mẫu', 'Lệch màu một chút cũng phải chỉnh lại.'],
+    ['13:00', 'Đứng máy, rút tờ in ra soi', 'Vừa chạy máy vừa soi lỗi từng xấp.'],
+    ['14:00', 'Cắt, gấp, cán màng', 'Hoàn thiện thành sách, hộp, tờ rơi.'],
+    ['15:00', 'May đường viền cổ áo', 0, 'may-mac', 2],
+    ['16:30', 'Lau máy, cất bản kẽm', 'Máy sạch thì hôm sau in mới đẹp.']] },
+  'may-mac': { pref: 'Gifu', where: 'Xưởng may', items: [
+    ['8:00', 'Xem sơ đồ, nhận việc', 'Mỗi người nhận công đoạn của mình đầu ngày.'],
+    ['8:30', 'Lắp giàn giáo', 0, 'xay-dung', 1],
+    ['9:30', 'Cắt vải theo rập', 'Cắt đúng rập thì may mới khớp.'],
+    ['10:00', 'May một công đoạn trên máy', 'Người mới thường may một công đoạn trước.'],
+    ['11:00', 'Kiểm tra đường may', 'Đường may lệch thì tháo ra may lại.'],
+    ['13:00', 'Cắt, gấp, cán màng tờ in', 0, 'in-an', 3],
+    ['14:00', 'Bóc vỏ tôm trong xưởng lạnh', 0, 'thuy-san', 2],
+    ['15:00', 'Là ủi, hoàn thiện', 'Áo phẳng, đẹp mới được đóng gói.'],
+    ['16:30', 'Gấp, phân loại theo cỡ', 'Gấp gọn, đúng cỡ để giao hàng.']] },
+  'xay-dung': { pref: 'Chiba', where: 'Công trường', items: [
+    ['7:30', 'Tập thể dục, họp an toàn', 'Công trường nào cũng khởi động, họp an toàn.'],
+    ['8:00', 'Đội mũ, móc dây an toàn', 'Làm trên cao bắt buộc móc dây an toàn.'],
+    ['9:00', 'Mang vác vật liệu', 'Việc phụ người mới thường làm trước.'],
+    ['9:30', 'Rửa bát trong bếp', 0, 'nha-hang', 1],
+    ['10:30', 'Chạy máy chà sàn, phủ wax', 0, 've-sinh-toa-nha', 3],
+    ['13:00', 'Buộc cốt thép', 'Cốt thép giữ cho bê tông chắc.'],
+    ['14:00', 'Dựng cốp pha theo bản vẽ', 'Cốp pha là khuôn để đổ bê tông.'],
+    ['15:00', 'Thay dầu cho xe khách', 0, 'o-to', 2],
+    ['16:30', 'Dọn công trường, cất dụng cụ', 'Dọn sạch cuối ngày để hôm sau an toàn.']] },
+  'o-to': { pref: 'Mie', where: 'Xưởng bảo dưỡng ô tô', items: [
+    ['8:30', 'Họp sáng, nhận phiếu việc từng xe', 'Mỗi xe có phiếu ghi việc cần làm.'],
+    ['9:00', 'Cho bò ăn', 0, 'nong-nghiep', 1],
+    ['9:30', 'Thay dầu, lọc dầu', 'Việc người mới thường làm trước.'],
+    ['10:30', 'Kiểm tra lốp, phanh', 'Làm theo danh mục, không bỏ bước nào.'],
+    ['11:00', 'Nâng xe, kiểm tra gầm', 'Dùng cầu nâng, làm đúng quy trình an toàn.'],
+    ['13:00', 'Chạy máy tiện CNC', 0, 'co-khi', 3],
+    ['14:00', 'Dùng máy chẩn đoán lỗi', 'Máy đọc lỗi thường học sau.'],
+    ['15:00', 'Sơ chế cá trong xưởng lạnh', 0, 'thuy-san', 2],
+    ['16:30', 'Ghi báo cáo, rửa xe', 'Ghi rõ đã làm gì rồi mới giao xe.']] },
+  'nong-nghiep': { pref: 'Kumamoto', where: 'Trang trại', items: [
+    ['6:30', 'Vào nhà màng, xem cây', 'Nông nghiệp thường bắt đầu từ sáng sớm.'],
+    ['7:30', 'Thu hoạch cà chua', 'Hái đúng độ chín theo hướng dẫn.'],
+    ['9:00', 'Lau kính cửa sổ tòa nhà', 0, 've-sinh-toa-nha', 1],
+    ['10:00', 'Phân loại, đóng thùng', 'Phân theo cỡ, theo loại rồi mới giao.'],
+    ['11:00', 'Rửa, cắt rau làm cơm hộp', 0, 'thuc-pham', 3],
+    ['13:00', 'Tỉa lá, buộc dây cho cây', 'Chăm cây mỗi ngày để cây sai quả.'],
+    ['14:00', 'Hàn khung thép', 0, 'han', 2],
+    ['15:00', 'Tưới nước, bón phân', 'Làm theo lịch của chủ trang trại.'],
+    ['16:00', 'Ghi nhật ký cây trồng', 'Ghi lại để biết cây khỏe hay yếu.']] },
+  'thuy-san': { pref: 'Miyagi', where: 'Xưởng chế biến thủy sản', items: [
+    ['7:30', 'Rửa tay, mặc đồ chống lạnh', 'Xưởng lạnh và sạch, vào phải đúng quy trình.'],
+    ['8:00', 'Lắp bản kẽm lên máy in', 0, 'in-an', 1],
+    ['9:30', 'Sơ chế cá', 'Người mới làm công đoạn đơn giản trước.'],
+    ['10:00', 'Rửa rau, nấu cơm hộp', 0, 'thuc-pham', 3],
+    ['11:00', 'Bóc vỏ tôm', 'Làm nhanh mà vẫn sạch, đúng chuẩn.'],
+    ['13:00', 'Fillet cá bằng dao', 'Dùng dao nhiều, học dần từ senpai.'],
+    ['14:00', 'Kiểm tra lốp, phanh xe', 0, 'o-to', 2],
+    ['15:00', 'Đóng gói, cấp đông', 'Đóng gói xong đưa vào kho lạnh ngay.'],
+    ['16:30', 'Ghi số lô, sổ vệ sinh', 'Ghi để truy lại được hàng khi có lỗi.']] },
+  'thuc-pham': { pref: 'Hokkaido', where: 'Nhà máy thực phẩm', items: [
+    ['8:00', 'Rửa tay, qua buồng thổi bụi', 'Bụi, tóc không được vào khu sản xuất.'],
+    ['8:30', 'Sơ chế, cắt nguyên liệu', 'Việc người mới thường làm trước.'],
+    ['9:30', 'Cân nguyên liệu theo công thức', 'Sai vài gam là vị đã khác.'],
+    ['10:00', 'Lắp giàn giáo', 0, 'xay-dung', 1],
+    ['11:00', 'Xếp cơm hộp theo dây chuyền', 'Làm nhanh, đều tay theo dây chuyền.'],
+    ['13:00', 'Fillet cá trong xưởng lạnh', 0, 'thuy-san', 3],
+    ['14:00', 'Soi dị vật trước khi đóng gói', 'Kiểm để không lẫn vật lạ vào hàng.'],
+    ['15:00', 'Hàn thiếc bo mạch', 0, 'dien-tu', 2],
+    ['16:30', 'Đóng gói, dán nhãn hạn dùng', 'Nhãn đúng là an toàn cho người ăn.']] },
+  'dieu-duong': { pref: 'Osaka', where: 'Viện dưỡng lão', items: [
+    ['7:00', 'Nhận bàn giao từ ca đêm', 'Nghe ca trước kể sức khỏe từng cụ.'],
+    ['7:30', 'Chào hỏi, giúp cụ ăn sáng', 'Chào bằng kính ngữ, gọi đúng tên cụ.'],
+    ['9:00', 'Đứng máy ép nhựa', 0, 'duc-nhua', 1],
+    ['10:00', 'Đo nhiệt độ, huyết áp', 'Đo mỗi ngày để biết cụ có khỏe không.'],
+    ['11:00', 'Giúp cụ tắm', 'Giữ an toàn và sự riêng tư cho cụ.'],
+    ['13:30', 'Phục vụ bàn ở nhà hàng', 0, 'nha-hang', 3],
+    ['14:00', 'Lái máy kéo ngoài đồng', 0, 'nong-nghiep', 2],
+    ['15:00', 'Cùng cụ tập thể dục, trò chuyện', 'Trò chuyện cũng là chăm sóc.'],
+    ['16:30', 'Ghi hồ sơ chăm sóc', 'Ghi rõ để ca sau chăm cụ đúng.']] },
+  'nha-hang': { pref: 'Nagano', where: 'Khách sạn', items: [
+    ['7:00', 'Chào khách, phục vụ bữa sáng', 'Chào bằng kính ngữ là việc đầu tiên.'],
+    ['9:00', 'Buộc cốt thép', 0, 'xay-dung', 1],
+    ['9:30', 'Dọn bàn, rửa bát', 'Khu ăn phải sạch trước bữa sau.'],
+    ['10:30', 'Dọn phòng, thay ga, khăn', 'Buồng phòng làm theo sổ hướng dẫn.'],
+    ['11:00', 'Lau sàn sảnh tòa nhà văn phòng', 0, 've-sinh-toa-nha', 3],
+    ['13:00', 'Kiểm tra phòng trước khi khách đến', 'Phòng phải sẵn sàng trước giờ nhận phòng.'],
+    ['14:00', 'Đón khách nhận phòng', 'Đông nhất cuối tuần và mùa du lịch.'],
+    ['15:00', 'Thay dầu xe', 0, 'o-to', 2],
+    ['17:00', 'Phụ bếp, sơ chế cho bữa tối', 'Nhà hàng khách sạn bận nhất buổi tối.']] },
+  've-sinh-toa-nha': { pref: 'Tokyo', where: 'Tòa nhà văn phòng', items: [
+    ['6:00', 'Lau sàn sảnh trước giờ mở cửa', 'Hay làm sáng sớm, khi tòa nhà còn vắng.'],
+    ['7:00', 'Lau tay vịn, nút thang máy', 'Chỗ nhiều người chạm thì lau kỹ hơn.'],
+    ['8:00', 'Tưới rau trong nhà kính', 0, 'nong-nghiep', 1],
+    ['9:00', 'Dọn phòng, thay ga cho khách', 0, 'nha-hang', 3],
+    ['10:00', 'Dọn nhà vệ sinh, khu ướt', 'Khu ướt làm kỹ, dùng đúng hóa chất.'],
+    ['11:00', 'Gom, phân loại rác', 'Phân đúng loại theo quy định của tòa nhà.'],
+    ['13:00', 'Chạy máy chà sàn, phủ wax', 'Việc định kỳ, thường học sau.'],
+    ['14:00', 'Cắt ba via sản phẩm nhựa', 0, 'duc-nhua', 2],
+    ['15:00', 'Đánh dấu bảng kiểm, bàn giao', 'Ghi đã làm khu nào để bàn giao.']] },
+  'ky-su': { pref: 'Kanagawa', where: 'Công ty', who: 'Kỹ sư', items: [
+    ['9:00', 'Họp nhóm, báo tiến độ', 'Báo cáo bằng tiếng Nhật mỗi sáng.'],
+    ['9:30', 'Giúp cụ ăn trưa', 0, 'dieu-duong', 1],
+    ['10:00', 'Đọc tài liệu kỹ thuật', 'Tài liệu thường bằng tiếng Nhật.'],
+    ['10:30', 'Vẽ thiết kế trên CAD', 'Việc hằng ngày của kỹ sư thiết kế.'],
+    ['11:30', 'Viết chương trình cho robot', 'Lập trình robot, máy tự động.'],
+    ['13:00', 'Đứng máy CNC cả ca', 0, 'co-khi', 3],
+    ['14:00', 'Bóc vỏ tôm', 0, 'thuy-san', 2],
+    ['15:00', 'Xuống xưởng xem máy chạy thử', 'Kỹ sư cũng xuống xưởng xem tận mắt.'],
+    ['17:00', 'Viết báo cáo cuối ngày', 'Ghi việc đã làm, việc mai cần làm.']] }
+};
+
 var VISA = {
   tts: { n: 'Thực tập sinh', p: 'Thực tập sinh', u: '/visa/thuc-tap-sinh', road: 'Thường: học JPC 6–12 tháng → làm ở Nhật 1–3 năm.',
     f: ['Học ở JPC khoảng 6–12 tháng', 'Làm ở Nhật 1–3 năm, đúng ngành đã chọn', 'Kaigo cần N4. Ngành khác học từ đầu', 'Xong có thể về nước hoặc lên Kỹ năng đặc định 1'],
@@ -980,6 +1157,17 @@ var TXT = {
   introKicker: 'Career Design 01',
   intro: 'Chào [Tên]! Mình là <b>Shin</b>. Ở đây không có đúng sai, chỉ có câu trả lời thật của bạn. Đi hết 7 ga, bạn có <b>Bản Career Design</b> của riêng mình.',
   introBtn: 'Chào Shin! Mình bắt đầu nhé',
+  printAsk: 'Chào [Tên]! Trước khi lên tàu, Shin in vé hành trình cho bạn nhé.',
+  printBtn: 'In vé hành trình',
+  printing: 'Máy đang in vé của [Tên]…',
+  printAgain: 'In lại vé',
+  /* hướng dẫn học lần đầu (4 bước, bước 4 bắt chạm thử nút Sổ tay) */
+  tour1: 'Đây là Vé hành trình. Mỗi chặng xong, tàu nhỏ chạy gần hơn về Ga Ước Mơ.',
+  tour2: 'Bản Career Design của bạn có 8 ô. Qua mỗi ga, bạn điền thêm một ô.',
+  tour3: 'Đây là Sơ đồ tuyến. Bắt đầu từ Sân ga Xuất phát, chạm vào ga để vào học.',
+  tour4: 'Giờ bạn thử nhé: chạm nút Sổ tay (quyển sách, góc trên) để xem điểm và bài làm.',
+  tourDone: 'Giỏi lắm! Sổ tay luôn ở đây. Giờ bắt đầu từ Sân ga Xuất phát nhé.',
+  tourAgain: 'Xem lại hướng dẫn',
   gateToast: 'Chính xác! Shin mê Oden lắm. Lên tàu thôi!',
   homeHi: ['Chào [Tên]! Hôm nay đi tiếp một ga nhé.', 'Chào [Tên]! Mỗi ga chỉ khoảng 15 phút thôi.', 'Chào [Tên]! Bản Career Design của bạn đang lớn dần đó.'],
   homeWait: '[Tên] đã đủ 8 ô rồi! Ga Ước Mơ đang chờ bạn về đích.',
@@ -1130,12 +1318,25 @@ var ACTS = {
         opts: [{ v: 'y', t: 'Khá khớp' }, { v: 'p', t: 'Khớp một phần' }, { v: 'n', t: 'Khác nhau' }, { v: 'u', t: 'Chưa chắc' }],
         rep: 'Khớp hay không đều có ích. Khác nhau nghĩa là bạn có nhiều hướng để cân nhắc.' }
     ] },
-  a33: { t: 'Chọn ga đích', mins: 5, st: 's3', d: 'Xem 3 dấu hiệu chọn nghề, chọn nghề chính và phương án 2.',
+  a33: { t: 'Chọn ga đích', mins: 5, st: 's3', d: 'Xem 3 đoạn video về dấu hiệu chọn nghề, chọn nghề chính và phương án 2.',
     steps: [
-      { k: 'video', yt: 'gndJToZz76M', start: 0, url: 'https://www.youtube.com/watch?v=gndJToZz76M', title: 'Thầy Lê Long Sơn · Dấu hiệu chọn nghề',
-        hint: '3 dấu hiệu: năng khiếu, ước mơ từ nhỏ, hình mẫu bạn muốn giống.',
-        key: 'a33.signs', q: 'Bạn đã thấy dấu hiệu nào ở mình?', sub: 'Chọn 1 hoặc vài ý.', min: 1, own: 'Ý khác',
-        opts: ['Năng khiếu', 'Ước mơ từ nhỏ', 'Hình mẫu mình muốn giống', 'Chưa thấy rõ'] },
+      /* video chia 3 đoạn (PS1.3.15): mỗi đoạn chọn ý chạm bạn nhất + 1 dòng "Ở bạn…". Ý viết là diễn giải của khóa, không trích nguyên văn. */
+      { k: 'vseg', yt: 'gndJToZz76M', url: 'https://www.youtube.com/watch?v=gndJToZz76M', title: 'Thầy Lê Long Sơn · Dấu hiệu chọn nghề',
+        hint: 'Video chia 3 đoạn ngắn. Xem từng đoạn, rồi nói về chính bạn.',
+        segs: [
+          { s: 0, e: 30, lbl: 'Năng khiếu', key: 'a33.v1',
+            opts: ['Năng khiếu là việc mình làm tốt và thích làm', 'Thích giao tiếp thì hợp nghề làm việc với người', 'Thích vẽ thì hợp nghề cần mắt tinh, tay khéo'] },
+          { s: 30, e: 60, lbl: 'Ước mơ từ nhỏ', tab: 'Ước mơ', key: 'a33.v2',
+            opts: ['Ước mơ từ nhỏ mà đến giờ vẫn còn', 'Muốn làm được thật, không chỉ để mơ', 'Xem mình có hợp với nghề đó không'] },
+          { s: 60, e: 118, lbl: 'Hình mẫu', key: 'a33.v3',
+            opts: ['Có một người mình muốn giống', 'Có thể là thần tượng, hay người thân', 'Tìm đường học để thành người như họ'] }
+        ],
+        none: 'Chưa thấy ở mình',
+        fields: [
+          { key: 'a33.l1', l: 'Ở bạn, năng khiếu đó là gì?', lN: 'Bạn sẽ hỏi ai, thử gì để tìm ra?', ph: 'Ví dụ: mình khéo tay, sửa xe đạp cho cả xóm', min: 4, rows: 2 },
+          { key: 'a33.l2', l: 'Ở bạn, ước mơ đó là gì?', lN: 'Bạn sẽ hỏi ai, thử gì để tìm ra?', ph: 'Ví dụ: từ nhỏ mình đã muốn làm thợ máy như bố', min: 4, rows: 2 },
+          { key: 'a33.l3', l: 'Ở bạn, hình mẫu đó là ai?', lN: 'Bạn sẽ hỏi ai, thử gì để tìm ra?', ph: 'Ví dụ: chú mình, thợ hàn 20 năm, ai cũng nể', min: 4, rows: 2 }
+        ] },
       { k: 'inds', key: 'a33.main', q: 'Nghề chính bạn chọn là gì?', sub: 'Đây là ga đích của chặng đầu. Sau này vẫn đổi được.', other: 1 },
       { k: 'inds', key: 'a33.b', q: 'Phương án 2 của bạn?', sub: 'Có phương án 2 không phải là thiếu quyết tâm.', other: 1, none: 'Chưa nghĩ ra', exclude: 'a33.main' },
       { k: 'write', q: 'Vì sao bạn chọn nghề chính này?', sub: 'Câu này giúp bạn trả lời khi phỏng vấn.',
@@ -1149,15 +1350,15 @@ var ACTS = {
       { k: 'guess', key: 'w4.g2', slot: 1 },
       { k: 'guess', key: 'w4.g3', slot: 2 }
     ] },
-  a42: { t: 'Nghề của tôi', mins: 5, st: 's4', d: 'Đoán trước, xem Tikme, rồi viết một ngày làm nghề.',
+  a42: { t: 'Nghề của tôi', mins: 5, st: 's4', d: 'Tìm việc lạc nghề, xem Tikme, rồi viết một ngày làm nghề.',
     steps: [
-      { k: 'jobguess', key: 'a42.guess', q: 'Bạn đoán một ngày làm [Nghề] có những gì?', sub: 'Chọn ít nhất 2. Đoán thôi, chưa cần chắc.', min: 2, own: 'Việc khác' },
+      { k: 'jobguess', key: 'a42.guess', dl: 'a42.dl', q: 'Bạn đoán một ngày làm [Nghề] có những gì?', sub: 'Chọn ít nhất 2. Đoán thôi, chưa cần chắc.', min: 2, own: 'Việc khác' }, /* có DAYJOB thì thành "Một ngày của bạn TTS"; không có ngành thì vẫn đoán chip */
       { k: 'tik', key: 'a42.open', dyn: 'job', btn: 'Xem ngành [Nghề] trên Tikme',
         t: 'Giờ xem Tikme nói gì về [Nghề]. Đọc phần <b>công việc hằng ngày</b> và <b>lộ trình</b>, rồi quay lại nhé.',
         tNear: 'Nghề của bạn chưa có trang riêng trên Tikme. Xem ngành gần nhất bạn đã chọn, rồi quay lại nhé.',
         tNone: 'Nghề của bạn chưa có trang riêng trên Tikme. Xem danh sách 17 ngành, rồi hỏi thầy cô thêm nhé.',
         tips: ['Tikme mở ở thẻ mới. Đọc xong, quay lại thẻ này.', 'Để ý chỗ nào khác với điều bạn vừa đoán.'] },
-      { k: 'write', show: 'a42.guess', real: 1, q: 'Sau khi xem Tikme, bạn thấy gì?', sub: 'Viết ngắn, mỗi ô một ý.',
+      { k: 'write', real: 1, q: 'Sau khi xem Tikme, bạn thấy gì?', sub: 'Viết ngắn, mỗi ô một ý.',
         fields: [
           { key: 'a42.wow', l: 'Điều làm bạn bất ngờ', ph: '@wow', min: 6, rows: 2 },
           { key: 'a42.like', l: 'Điều bạn thích ở nghề này', ph: '@like', min: 6, rows: 2 },
@@ -1334,10 +1535,10 @@ var DEMO_DATA = {
     'a23.inter': 'Mình nghĩ tới thợ cơ khí CNC hoặc sửa ô tô, vì mình khéo tay và thích máy móc.',
     'a31.n': 60, 'a31.rq': [1, 1, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 1, 0, 0],
     'a32.open': 1, 'a32.t': ['co-khi', 'o-to'], 'a32.feel': 'y',
-    'a33.signs': ['Năng khiếu', 'Hình mẫu mình muốn giống'], 'a33.main': 'co-khi', 'a33.b': 'han',
+    'a33.signs': ['Năng khiếu', 'Hình mẫu'], 'a33.v1': '0', 'a33.l1': 'Mình khéo tay, sửa xe đạp cho cả xóm.', 'a33.v2': 'n', 'a33.l2': 'Mình sẽ hỏi mẹ hồi nhỏ mình hay nói muốn làm gì.', 'a33.v3': '2', 'a33.l3': 'Chú Ba, thợ cơ khí 20 năm ở quê.', 'a33.vs': { seg: 2, w: [1, 1, 1] }, 'a33.main': 'co-khi', 'a33.b': 'han',
     'a33.why': 'Mình chọn nghề này vì mình khéo tay, thích máy móc và muốn giỏi như chú mình, thợ máy 20 năm.',
     'w4.g1': 1, 'w4.g2': 0, 'w4.g3': 1,
-    'a42.guess': ['Đứng máy tiện, phay, CNC', 'Đọc bản vẽ', 'Làm theo ca'], 'a42.open': 1, 'a42.for': 'co-khi',
+    'a42.guess': ['Đứng máy tiện, phay, CNC', 'Đọc bản vẽ', 'Làm theo ca'], 'a42.dl': { f: [5, 1, 7], r: [0, 3] }, 'a42.open': 1, 'a42.for': 'co-khi',
     'a42.wow': 'Người mới phải đo hàng bằng thước kẹp rất nhiều, chưa đứng máy ngay.',
     'a42.like': 'Làm ra chi tiết máy chính xác, nhìn thấy kết quả.',
     'a42.worry': 'Sợ đọc bản vẽ tiếng Nhật chưa hiểu.',
@@ -1393,7 +1594,7 @@ var KW = {
 };
 
 /* ---------- Màn hình tàu vào ga (lần đầu vào mỗi ga) ----------
-   Câu 1 lấy từ CD49 (ARRIVE); câu 2 là lời Shin mở ga hiện tại (st.intro). Ga 8: câu mới, chờ thầy duyệt. ---------- */
+   Chỉ 1 câu, lấy từ CD49 (ARRIVE). Lời Shin mở ga (st.intro) hiện sẵn ở trang ga lần đầu. Ga 8: câu mới, chờ thầy duyệt. ---------- */
 var ARRIVE = {
  "1": "Ga Nhìn Xa là nơi bạn tập hình dung “tôi của 5 năm sau”, vì những việc nhỏ hôm nay đang vẽ nên con người tương lai ấy của bạn.",
  "2": "Ga Biết Mình giúp bạn suy nghĩ về những câu hỏi có tính cá nhân của riêng mỗi người: Bạn thích gì, giỏi làm gì và điều gì quan trọng với bạn?",

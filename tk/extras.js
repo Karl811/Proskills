@@ -355,9 +355,8 @@ function nbSettings(){
   var r=remind();
   var pc='<p class="small">Số ải mỗi ngày. Vòng tròn quanh nút bản đồ đầy dần khi đủ chỉ tiêu.</p><div class="chips">'+[1,2,3].map(function(n){ return '<button class="chp'+(pace()===n?' sel':'')+'" data-act="pace" data-n="'+n+'">'+n+' ải/ngày</button>'; }).join('')+'</div>'+
     '<p class="small" id="paceLn" style="margin:8px 0 12px">'+paceLine()+'</p>'+
-    '<p class="small"><b>Lời nhắc học</b></p><div class="form"><label>Giờ học<input class="inp" type="time" id="rmT" value="'+esc(r.t)+'"></label></div>'+
-    '<div class="chips" style="margin:8px 0">'+DAYS.map(function(d,i){ return '<button class="chp'+(r.d.indexOf(i)>=0?' sel':'')+'" data-act="rmDay" data-i="'+i+'">'+d[1]+'</button>'; }).join('')+'</div>'+
-    '<div class="btnrow"><button class="btn btn--sm" data-act="rmIcs">Thêm vào lịch điện thoại</button><a class="btn btn--sm btn--soft" id="rmG" target="_blank" rel="noopener" href="'+gcalUrl()+'">Google Calendar</a></div>';
+    '<p class="small"><b>Lời nhắc học</b></p><p class="small" style="margin:4px 0 8px">Giờ tự học giờ đặt chung ở trang chủ Proskills, nhắc cho mọi khóa học.</p>'+
+    '<div class="btnrow"><a class="btn btn--sm" href="'+PS.url('index.html?lich=nhac')+'">'+icon('next',16)+' Đặt giờ tự học ở trang chủ</a></div>';
   var sos='<div class="form">'+SOS_FIELDS.map(function(f){ return '<label>'+esc(f[1])+'<input class="inp" data-sos="'+f[0]+'" maxlength="40" value="'+esc((S.d.sos||{})[f[0]]||'')+'"></label>'; }).join('')+'</div>'+sosCardHTML()+
     '<div class="btnrow"><button class="btn btn--sm" data-act="sosSave">'+icon('download',16)+' Lưu thẻ thành ảnh</button></div>';
   return PS.settingsHTML({ ctx:'module', mod:TK_ID, ver:VERSION,

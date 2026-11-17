@@ -6,7 +6,7 @@
    - Không bao giờ đụng tới bài làm (localStorage) của học viên.
    ========================================================= */
 'use strict';
-const VERSION = 'PS1.3.12';
+const VERSION = 'PS1.3.15';
 const BASE = new URL(self.registration.scope);
 const PREFIX = 'proskills-' + encodeURIComponent(BASE.pathname) + '-';
 const SHELL = PREFIX + 'shell-' + VERSION;
@@ -14,7 +14,7 @@ const RUNTIME = PREFIX + 'runtime';
 const CORE = [
   './', 'index.html', 'offline.html', 'config.js', 'manifest.webmanifest',
   'core/core.js', 'core/core.css', 'core/pwa.js',
-  'hub/hub.js', 'hub/hub.css',
+  'hub/hub.js', 'hub/lich.js', 'hub/hub.css',
   'icons/logo.svg', 'icons/app-192.png', 'icons/app-512.png', 'icons/maskable-512.png', 'icons/apple-touch-icon.png'
 ];
 const abs = p => new URL(p, BASE).href;

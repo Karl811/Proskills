@@ -109,11 +109,25 @@
       '<div class="st st--xp">' + icon('star', 18) + '<b data-n="' + t.xp + '">' + t.xp + '</b><small>Tổng XP</small></div>' +
       '<div class="st st--ins">' + icon('bulb', 18) + '<b data-n="' + t.ins + '">' + t.ins + '</b><small>Insight</small></div>' +
       '</div><p class="hero__today">' + icon('clock', 15) + (t.todayMin ? ' Hôm nay bạn đã học ' + t.todayMin + ' phút. Giữ chuỗi nhé!' : (t.streak ? ' Học hôm nay để giữ chuỗi ' + t.streak + ' ngày.' : ' Học vài phút mỗi ngày để bắt đầu chuỗi ngày học.')) + '</p></section>' +
+      (W.PSLich ? W.PSLich.cardHTML() : '') +
       '<div style="--i:1">' + nudge() + '</div>' +
       '<h2 class="sec" style="--i:2">Khóa học của bạn</h2>' +
       '<div class="mlist">' + mods.map(cardHTML).join('') + '</div>' +
+      guidesHTML() +
       '<footer class="hfoot">' + esc(CFG.ORG) + '<br>' + esc(CFG.APP) + ' ' + esc(CFG.APP_VER) + ' · Bài làm lưu trên máy này</footer>' +
       '</div>';
+  }
+
+  /* thẻ hướng dẫn (cao bằng nửa thẻ khóa): CFG.GUIDES */
+  function guidesHTML() {
+    var g = CFG.GUIDES || []; if (!g.length) return '';
+    return '<div class="glist" style="--i:7">' + g.map(function (x) {
+      var mc = x.color || '#24307A', soon = x.state !== 'ready';
+      var tag = soon ? 'div' : 'a href="' + esc(PS.url(x.href || '')) + '"';
+      return '<' + tag + ' class="gcard' + (soon ? ' gcard--soon' : '') + '" style="--mc:' + esc(mc) + ';--ml:' + mix(mc, '#FFFFFF', 0.18) + ';--md:' + mix(mc, '#0B1233', 0.28) + ';--mt:' + mix(mc, '#FFFFFF', 0.9) + '">' +
+        '<span class="gcard__ic">' + icon(x.icon, 24, 2) + '</span><span class="gcard__tx"><span class="mcard__code">' + esc(x.code || 'HƯỚNG DẪN') + '</span><b>' + esc(x.title) + '</b><small>' + esc(x.sub) + '</small></span>' +
+        (soon ? '<span class="gcard__soon">Sắp có</span>' : icon('next', 18)) + '</' + (soon ? 'div' : 'a') + '>';
+    }).join('') + '</div>';
   }
 
   /* ---------------- Cổng mật khẩu ---------------- */
@@ -177,7 +191,7 @@
   });
   D.addEventListener('keydown', function (e) {
     if ((e.key === 'Enter' || e.keyCode === 13) && PS.closest(e.target, '.onb__form') && e.target.tagName === 'INPUT') { e.preventDefault(); onbGo(); }
-    if ((e.key === 'Escape' || e.keyCode === 27) && D.querySelector('.sheet') && !D.querySelector('.ps-ov')) closeSettings();
+    if ((e.key === 'Escape' || e.keyCode === 27) && D.querySelector('.sheet:not(.sheet--lc)') && !D.querySelector('.ps-ov')) closeSettings();
   });
   W.addEventListener('ps:change', function (e) { if (e.detail && (e.detail.field === 'backup') && !D.querySelector('.sheet')) render(false); });
   var hbT = null;
@@ -187,7 +201,15 @@
   }, { passive: true });
   W.addEventListener('pageshow', function (e) { if (e.persisted) { D.body.classList.remove('leaving'); render(false); } });
 
+  W.PSHubRender = function () { if (!PS.needProfile()) render(false); };
+  /* trạng thái lịch học (Đang học, Còn … phút) tự cập nhật mỗi phút */
+  setInterval(function () {
+    var c = D.querySelector('.lc'); if (!c || !W.PSLich || D.hidden) return;
+    var t = D.createElement('div'); t.innerHTML = W.PSLich.cardHTML(); var n = t.firstChild; if (n) { n.style.cssText = c.style.cssText; c.parentNode.replaceChild(n, c); }
+  }, 60000);
   render(true);
+  /* ?lich=1 mở tấm Lịch học; ?lich=nhac mở phần giờ tự học (link từ các khóa) */
+  if (QS.lich && !PS.needProfile() && W.PSLich) { try { history.replaceState(null, '', location.pathname); } catch (e) {} setTimeout(function () { W.PSLich.open(QS.lich === 'nhac' ? 'nhac' : '', W.PSHubRender); }, 300); }
   /* Đến từ module chưa đủ điều kiện (?m=id): hỏi thông tin trước, rồi mở cổng */
   if (WANT && !PS.needProfile()) { var w0 = WANT; WANT = ''; setTimeout(function () { openMod(w0); }, 350); }
 })(window, document);

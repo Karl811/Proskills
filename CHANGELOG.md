@@ -5,6 +5,49 @@ Quy ước số phiên bản: **PS a.b.c**
 - b: giai đoạn / thêm module hoặc tính năng lớn
 - c: sửa nhỏ trong giai đoạn đó
 
+## PS1.3.15 · 17/11/2026 · CD01 bài mới (Đợt 3) + Bản Career Design kiểu biển ga · CD01.1.4
+CD01 · bài mới
+- **Ga 3 · Chặng 3 · video chia 3 đoạn** (gndJToZz76M): Năng khiếu 0:00–0:30 · Ước mơ từ nhỏ 0:30–1:00 · Hình mẫu 1:00–1:58. Mỗi đoạn: bấm xem (video tự dừng cuối đoạn, có link mở YouTube đúng mốc) → “Mình xem xong rồi” → chọn ý chạm bạn nhất (3 ý, ý nào cũng đúng, + “Chưa thấy ở mình”) → 1 dòng “Ở bạn, … là gì?” (chọn “Chưa thấy” thì hỏi “Bạn sẽ hỏi ai, thử gì để tìm ra?”). Thay câu “Bạn đã thấy dấu hiệu nào ở mình?”; `a33.signs` tự ghi theo đoạn đã chọn ý. Ý trong khóa là diễn giải, không trích nguyên văn. Ô viết tính Insight như các ô khác.
+- **Ga 4 · Chặng 1 · “Một ngày của bạn TTS ngành [Nghề]”** (thay bước đoán chip): dòng thời gian 9 mốc, có 3 việc lạc sang ngành khác (dễ, vừa, khó). Chạm việc lạc: đánh số + “Việc này của ngành …”; chạm việc thật: “Việc này có thật: …”. Đếm x/3; chạm 4 việc thật chưa đủ thì Shin gợi ý. Đủ 17 nghề (`DAYJOB` trong content.js), nơi làm theo tỉnh ghi “minh họa”; Kỹ sư = “bạn Kỹ sư công nghệ”; Nhà hàng kể ngày ở khách sạn (TTS chỉ có nhánh khách sạn, ryokan theo Tikme). Nghề khác không có ngành gần: vẫn đoán chip như cũ. Đổi ngành thì tự tìm lại. Bước “Sau khi xem Tikme” bỏ ô “Lúc nãy bạn đoán”.
+CD01 · giao diện
+- **Sổ tay › Bản Career Design** thiết kế lại theo **biển tên ga Nhật (駅名標)**: ô số kiểu số hiệu ga, chữ Hán + kana + tên ga, dải màu chủ đạo có vạch vàng ghi ga trước, ga sau; nội dung ô bên dưới; **con dấu ga (駅スタンプ)** màu coban đóng ở góc ô đã điền (chữ Hán ga, chữ cong CAREER DESIGN, ngày đóng dấu). Ô của ga tiếp theo viền vàng “Ga tiếp theo của bạn”. Đầu tab: **thẻ tuyến** (tên, x/8 ô, 8 ô trên đường ray, Ga đích); về đích thì thay bằng Vé hoàn thành vàng.
+- **Hộp “Hoàn thành ga”** đồng bộ: con dấu ga lớn đóng xuống (giảm chuyển động: hiện ngay), nhãn “Con dấu ga mới · x/8”, biển ga + ô vừa điền, loa đọc chữ Nhật nằm trên biển ga (bỏ ô từ riêng). Xem trước ô ở bước cuối chặng cũng dùng kiểu biển ga.
+- **Banner ga:** giữ hoa văn chấm bi, chấm mờ hơn (.12 → .075). Bỏ chế độ xem thử `?pat=` (máy nào đã thử tự về chấm bi).
+- Kiểm 390/1280, demo, 4 nghề (Cơ khí, Nhà hàng, Kỹ sư, Kaigo); ES5 đạt; không lỗi console.
+
+Tệp đổi: config.js, sw.js, index.html, cd01/index.html, cd01/engine.js, cd01/content.js, cd01/cd01.css, tk/index.html, mau/index.html (số phiên bản), CHANGELOG.md, AGENTS.md.
+File cần xóa trên GitHub: không có.
+
+## PS1.3.14 · 17/11/2026 · Logo B + CD01 giao diện (Đợt 2) · CD01.1.3
+Logo và trang chủ
+- **Logo chốt kiểu B** (đầu tàu chính diện, to): thay `icons/logo.svg` + 4 ảnh PNG (192, 512, apple-touch 180, maskable 512).
+- Thẻ Lịch học: dòng link đổi thành “Xem lịch học tuần này trên oden.vn” (vẫn mở thẻ mới). Ô buổi học hôm nay phẳng, bỏ vạch màu bên trái.
+- Nút “‹ Proskills” (về trang chủ) ở CD01 và TK: nền màu chủ đạo của khóa, chữ trắng, đậm, nổi khối 2px.
+CD01
+- **Mở CD01 lần đầu: màn in vé.** Shin mời in vé → học viên chạm “In vé hành trình” → vé chui ra từ máy in (đèn xanh, tiếng mô-tơ + kim in lách tách + xoẹt), các dòng thông tin hiện dần kèm tiếng “ting” → lời chào của Shin → “Chào Shin! Mình bắt đầu nhé”. Cần chạm để điện thoại cho phát âm thanh. Giảm chuyển động: vé hiện ngay.
+- **Hướng dẫn học lần đầu kiểu TK** (4 bước): Vé hành trình → Bản Career Design → Sơ đồ tuyến (Sân ga) → bắt chạm thử nút Sổ tay. Học viên cũ chưa xem cũng được hướng dẫn một lần. Sổ tay › Tổng quan có “Xem lại hướng dẫn” và “In lại vé” (dùng được cả trong demo).
+- Bỏ khung trích dẫn đầu Ga 1. Lời Shin mở ga **hiện sẵn lần đầu** (sửa lỗi bị thu gọn), từ lần 2 thu gọn. Màn tàu vào ga chỉ còn câu 1 (`ARRIVE`).
+- **Âm thanh tàu vào ga mới** (tự soạn bằng Web Audio): bánh xe chậm dần theo tàu, xì phanh, chuông ga 6 nốt Đô Mi Son Mi La Son. Giảm chuyển động: chỉ chuông.
+- Banner ga: ô chữ Nhật có viền vàng + nét trong mảnh, nghiêng nhẹ (như ô chữ ở banner TK); chấm bi mờ hơn (.12).
+- **4 hoa văn banner xem thử**: mở `cd01/?pat=a` (chấm bi mờ, mặc định) · `?pat=b` (lưới ô vé) · `?pat=c` (tuyến tàu + chấm ga) · `?pat=d` (Asanoha nét mảnh). Máy nhớ lựa chọn; `?pat=0` về mặc định. Chờ thầy chọn.
+- Kiểm 390/1280, giảm chuyển động, demo; ES5 đạt; không lỗi console.
+
+Tệp đổi: config.js, sw.js, index.html, icons/* (5 tệp), hub/lich.js, hub/hub.css, cd01/index.html, cd01/engine.js, cd01/content.js, cd01/cd01.css, tk/index.html, tk/tk.css, mau/index.html (số phiên bản), CHANGELOG.md, AGENTS.md.
+File cần xóa trên GitHub: không có.
+
+## PS1.3.13 · 17/11/2026 · Trang chủ: Lịch học, nhắc tự học chung, thẻ Hướng dẫn
+- **Lịch học trên lớp** (thẻ ngay dưới banner chào): học viên chạm lưới T2–T6 × 6 ca (1-2 08:00 · 3-4 10:00 · 5-6 13:15 · 7-8 15:15 · 9-10 17:45 · 11-12 19:45) để chọn môn (Kỹ năng · Kiến thức nghề · Thể chất) và cơ sở (Âu Cơ · Ấp Bắc 1 · Ấp Bắc 2).
+  - Trang chủ hiện dải tuần T2–T6 (chấm màu theo môn) + danh sách buổi học của ngày đang chọn, trạng thái "Còn … phút / Đang học / Đã xong" tự cập nhật mỗi phút.
+  - Lần đầu đặt xong, hỏi "Thêm vào lịch điện thoại?": tệp lịch lặp hằng tuần, nhắc trước 15 phút, dừng ở ngày kết thúc (mặc định 3 tháng, sửa được). Có thêm link Google Calendar từng môn. Đổi lịch thì thẻ nhắc "cập nhật lịch điện thoại".
+  - Nút sang **oden.vn** xem lịch Kỹ năng, Thể chất, Oden (THT).
+- **Giờ tự học e-learning chung** cho mọi khóa (giờ + ngày), nằm trong tấm Lịch học và cùng tệp lịch. TK bỏ phần nhắc riêng trong Cài đặt, thay bằng nút "Đặt giờ tự học ở trang chủ" (`index.html?lich=nhac`).
+- **Thẻ Hướng dẫn · Hoạt động nhóm gắn kết** dưới danh sách khóa, cao bằng nửa thẻ khóa, "Sắp có" (cấu hình `GUIDES` trong config.js, màu #C8507E, biểu tượng nhóm khoác vai).
+- Lõi: thêm biểu tượng calendar, bell, ext, team. Dữ liệu lịch lưu trong `ps.settings` nên đi theo bản sao lưu.
+- Logo: 4 kiểu tàu để chọn ở thư mục `Logo-Proskills/PS1.3.13-4-kieu-tau` (chưa thay icon ứng dụng).
+
+Tệp đổi: config.js, index.html, sw.js, core/core.js, hub/hub.js, hub/hub.css, **hub/lich.js (mới)**, tk/extras.js, cd01/index.html, tk/index.html, mau/index.html (số phiên bản), CHANGELOG.md.
+File cần xóa trên GitHub: không có.
+
 ## PS1.3.12 · 16/11/2026 · CD01: màu coban dịu + tàu vào ga vẽ lại · CD01.1.2
 - Màu chủ đạo CD01 chốt **Xanh coban dịu #2C5BC4** (sáng #4472D6, đậm #2149A6, đậm hơn #1A3A85, nhạt #E9F0FC). Đổi cả thẻ CD01 ở trang chủ, nhãn Sân ga, hình minh họa, Lưu ảnh. Bỏ chế độ thử màu `?mau=` (máy nào đã thử cũng tự về màu mới).
 - Màn hình tàu vào ga vẽ lại kỹ hơn:
