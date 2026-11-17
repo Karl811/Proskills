@@ -128,6 +128,7 @@
   function render(top) {
     if (!S.mem && V.v !== 'join') { V = { v: 'join', step: 0 }; J = J || {}; }
     var h = '';
+    if (W.TCYard) TCYard.unmount();
     SHIN_OUTFIT = curKhu() === 'bep' ? 'apron' : (curKhu() === 'nghe' ? 'helmet' : '');
     if (V.v === 'join') h = viewJoin();
     else if (V.v === 'khu') h = viewKhu();
@@ -138,6 +139,7 @@
     var kids = $$('.wrap.enter > *'); kids.forEach(function (el, i) { el.style.setProperty('--i', Math.min(i, 8)); });
     if (top) W.scrollTo(0, 0);
     afterRender();
+    if (V.v === 'home') mountYard();
   }
   function afterRender() {
     if (V.v === 'act') { var a = actById(V.a); if (a && a.k === 'try' && V.step === 1) drawCounter(); }
@@ -150,12 +152,12 @@
     J = J || {}; var st = V.step || 0, h = '';
     var bar = '<div class="stepbar stepbar--join">' + [1, 2, 3, 4].map(function (i) { return '<i class="' + (i < st ? 'on' : (i === st ? 'cur' : '')) + '"></i>'; }).join('') + '</div>';
     if (st === 0) {
-      return '<div class="intro">' + shin('hi', 120, 'bob') + '<span class="kicker">TC01 · Huấn luyện thể chất</span><h1 class="h1">Phòng tập của <em>HLV Shin</em></h1>' +
+      return '<div class="intro intro--gym">' + storefront() + '<span class="kicker">TC01 · Huấn luyện thể chất</span>' +
         shinSays('hi', fill(TXT.joinHi)) + shinSays('encourage', TXT.joinHi2) +
-        '<button type="button" class="btn btn--go btn--w" data-act="jNext">' + ic('card', 18) + 'Làm thẻ hội viên</button>' +
+        '<button type="button" class="btn btn--go btn--w" data-act="jEnter">' + ic('card', 18) + 'Vào phòng tập</button>' +
         (S.mem ? '' : '<button type="button" class="link" data-act="psHome">Về trang chính Proskills</button>') + '</div>';
     }
-    h = (S.mem ? back('Sơ đồ phòng tập', 'home') : '') + '<div class="ah"><span class="ah__lab">Thẻ hội viên · bước ' + st + '/4</span>' + bar + '</div>';
+    h = (S.mem ? back('Sơ đồ phòng tập', 'home') : '') + '<div class="reg"><span class="reg__clip" aria-hidden="true"></span><small>SHIN FITNESS CENTER · RECEPTION</small><b>' + (S.mem ? 'Sửa thẻ hội viên' : 'Phiếu đăng ký hội viên') + '</b><span class="reg__st">Bước ' + st + '/4</span>' + bar + '</div>';
     if (st === 1) {
       if (!J.job && J.cd === undefined) { J.cd = cdJob(); if (J.cd) J.job = J.cd; }
       h += '<div class="card"><p class="q">' + esc(TXT.jobQ) + '</p><p class="qsub">' + esc(TXT.jobSub) + '</p>' +
@@ -197,7 +199,7 @@
         '<textarea class="inp ta" id="jGoal" rows="3" maxlength="160" placeholder="Ví dụ: Chống đẩy được 20 cái liên tục">' + esc(J.goal || '') + '</textarea>' +
         '<div class="chips chips--tips">' + TXT.goalTips.map(function (t, i) { return '<button type="button" class="chip chip--tip" data-act="jTip" data-i="' + i + '">' + esc(t) + '</button>'; }).join('') + '</div></div>' +
         '<details class="card fold"' + (J.h || J.w ? ' open' : '') + '><summary>' + esc(TXT.bodyQ) + '</summary><div class="body2"><label>Chiều cao (cm)<input class="inp" id="jH" inputmode="numeric" maxlength="3" value="' + esc(J.h || '') + '"></label><label>Cân nặng (kg)<input class="inp" id="jW" inputmode="decimal" maxlength="5" value="' + esc(J.w || '') + '"></label></div><div id="jBmi">' + bmiHTML(J.h, J.w) + '</div><p class="ps-small">' + esc(TXT.bodyNote) + '</p></details>' +
-        '<button type="button" class="btn btn--go btn--w" data-act="jDone" id="jDoneBtn"' + (okGoal ? '' : ' disabled') + '>' + ic('card', 18) + 'In thẻ hội viên</button>';
+        '<button type="button" class="btn btn--go btn--w" data-act="jDone" id="jDoneBtn"' + (okGoal ? '' : ' disabled') + '>' + ic('card', 18) + (S.mem ? 'Lưu thẻ hội viên' : 'Nhận thẻ hội viên') + '</button>';
       return h;
     }
     return h;
@@ -221,24 +223,112 @@
     markDay(); save(true);
   }
 
-  /* ---------- thẻ hội viên ---------- */
-  function stampRow(k, lab) {
-    return '<div class="mcard__row"><span class="mcard__rl">' + lab + '</span>' + baisOf(k).map(function (b) { var dn = baiDone(b); return '<i class="' + (dn ? 'on' : '') + '" title="' + esc(b.t) + '">' + (dn ? ic(b.ic, 15) : '') + '</i>'; }).join('') + '</div>';
+  /* ---------- thẻ hội viên (TC01.0.7): thẻ nhựa phòng gym, mặt trước thông tin, mặt sau thẻ đục lỗ ---------- */
+  var TIERS = [[0, 'STARTER'], [6, 'REGULAR'], [18, 'ATHLETE'], [36, 'CHAMPION']];
+  var PUNCH = [['san', 'FLOOR'], ['bep', 'KITCHEN'], ['nghe', 'WORK']];
+  function pad2(n) { return (n < 10 ? '0' : '') + n; }
+  function stampTotal() { var n = 0; PUNCH.forEach(function (x) { n += baiCount(x[0]); }); return n; }
+  function tier() { var n = stampTotal(), t = TIERS[0][1]; TIERS.forEach(function (x) { if (n >= x[0]) t = x[1]; }); return t; }
+  function memNo() {
+    var c = ('0000' + String(PS.profile().cls || '').replace(/\D/g, '')).slice(-4), d = new Date((S.mem && S.mem.at) || Date.now());
+    return c + ' · ' + pad2(d.getDate()) + pad2(d.getMonth() + 1);
   }
-  function memCard(big) {
-    var o = SHIN_OUTFIT; SHIN_OUTFIT = '';
-    var h = memCardIn(big); SHIN_OUTFIT = o; return h;
+  function punchRow(k, lab, fresh) {
+    return '<span class="prow"><span>' + lab + '</span>' + baisOf(k).map(function (b) { return '<i class="' + (baiDone(b) ? 'on' : '') + (fresh === b.id ? ' new' : '') + '" title="' + esc(b.t) + '"></i>'; }).join('') + '</span>';
   }
-  function memCardIn(big) {
-    var p = PS.profile(), m = S.mem || {}, G = GROUPS[m.g] || {};
-    return '<section class="mcard' + (big ? ' mcard--big' : '') + '" aria-label="Thẻ hội viên"><div class="mcard__body">' +
-      '<div class="mcard__lab"><span>Thẻ hội viên · <span class="jp">会員証</span></span><span>TC01</span></div>' +
-      '<div class="mcard__top">' + shin('cheer', 54) + '<div><small>Phòng tập HLV Shin</small><b>' + esc(p.name || (IS_DEMO ? 'Học viên demo' : given())) + '</b></div></div>' +
-      '<div class="mcard__grid"><div><small>Lớp</small><b>' + esc(p.cls || '—') + '</b></div><div><small>Nhóm</small><b>' + (G.ic ? ic(G.ic, 14) : '') + esc(grpName(m.g)) + (m.g2 && GROUPS[m.g2] ? ' + ' + esc(GROUPS[m.g2].n) : '') + '</b></div>' +
-      '<div><small>Nghề</small><b>' + esc(jobName() || '—') + '</b></div><div><small>Ngày cấp</small><b>' + esc(dmy(m.at)) + '</b></div></div>' +
-      (m.goal ? '<div class="mcard__goal"><small>Mục tiêu</small><span>' + esc(m.goal) + '</span></div>' : '') +
-      '<div class="mcard__meta"><span>Dấu: Sàn ' + baiCount('san') + '/' + BAI.length + ' · Bếp ' + baiCount('bep') + '/' + BAI_BEP.length + ' · Nghề ' + baiCount('nghe') + '/' + BAI_NGHE.length + '</span><span class="mcard__pts"><span title="Chuỗi ngày">' + PS.icon('flame', 13) + (IS_DEMO ? 5 : PS.streak()) + '</span><span title="XP">' + PS.icon('star', 13) + xpTotal() + '</span><span title="Insight">' + PS.icon('bulb', 13) + insTotal() + '</span></span></div></div>' +
-      '<div class="mcard__stamps">' + stampRow('san', 'Sàn tập') + stampRow('bep', 'Bếp') + stampRow('nghe', 'Nghề') + '</div></section>';
+  var HOOK = '<svg class="hang__hook" viewBox="0 0 150 44" aria-hidden="true"><path d="M30 5h90" stroke="#C9D3CC" stroke-width="4" stroke-linecap="round"/><circle cx="75" cy="6" r="5" fill="#9AA59E"/>' +
+    '<path d="M71 8L69 36M79 8L81 36" stroke="#2A714D" stroke-width="5" stroke-linecap="round"/><rect x="67" y="33" width="16" height="12" rx="3" fill="#C9D3CC" stroke="#9AA59E" stroke-width="1.5"/></svg>';
+  /* hoa văn nhẹ góc dưới phải: tạ đơn nằm xéo + đĩa tạ */
+  var MC_PAT = '<svg width="190" height="150" viewBox="0 0 190 150"><g fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" transform="rotate(-28 95 75)"><rect x="18" y="52" width="22" height="50" rx="7"/><rect x="40" y="62" width="12" height="30" rx="4"/><path d="M52 77h86"/><rect x="138" y="62" width="12" height="30" rx="4"/><rect x="150" y="52" width="22" height="50" rx="7"/></g><circle cx="150" cy="128" r="30" fill="none" stroke="currentColor" stroke-width="6"/><circle cx="150" cy="128" r="8" fill="none" stroke="currentColor" stroke-width="5"/></svg>';
+  var PT_IC = {
+    fl: '<svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c1 4 6 6 6 12a6 6 0 0 1-12 0c0-3 2-5 3-6 0 2 1 3 2 3 0-4-1-6 1-9z" fill="#E8743B"/></svg>',
+    st: '<svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17l-5.9 3.3 1.3-6.5L2.5 9.3l6.6-.8z" fill="#D9A514"/></svg>',
+    bu: '<svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z" fill="#7A55D3"/><rect x="8.5" y="18.5" width="7" height="3" rx="1.5" fill="#7A55D3"/></svg>'
+  };
+  function cardFront() {
+    var p = PS.profile(), m = S.mem || {}, t = tier(), nm = p.name || (IS_DEMO ? 'Học viên demo' : given());
+    var info = [p.cls, grpName(m.g) + (m.g2 && GROUPS[m.g2] ? ' + ' + GROUPS[m.g2].n : ''), jobName()].filter(function (x) { return x && x !== '—'; }).join(' · ');
+    return '<span class="mc__f"><span class="mc__slot"></span><span class="mc__pat" aria-hidden="true">' + MC_PAT + '</span><span class="mc__shine"></span>' +
+      '<span class="mc__top"><span class="mc__logo">' + PS.icon('dumbbell', 15, 2.6) + '</span><span class="mc__brand"><b>SHIN FITNESS</b><small>CENTER</small></span>' +
+      '<span class="mc__tier"><small>MEMBER</small><span>' + t + '</span></span></span>' +
+      '<span class="mc__name"><b>' + esc(nm.toUpperCase()) + '</b><small>' + esc(info) + '</small></span>' +
+      '<span class="mc__bot"><span class="mc__no"><small>MEMBER NO.</small><b>' + memNo() + '</b><span>SINCE ' + esc(dmy(m.at)) + '</span></span><span class="mc__code">TC01</span></span></span>';
+  }
+  function cardBack() {
+    var m = S.mem || {};
+    return '<span class="mc__b"><span class="mc__mag"></span><span class="mc__bin"><span class="punch"><span class="punch__h">PUNCH CARD</span>' +
+      PUNCH.map(function (x) { return punchRow(x[0], x[1]); }).join('') + '</span>' +
+      '<span class="mc__side"><small>MỤC TIÊU</small><span class="mc__goal">' + esc(m.goal || 'Chưa viết') + '</span>' +
+      '<span class="mc__pts"><span title="Chuỗi ngày">' + PT_IC.fl + (IS_DEMO ? 5 : PS.streak()) + '</span><span title="XP">' + PT_IC.st + xpTotal() + '</span><span title="Insight">' + PT_IC.bu + insTotal() + '</span></span></span></span>' +
+      '<span class="mc__sig">' + SHIN_SIG + 'HLV SHIN</span></span>';
+  }
+  /* big: thẻ trong Sổ tay (không móc); still: thẻ ở cảnh trao thẻ (không lật) */
+  function memCard(big, still) {
+    var t = tier();
+    return '<div class="hang' + (big ? ' hang--big' : '') + '">' + (big || still ? '' : HOOK) +
+      '<div class="mcw"><div class="mc' + (t === 'CHAMPION' ? ' mc--gold' : '') + '"' + (still ? '' : ' role="button" tabindex="0" data-act="flipCard" aria-label="Thẻ hội viên, chạm để lật"') + '>' +
+      cardFront() + (still ? '' : cardBack()) + '</div></div>' + (still ? '' : '<p class="mc__hint">Chạm thẻ để lật · mặt sau là thẻ đục lỗ</p>') + '</div>';
+  }
+  function flipCard(el) {
+    var w = PS.closest(el, '.mcw'); el.className = el.className.indexOf(' flip') > -1 ? el.className.replace(' flip', '') : el.className + ' flip';
+    sfx('flip');
+    if (w && !RM) { w.className = 'mcw'; void w.offsetWidth; w.className = 'mcw swing'; }
+  }
+
+  /* ---------- cửa phòng tập (lần đầu vào) ---------- */
+  function storefront() {
+    var bl = '', i, n = 13;
+    for (i = 0; i < n; i++) bl += '<i style="left:' + (i / (n - 1) * 100).toFixed(1) + '%;top:-3px"></i><i style="left:' + (i / (n - 1) * 100).toFixed(1) + '%;bottom:-3px"></i>';
+    return '<div class="sf"><div class="sign"><span class="sign__bulbs" aria-hidden="true">' + bl + '</span><span class="sign__s">SHIN</span>' +
+      '<span class="sign__f">' + PS.icon('dumbbell', 15, 2.4) + 'FITNESS CENTER' + PS.icon('dumbbell', 15, 2.4) + '</span><span class="sign__e">TC01 · OPEN 24/7</span></div>' +
+      '<div class="awn" aria-hidden="true"></div><div class="door"><span class="cnt" aria-hidden="true"><span>1</span><span>2</span><span>3</span><span>4</span></span>' +
+      '<span class="n8" aria-hidden="true">♪</span><span class="n8 n8b" aria-hidden="true">♪</span><span class="door__mat"></span><span class="door__radio"></span>' +
+      '<button type="button" class="door__shin" data-act="shinTap" aria-label="HLV Shin đang tập Radio Taiso">' + shin('cheer', 128, 'taiso') + '</button></div></div>';
+  }
+
+  /* ---------- quầy lễ tân: Shin trao thẻ ---------- */
+  function handover(done) {
+    var ov = D.createElement('div'), fin = false;
+    ov.className = 'hov' + (RM ? ' hov--rm' : ''); ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-label', 'Nhận thẻ hội viên');
+    ov.innerHTML = '<div class="hov__in"><div class="desk"><span class="desk__logo">SHIN FITNESS CENTER · RECEPTION</span><span class="desk__shin">' + shin('cheer', 108, 'bob') + '</span>' +
+      '<span class="desk__top"></span><span class="desk__front"><b>WELCOME</b></span><div class="desk__card">' + memCard(false, true) + '</div></div>' +
+      '<div class="hov__say">' + shinSays('party', fill(TXT.cardSay), 48) + '<button type="button" class="btn btn--go btn--w" id="hovGo">' + PS.icon('check', 18, 2.6) + esc(TXT.cardGo) + '</button></div></div>';
+    D.body.appendChild(ov); D.body.classList.add('ps-lock');
+    function close() { if (fin) return; fin = true; sfx('whistle'); D.body.classList.remove('ps-lock'); if (ov.parentNode) ov.parentNode.removeChild(ov); if (done) done(); }
+    $('#hovGo', ov).onclick = close;
+    setTimeout(function () { ov.className += ' play'; if (!RM) { sfx('slide'); setTimeout(function () { sfx('ting'); }, 1650); } else sfx('ting'); }, 60);
+  }
+
+  /* ---------- âm thanh TC01 (tự soạn bằng WebAudio, theo công tắc chung PS.soundOn) ---------- */
+  var AC = null;
+  function actx() { var C = W.AudioContext || W.webkitAudioContext; if (!C) return null; if (!AC) AC = new C(); if (AC.state === 'suspended' && AC.resume) AC.resume(); return AC; }
+  function tone(c, f, t0, dur, type, vol, f2) {
+    var o = c.createOscillator(), g = c.createGain(); o.type = type || 'sine'; o.frequency.setValueAtTime(f, t0); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t0 + dur);
+    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol || 0.1, t0 + 0.012); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g); g.connect(c.destination); o.start(t0); o.stop(t0 + dur + 0.02); return o;
+  }
+  function noise(c, t0, dur, vol, f1, f2, q) {
+    var len = Math.floor(c.sampleRate * dur), buf = c.createBuffer(1, len, c.sampleRate), d = buf.getChannelData(0), i;
+    for (i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+    var s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain(); s.buffer = buf; f.type = 'bandpass'; f.Q.value = q || 1.2;
+    f.frequency.setValueAtTime(f1, t0); if (f2) f.frequency.exponentialRampToValueAtTime(f2, t0 + dur);
+    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + dur * 0.25); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    s.connect(f); f.connect(g); g.connect(c.destination); s.start(t0); s.stop(t0 + dur + 0.02);
+  }
+  function sfx(k) {
+    if (!PS.soundOn()) return;
+    try {
+      var c = actx(); if (!c) return; var t = c.currentTime + 0.01;
+      if (k === 'door') { tone(c, 1318, t, 0.7, 'sine', 0.09); tone(c, 2636, t, 0.25, 'sine', 0.02); tone(c, 988, t + 0.32, 0.9, 'sine', 0.09); tone(c, 1976, t + 0.32, 0.3, 'sine', 0.02); }
+      else if (k === 'whistle') { var o = tone(c, 2350, t, 0.32, 'sine', 0.05); var l = c.createOscillator(), lg = c.createGain(); l.frequency.value = 28; lg.gain.value = 90; l.connect(lg); lg.connect(o.frequency); l.start(t); l.stop(t + 0.34); noise(c, t, 0.3, 0.02, 2400, 0, 3); }
+      else if (k === 'pen') { noise(c, t, 0.05, 0.05, 2600, 0, 2); tone(c, 700, t, 0.06, 'triangle', 0.03); }
+      else if (k === 'slide') noise(c, t, 0.45, 0.06, 500, 2400, 0.9);
+      else if (k === 'ting') { tone(c, 1568, t, 0.5, 'triangle', 0.07); tone(c, 2093, t + 0.08, 0.6, 'sine', 0.05); }
+      else if (k === 'flip') noise(c, t, 0.14, 0.05, 1200, 3200, 1);
+      else if (k === 'pop') { tone(c, 420 + Math.random() * 220, t, 0.16, 'sine', 0.07, 900); }
+      else if (k === 'toss') { noise(c, t, 0.35, 0.05, 400, 1800, 0.8); tone(c, 520, t + 0.05, 0.2, 'sine', 0.04, 1100); }
+      else if (k === 'punch') { tone(c, 170, t, 0.12, 'sine', 0.16, 55); noise(c, t, 0.05, 0.08, 3000, 0, 1.5); noise(c, t + 0.05, 0.06, 0.03, 5000, 0, 2); }
+    } catch (e) {}
   }
 
   /* =========================================================
@@ -252,33 +342,69 @@
       shinSays('hi', fill(hi) + (S.mem && S.mem.inj ? '<br><span class="warn-s">' + esc(TXT.injHome) + '</span>' : '')) +
       memCard() +
       (nb ? '<button type="button" class="btn btn--go btn--w glow" data-act="bai" data-id="' + nb.id + '">Gợi ý hôm nay: ' + esc(nb.t) + '</button>' : '<button type="button" class="btn btn--go btn--w" data-act="khu" data-id="san">Ôn lại Sàn tập</button>') +
-      '<h2 class="sec-h">Sơ đồ phòng tập</h2><p class="sec-sub">Chọn khu nào học trước cũng được</p>' +
-      '<div class="gym">' + KHU.map(function (k) {
-        var nDone = k.ready ? baiCount(k.id) : 0, tot = k.ready ? baisOf(k.id).length : 0;
-        return '<button type="button" class="zone' + (k.ready ? '' : ' zone--soon') + '" data-act="khu" data-id="' + k.id + '">' +
-          '<span class="zone__jp jp">' + esc(k.jp) + '</span><span class="zone__ic">' + ic(k.ic, 24) + '</span><b>' + esc(k.t) + '</b><small>' + esc(k.sub) + '</small>' +
-          (k.ready ? '<span class="zone__bar"><i style="width:' + Math.round(nDone / tot * 100) + '%"></i></span><span class="zone__n">' + nDone + '/' + tot + ' bài</span>' : '<span class="badge badge--soon">Sắp mở</span>') + '</button>';
-      }).join('') + '</div>' +
+      '<h2 class="sec-h">Sơ đồ phòng tập</h2><p class="sec-sub">Chọn phòng nào tập trước cũng được</p>' +
+      building(nb ? nb.khu : '') + yardHTML() +
       '<p class="foot">Proskills · TC01 Huấn luyện thể chất · ' + esc(TC_VER) + '<br>Bài làm tự lưu trên trình duyệt của máy này</p>';
+  }
+
+  /* ---------- tòa nhà Shin Fitness Center (TC01.0.8) ---------- */
+  function room(id, wide, today) {
+    var lobby = id === 'lobby', k = lobby ? LOBBY : khuById(id), w = TC_ROOM_W[id], ready = !lobby && k.ready, L = ready ? baisOf(id) : [], n = ready ? baiCount(id) : 0;
+    var lights = ready ? '<span class="rm__lights" aria-hidden="true">' + L.map(function (b) { return '<i class="' + (baiDone(b) ? 'on' : '') + '"></i>'; }).join('') + '</span>' : '';
+    return '<button type="button" class="rm' + (wide ? ' rm--w' : '') + (id === 'radio' ? ' rm--deck' : '') + (!lobby && !ready ? ' rm--soon' : '') + '" ' + (lobby ? 'data-act="lobby"' : 'data-act="khu" data-id="' + id + '"') +
+      ' aria-label="' + esc(k.t + (ready ? ', ' + n + ' trên ' + L.length + ' bài' : (lobby ? ', thẻ hội viên' : ', sắp mở'))) + '">' +
+      '<svg class="rm__in" viewBox="0 0 ' + w + ' 118" preserveAspectRatio="xMidYMax slice" aria-hidden="true">' + TC_ROOM[id](w) + '</svg>' +
+      (ready ? '<span class="rm__dim" style="opacity:' + (0.22 * (1 - n / L.length)).toFixed(2) + '"></span>' + lights : '') +
+      (!lobby && !ready ? (id === 'radio' ? '<span class="rm__tape"><b>COMING SOON · COMING SOON · COMING SOON · COMING SOON</b></span>' : '<span class="rm__shut"><b>COMING SOON</b></span>') : '') +
+      '<span class="rm__pl"><i' + (k.col ? ' style="background:' + k.col[0] + '"' : '') + '>' + esc(k.no) + '</i><span>' + esc(k.short) + '</span></span>' +
+      (today ? '<span class="rm__today">' + shin('hi', 20) + 'Hôm nay</span>' : '') +
+      '<span class="rm__vn">' + esc(k.t) + (ready ? '<small>' + n + '/' + L.length + '</small>' : '') + '</span></button>';
+  }
+  function building(todayKhu) {
+    var fl = ['', '3F', '2F', '1F'];
+    return '<div class="bld"><div class="bld__sign"><b>SHIN FITNESS</b><small>CENTER</small></div><div class="bld__body">' +
+      FLOORS.map(function (f, i) { return '<div class="fl">' + (fl[i] ? '<span class="fl__n" aria-hidden="true">' + fl[i] + '</span>' : '') + f.map(function (id) { return room(id, id === 'san', id === todayKhu); }).join('') + '</div>'; }).join('') +
+      '</div><div class="bld__ground"></div></div>';
+  }
+  function yardHTML() {
+    return '<div class="yard" id="yard"><div class="yard__bar"><button type="button" data-y="reset">' + '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.3-5.6"/><path d="M4 4v4h4"/></svg>Xếp lại</button><button type="button" class="go" data-y="toss">Tung lên</button></div>' +
+      '<p class="yard__hint">Chạm hoặc vuốt các khối</p><p class="yard__tip" aria-live="polite"></p><span class="yard__floor"></span></div>';
+  }
+  var MATTER = 0; /* 0 chưa tải, 1 đang tải, 2 xong */
+  function mountYard() {
+    var el = $('#yard'); if (!el || !W.TCYard) return;
+    function go2() { if (!$('#yard') || V.v !== 'home') return; TCYard.mount($('#yard'), { tips: YARD_TIPS, onTap: function (id) { sfx(id === 'toss' ? 'toss' : 'pop'); } }); }
+    function load() {
+      if (W.Matter) { MATTER = 2; go2(); return; }
+      if (MATTER === 1) return; MATTER = 1;
+      var sc = D.createElement('script'); sc.src = 'matter-0.19.0.min.js?v=' + TC_VER; sc.onload = function () { MATTER = 2; go2(); }; sc.onerror = function () { MATTER = 0; };
+      D.body.appendChild(sc);
+    }
+    if ('IntersectionObserver' in W) { var io = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { io.disconnect(); load(); } }, { rootMargin: '200px' }); io.observe(el); }
+    else load();
   }
 
   /* ---------- khu ---------- */
   function khuById(id) { for (var i = 0; i < KHU.length; i++) if (KHU[i].id === id) return KHU[i]; return KHU[0]; }
   function zoneHead(k, extra) {
-    return '<header class="zh"><span class="zh__jp"><b class="jp">' + esc(k.jp) + '</b><small class="jp">' + esc(k.kana) + '</small></span><div class="zh__tx"><span class="zh__lab">Khu</span><h1>' + esc(k.t) + '</h1><p>' + esc(k.sub) + '</p></div>' + (extra || '') + '</header>';
+    var c = k.col || ['#3E9A6B', '#2A714D'];
+    return '<header class="zh"><div class="zh__no" style="background:linear-gradient(160deg,' + c[0] + ',' + c[1] + ')"><small>ROOM</small><b>' + esc(k.no) + '</b><span class="zh__pic">' + ic(k.ic, 24, 2.2) + '</span></div>' +
+      '<div class="zh__tx"><span class="zh__lab" style="color:' + c[1] + '">' + esc(k.en) + '</span><h1>' + esc(k.t) + '</h1><p>' + esc(k.sub) + '</p>' + (extra || '<div class="zh__bar"><i style="width:0"></i></div><div class="zh__meta"><b>Sắp mở</b><span>Shin đang chuẩn bị</span></div>') + '</div>' +
+      '<span class="zh__sc" style="left:6px;top:6px"></span><span class="zh__sc" style="left:6px;bottom:6px"></span><span class="zh__sc" style="right:6px;bottom:6px"></span>' +
+      '<span class="zh__open' + (k.ready ? '' : ' cl') + '" aria-hidden="true"><span>' + (k.ready ? 'OPEN' : 'CLOSED') + '</span></span></header>';
   }
   function viewKhu() {
     var k = khuById(V.id);
     if (!k.ready) return back('Sơ đồ phòng tập', 'home') + zoneHead(k) + shinSays('think', TXT.khuSoon) + '<button type="button" class="btn btn--soft btn--w" data-act="home">Về sơ đồ phòng tập</button>';
     var L = baisOf(k.id), n = baiCount(k.id);
-    return back('Sơ đồ phòng tập', 'home') + zoneHead(k, '<div class="zh__bar"><i style="width:' + Math.round(n / L.length * 100) + '%"></i></div><div class="zh__meta"><span>' + n + '/' + L.length + ' bài xong</span><span>Chọn bài nào trước cũng được</span></div>') +
+    return back('Sơ đồ phòng tập', 'home') + zoneHead(k, '<div class="zh__bar"><i style="width:' + Math.round(n / L.length * 100) + '%;background:' + (k.col ? k.col[0] : '') + '"></i></div><div class="zh__meta"><b>' + n + '/' + L.length + ' bài xong</b><span>Chọn bài nào trước cũng được</span></div>') +
       (k.id === 'bep' ? shinSays('hi', esc(BEP_TXT.khuSay)) + commitCard() : '') +
       (k.id === 'nghe' ? shinSays('hi', esc(NGHE_TXT.khuSay)) : '') +
       '<div class="bais">' + L.map(function (b) {
         var dn = baiDone(b), nd = baiN(b);
         if (b.soon) return '<button type="button" class="bai bai--soon" data-act="baiSoon"><span class="bai__ic">' + ic(b.ic, 24) + '</span><span class="bai__tx"><b>' + esc(b.t) + '</b><small>' + esc(b.sub) + '</small><span class="bai__meta"><span class="badge badge--soon">Sắp mở</span></span></span></button>';
         return '<button type="button" class="bai' + (dn ? ' bai--done' : '') + '" data-act="bai" data-id="' + b.id + '"><span class="bai__ic">' + ic(b.ic, 24) + '</span><span class="bai__tx"><b>' + esc(b.t) + '</b><small>' + esc(b.sub) + '</small>' +
-          '<span class="bai__meta"><span>' + ic('timer', 13) + b.min + ' phút</span><span class="pips">' + b.acts.map(function (a) { return '<i class="' + (S.done[a.id] ? 'on' : '') + '"></i>'; }).join('') + '</span>' + (dn ? '<span class="badge badge--ok">Có dấu</span>' : (nd ? '<span class="badge">' + nd + '/' + b.acts.length + '</span>' : '')) + '</span></span></button>';
+          '<span class="bai__meta"><span>' + ic('timer', 13) + b.min + ' phút</span><span class="pips">' + b.acts.map(function (a) { return '<i class="' + (S.done[a.id] ? 'on' : '') + '"></i>'; }).join('') + '</span>' + (dn ? '<span class="badge badge--ok">Đã đục lỗ</span>' : (nd ? '<span class="badge">' + nd + '/' + b.acts.length + '</span>' : '')) + '</span></span></button>';
       }).join('') + '</div>';
   }
 
@@ -295,7 +421,7 @@
         var dn = !!S.done[a.id];
         return '<button type="button" class="act' + (dn ? ' act--done' : '') + '" data-act="act" data-id="' + a.id + '"><span class="act__n">' + (dn ? PS.icon('check', 18, 3) : (i + 1)) + '</span><span><b>' + esc(a.t) + '</b><small>' + esc(KIND[a.k]) + ' · ' + a.min + ' phút · +' + a.xp + ' XP</small></span>' + (dn ? '<span class="badge badge--ok">Xong</span>' : '') + '</button>';
       }).join('') + '</div>' +
-      (baiDone(b) ? '<div class="stampbox">' + ic('stamp', 20) + '<span>Bài này đã có dấu trên thẻ hội viên. ' + (b.khu === 'san' ? 'Tập lại' : 'Làm lại') + ' lúc nào cũng được.</span></div>' : '');
+      (baiDone(b) ? '<div class="stampbox">' + ic('stamp', 20) + '<span>Bài này đã đục lỗ trên thẻ hội viên. ' + (b.khu === 'san' ? 'Tập lại' : 'Làm lại') + ' lúc nào cũng được.</span></div>' : '');
   }
   var KIND = { how: 'Xem cách làm', spot: 'Tìm điểm chưa đúng', 'try': 'Tập thử', order: 'Xếp thứ tự', pick: 'Chọn cách đúng', plan: 'Lên lịch',
     plate: 'Xếp đĩa', meal: 'Bữa của bạn', write: 'Viết ra', calc: 'Máy tính', hilo: 'Cao hay thấp', day: 'Tìm việc chưa ổn', commit: 'Cam kết',
@@ -545,7 +671,9 @@
     PS.toast(msg);
     if (!wasDone && baiDone(b)) {
       go({ v: 'bai', id: b.id }, true);
-      PS.dialog({ title: 'Có dấu mới!', html: '<div class="stampdlg">' + shin('party', 90, 'hop') + '<div class="stampdlg__s">' + ic(b.ic, 34) + '</div><p>' + TXT.baiDone.replace('[Bài]', esc(b.t)) + '</p><p class="ps-small">' + esc(khuById(b.khu).t) + ' · ' + baiCount(b.khu) + '/' + baisOf(b.khu).length + ' dấu</p></div>', buttons: [{ t: 'Tuyệt!', cls: 'ps-btn--go' }] });
+      var lab = ''; PUNCH.forEach(function (x) { if (x[0] === b.khu) lab = x[1]; });
+      PS.dialog({ title: 'Đục lỗ thẻ hội viên!', html: '<div class="stampdlg">' + shin('party', 90, 'hop') + '<div class="punchdlg">' + punchRow(b.khu, lab, b.id) + '</div><p>' + TXT.baiDone.replace('[Bài]', esc(b.t)) + '</p><p class="ps-small">' + esc(khuById(b.khu).t) + ' · ' + baiCount(b.khu) + '/' + baisOf(b.khu).length + ' lỗ · hạng ' + tier() + '</p></div>', buttons: [{ t: 'Tuyệt!', cls: 'ps-btn--go' }] });
+      setTimeout(function () { sfx('punch'); }, RM ? 0 : 520);
     } else go({ v: 'bai', id: b.id }, true);
   }
 
@@ -1144,12 +1272,18 @@
   /* =========================================================
      SỰ KIỆN
      ========================================================= */
+  D.addEventListener('keydown', function (e) {
+    var k = e.key || e.keyCode; if (k !== 'Enter' && k !== ' ' && k !== 13 && k !== 32) return;
+    var b = e.target && e.target.getAttribute && e.target.getAttribute('data-act') === 'flipCard' ? e.target : null; if (!b) return;
+    e.preventDefault(); flipCard(b);
+  });
   D.addEventListener('click', function (e) {
     var b = PS.closest(e.target, '[data-act]'); if (!b) return;
     var a = b.getAttribute('data-act'), id = b.getAttribute('data-id');
     if (a === 'psHome') { save(true); PS.home(); return; }
     if (a === 'home') { if (nbOpen) closeNb(); go({ v: 'home' }); return; }
     if (a === 'nb') { openNb(); return; }
+    if (a === 'lobby') { TAB = 'the'; sfx('door'); openNb(); return; }
     if (a === 'nbClose') { closeNb(); return; }
     if (a === 'tab') { TAB = b.getAttribute('data-t'); drawNb(); return; }
     if (a === 'editMem') { if (nbOpen) closeNb(); var m = S.mem || {}; J = { job: m.job, g: m.g, g2: m.g2 || (m.job === 'du-hoc' ? 'none' : ''), sex: m.sex, inj: m.inj, goal: m.goal, h: m.h || '', w: m.w || '', cd: '' }; go({ v: 'join', step: 1 }); return; }
@@ -1160,14 +1294,17 @@
     if (a === 'baiSoon') { PS.toast('Bài này Shin đang chuẩn bị. Sắp mở nhé!', 2000); return; }
     if (a === 'cmtTick') { var CC = S.food.commit; if (CC) { CC.days[today()] = 1; markDay(); save(true); tick(); PS.toast('Giỏi lắm! Thêm một ngày giữ lời hẹn.'); } if (nbOpen) drawNb(); else render(); return; }
     /* làm thẻ hội viên */
-    if (a === 'jNext') { var st = V.step || 0; if (st === 1) { var jj = jobOf(J.job); if (jj && jj.g && !jj.two) { J.g = jj.g; J.g2 = ''; } } go({ v: 'join', step: st + 1 }); return; }
+    if (a === 'jEnter') { sfx('door'); go({ v: 'join', step: 1 }); return; }
+    if (a === 'shinTap') { sfx('whistle'); var sv = b.querySelector('.shin'); if (sv && !RM) { sv.className.baseVal = 'shin a-taiso a-jump'; setTimeout(function () { sv.className.baseVal = 'shin a-taiso'; }, 700); } return; }
+    if (a === 'flipCard') { flipCard(b); return; }
+    if (a === 'jNext') { sfx('pen'); var st = V.step || 0; if (st === 1) { var jj = jobOf(J.job); if (jj && jj.g && !jj.two) { J.g = jj.g; J.g2 = ''; } } go({ v: 'join', step: st + 1 }); return; }
     if (a === 'jJob') { J.job = b.getAttribute('data-s'); var jb = jobOf(J.job); if (jb.g && !jb.two) { J.g = jb.g; J.g2 = ''; } else if (jb.two) { J.g = 'vp'; } else { J.g = ''; J.g2 = ''; } render(); return; }
     if (a === 'jG') { J.g = b.getAttribute('data-g'); render(); return; }
     if (a === 'jG2') { J.g2 = b.getAttribute('data-g'); render(); return; }
     if (a === 'jSex') { J.sex = b.getAttribute('data-v'); render(); return; }
     if (a === 'jInj') { J.inj = +b.getAttribute('data-v'); render(); return; }
     if (a === 'jTip') { var gt = $('#jGoal'); J.goal = TXT.goalTips[+b.getAttribute('data-i')]; if (gt) gt.value = J.goal; syncJoin(); return; }
-    if (a === 'jDone') { syncJoin(); if (words(J.goal) < 3) return; var isNew = !S.mem; finishJoin(); if (isNew) showCardDlg(); else PS.toast('Đã cập nhật thẻ hội viên.'); go({ v: 'home' }, true); return; }
+    if (a === 'jDone') { syncJoin(); if (words(J.goal) < 3) return; var isNew = !S.mem; finishJoin(); if (isNew) handover(function () { go({ v: 'home' }, true); }); else { go({ v: 'home' }, true); PS.toast('Đã cập nhật thẻ hội viên.'); } return; }
     /* hoạt động */
     if (a === 'finish') {
       syncWrite();
@@ -1275,9 +1412,6 @@
   function syncWrite() {
     var ta = $('#wTxt'); if (ta) { T.txt = ta.value; var w = words(T.txt), c = $('#wCnt'); if (c) c.textContent = w + ' chữ' + (w >= 10 ? (T.txt === T.tipUsed ? ' · sửa thành lời của bạn để được Insight' : ' · +1 Insight') : ''); var d = $('#wDone'); if (d) d.disabled = w < 3; }
     var pt = $('#pTxt'); if (pt) { T.plan.txt = pt.value; var pd = $('#pDone'); if (pd) pd.disabled = words(T.plan.txt) < 4; }
-  }
-  function showCardDlg() {
-    PS.dialog({ title: 'Thẻ hội viên của bạn', wide: true, html: memCard(true) + shinSays('party', esc(TXT.cardSay), 50), buttons: [{ t: 'Vào phòng tập', cls: 'ps-btn--go' }] });
   }
 
   /* ---------- khởi động ---------- */

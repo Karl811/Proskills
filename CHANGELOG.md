@@ -5,6 +5,37 @@ Quy ước số phiên bản: **PS a.b.c**
 - b: giai đoạn / thêm module hoặc tính năng lớn
 - c: sửa nhỏ trong giai đoạn đó
 
+## PS1.3.24 · 17/11/2026 · TC01 giao diện "Shin Fitness Center", phần 2 · TC01.0.8
+TC01 · tòa nhà phòng tập, bảng tên phòng, sân trước (thầy duyệt bản phác) + chỉnh thẻ hội viên. Không đổi bài, hoạt động.
+- **Sơ đồ phòng tập = tòa nhà nhìn mặt cắt** (thay 6 ô): bảng hiệu SHIN FITNESS CENTER trên nóc; R Radio Taiso Deck (sân thượng) · 3F 301 First Aid, 302 Test Lab · 2F 201 Kitchen, 202 Work-fit · 1F 101 Workout Floor + Lobby.
+  Phòng sáng dần theo bài xong (đèn trần = số bài), phòng chưa mở kéo cửa cuốn COMING SOON (sân thượng: băng dây), nhãn "Hôm nay" có Shin ở phòng của bài gợi ý. Chạm Lobby = mở Sổ tay › Thẻ hội viên. Nút "Gợi ý hôm nay" giữ nguyên.
+- **Bảng tên phòng** thay banner khu: dải màu trái (ROOM + số phòng + biểu tượng), MỖI PHÒNG MỘT MÀU dịu (101 xanh lá, 201 đất nung, 202 xanh xám, 301 xanh ngọc, 302 tím nhạt, R vàng đất), tên tiếng Anh, tên Việt, mô tả, thanh tiến độ cùng màu phòng, "x/6 bài xong · Chọn bài nào trước cũng được", biển treo OPEN/CLOSED đung đưa, ốc vít. Bỏ chữ Nhật ở tên khu.
+- **Sân trước phòng tập**: 12 khối (tạ đơn, đĩa tạ, tạ ấm, bình nước, onigiri, cơm hộp, mũ bảo hộ, đồng hồ, thảm, radio, hộp sơ cứu, Shin) rơi theo trọng lực. Chạm khối: nảy lên + 1 mẹo (`YARD_TIPS`); vuốt: kéo ném; chạm chỗ trống vẫn cuộn trang. Nút Xếp lại / Tung lên. Thư viện Matter.js chỉ tải khi cuộn gần tới sân; sân dừng khi khuất màn hình; giảm chuyển động thì khối xếp sẵn.
+- **Âm thanh mới**: "pop" khi chạm khối, "vút" khi tung lên, chuông cửa khi chạm Lobby.
+- **Thẻ hội viên (chỉnh theo góp ý)**: xanh lá tươi hơn (#30A06A → #1D774D); hoa văn nhẹ tạ đơn nằm xéo + đĩa tạ ở góc dưới phải; vệt sáng dày như nút "Gợi ý hôm nay"; tên to hơn (23px) và cả khối tên + thông tin hạ thấp xuống cho cân; chữ ký mặt sau là chữ "Shin" viết tay thanh thoát (đường vẽ từ phông Great Vibes, SIL OFL) + gạch dưới.
+- **Trao thẻ**: lớp phủ nền đặc; trang chính chỉ hiện sau khi bấm "Đeo thẻ, vào tập" (trước đó thấy cả thẻ và nút gợi ý phía dưới).
+- Sửa: biến màu `--bg`, `--mut` chưa khai báo (nền lớp phủ bị trong suốt).
+- Kiểm 390 (demo: trang chính, chạm khối, Bếp, Phòng y tế, Lobby, lật thẻ; học viên mới: phiếu → trao thẻ → trang chính) và 1280; ES5; không lỗi console.
+
+Tệp đổi: config.js, sw.js, index.html, cd01/index.html, tk/index.html, mau/index.html (số phiên bản), tc01/index.html, tc01/art.js, tc01/content.js, tc01/engine.js, tc01/tc01.css, CHANGELOG.md, AGENTS.md.
+**Tệp mới:** tc01/yard.js, tc01/matter-0.19.0.min.js, tc01/MATTER-LICENSE.txt.
+
+## PS1.3.23 · 17/11/2026 · TC01 giao diện "Shin Fitness Center", phần 1 · TC01.0.7
+TC01 · mạch chuyện phòng tập (thầy duyệt bản phác `TC01-y-tuong-giao-dien-v1.html`). Không đổi bài, hoạt động.
+- **Cửa phòng tập** (lần đầu vào): biển hiệu SHIN FITNESS CENTER có viền bóng đèn, mái hiên sọc, Shin tập Radio Taiso sau cửa kính (giơ tay, nghiêng lườn, nhún nhảy) và đếm 1-2-3-4; chạm Shin thì Shin thổi còi, nhảy lên. Nút "Vào phòng tập".
+- **Phiếu đăng ký hội viên**: 4 bước làm thẻ có đầu phiếu kiểu bìa kẹp (RECEPTION). Nút cuối "Nhận thẻ hội viên" (sửa thẻ: "Lưu thẻ hội viên").
+- **Shin trao thẻ** qua quầy lễ tân (thẻ trượt ra, xoay thẳng), thay hộp thoại thẻ cũ. Nút "Đeo thẻ, vào tập".
+- **Thẻ hội viên mới** (thẻ nhựa phòng gym, treo trên móc ở trang chính, chạm để lật + đung đưa; trong Sổ tay không có móc):
+  mặt trước: SHIN FITNESS CENTER nhỏ, MEMBER + hạng, HỌ TÊN, lớp · nhóm · nghề, MEMBER NO. (số trong tên lớp + ngày, tháng cấp), SINCE, một vệt sáng mảnh lướt qua mỗi 7 giây; bỏ 会員証, bỏ hoa văn chéo, không mã vạch.
+  mặt sau: dải từ, PUNCH CARD 3 hàng FLOOR / KITCHEN / WORK (bài xong = lỗ đục), mục tiêu, Streak/XP/Insight, chữ ký HLV Shin.
+  Hạng theo số bài đã đục lỗ: STARTER 0–5 · REGULAR 6–17 · ATHLETE 18–29 · CHAMPION 36 (thẻ kem cát).
+- **Xong bài = đục lỗ**: hộp "Đục lỗ thẻ hội viên!" hiện hàng lỗ của khu, lỗ mới đục vào; nhãn bài "Đã đục lỗ".
+- **Âm thanh mới** (tự soạn WebAudio, theo công tắc âm thanh chung): chuông cửa khi vào phòng tập, tiếng bút khi qua bước phiếu, tiếng trượt + "ting" khi trao thẻ, còi khi đeo thẻ vào tập và khi chạm Shin, tiếng lật thẻ, tiếng đục lỗ.
+- Chữ đổi: `TXT.joinHi`, `joinHi2`, `cardSay`, thêm `cardGo`, `baiDone` ("đục một lỗ").
+- Kiểm 390 (học viên mới: cửa → phiếu 4 bước → trao thẻ → trang chính → lật thẻ; demo: Sổ tay › Thẻ hội viên, xong bài n1 → hộp đục lỗ) và 1280; ES5; không lỗi console.
+
+Tệp đổi: config.js, sw.js, index.html, cd01/index.html, tk/index.html, mau/index.html (số phiên bản), tc01/index.html, tc01/content.js, tc01/engine.js, tc01/tc01.css, CHANGELOG.md, AGENTS.md.
+
 ## PS1.3.22 · 17/11/2026 · TC01 Góc nghề, đợt 2 (Phiên 3, phần 2) · TC01.0.6
 TC01 · Góc nghề đủ 6 bài (thầy đã duyệt dàn bài). Đợt 2 dựng 3 bài × 3 hoạt động:
 - **Khởi động trước ca**: Xem 5 động tác (cổ · vai · cổ tay · hông · gối – cổ chân; hình mới) · Xếp thứ tự (từ trên xuống) · **Tập theo Shin 3 phút** (dạng mới flow: Shin đếm 30 giây mỗi động tác, có Tạm dừng, Động tác tiếp; xong hỏi "Người bạn thấy thế nào?", chọn "Có chỗ bị đau" thì Shin nhắc dừng và báo thầy cô).

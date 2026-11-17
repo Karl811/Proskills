@@ -4,7 +4,7 @@
    Nguồn nội dung: Sổ quản lý học tập GDTC v10.1, chương trình GDTC TTS/Kỹ sư, tiêu chí đo lường theo nghề (KTN),
    Sổ tay sức khỏe 2.0. Kỹ thuật động tác do GV GDTC duyệt lại. Mốc thể lực: bảng thành tích Sổ quản lý v10.1.
    ========================================================= */
-var TC_VER = 'TC01.0.6';
+var TC_VER = 'TC01.0.8';
 var TC_YT = 'https://www.youtube.com/@THECHAT_SUCKHOE/shorts'; /* kênh video động tác của thầy cô GDTC */
 var TC_RADIO = 'https://www.youtube.com/watch?v=0xfDmrcI7OI';
 
@@ -42,19 +42,38 @@ var JOBS = [
 ];
 
 /* ---------- 6 khu của phòng tập ---------- */
+/* Phòng tập Shin Fitness Center (TC01.0.8): no = số phòng, en = tên tiếng Anh (short: bản ngắn trên tòa nhà), col = 2 màu dải trái bảng tên phòng */
 var KHU = [
-  { id: 'san',   t: 'Sàn tập',        jp: '筋トレ', kana: 'きんトレ', ic: 'dumbbell', sub: 'Động tác đúng kỹ thuật, tự tập ở nhà', ready: 1 },
-  { id: 'radio', t: 'Radio Taiso',    jp: '体操', kana: 'たいそう', ic: 'radio',    sub: '13 động tác buổi sáng của người Nhật' },
-  { id: 'bep',   t: 'Bếp dinh dưỡng', jp: '栄養', kana: 'えいよう', ic: 'bowl',     sub: 'Ăn vậy đủ chưa? Món Việt, món Nhật', ready: 1 },
-  { id: 'nghe',  t: 'Góc nghề',       jp: '仕事', kana: 'しごと',   ic: 'helmet',   sub: 'Thân thể cho nghề, nâng vật đúng, an toàn', ready: 1 },
-  { id: 'yte',   t: 'Phòng y tế',     jp: '保健室', kana: 'ほけんしつ', ic: 'cross', sub: 'Choáng, say nắng, cảm lạnh, đau lưng' },
-  { id: 'test',  t: 'Phòng test',     jp: '測定', kana: 'そくてい', ic: 'gauge',    sub: 'Test thử lý thuyết, tự test thể lực' }
+  { id: 'san',   t: 'Sàn tập',        no: '101', en: 'WORKOUT FLOOR',     short: 'WORKOUT FLOOR', col: ['#3E9A6B', '#2A714D'], ic: 'dumbbell', sub: 'Động tác đúng kỹ thuật, tự tập ở nhà', ready: 1 },
+  { id: 'radio', t: 'Radio Taiso',    no: 'R',   en: 'RADIO TAISO DECK',  short: 'RADIO TAISO DECK', col: ['#C9A45A', '#9C7C38'], ic: 'radio', sub: '13 động tác buổi sáng của người Nhật' },
+  { id: 'bep',   t: 'Bếp dinh dưỡng', no: '201', en: 'NUTRITION KITCHEN', short: 'KITCHEN', col: ['#D08A60', '#A9623E'], ic: 'bowl', sub: 'Ăn vậy đủ chưa? Món Việt, món Nhật', ready: 1 },
+  { id: 'nghe',  t: 'Góc nghề',       no: '202', en: 'WORK-FIT CORNER',   short: 'WORK-FIT', col: ['#5E88A8', '#406A89'], ic: 'helmet', sub: 'Thân thể cho nghề, nâng vật đúng, an toàn', ready: 1 },
+  { id: 'yte',   t: 'Phòng y tế',     no: '301', en: 'FIRST AID ROOM',    short: 'FIRST AID', col: ['#3A9C97', '#24736F'], ic: 'cross', sub: 'Choáng, say nắng, cảm lạnh, đau lưng' },
+  { id: 'test',  t: 'Phòng test',     no: '302', en: 'TEST LAB',          short: 'TEST LAB', col: ['#8C7BB0', '#66568A'], ic: 'gauge', sub: 'Test thử lý thuyết, tự test thể lực' }
 ];
+/* tầng của tòa nhà (từ trên xuống); 'lobby' = quầy lễ tân, mở Sổ tay › Thẻ hội viên */
+var FLOORS = [['radio'], ['yte', 'test'], ['bep', 'nghe'], ['san', 'lobby']];
+var LOBBY = { no: 'G', short: 'LOBBY', t: 'Lễ tân' };
+/* sân trước phòng tập: chạm khối, Shin kể 1 mẹo (câu ngắn lấy từ bài đã duyệt) */
+var YARD_TIPS = {
+  dumb: 'Làm đúng 5 cái tốt hơn làm sai 15 cái.',
+  plate: 'Làm ấm khớp và tim trước khi tập.',
+  kb: 'Siết bụng, lưng thẳng khi nâng.',
+  bottle: 'Nước mỗi ngày: cân nặng (kg) × 0,04 lít.',
+  oni: 'Ăn đủ bữa trước ca làm.',
+  bento: 'Cơm hộp mang đi: giữ mát, ăn sớm.',
+  helm: 'Thấy nặng quá sức: nhờ người, dùng xe đẩy.',
+  watch: 'Giãn cơ 2 phút giữa ca.',
+  mat: 'Làm 5 động tác khởi động trước ca.',
+  radio: 'Radio Taiso ở sân thượng. Sắp mở!',
+  aid: 'Phòng y tế: sắp mở.',
+  shin: 'Chạm khối nào, Shin kể một mẹo cho bạn.'
+};
 
 /* ---------- lời Shin ---------- */
 var TXT = {
-  joinHi: 'Chào <b class="nm">[Tên]</b>! Mình là HLV Shin. Ở phòng tập này, bạn chọn khu nào học trước cũng được.',
-  joinHi2: 'Trước hết, mình làm thẻ hội viên cho bạn nhé. Mất khoảng 2 phút.',
+  joinHi: 'Chào <b class="nm">[Tên]</b>! Shin đang khởi động nè. Vào tập cùng Shin nhé!',
+  joinHi2: 'Trước hết, ghé quầy lễ tân làm thẻ hội viên nhé. Mất khoảng 2 phút.',
   jobQ: 'Bạn sẽ làm nghề gì ở Nhật?',
   jobSub: 'Shin dùng để gợi ý bài tập hợp nơi làm việc của bạn. Đổi lại được bất cứ lúc nào.',
   fromCd: 'Ở Career Design 01, Ga đích của bạn là <b>[Nghề]</b>. Shin chọn sẵn nhé.',
@@ -72,7 +91,8 @@ var TXT = {
   goalTips: ['Chống đẩy được 20 cái liên tục', 'Plank được 1 phút', 'Ngủ trước 23 giờ mỗi ngày', 'Đủ sức làm ca 8 tiếng không mệt lả'],
   bodyQ: 'Thêm chiều cao, cân nặng (không bắt buộc)',
   bodyNote: 'Chỉ số BMI chỉ để tham khảo. Thầy cô GDTC sẽ đo lại trên lớp.',
-  cardSay: 'Thẻ hội viên của bạn đây! Vào phòng tập thôi.',
+  cardSay: 'Thẻ của <b class="nm">[Tên]</b> đây! Xong mỗi bài, Shin đục một lỗ trên thẻ.',
+  cardGo: 'Đeo thẻ, vào tập',
   homeHi: [
     'Hôm nay tập gì nào, <b class="nm">[Tên]</b>? Chọn một bài 5 phút thôi cũng được.',
     'Làm đúng 5 cái tốt hơn làm sai 15 cái. Mình tập chậm mà chắc nhé.',
@@ -81,7 +101,7 @@ var TXT = {
   ],
   injHome: 'Bạn có chấn thương cũ: tập nhẹ, thấy đau là dừng, hỏi thầy cô GDTC trước nhé.',
   khuSoon: 'Khu này đang xây. Shin mở sớm nhé!',
-  baiDone: 'Xong bài <b>[Bài]</b>! Shin đóng dấu lên thẻ hội viên cho bạn.',
+  baiDone: 'Xong bài <b>[Bài]</b>! Shin đục một lỗ trên thẻ hội viên cho bạn.',
   painStop: 'Dừng bài này hôm nay nhé. Đau kéo dài hoặc đau nhói thì báo thầy cô GDTC.',
   hardSay: 'Lần sau giảm số lần, giữ đúng tư thế trước đã. Tăng dần 1–2 cái mỗi 2 ngày.',
   okSay: 'Vừa sức là đúng nhịp rồi. Ghi lại để lần sau so với chính mình nhé.',
@@ -182,7 +202,7 @@ var EX = {
       { p: 'sideBend', t: 'Nghiêng lườn: một tay lên cao, nghiêng người sang bên. Đổi bên.' }
     ],
     keys: ['Giữ 15–30 giây mỗi bên', 'Căng nhẹ là đủ, không đau', 'Thở đều, không nhún giật'] },
-  /* Góc nghề đợt 2 (TC01.0.6): khởi động trước ca, giãn giữa ca (dùng cho dạng flow: c = lời ngắn khi tập theo Shin) */
+  /* Góc nghề đợt 2 (TC01.0.8): khởi động trước ca, giãn giữa ca (dùng cho dạng flow: c = lời ngắn khi tập theo Shin) */
   preshift: { n: 'Khởi động trước ca', who: 'Khoảng 3 phút · đứng tại chỗ, không cần dụng cụ', yt: '',
     frames: [
       { p: 'neckSide', c: 'Cổ: nghiêng, cúi, ngửa', t: 'Cổ: nghiêng đầu sang trái, sang phải, rồi cúi xuống, ngửa nhẹ. Mỗi hướng 4 nhịp.' },
@@ -838,7 +858,7 @@ var BAI_BEP = [
 ];
 
 /* =========================================================
-   GÓC NGHỀ (khu 'nghe') · TC01.0.5 đợt 1: n1, n3, n5 · TC01.0.6 đợt 2: n2, n4, n6 (đủ 6 bài)
+   GÓC NGHỀ (khu 'nghe') · TC01.0.5 đợt 1: n1, n3, n5 · TC01.0.8 đợt 2: n2, n4, n6 (đủ 6 bài)
    Nguồn: bài giảng lớp Kiến thức nghề (cơ khí, thực phẩm & nông nghiệp, vệ sinh tòa nhà, đóng gói – in ấn, may mặc),
    tiêu chí đo lường nhóm nghề (phần tư thế làm việc), casestudy Koka (gộp, ẩn danh),
    職場における腰痛予防対策指針 (Bộ Y tế, Lao động và Phúc lợi Nhật Bản, 2013) cho mức nâng tham khảo.
@@ -894,7 +914,7 @@ var LAD_G = [
 var LAD_NEED = { xuong: ['nvt', 'ch'], chuyen: ['ch', 'bl'], troi: ['nvt', 'bl'], dv: ['bl', 'ch'], vp: ['bl', 'tm'],
   'dieu-duong': ['bl', 'ch'], 'xay-dung': ['nvt', 'bl'], 'thuc-pham': ['ch', 'nvt'], 'o-to': ['nvt', 'bl'], 've-sinh-toa-nha': ['bl', 'ch'] };
 
-/* ---------- Góc nghề đợt 2 (TC01.0.6): n2, n4, n6 ----------
+/* ---------- Góc nghề đợt 2 (TC01.0.8): n2, n4, n6 ----------
    flow: tập theo Shin, đếm giờ từng động tác (EX[fx].frames, sec giây mỗi động tác)
    ca: một ca 8 giờ của nhóm (CA_DAY) + ngày học ở trường 8–17 giờ (SCHOOL_DAY, lịch tiết JPC)
    habit: chọn 1 thói quen (NHABITS) · week: lịch tập bài bổ trợ (N6_SET) */

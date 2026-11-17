@@ -176,3 +176,62 @@ TC_ART.kho = function () {
     /* vũng nước */
     '<ellipse cx="203" cy="168" rx="26" ry="5" fill="#A9D3EC"/><path d="M188 167q6-2 11 0M207 169q6-2 11 0" stroke="#fff" stroke-width="1.3" fill="none"/>';
 };
+
+/* Chữ ký HLV Shin (mặt sau thẻ hội viên): nét chữ 'Shin' từ phông Great Vibes (SIL OFL), đã đổi thành đường vẽ */
+var SHIN_SIG = '<svg class="sig" width="76" height="34" viewBox="0 -860 1900 1000" aria-hidden="true"><path d="M413 92Q315 92 234 63Q152 34 102 -22Q52 -79 47 -162Q45 -196 58 -237Q71 -278 94 -318Q118 -359 150 -392Q183 -424 220 -441Q223 -443 230 -444Q236 -445 239 -445Q245 -445 245 -442Q245 -437 230 -426Q188 -393 161 -350Q133 -307 119 -258Q105 -209 105 -159Q105 -100 130 -58Q156 -15 199 12Q242 40 297 53Q352 66 412 66Q479 66 544 51Q610 36 664 8Q747 -36 796 -101Q844 -166 844 -230Q844 -264 830 -295Q815 -326 783 -351Q759 -370 724 -387Q690 -404 652 -420Q613 -436 576 -452Q539 -469 511 -488Q471 -515 452 -546Q434 -577 434 -608Q434 -645 456 -680Q477 -715 514 -744Q552 -772 599 -788Q640 -802 688 -810Q737 -818 784 -818Q823 -818 858 -812Q894 -807 921 -793Q955 -777 973 -750Q991 -724 991 -695Q991 -655 955 -625Q942 -615 926 -606Q910 -598 888 -592Q884 -591 879 -591Q867 -591 867 -598Q867 -602 874 -606Q880 -611 893 -612Q923 -616 938 -635Q954 -654 954 -679Q954 -705 936 -730Q919 -756 883 -774Q847 -791 791 -791Q759 -791 720 -784Q682 -777 637 -761Q582 -742 546 -705Q509 -668 509 -626Q509 -600 526 -574Q544 -547 583 -523Q616 -503 658 -484Q700 -464 743 -444Q786 -425 821 -403Q876 -369 900 -330Q924 -291 924 -250Q924 -202 896 -154Q867 -105 821 -62Q775 -20 720 13Q656 51 576 72Q495 92 413 92ZM888 8Q930 -78 976 -172Q1021 -267 1069 -363Q1117 -459 1164 -546Q1181 -576 1196 -593Q1210 -610 1234 -610Q1243 -610 1255 -607Q1267 -604 1278 -606Q1265 -592 1242 -557Q1220 -522 1192 -473Q1165 -424 1134 -368Q1104 -311 1074 -254Q1045 -196 1020 -146Q1040 -172 1061 -195Q1082 -218 1102 -235Q1124 -255 1158 -277Q1191 -299 1224 -315Q1258 -331 1278 -331Q1285 -331 1288 -330Q1288 -330 1277 -310Q1266 -290 1250 -259Q1233 -228 1216 -192Q1198 -156 1185 -124Q1172 -91 1168 -70Q1165 -54 1165 -43Q1165 -27 1171 -22Q1177 -16 1184 -16Q1201 -16 1220 -34Q1240 -51 1259 -78Q1278 -105 1294 -136Q1311 -166 1321 -193Q1333 -193 1333 -184Q1322 -157 1306 -124Q1289 -92 1268 -63Q1247 -34 1222 -15Q1197 4 1169 4Q1149 4 1128 -10Q1107 -24 1107 -61Q1107 -72 1109 -84Q1111 -97 1116 -113Q1122 -133 1136 -158Q1150 -182 1172 -219Q1182 -236 1182 -246Q1182 -258 1170 -258Q1160 -258 1143 -248Q1126 -238 1100 -213Q1075 -189 1038 -143Q1001 -97 959 -14Q952 -1 944 0Q935 0 921 1Q912 2 903 2Q894 3 888 8ZM1349 0Q1312 0 1297 -22Q1282 -43 1282 -71Q1282 -86 1286 -102Q1289 -117 1294 -130L1361 -301Q1364 -309 1364 -315Q1364 -325 1359 -332Q1354 -340 1352 -343L1407 -345Q1422 -346 1428 -342Q1435 -337 1435 -331Q1435 -325 1428 -309Q1418 -285 1401 -249Q1384 -213 1368 -175Q1351 -137 1340 -104Q1328 -71 1328 -53Q1328 -40 1334 -31Q1341 -22 1357 -22Q1378 -22 1398 -38Q1419 -55 1437 -81Q1455 -107 1470 -137Q1486 -167 1497 -193Q1509 -193 1509 -184Q1499 -159 1483 -127Q1467 -95 1446 -66Q1426 -38 1402 -19Q1377 0 1349 0ZM1438 -407Q1425 -407 1416 -417Q1406 -427 1406 -441Q1406 -458 1420 -472Q1434 -485 1451 -485Q1465 -485 1475 -476Q1485 -467 1485 -453Q1485 -435 1471 -421Q1457 -407 1438 -407ZM1401 8Q1437 -65 1470 -136Q1503 -208 1538 -273Q1558 -309 1572 -324Q1586 -338 1609 -338Q1617 -338 1626 -336Q1635 -333 1644 -333Q1650 -333 1653 -334Q1639 -326 1616 -294Q1594 -263 1571 -222Q1548 -181 1530 -145Q1549 -168 1570 -191Q1591 -214 1616 -235Q1640 -256 1674 -278Q1707 -301 1739 -316Q1771 -331 1790 -331Q1797 -331 1800 -330Q1800 -330 1789 -310Q1778 -291 1762 -260Q1745 -228 1728 -192Q1711 -157 1698 -124Q1684 -92 1680 -70Q1677 -57 1677 -46Q1677 -30 1683 -25Q1689 -20 1696 -20Q1715 -20 1735 -37Q1755 -54 1774 -80Q1792 -107 1808 -137Q1824 -167 1835 -193Q1847 -193 1847 -184Q1836 -157 1820 -124Q1803 -92 1782 -63Q1762 -34 1737 -15Q1712 4 1683 4Q1663 4 1642 -10Q1620 -24 1620 -62Q1620 -73 1622 -86Q1624 -98 1629 -113Q1637 -133 1648 -156Q1659 -179 1684 -219Q1691 -230 1692 -236Q1694 -242 1694 -246Q1694 -258 1683 -258Q1674 -258 1656 -248Q1639 -238 1613 -213Q1588 -189 1554 -145Q1519 -101 1474 -15Q1467 -2 1458 -1Q1450 0 1435 1Q1425 2 1416 2Q1407 3 1401 8Z" fill="#2A714D"/><path d="M260 70Q1000 10 1860 -60" fill="none" stroke="#2A714D" stroke-width="26" stroke-linecap="round" opacity=".7"/></svg>';
+
+/* ---------- tòa nhà Shin Fitness Center (TC01.0.8): nội thất từng phòng, hệ W×118, sàn ở y = 96 ---------- */
+var TC_ROOM_W = { san: 206, lobby: 133, bep: 170, nghe: 170, yte: 170, test: 170, radio: 346 };
+function roomFloor(w, c) { return '<rect x="0" y="96" width="' + w + '" height="22" fill="' + (c || '#D9CFBE') + '"/><path d="M0 96h' + w + '" stroke="#C4B79F" stroke-width="1.5"/>'; }
+function roomDumb(x, y, c) { return '<g transform="translate(' + x + ' ' + y + ')"><rect x="-12" y="-1.5" width="24" height="3" fill="#8E9891"/><rect x="-14" y="-6" width="5" height="12" rx="1.5" fill="' + c + '"/><rect x="9" y="-6" width="5" height="12" rx="1.5" fill="' + c + '"/></g>'; }
+var TC_ROOM = {
+  san: function (w) {
+    return '<rect width="' + w + '" height="118" fill="#EEF4F0"/>' +
+      '<rect x="66" y="26" width="86" height="58" rx="3" fill="#DCE8EA" stroke="#C3D3D6" stroke-width="2"/><path d="M80 34l18-6M84 44l30-12M122 70l22-9" stroke="#fff" stroke-width="3" opacity=".7" stroke-linecap="round"/>' +
+      '<circle cx="174" cy="40" r="9" fill="#fff" stroke="#9AA59E" stroke-width="2"/><path d="M174 35v5l3 2" stroke="#2A714D" stroke-width="1.6" fill="none" stroke-linecap="round"/>' +
+      roomFloor(w) + '<rect x="60" y="91" width="98" height="6" rx="3" fill="#9CCAB1"/>' +
+      '<rect x="8" y="60" width="44" height="36" rx="2" fill="none" stroke="#7E8A83" stroke-width="2.5"/><path d="M8 72h44M8 84h44" stroke="#7E8A83" stroke-width="2"/>' +
+      roomDumb(19, 68, '#2A714D') + roomDumb(41, 68, '#348A5F') + roomDumb(19, 80, '#B8964F') + roomDumb(41, 80, '#2A714D') + roomDumb(30, 92, '#348A5F') +
+      '<rect x="158" y="76" width="40" height="7" rx="3" fill="#2A714D"/><path d="M163 83v13M193 83v13" stroke="#7E8A83" stroke-width="3"/>' +
+      '<g transform="translate(150 96)"><path d="M-7-12q0-7 7-7t7 7" fill="none" stroke="#1F563B" stroke-width="3"/><circle cx="0" cy="-6" r="7" fill="#1F563B"/></g>';
+  },
+  lobby: function (w) {
+    return '<rect width="' + w + '" height="118" fill="#F3EEE3"/>' + roomFloor(w, '#DCD3C2') +
+      '<rect x="96" y="30" width="32" height="66" rx="2" fill="#DCEAE2" stroke="#B9C4BC" stroke-width="2.5"/><path d="M112 30v66" stroke="#B9C4BC" stroke-width="2"/><circle cx="108" cy="66" r="1.6" fill="#7E8A83"/><circle cx="116" cy="66" r="1.6" fill="#7E8A83"/>' +
+      shin('hi', 44).replace('<svg class', '<svg x="22" y="30" class') +
+      '<rect x="6" y="66" width="82" height="6" rx="2" fill="#E6D3A8"/><rect x="10" y="72" width="74" height="24" fill="#2A714D"/><text x="47" y="88" text-anchor="middle" font-size="7" font-weight="800" letter-spacing="1.5" fill="#F3E7CB" font-family="Be Vietnam Pro,sans-serif">RECEPTION</text>';
+  },
+  bep: function (w) {
+    var t = '', i, j;
+    for (i = 0; i < 9; i++) for (j = 0; j < 3; j++) t += '<rect x="' + (2 + i * 14) + '" y="' + (40 + j * 10) + '" width="13" height="9" fill="#fff" opacity=".55"/>';
+    return '<rect width="' + w + '" height="118" fill="#F4F1E8"/>' + t + roomFloor(w, '#D6CDBD') +
+      '<rect x="6" y="20" width="60" height="4" rx="2" fill="#B8964F"/><path d="M14 20a6 5 0 0 1 12 0M32 20a6 5 0 0 1 12 0" fill="#E9F3ED" stroke="#2A714D" stroke-width="1.5"/>' +
+      '<rect x="4" y="68" width="122" height="5" rx="2" fill="#B8964F"/><rect x="6" y="73" width="118" height="23" fill="#F1E2C0"/><path d="M45 73v23M85 73v23" stroke="#CDB68A" stroke-width="1.5"/><path d="M40 84h-4M50 84h4M80 84h-4M90 84h4" stroke="#B8964F" stroke-width="2" stroke-linecap="round"/>' +
+      '<rect x="20" y="56" width="26" height="12" rx="3" fill="#7E8A83"/><path d="M18 56h30" stroke="#5E6B64" stroke-width="2.5" stroke-linecap="round"/>' +
+      '<path d="M28 50q-3-5 0-9M36 50q-3-5 0-9" stroke="#9AA59E" stroke-width="1.8" fill="none" stroke-linecap="round"/>' +
+      '<rect x="62" y="62" width="34" height="6" rx="2" fill="#D9C08F"/><circle cx="72" cy="60" r="4" fill="#9CCAB1"/><circle cx="84" cy="60" r="3.5" fill="#E8A87C"/>' +
+      '<rect x="132" y="28" width="32" height="68" rx="4" fill="#fff" stroke="#B9C4BC" stroke-width="2"/><path d="M132 52h32M137 40v6M137 58v10" stroke="#B9C4BC" stroke-width="2" stroke-linecap="round"/>';
+  },
+  nghe: function (w) {
+    return '<rect width="' + w + '" height="118" fill="#EEF0EC"/>' + roomFloor(w, '#CFCBC2') +
+      '<path d="M0 92h' + w + '" stroke="#3E3218" stroke-width="4" stroke-dasharray="8 8"/><path d="M8 92h' + w + '" stroke="#E6D3A8" stroke-width="4" stroke-dasharray="8 8"/>' +
+      '<path d="M8 26v62M62 26v62M8 46h54M8 68h54" stroke="#7E8A83" stroke-width="3"/>' +
+      '<rect x="13" y="32" width="18" height="14" fill="#D9C08F" stroke="#B8964F"/><rect x="36" y="36" width="20" height="10" fill="#D9C08F" stroke="#B8964F"/><rect x="14" y="54" width="22" height="14" fill="#D9C08F" stroke="#B8964F"/>' +
+      '<path d="M42 66a8 8 0 0 1 16 0z" fill="#F1E2C0" stroke="#B8964F" stroke-width="1.5"/><path d="M40 66h20" stroke="#B8964F" stroke-width="2.5" stroke-linecap="round"/>' +
+      '<rect x="80" y="86" width="44" height="6" fill="#A08A5E"/><rect x="84" y="62" width="36" height="24" fill="#D9C08F" stroke="#B8964F"/><rect x="88" y="42" width="28" height="20" fill="#E2CDA0" stroke="#B8964F"/>' +
+      '<path d="M140 40l8 48h14" fill="none" stroke="#2A714D" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="150" cy="90" r="5" fill="#1F563B"/><rect x="146" y="64" width="16" height="22" fill="#D9C08F" stroke="#B8964F"/>';
+  },
+  yte: function (w) {
+    return '<rect width="' + w + '" height="118" fill="#F2F5F3"/>' + roomFloor(w) + '<rect x="20" y="70" width="70" height="10" rx="3" fill="#fff" stroke="#B9C4BC" stroke-width="2"/><rect x="120" y="40" width="34" height="40" fill="#fff" stroke="#B9C4BC" stroke-width="2"/><path d="M137 50v20M127 60h20" stroke="#348A5F" stroke-width="5"/>';
+  },
+  test: function (w) {
+    return '<rect width="' + w + '" height="118" fill="#F2F5F3"/>' + roomFloor(w) + '<circle cx="50" cy="56" r="20" fill="#fff" stroke="#348A5F" stroke-width="3"/><path d="M50 56l8-8" stroke="#1F563B" stroke-width="2.5"/><rect x="110" y="80" width="40" height="10" rx="2" fill="#7E8A83"/>';
+  },
+  radio: function (w) {
+    var r = '', i;
+    for (i = 0; i < 18; i++) r += '<path d="M' + (8 + i * 19) + ' 74v22" stroke="#9AA59E" stroke-width="2"/>';
+    return '<rect width="' + w + '" height="118" fill="#E3EEF2"/><circle cx="300" cy="30" r="14" fill="#F3E7CB"/><circle cx="300" cy="30" r="22" fill="#F3E7CB" opacity=".35"/>' +
+      '<path d="M0 74h' + w + '" stroke="#9AA59E" stroke-width="3"/>' + r + roomFloor(w, '#C9D3CC') +
+      '<rect x="150" y="44" width="40" height="28" rx="5" fill="#E6D3A8" stroke="#B8964F" stroke-width="2"/><circle cx="162" cy="58" r="7" fill="#fff" stroke="#B8964F" stroke-width="2"/><path d="M160 44l14-14" stroke="#B8964F" stroke-width="2"/>';
+  }
+};
