@@ -62,11 +62,11 @@
   }
   function cardHTML() {
     var n = count(), nh = nhac();
-    var odenA = '<a class="lc-oden" href="' + ODEN + '" target="_blank" rel="noopener">' + icon('ext', 15) + '<span>Xem lịch học tuần này trên <b>oden.vn</b></span></a>';
+    var odenA = '<a class="lc-oden" href="' + ODEN + '" target="_blank" rel="noopener">' + icon('ext', 15) + '<span>Xem lịch học trên <b>oden.vn</b></span></a>';
     var nhacRow = '<button type="button" class="lc-nhac" data-act="lcOpen" data-to="nhac">' + icon('bell', 17) + '<span>' +
-      (nh ? 'Tự học e-learning <b>' + esc(nh.t) + '</b> · ' + esc(daysTxt(nh.d)) : 'Đặt giờ tự học e-learning mỗi ngày') + '</span>' + icon('next', 15) + '</button>';
+      (nh ? 'Tự học <b>' + esc(nh.t) + '</b> · ' + esc(daysTxt(nh.d)) : 'Đặt giờ tự học mỗi ngày') + '</span>' + icon('next', 15) + '</button>';
     if (!n) {
-      return '<section class="lc lc--empty" style="--i:1"><div class="lc-hd"><span class="lc-ic">' + icon('calendar', 22) + '</span><div><b>Lịch học trên lớp</b>' +
+      return '<section class="lc lc--empty" style="--i:1"><div class="lc-hd"><span class="lc-ic">' + icon('calendar', 22) + '</span><div><b>LỊCH HỌC</b>' +
         '<p>Lưu lịch Kỹ năng, Kiến thức nghề, Thể chất. Proskills nhắc bạn đi học.</p></div></div>' +
         '<button type="button" class="ps-btn lc-wide" data-act="lcOpen">' + icon('calendar', 18) + ' Đặt lịch học</button>' + nhacRow + odenA + '</section>';
     }
@@ -85,7 +85,7 @@
         '<span class="lc-tx"><b>' + esc(m.n) + '</b><small>Tiết ' + CA[x.c][0] + ' · ' + esc(PLACE[x.p] ? PLACE[x.p][0] : '') + '</small></span>' + status(x, isT) + '</div>';
     }).join('') : '<p class="lc-none">' + (isT ? 'Hôm nay bạn không có lịch học trên lớp.' : 'Không có lịch học trên lớp.') + '</p>';
     var exp = exported() ? '' : '<button type="button" class="lc-exp" data-act="lcExport">' + icon('phone', 16) + (PS.prefs().lichExp ? 'Lịch đã đổi · cập nhật lịch điện thoại' : 'Thêm vào lịch điện thoại để được nhắc') + '</button>';
-    return '<section class="lc" style="--i:1"><div class="lc-top"><b>' + icon('calendar', 18) + ' Lịch học</b><button type="button" class="lc-edit" data-act="lcOpen">' + icon('edit', 15) + ' Sửa</button></div>' +
+    return '<section class="lc" style="--i:1"><div class="lc-top"><b>' + icon('calendar', 18) + ' LỊCH HỌC</b><button type="button" class="lc-edit" data-act="lcOpen">' + icon('edit', 15) + ' Sửa</button></div>' +
       strip + '<p class="lc-dh">' + head + '</p><div class="lc-list">' + list + '</div>' + exp + nhacRow + odenA + '</section>';
   }
   function daysTxt(d) {
@@ -135,7 +135,7 @@
         '<p class="ps-small lc-howto"><b>iPhone:</b> chọn <i>Thêm tất cả</i>. <b>Android:</b> mở tệp vừa tải bằng ứng dụng Lịch. Khi đổi lịch, hãy xóa lịch cũ trên điện thoại rồi thêm lại.</p>' +
         '<details class="lc-det"><summary>Hoặc thêm từng môn vào Google Calendar</summary>' + gLinks() + '</details>'
         : '<p class="ps-small">Đặt lịch trên lớp hoặc giờ tự học trước nhé.</p>') + '</section>' +
-      '<a class="lc-oden lc-oden--big" href="' + ODEN + '" target="_blank" rel="noopener">' + icon('ext', 16) + '<span>Xem lịch học tuần này trên <b>oden.vn</b></span></a>' +
+      '<a class="lc-oden lc-oden--big" href="' + ODEN + '" target="_blank" rel="noopener">' + icon('ext', 16) + '<span>Xem lịch học trên <b>oden.vn</b></span></a>' +
       '<button type="button" class="ps-btn lc-wide" data-act="lcClose" style="margin-top:16px">Xong</button>';
   }
   var onClose = null;

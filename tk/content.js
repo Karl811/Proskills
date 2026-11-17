@@ -6,7 +6,7 @@
    Tikme, Casestudy TTS Esuhai (chỉ dùng để xây tình huống), Sổ tay TTS của OTIT (bản tiếng Việt),
    Sổ tay hướng dẫn cư trú và lao động 2024 (Cơ quan Quản lý XNC & cư trú Nhật Bản).
    ========================================================= */
-var VERSION = 'TK15';
+var VERSION = 'TK16';
 var COURSE = 'HP05 · Kiến thức quy định';
 /* Câu hỏi qua cổng và mật khẩu: nằm ở config.js của Proskills (module 'tk'). */
 var BUILT = {start:1, 1:1, 2:1, 3:1, 4:1, 5:1, 6:1, 7:1, 8:1};   /* TK04: đủ 7 ải và Phù Tang */

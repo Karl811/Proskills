@@ -5,6 +5,16 @@ Quy ước số phiên bản: **PS a.b.c**
 - b: giai đoạn / thêm module hoặc tính năng lớn
 - c: sửa nhỏ trong giai đoạn đó
 
+## PS1.3.27 · 17/11/2026 · Trang chủ: chữ, banner gọn, Lịch học tông xanh lá
+Chỉ sửa giao diện trang chủ, không đổi dữ liệu, khóa học.
+- **Chữ**: "RÈN LUYỆN MỖI NGÀY" → "CHECK-IN RÈN LUYỆN"; bỏ dòng "Chọn một việc nhỏ để bắt đầu rèn luyện cùng Shin." (thẻ Shin khi chưa có thẻ nào chỉ còn tên + nút Bắt đầu); tiêu đề hộp "Lịch học trên lớp" / "Lịch học" → "LỊCH HỌC"; "Đặt giờ tự học e-learning mỗi ngày" → "Đặt giờ tự học mỗi ngày" (đã đặt: "Tự học 20:00 · …"); "Xem lịch học tuần này trên oden.vn" → "Xem lịch học trên oden.vn" (cả trong tấm Lịch của tôi). Câu "Lưu lịch Kỹ năng, Kiến thức nghề, Thể chất. Proskills nhắc bạn đi học." giữ nguyên.
+- **Banner trên điện thoại (< 700px)**: thấp hơn khoảng 1/3 (lề, cỡ tên, khoảng cách nhỏ lại). Ba ô Chuỗi ngày, Tổng XP, Insight thành hộp chữ nhật thấp (biểu tượng + số một dòng, nhãn dòng dưới), dùng cho mọi màn hình; số dài quá thì có dấu "…".
+- **Hộp Lịch học**: nút, biểu tượng, ngày đang chọn, dòng nhắc, link oden.vn dùng tông xanh lá của TC01 (#348A5F) thay xanh đậm. Màu từng môn (Kỹ năng, Nghề, Thể chất) giữ nguyên. Tấm "Lịch học của tôi" không đổi.
+- Kiểm 360, 390, 1280: học viên mới, đã có lịch + giờ tự học, XP 5 chữ số; không lỗi console.
+
+Tệp đổi: hub/hub.js, hub/lich.js, hub/hub.css, config.js, sw.js, index.html, cd01/index.html, tk/index.html, tc01/index.html, mau/index.html, routine/index.html (số phiên bản), CHANGELOG.md.
+File cần xóa trên GitHub: không có.
+
 ## PS1.3.26 · 17/11/2026 · Shin Routine nối với CD01, TC01 · chỉ còn sao lưu chung · Shin M.Claude.3.3.41
 - **Sao lưu**: Shin Routine bỏ sao lưu riêng. Sổ tay › Cài đặt › "Sao lưu và khôi phục" của Shin dùng tập tin chung của Proskills (Tải sao lưu → `PS.backup`, Khôi phục → `PS.restorePick`); nhắc "Đã … ngày chưa sao lưu" và chấm đỏ tính theo lần sao lưu chung. Bản sao lưu chung gồm `ps.mod.routine` (+ phút rèn luyện).
 - **Khóa gợi ý thẻ Shin** (`PS.routineSugHTML`, core): khối "Rèn mỗi ngày cùng Shin" với 1–3 thẻ; thẻ đang rèn có dấu ✓ "Đang rèn" + "Xem thẻ", thẻ chưa có "Rèn thẻ này". Chạm → Shin Routine mở thẻ (nếu đã có) hoặc màn đặt công thức (đủ 5 thẻ thì Shin hỏi cất thẻ nào); xong hiện thanh "Xong rồi? Quay lại <khóa>". Một chiều: khóa chỉ đọc tóm tắt của Shin, không tự thêm thẻ. Không hiện ở bản demo giáo viên.

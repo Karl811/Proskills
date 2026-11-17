@@ -43,7 +43,7 @@
   function routineHTML() {
     var m = routineMod(); if (!m) return '';
     var r = routineInfo(), x = r.x, n = x ? (x.active || 0) : 0, st, cta, k;
-    if (!x || !x.habits) { k = 'new'; st = 'Chọn một việc nhỏ để bắt đầu rèn luyện cùng Shin.'; cta = 'Bắt đầu'; }
+    if (!x || !x.habits) { k = 'new'; st = ''; cta = 'Bắt đầu'; }
     else if (r.rec) { k = 'done'; st = 'Đã đóng dấu hôm nay. Giữ nhịp nhé!'; cta = 'Mở'; }
     else if (!n) { k = 'idle'; st = 'Chưa có thẻ đang rèn. Chọn thêm thẻ trong Thư viện.'; cta = 'Mở'; }
     else { k = 'todo'; st = 'Hôm nay chưa đóng dấu · ' + n + ' thẻ đang rèn'; cta = 'Đóng dấu'; }
@@ -54,7 +54,7 @@
     var fire = x && x.habits ? '<span class="rt__fire">' + icon('flame', 14) + ' Lửa <b>' + (x.fire || 0) + '</b></span>' : '';
     return '<button type="button" class="rt rt--' + k + '" data-act="mod" data-id="routine" style="--i:1">' +
       '<span class="rt__row"><img class="rt__shin" src="' + PS.url('routine/icon-192.png') + '" width="52" height="52" alt="">' +
-      '<span class="rt__tx"><small>RÈN LUYỆN MỖI NGÀY</small><b>Shin Routine</b><span class="rt__st">' + (k === 'done' ? icon('check', 15, 3) + ' ' : '') + st + '</span></span>' +
+      '<span class="rt__tx"><small>CHECK-IN RÈN LUYỆN</small><b>Shin Routine</b>' + (st ? '<span class="rt__st">' + (k === 'done' ? icon('check', 15, 3) + ' ' : '') + st + '</span>' : '') + '</span>' +
       '<span class="rt__go">' + cta + icon('next', 16) + '</span></span>' +
       (chips || fire ? '<span class="rt__foot">' + chips + fire + '</span>' : '') + '</button>';
   }
