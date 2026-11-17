@@ -5,6 +5,68 @@ Quy ước số phiên bản: **PS a.b.c**
 - b: giai đoạn / thêm module hoặc tính năng lớn
 - c: sửa nhỏ trong giai đoạn đó
 
+## PS1.3.20 · 17/11/2026 · Mở TC01 trên trang chủ để thử trên GitHub · TC01.0.4
+- **TC01 · Huấn luyện thể chất hiện trên trang chủ** cho mọi người (config.js `state: 'ready'`), không cần `?thu=1`. Vào khóa vẫn qua cổng mật khẩu: câu hỏi "Bài thể dục buổi sáng của người Nhật tên là gì?", mật khẩu **Radio Taiso** (gõ "rajio taiso", "ラジオ体操" cũng được).
+- Nội dung TC01 không đổi so với PS1.3.19 (Sàn tập 6 bài, Bếp dinh dưỡng 6 bài; 4 khu còn lại hiện "Sắp mở").
+
+Tệp đổi: config.js (APP_VER, state tc01), sw.js, index.html, cd01/index.html, tk/index.html, mau/index.html, tc01/index.html (số phiên bản), CHANGELOG.md.
+File cần xóa trên GitHub: không có.
+
+## PS1.3.19 · 17/11/2026 · TC01 khu Bếp dinh dưỡng, đợt 2 (Phiên 2, phần 3) · TC01.0.4
+TC01 · Bếp dinh dưỡng đủ 6 bài (vẫn ẩn với học viên; thử như PS1.3.16)
+- **Món Việt, món Nhật**: Ghép cặp (6 món Việt ↔ món Nhật gần giống, chữ Nhật + cách đọc; ghép sai "Thử lại nhé.") · Giỏ konbini 600 yên (12 món có tên tiếng Nhật, giá minh họa; thanh ngân sách, 3 nhóm tinh bột/đạm/rau; vượt ngân sách thì nhắc bỏ bớt; xong thì tính thử tiền một tháng = giá × 22 ngày, ghi "giá minh họa") · Đọc nhãn 栄養成分表示 (4 câu: năng lượng, đạm, muối, "tính cho bao nhiêu"; chạm sai thì hiện nghĩa dòng vừa chạm; số liệu minh họa).
+- **Ăn theo ca và nghề**: Tình huống của nhóm mình (2 câu riêng cho mỗi nhóm trong 5 nhóm: tăng ca, đứng máy, xưởng lạnh, đổi ca, công trường sáng sớm, mùa đông, kaigo ca sớm/ca đêm, ngồi lâu, làm thêm ca đêm) · Giờ ăn theo ca (6 mẫu ca + chỉnh giờ bắt đầu, số giờ; thanh 24 giờ và lịch: trước ca, giữa ca, sau ca, nước) · Hộp cơm mang đi (4 ngăn, mỗi ngăn có 1 món chưa hợp mang đi kèm lý do; xong hiện 3 điều mang đi an toàn + câu riêng của nhóm).
+- **An toàn thực phẩm ở ký túc xá**: Tủ lạnh chung (hình vẽ mới, tìm 3 chỗ chưa ổn: thịt sống không bọc ở ngăn trên, hộp không tên/ngày, bát canh không đậy) · Hạn dùng (消費期限 / 賞味期限, cách đọc ngày năm.tháng.ngày; 5 món: quá hạn an toàn, quá hạn ngon nhất chưa mở, ngày cuối, còn hạn nhưng để ngoài tủ cả ngày, còn hạn lâu) · Đau bụng sau ăn (4 câu: việc đầu tiên, báo ai ở Nhật, dấu hiệu cần đi khám ngay, nhắn Hō-Ren-Sō cho rõ).
+- Dạng hoạt động mới: match, basket, label, shift, bento, date. pick nhận `byGroup[nhóm].rounds` (nhiều câu theo nhóm) và `end` (lời Shin cuối). Bài tìm điểm nhận `art` (hình cảnh trong `TC_ART`, art.js) thay cho tư thế người tập.
+- Lưu thêm `S.food.konbini`, `S.food.shift`, `S.food.bento`; báo về trang chủ `extra.food.shift/bento/konbini`. Sổ tay "Bếp của mình" thêm giờ ăn theo ca, hộp cơm mang đi. Demo GV có sẵn bài Ghép cặp và giờ ăn ca ngày.
+- Tổng hoạt động TC01: 36 (config.js total 36). Kiểm 390 (5 nhóm) / 1280, demo + học viên mới, ES5; không lỗi console. Câu chọn cách đúng: mỗi câu có đáp án sai dài bằng hoặc hơn đáp án đúng, vị trí đáp án đúng đã xáo.
+
+Tệp đổi: config.js, sw.js, index.html, cd01/index.html, tk/index.html, mau/index.html (số phiên bản), tc01/index.html, tc01/content.js, tc01/engine.js, tc01/art.js, tc01/tc01.css, CHANGELOG.md, AGENTS.md.
+File cần xóa trên GitHub: không có.
+
+## PS1.3.18 · 17/11/2026 · TC01 khu Bếp dinh dưỡng, đợt 1 (Phiên 2, phần 2) · TC01.0.3
+TC01 · Bếp dinh dưỡng mở (vẫn ẩn với học viên; thử như PS1.3.16)
+- **Khu Bếp 6 bài** (Phương án A, thầy đã duyệt). Đợt 1 dựng 3 bài × 3 hoạt động; 3 bài còn lại hiện "Sắp mở" (Món Việt, món Nhật · Ăn theo ca và nghề · An toàn thực phẩm ở ký túc xá).
+  - **Đĩa cơm của mình**: Xếp đĩa (chạm món rồi chạm nhóm; đĩa 4 nhóm đậm dần theo số món đã xếp; chọn sai thì "Thử lại nhé." kèm gợi ý) · Bữa hôm qua (chọn món từng bữa hoặc "Mình bỏ bữa này" → bảng 4 nhóm + Shin nói bữa nào thiếu gì, không chấm điểm) · Bữa mai mình thêm… (viết, câu gợi ý lấy theo chỗ thiếu của chính học viên).
+  - **Năng lượng của mình**: Máy tính (BMI ngưỡng 23, năng lượng khi nghỉ, năng lượng cả ngày theo 5 mức vận động, nước = cân nặng × 0,04 L; lấy sẵn chiều cao, cân nặng ở thẻ hội viên, tuổi từ năm sinh; ghi rõ chỉ để tham khảo, không ăn kiêng) · Cao hay thấp (5 cặp món cùng 100 g, số từ bảng calo Sổ quản lý) · Ca làm của mình cần gì (1 tình huống riêng cho từng nhóm môi trường).
+  - **Lỗi ăn uống hay gặp**: Một ngày của bạn cùng lớp (8 mốc giờ, tìm 4 việc chưa ổn: bỏ sáng + cà phê lúc đói, nước tăng lực, nhịn ăn tối vì sợ mập, mì gói khuya; trượt 2 lần nhấp nháy gợi ý, 3 lần có "Xem đáp án") · Đổi món (4 câu) · Cam kết 21 ngày (chọn 1 thói quen hoặc tự viết, lời hẹn "Khi…, mình sẽ…").
+- **Cam kết 21 ngày**: thẻ 21 chấm ở đầu khu Bếp và Sổ tay; mỗi ngày chạm "Hôm nay mình đã làm được". Báo về trang chủ số ngày giữ cam kết.
+- **Thẻ hội viên**: 2 dải dấu Sàn tập và Bếp; dòng "Dấu: Sàn tập x/6 · Bếp y/6". "Gợi ý hôm nay" xoay giữa bài tiếp theo của hai khu.
+- **Sổ tay**: thêm ô Dấu Bếp, Ngày giữ cam kết; thẻ "Bếp của mình" (BMI, năng lượng, nước, bữa đã ghi, cam kết).
+- **HLV Shin ở Bếp** đeo tạp dề kem cát (không băng đô, không còi).
+- Tổng hoạt động TC01: 27 (config.js total 27). Demo GV có sẵn bài Đĩa cơm, máy tính, cam kết đang ở ngày 5.
+- Kiểm 390/1280, demo + học viên mới (làm thẻ → Bếp → máy tính), ES5; không lỗi console. Đáp án đúng có vị trí xáo; mỗi câu có đáp án sai dài bằng hoặc hơn đáp án đúng.
+
+Tệp đổi: config.js, sw.js, index.html, cd01/index.html, tk/index.html, mau/index.html (số phiên bản), tc01/index.html, tc01/content.js, tc01/engine.js, tc01/art.js, tc01/tc01.css, CHANGELOG.md, AGENTS.md.
+File cần xóa trên GitHub: không có.
+
+## PS1.3.17 · 17/11/2026 · TC01 đổi màu (Phiên 2, phần 1) · TC01.0.2
+TC01 · màu (theo `claude/tc01-mau-phuong-an.md`, đã chốt)
+- **Màu chủ đạo M4 Xanh JPC dịu #348A5F** thay cam đất #D36C3C: nút, thẻ hội viên, banner khu, nút tròn đếm, băng đô HLV Shin, dấu "?" của Shin, áo người tập trên hình động tác; dây còi Shin đổi xanh đậm #2A714D cho hợp băng đô. Thẻ TC01 ở trang chủ đổi theo.
+- **Màu phụ Kem cát #E6D3A8** thay toàn bộ vàng: nút mời gọi (Gợi ý hôm nay, Hoàn thành, Bắt đầu…), dải dấu thẻ hội viên, nhãn thẻ và banner, thanh tiến độ khu, ô chữ Nhật banner, khung gợi ý theo nhóm, bước hiện tại, nhãn Kỷ lục, nút Thoát demo, viền dấu mới, mũi tên và vòng xoay trên hình (#B8964F), gợi ý nhấp nháy và đáp án ở bài tìm điểm, vạch mốc Yếu/Trung bình.
+- `--ok` đổi xanh ngọc #2B8A86 (Đúng rồi!, Xong, vòng tìm đúng, đường gióng đúng) để không trùng màu chủ đạo. Nền trang và Sổ tay #F4F7F5, viền #E3EAE5; các xám ấm cũ đổi sang xám ánh xanh. Biểu tượng Streak/XP/Insight giữ như mọi khóa.
+- Không đổi chữ, bài, tính năng. Kiểm 390/1280, demo, bài tìm điểm (gợi ý + xem đáp án); không lỗi console; không còn mã vàng cũ trong tc01.css, art.js.
+
+Tệp đổi: config.js (APP_VER, màu và ver thẻ tc01), sw.js, index.html, cd01/index.html, tk/index.html, mau/index.html (số phiên bản), tc01/index.html, tc01/tc01.css, tc01/art.js, tc01/content.js (TC_VER), CHANGELOG.md, AGENTS.md.
+File cần xóa trên GitHub: không có.
+
+## PS1.3.16 · 17/11/2026 · TC01 Huấn luyện thể chất (Phiên 1, bản ẩn) · TC01.0.1
+TC01 · module mới (ẩn với học viên, mở thử ở trang chủ `index.html?thu=1` rồi chạm thẻ TC01; mật khẩu cổng: **Radio Taiso**)
+- **Phòng tập của HLV Shin**: không đi tuần tự, học viên chọn khu nào trước cũng được. Trang chủ khóa: Shin nói · **Thẻ hội viên** (tên, lớp, nhóm, nghề, ngày cấp, mục tiêu, 6 ô dấu Sàn tập, chuỗi ngày/XP/Insight) · nút vàng "Gợi ý hôm nay" · **Sơ đồ phòng tập 6 khu**: Sàn tập (mở), Radio Taiso, Bếp dinh dưỡng, Góc nghề, Phòng y tế, Phòng test (Sắp mở).
+- **Làm thẻ hội viên lần đầu** (4 bước, ~2 phút): chọn nghề (17 nghề + Du học sinh + Nghề khác; đã học CD01 thì tự chọn sẵn Ga đích) → nhóm môi trường (Nhà xưởng, Dây chuyền, Ngoài trời, Dịch vụ, Văn phòng; Du học sinh = Văn phòng + nhóm việc làm thêm; Nghề khác chọn nơi làm) → mốc nam/nữ + câu chấn thương (chỉ lưu Có/Không, không hỏi chi tiết) → mục tiêu tự viết (bắt buộc) + chiều cao, cân nặng, BMI (không bắt buộc). Sửa lại ở Sổ tay.
+- **Sàn tập · 6 bài × 3 hoạt động**: Khởi động đúng cách · Ngực – Vai – Tay · Bụng – Lưng · Chân – Hông · Tim mạch · Giãn cơ và lịch tập. Mỗi bài có một câu riêng cho nhóm của học viên (`gtip`).
+  - Xem cách làm: hình người tập vẽ trên khung xương (đúng độ dài xương), 3 bước mỗi động tác, đường gióng, mũi tên, 3 điểm chính, nút video của thầy cô GDTC.
+  - Tìm điểm chưa đúng: chạm vào chỗ sai trên hình; trượt 2 lần thì nhấp nháy gợi ý, 3 lần thì có "Xem đáp án".
+  - Tập thử cùng Shin: chọn động tác → nhắc khởi động (và nhắc chấn thương) → đếm bằng nút tròn hoặc bấm giờ → so với mốc lớp (Sổ quản lý học tập v10.1) và kỷ lục của chính mình → cảm nhận (Thấy đau → Shin bảo dừng) → viết một câu cho lần sau (bắt buộc).
+  - Xếp thứ tự (chuỗi khởi động), Chọn cách đúng ("Đúng rồi!"/"Thử lại nhé."), Lịch tập (kế hoạch A/B của Sổ quản lý, ngày, giờ, lời hẹn "Khi…, mình sẽ…").
+- XP khi xong hoạt động; Insight khi tự viết từ 10 chữ (câu gợi ý chưa sửa thì không tính). Xong 3 hoạt động = dấu trên thẻ hội viên.
+- Sổ tay: Tổng quan | Thẻ hội viên (thông tin tập luyện, lịch tập, kỷ lục, ghi chú sau khi tập) | Cài đặt chung. Demo GV: `tc01/?demo`.
+- Màu chủ đạo TC01: cam đất dịu #D36C3C (thẻ ở trang chủ đổi theo). HLV Shin = dáng gà rừng của CD01 + băng đô + còi.
+- Kiểm 390/1280, demo, ES5 đạt; không lỗi console.
+
+Tệp đổi: config.js (APP_VER, thẻ tc01 ẩn + mật khẩu), sw.js, index.html, cd01/index.html, tk/index.html, mau/index.html (số phiên bản), CHANGELOG.md, AGENTS.md. **Tệp mới:** tc01/index.html, tc01/art.js, tc01/content.js, tc01/engine.js, tc01/tc01.css.
+File cần xóa trên GitHub: không có.
+
 ## PS1.3.15 · 17/11/2026 · CD01 bài mới (Đợt 3) + Bản Career Design kiểu biển ga · CD01.1.4
 CD01 · bài mới
 - **Ga 3 · Chặng 3 · video chia 3 đoạn** (gndJToZz76M): Năng khiếu 0:00–0:30 · Ước mơ từ nhỏ 0:30–1:00 · Hình mẫu 1:00–1:58. Mỗi đoạn: bấm xem (video tự dừng cuối đoạn, có link mở YouTube đúng mốc) → “Mình xem xong rồi” → chọn ý chạm bạn nhất (3 ý, ý nào cũng đúng, + “Chưa thấy ở mình”) → 1 dòng “Ở bạn, … là gì?” (chọn “Chưa thấy” thì hỏi “Bạn sẽ hỏi ai, thử gì để tìm ra?”). Thay câu “Bạn đã thấy dấu hiệu nào ở mình?”; `a33.signs` tự ghi theo đoạn đã chọn ý. Ý trong khóa là diễn giải, không trích nguyên văn. Ô viết tính Insight như các ô khác.

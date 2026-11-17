@@ -18,7 +18,7 @@ core/                 LÕI CHUNG, ít sửa: core.js (hồ sơ, lưu trữ, sao 
 hub/                  giao diện trang chủ: hub.js, hub.css
 icons/                biểu tượng ứng dụng
 mau/                  module mẫu (ẩn với học viên, mở bằng ?thu=1) — sao chép khi làm module mới
-<id>/                 mỗi module một thư mục, id trùng với config.js (cd01, tk, ...)
+<id>/                 mỗi module một thư mục, id trùng với config.js (cd01, tk, tc01, ...)
 ```
 
 ### Module tk (Nhật Bản Du Ký, HP05)
@@ -39,6 +39,16 @@ Dạng bước có sẵn (khóa `k`): say, pick, multi, video, write (+show, +re
 **Chặng đã xong:** bấm vào hiện Xem và sửa / Làm lại từ đầu (bài cũ giữ ở `S.bak` đến khi đóng dấu lại, có Khôi phục). Đổi nghề chính khi Ga 4 đã làm: hộp thoại, bài cũ vào `a42.hist`, chặng a42 hiện "Cần làm lại theo nghề mới".
 Chữ có thể chèn `[Tên]`, `[Nghề]` (nghề chính ở a33), `[Diện]` (a44 hoặc hồ sơ). Dữ liệu diện đi Nhật ở `VISA` (content.js) là tóm tắt tham khảo: soát lại với Tikme và nguồn Nhật trước mỗi đợt phát hành.
 Dạng bước có sẵn: say, pick, multi (có groups), video, write, dil (tình huống hai bên), recap, age, tag, venn, ria (RIASEC từng câu), riares, tik (mở link Tikme bắt buộc), inds (chọn ngành), cmp. **CD không chấm đúng/sai; chữ viết cho điện thoại: câu ngắn, một ý một câu** (xem đầu content.js).
+
+### Module tc01 (Huấn luyện thể chất, TC01)
+Nạp theo thứ tự trong `tc01/index.html`: `art.js` (HLV Shin `shin()`, người tập `fig(tênTưThế,{marks})` từ `POSES`, `figGuide/figArrow/figArc`, biểu tượng `TC_ICONS`) → `content.js` (**chữ: sửa ở đây**: `GROUPS`, `JOBS`, `KHU`, `TXT`, `EX` động tác, `MOC` mốc lớp, `BAI` bài và hoạt động, `PLANS`, `DEMO`) → `engine.js`.
+**Không tuần tự:** mọi khu, bài, hoạt động mở tự do. Khu chưa làm: `KHU[].ready` không có → "Sắp mở". Thêm khu mới: thêm dữ liệu bài như `BAI` và bật `ready: 1`.
+Dạng hoạt động (`k`): how (EX.frames: p tư thế, t lời, g đường gióng, a mũi tên, arc vòng xoay) · spot (rounds: p, q, hs [x,y,r,t,why] trên hệ tọa độ 240×180) · try (ex: danh sách động tác; MOC[ex].u 'rep' đếm, 's' bấm giờ) · order · pick (opts, ok, why) · plan.
+Tư thế mới: thêm vào `POSES` (tọa độ khớp; công cụ tạo ở máy Claude, có thể sửa tay từng số). Nhìn nghiêng: L = [chân xa, tay xa, chân gần, tay gần]; nhìn thẳng: L = [chân trái, chân phải, tay trái, tay phải].
+**Khu Bếp dinh dưỡng (từ TC01.0.3):** bài ở `BAI_BEP` (content.js, id d1–d6, hoạt động d1a…); bài chưa làm có `soon: 1, acts: []` → hiện "Sắp mở". Mỗi bài có `khu` ('san' | 'bep', engine tự gán); `baisOf(khu)`, `baiCount(khu)`. Dạng mới: plate (xếp đĩa, `items[].z` ∈ PLATE_Z) · meal (bữa hôm qua, `MEAL_FOODS`) · write (viết ra, `tips`) · calc (BMI/BMR/TDEE/nước, `ACT_LV`) · hilo (`pairs` [tên, kcal/100 g]) · day (`items` có `err`) · commit (`HABITS`, 21 ngày). pick có thêm `rounds` (nhiều câu) và `byGroup` (câu theo nhóm). Dữ liệu học viên ở `S.food` (meal, calc, commit{h, txt, at, days}); báo về trang chủ `extra.food`. Ở khu Bếp, `SHIN_OUTFIT = 'apron'` (Shin đeo tạp dề, không băng đô). Thẻ hội viên có 2 dải dấu (Sàn tập, Bếp).
+**Bếp đợt 2 (TC01.0.4):** dạng match (`pairs` v/j/k/r) · basket (`items` j/k/v/p/g/w, `budget`, `days`) · label (`rows`, `rounds[].ok` = số dòng hoặc 'p') · shift (`SHIFTS`, `shiftPlan`) · bento (`slots[].opts[].no` = món chưa hợp) · date (`items`, `DATE_LAB`). pick: `byGroup[g].rounds`, `end`. spot: `rounds[].art` = tên hình trong `TC_ART` (art.js, hệ 240×180). Chữ ở `BEP2_TXT`. Lưu `S.food.konbini/shift/bento`.
+Màu (từ TC01.0.2): chủ đạo M4 Xanh JPC dịu `--c #348A5F`, màu phụ Kem cát `--ac*` (nút mời gọi `.btn--go`, dải dấu thẻ hội viên, `gtip`, mũi tên/vòng trên hình `#B8964F`), `--ok #2B8A86`. Không dùng lại vàng `#FFC93C` trong TC01; `--xp` giữ như mọi khóa.
+Hồ sơ tập luyện ở `S.mem` (job, g, g2, sex, inj 0/1, goal, h, w). Gợi ý nghề từ CD01: `PS.summary('cd01').extra.jobKey`. Báo về trang chủ `extra`: job, group, goal, tries, plan.
 
 ## 3. Hợp đồng giữa module và lõi (bắt buộc)
 1. Trang module nạp theo thứ tự: `../config.js`, `../core/core.css`, `../core/core.js`, `../core/pwa.js`, rồi file của module.
