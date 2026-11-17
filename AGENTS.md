@@ -19,7 +19,19 @@ hub/                  giao diện trang chủ: hub.js, hub.css
 icons/                biểu tượng ứng dụng
 mau/                  module mẫu (ẩn với học viên, mở bằng ?thu=1) — sao chép khi làm module mới
 <id>/                 mỗi module một thư mục, id trùng với config.js (cd01, tk, tc01, ...)
+routine/              Shin Routine (rèn luyện thói quen mỗi ngày), module đặc biệt kind:'routine'
 ```
+
+### Shin Routine (routine/, từ PS1.3.25)
+App Shin Routine (bản gốc M.Claude.3.3.40; trong Proskills đánh số tiếp từ 3.3.41, mã riêng, không phải ES5: có async/await) đặt nguyên trong `routine/`. Tài liệu bàn giao riêng của Shin (HANDOFF, CHANGELOG…) giữ ở thư mục Shin trên máy thầy, không đưa lên GitHub.
+- Trong config.js: `{ id:'routine', kind:'routine', open:1, door:1, ver:'M.Claude.3.3.40' }`. `kind:'routine'` = không hiện trong danh sách khóa, trang chủ vẽ thẻ "Rèn luyện hôm nay" (`routineHTML()` trong hub.js). `open:1` = không cần cổng (`PS.isUnlocked`). `door:1` = cửa Rèn luyện (`doorNeeded()` trong hub.js).
+- **Cầu nối duy nhất: `routine/proskills.js`** (ES5, nạp trước boot.js). Gói lại các hàm Shin `load`, `save`, `splashBoot`, `nbSet`, `exitDemo`; báo `PS.report('routine', …)`; nút về trang chủ ở đầu Sổ tay › Cài đặt; demo `?demo`; thanh "Vào học" khi vào bằng cửa Rèn luyện (`?door=1`). Sửa hành vi Proskills của Shin ở đây, không sửa rải rác trong mã Shin.
+- Đã sửa trực tiếp trong mã Shin (ghi lại khi cập nhật bản Shin mới): `routine/scripts/core.js` (khóa lưu `ps.mod.routine` / `ps.demo.routine` / `ps.demo.routine.mode`; `startSW32` đăng ký `../sw.js` phạm vi `../`; chữ "biểu tượng Proskills"), `routine/index.html` (manifest, biểu tượng Proskills; nạp config.js, core.css, core.js, pwa.js, kiểm tra hồ sơ `PS.guard`; nạp proskills.js), `routine/boot.js` (bọc `if(!window.PS_STOP)`). Không có `routine/sw.js`, `routine/manifest.webmanifest`.
+- `PS.summary('routine').extra`: day, rec, need, cards [{id, n, m}], active, fire, recDays, mastered, habits, mine {mã: active|pause|keep|master|stored}, lib {mã: tên}. Phút rèn luyện: `ps.mod.routine.min`.
+- **Sao lưu (PS1.3.26):** Shin không còn sao lưu riêng; `backup` → `PS.backup()`, nút `data-act="psRestore"` → `PS.restorePick()`; `bkLast()/bkDays()` đọc `PS.prefs().lastBackup` (routine/scripts/core.js).
+- **Khóa gợi ý thẻ Shin (PS1.3.26):** `PS.routineSugHTML([mã thẻ…], {from: ID, sub: 'lời dẫn đã esc', title, max})` trả khối HTML (kiểu `.ps-rt` trong core.css); link `PS.routineURL(mã, from)` = `routine/index.html?add=<mã>&from=<id khóa>`. Shin (proskills.js) mở thẻ hoặc màn đặt công thức, rồi hiện "Quay lại <khóa>". Mã thẻ và tên dự phòng: `PS_CONFIG.ROUTINE_LIB`. Dữ liệu gợi ý đặt ở content.js của khóa: CD01 `RT_GAP`, `RT_GRP`, `RT_TXT`; TC01 `RT_BAI`. Không hiện ở demo. Khóa TK (HP05): chưa nối (thầy chốt 17/11/2026), đề xuất sẵn nếu làm sau: Ải Ký túc → 5S, Đúng giờ; Ải Xưởng Rèn → Quan sát ghi lại, Báo cáo; Ải Hồ Ly → Báo cáo; Ải Sòng Đỏ Đen → Chi tiêu.
+- **Đổi mã Shin:** tăng `APP_VER` (routine/scripts/core.js), các `?v=` trong routine/index.html và routine/habit-game.html, `ROUTINE_VER` (sw.js), `ver` của module routine (config.js) cùng một số.
+- **Cập nhật bản Shin mới:** chép đè các tệp Shin vào `routine/` (trừ 3 tệp đã sửa ở trên: áp lại các chỗ sửa), đổi `ROUTINE_VER` và danh sách `ROUTINE_FILES` trong sw.js, đổi `ver` của module routine trong config.js.
 
 ### Module tk (Nhật Bản Du Ký, HP05)
 Tách từ một tệp TK13. Các tệp `tk/*.js` dùng **biến toàn cục chung**, nạp đúng thứ tự trong `tk/index.html`:
@@ -61,7 +73,7 @@ Hồ sơ tập luyện ở `S.mem` (job, g, g2, sex, inj 0/1, goal, h, w). Gợi
 4. Mỗi lần lưu gọi `PS.report(ID, {xp, ins, done, total, days, extra})`. Trang chủ cộng XP, tính chuỗi ngày chung từ đây.
    `extra` là dữ liệu module khác được đọc (ví dụ CD01 để CD02 điền sẵn).
 5. Tên, năm sinh, mã HV, lớp, diện, thầy cô: **chỉ đọc** `PS.profile()`, `PS.given()`, `PS.teacher()`. Không hỏi lại, không lưu bản riêng.
-6. Sổ tay 3 thẻ: **Tổng quan | thẻ riêng của module | Cài đặt**. Thẻ Cài đặt = `PS.settingsHTML({ctx:'module', mod:ID, pace, extra})` + `PS.wireSettings(el, {...})`. Không tự làm Cài đặt riêng.
+6. Sổ tay 3 thẻ: **Tổng quan | thẻ riêng của module | Cài đặt**. Nút Sổ tay chính của module **mở thẻ Cài đặt trước** (có nút về trang chính; từ PS1.3.25). Thẻ Cài đặt = `PS.settingsHTML({ctx:'module', mod:ID, pace, extra})` + `PS.wireSettings(el, {...})`. Không tự làm Cài đặt riêng.
 7. Nghe `window` sự kiện `ps:change`: `beforeBackup`/`beforeRestore` → lưu ngay; `profile` → vẽ lại tên. Không lưu khi `window.PS_NOSAVE` bật.
 8. Âm thanh: đọc `PS.soundOn()` (công tắc chung).
 9. Demo giáo viên: **một mật khẩu chung** `PS_CONFIG.DEMO_PASS` cho mọi module. Mở bằng `<id>/?demo`: module đọc `PS.demoParam()`;

@@ -111,7 +111,7 @@
   PS.checkYear = function (v) { var y = parseInt(v, 10); var now = new Date().getFullYear(); return /^\d{4}$/.test(String(v).trim()) && y >= now - 45 && y <= now - 14; };
 
   /* ---------- cổng mật khẩu ---------- */
-  PS.isUnlocked = function (id) { var u = get('ps.unlock', {}) || {}; return !!u[id]; };
+  PS.isUnlocked = function (id) { var m = PS.mod(id); if (m && m.open) return true; var u = get('ps.unlock', {}) || {}; return !!u[id]; };
   PS.tryPass = function (id, val) {
     var m = PS.mod(id); if (!m) return false;
     var v = norm(val), ok = false;
@@ -165,6 +165,30 @@
     });
     t.todayMin = Math.round(PS.allDays()[today()] || 0);
     return t;
+  };
+
+  /* ---------- Shin Routine: các khóa gợi ý thẻ thói quen (PS1.3.26) ----------
+     Một chiều: khóa chỉ đọc tóm tắt của Shin (PS.summary('routine').extra) và mở Shin để học viên tự chọn thẻ.
+     extra.mine = {mã thẻ: 'active' | 'pause' | 'keep' | 'master' | 'stored'}, extra.lib = {mã thẻ: tên}. */
+  PS.routineOn = function () { var m = PS.mod('routine'); return !!(m && m.state === 'ready'); };
+  PS.routineLib = function () { var s = PS.summary('routine'), x = s && s.extra; return (x && x.lib) || CFG.ROUTINE_LIB || {}; };
+  PS.routineURL = function (id, from) { return PS.url('routine/index.html') + '?add=' + encodeURIComponent(id) + (from ? '&from=' + encodeURIComponent(from) : ''); };
+  PS.routineSugHTML = function (ids, o) {
+    if (!PS.routineOn() || !ids || !ids.length) return '';
+    o = o || {};
+    var lib = PS.routineLib(), s = PS.summary('routine'), mine = (s && s.extra && s.extra.mine) || {}, seen = {};
+    var ST = { active: 'Đang rèn', pause: 'Đang tạm dừng', keep: 'Đang duy trì', master: 'Đã thành nếp', stored: 'Đã cất' };
+    var list = ids.filter(function (id) { if (!lib[id] || seen[id]) return false; seen[id] = 1; return true; }).slice(0, o.max || 3);
+    if (!list.length) return '';
+    var items = list.map(function (id) {
+      var st = mine[id] || '', on = st === 'active' || st === 'keep' || st === 'master';
+      return '<a class="ps-rt__it' + (on ? ' is-on' : '') + '" href="' + esc(PS.routineURL(id, o.from)) + '"><span class="ps-rt__mk" aria-hidden="true">' + (on ? PS.icon('check', 14, 3) : '') + '</span>' +
+        '<span class="ps-rt__n"><b>' + esc(lib[id]) + '</b>' + (st ? '<small>' + ST[st] + '</small>' : '') + '</span>' +
+        '<span class="ps-rt__go">' + (on ? 'Xem thẻ' : 'Rèn thẻ này') + PS.icon('next', 14) + '</span></a>';
+    }).join('');
+    return '<div class="ps-rt"><div class="ps-rt__hd"><img class="ps-rt__shin" src="' + esc(PS.url('routine/icon-192.png')) + '" width="40" height="40" alt="">' +
+      '<div><b>' + esc(o.title || 'Rèn mỗi ngày cùng Shin') + '</b>' + (o.sub ? '<small>' + o.sub + '</small>' : '') + '</div></div>' +
+      '<div class="ps-rt__l">' + items + '</div><p class="ps-rt__ft">Mở Shin Routine để đặt công thức. Bạn tự chọn, tối đa 5 thẻ cùng lúc.</p></div>';
   };
 
   /* ---------- cài đặt chung ---------- */

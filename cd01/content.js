@@ -7,7 +7,7 @@
    - Senpai có cờ draft:1 = LỜI KỂ MẪU do Claude viết, cần thay bằng chuyện thật (ẩn danh) trước khi phát hành.
    ES5. */
 var CD_ID = 'cd01';
-var CD_VER = 'CD01.1.4';
+var CD_VER = 'CD01.1.6';
 var CD_TOTAL = 18;            /* Xuất phát (1) + 7 ga (17 chặng). Ga Ước Mơ (3 chặng nghi thức, FIN_ORDER) không tính vào 18 */
 var CD_XP_ACT = 30, CD_XP_WARM = 10, CD_INS_WORDS = 20, CD_INS_FIELD = 5;
 var TIKME = 'https://tikme.com';
@@ -623,6 +623,18 @@ var GAP_GRP = {
 };
 var GAP_JOB = { 'thuc-pham': 'tp', 'thuy-san': 'tp' }; /* ngành dùng nhóm riêng thay nhóm grp */
 var GAP_OPTS = [['h', 'Đã có'], ['p', 'Đang có dần'], ['n', 'Chưa có']];
+/* ---------- Ga 6 · Biến điều còn thiếu thành thói quen (a63) → gợi ý thẻ Shin Routine (PS1.3.26) ----------
+   RT_GAP: thẻ Shin cho từng điều chung GAP_COMMON (cùng thứ tự); điều nào học viên chọn "Chưa có"/"Đang có dần" thì gợi ý trước.
+   RT_GRP: thẻ Shin hợp với nhóm nghề (sx, tp, xd, nn, kg, dv, vs, ks, gen). Lấy tối đa 3 thẻ, không trùng. Mã thẻ: PS_CONFIG.ROUTINE_LIB. */
+var RT_GAP = ['5phut', '5s', 'vandong', 'chitieu'];
+var RT_GRP = {
+  sx: ['5s', 'horenso', 'som'], tp: ['5s', 'anuong', 'som'], xd: ['vandong', 'horenso', 'ngu'], nn: ['ngu', 'vandong', 'som'],
+  kg: ['chao', 'camxuc', 'giup'], dv: ['chao', 'som', 'camxuc'], vs: ['5s', 'som', 'ngu'], ks: ['horenso', 'memo', '5phut'], gen: ['chao', '5s', 'horenso']
+};
+var RT_TXT = {
+  sub: 'Công thức thành nếp khi bạn làm mỗi ngày. Shin gợi ý vài thẻ hợp với nghề [Nghề] và điều bạn còn thiếu.',
+  subNoJob: 'Công thức thành nếp khi bạn làm mỗi ngày. Shin gợi ý vài thẻ hợp với điều bạn còn thiếu.'
+};
 var HABIT_WHEN = ['vừa thức dậy', 'đánh răng xong buổi sáng', 'trên đường đến lớp', 'học xong buổi chiều', 'ăn tối xong', 'trước khi ngủ'];
 
 /* ---------- Ga 6 · CÁ NHÂN HÓA THEO TỪNG NGHỀ (CD01.0.8) ----------

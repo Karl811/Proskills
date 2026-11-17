@@ -8,7 +8,7 @@
    ========================================================= */
 var PS_CONFIG = {
   APP: 'Proskills',
-  APP_VER: 'PS1.3.24',
+  APP_VER: 'PS1.3.26',
   ORG: 'Khoa Kỹ năng · JPC · Proskills',
 
   /* Mật khẩu bản demo giáo viên, dùng chung cho MỌI module (phân biệt hoa thường).
@@ -39,19 +39,35 @@ var PS_CONFIG = {
      gateQ  : câu hỏi hiện ở cổng
      color  : màu chủ đạo của module (chỉ dùng cho thẻ ở trang chủ)
      total  : số hoạt động chính để tính phần trăm (module tự báo lại khi chạy)
-     ver    : phiên bản riêng của module */
+     ver    : phiên bản riêng của module
+     kind   : 'routine' = Shin Routine (rèn luyện mỗi ngày): không nằm trong danh sách khóa học,
+              trang chủ vẽ thẻ "Rèn luyện hôm nay" riêng ở trên cùng
+     open   : 1 = không cần mật khẩu cổng */
   MODULES: [
+    { id: 'routine', code: 'RÈN LUYỆN', title: 'Shin Routine', sub: 'Rèn luyện thói quen tốt mỗi ngày cùng Shin',
+      icon: 'flame', color: '#2265C5', state: 'ready', kind: 'routine', open: 1, gateQ: '', pass: [], total: 0, ver: 'M.Claude.3.3.41',
+      door: 1 /* 1 = mở Proskills mà hôm nay chưa đóng dấu thì vào thẳng Shin Routine; 0 = tắt */ },
     { id: 'cd01', code: 'CD01', title: 'Career Design 1', sub: 'Hiểu mình, chọn nghề, kế hoạch JPC và 3 năm đầu ở Nhật',
-      icon: 'rail', color: '#2C5BC4', state: 'ready', gateQ: 'Shin thích ăn món gì nhất?', pass: ['oden', 'おでん', 'オデン'], total: 18, ver: 'CD01.1.4' },
+      icon: 'rail', color: '#2C5BC4', state: 'ready', gateQ: 'Shin thích ăn món gì nhất?', pass: ['oden', 'おでん', 'オデン'], total: 18, ver: 'CD01.1.6' },
     { id: 'cd02', code: 'CD02', title: 'Career Design 2', sub: 'Sau 3–5 năm ở Nhật: hướng đi 5–10 năm',
       icon: 'compass', color: '#0F9F98', state: 'soon', gateQ: '', pass: [], total: 0, ver: '0' },
     { id: 'tk', code: 'HP05', title: 'Nhật Bản Du Ký', sub: 'Kiến thức quy định: luật Nhật, luật cư trú, luật Việt Nam',
-      icon: 'scroll', color: '#2F4BD8', state: 'ready', gateQ: 'Ngộ Không thích ăn quả gì nhất?', pass: ['dao'], total: 26, ver: 'TK15' },
+      icon: 'scroll', color: '#2F4BD8', state: 'ready', gateQ: 'Ngộ Không thích ăn quả gì nhất?', pass: ['dao'], total: 26, ver: 'TK16' },
     { id: 'tc01', code: 'TC01', title: 'Huấn luyện thể chất', sub: 'Phòng tập HLV Shin: động tác đúng, dinh dưỡng, sức khỏe theo nghề',
-      icon: 'dumbbell', color: '#348A5F', state: 'ready', gateQ: 'Bài thể dục buổi sáng của người Nhật tên là gì?', pass: ['radio taiso', 'rajio taiso', 'radio taisou', 'rajio taisou', 'radiotaiso', 'ラジオ体操', 'radio'], total: 54, ver: 'TC01.0.8' },
+      icon: 'dumbbell', color: '#348A5F', state: 'ready', gateQ: 'Bài thể dục buổi sáng của người Nhật tên là gì?', pass: ['radio taiso', 'rajio taiso', 'radio taisou', 'rajio taisou', 'radiotaiso', 'ラジオ体操', 'radio'], total: 54, ver: 'TC01.1.0' },
     { id: 'mau', code: 'MẪU', title: 'Module mẫu', sub: 'Dùng để thử khung và làm mẫu cho module mới',
       icon: 'spark', color: '#E8834A', state: 'hidden', gateQ: 'Mật khẩu thử là gì?', pass: ['mau'], total: 3, ver: '1.0.0' }
   ],
+
+  /* Thẻ thói quen của Shin Routine mà các khóa có thể gợi ý (mã thẻ → tên ngắn).
+     Tên dự phòng khi học viên chưa mở Shin lần nào; khi đã mở, tên lấy từ chính Shin.
+     Khóa gợi ý thẻ bằng PS.routineSugHTML([mã thẻ…], {from: id khóa, sub: lời dẫn}). */
+  ROUTINE_LIB: {
+    chao: 'Chào hỏi và cảm ơn', som: 'Đúng giờ, đúng hẹn', memo: 'Quan sát, hỏi và ghi lại', '5s': '5S - Gọn gàng và ngăn nắp',
+    xinloi: 'Lắng nghe và sửa sai', '5phut': 'Tận dụng 05 phút', camxuc: 'Nhận biết và điều chỉnh cảm xúc', vandong: 'Vận động',
+    anuong: 'Ăn uống dinh dưỡng, điều độ', ngu: 'Ngủ đủ giấc', chitieu: 'Chi tiêu có kế hoạch', viecko: 'Dám thử việc khó',
+    horenso: 'Báo cáo và xác nhận', giup: 'Giúp đỡ một việc'
+  },
 
   /* Thẻ hướng dẫn (cao bằng nửa thẻ khóa học), hiện dưới danh sách khóa ở trang chủ.
      state: 'soon' (Sắp có) · 'ready' (mở trang href) */

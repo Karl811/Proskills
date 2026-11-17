@@ -421,7 +421,14 @@
         var dn = !!S.done[a.id];
         return '<button type="button" class="act' + (dn ? ' act--done' : '') + '" data-act="act" data-id="' + a.id + '"><span class="act__n">' + (dn ? PS.icon('check', 18, 3) : (i + 1)) + '</span><span><b>' + esc(a.t) + '</b><small>' + esc(KIND[a.k]) + ' · ' + a.min + ' phút · +' + a.xp + ' XP</small></span>' + (dn ? '<span class="badge badge--ok">Xong</span>' : '') + '</button>';
       }).join('') + '</div>' +
-      (baiDone(b) ? '<div class="stampbox">' + ic('stamp', 20) + '<span>Bài này đã đục lỗ trên thẻ hội viên. ' + (b.khu === 'san' ? 'Tập lại' : 'Làm lại') + ' lúc nào cũng được.</span></div>' : '');
+      (baiDone(b) ? '<div class="stampbox">' + ic('stamp', 20) + '<span>Bài này đã đục lỗ trên thẻ hội viên. ' + (b.khu === 'san' ? 'Tập lại' : 'Làm lại') + ' lúc nào cũng được.</span></div>' : '') +
+      rtSug(b);
+  }
+  /* Gợi ý thẻ Shin Routine của bài (PS1.3.26, RT_BAI trong content.js) */
+  function rtSug(b) {
+    var r = RT_BAI[b.id];
+    if (!r || S.demo || !PS.routineSugHTML) return '';
+    return PS.routineSugHTML(r.ids, { from: ID, sub: esc(r.sub) });
   }
   var KIND = { how: 'Xem cách làm', spot: 'Tìm điểm chưa đúng', 'try': 'Tập thử', order: 'Xếp thứ tự', pick: 'Chọn cách đúng', plan: 'Lên lịch',
     plate: 'Xếp đĩa', meal: 'Bữa của bạn', write: 'Viết ra', calc: 'Máy tính', hilo: 'Cao hay thấp', day: 'Tìm việc chưa ổn', commit: 'Cam kết',
@@ -1282,7 +1289,7 @@
     var a = b.getAttribute('data-act'), id = b.getAttribute('data-id');
     if (a === 'psHome') { save(true); PS.home(); return; }
     if (a === 'home') { if (nbOpen) closeNb(); go({ v: 'home' }); return; }
-    if (a === 'nb') { openNb(); return; }
+    if (a === 'nb') { TAB = 'cd'; openNb(); return; } /* PS1.3.25: nút Sổ tay mở thẻ Cài đặt trước */
     if (a === 'lobby') { TAB = 'the'; sfx('door'); openNb(); return; }
     if (a === 'nbClose') { closeNb(); return; }
     if (a === 'tab') { TAB = b.getAttribute('data-t'); drawNb(); return; }

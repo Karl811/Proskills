@@ -1069,8 +1069,16 @@
         '<p class="habit__l">…tôi sẽ</p><input class="inp" data-k="a63.h' + i + 'd" maxlength="100" placeholder="Ví dụ: ' + esc(need[i - 1] ? need[i - 1][1] : 'học 10 từ mới') + '" value="' + esc(g('a63.h' + i + 'd') || '') + '">' +
         '<p class="formula" id="fm' + i + '">' + formulaHTML(i) + '</p></div>';
     }
-    return h;
+    return h + rtSug();
   };
+  /* Gợi ý thẻ Shin Routine (PS1.3.26): điều chung còn thiếu trước, rồi theo nhóm nghề; học viên tự mở Shin để chọn */
+  function rtSug() {
+    if (S.demo || !PS.routineSugHTML) return '';
+    var m = g('a63.gap') || {}, ids = [];
+    GAP_COMMON.forEach(function (x, i) { if ((m[x[0]] === 'n' || m[x[0]] === 'p') && RT_GAP[i]) ids.push(RT_GAP[i]); });
+    ids = ids.concat(RT_GRP[grpKey()] || RT_GRP.gen);
+    return PS.routineSugHTML(ids, { from: ID, sub: Q(jobKey() ? RT_TXT.sub : RT_TXT.subNoJob) });
+  }
   function habFill(v) {
     var k = !trim(g('a63.h1d')) ? 'a63.h1d' : (!trim(g('a63.h2d')) ? 'a63.h2d' : null);
     if (!k) { PS.toast('Hai ô “tôi sẽ…” đã có chữ. Xóa một ô để dùng gợi ý này.'); return; }
@@ -2078,7 +2086,7 @@
     else if (a === 'speak') speak(b.getAttribute('data-t'));
     else if (a === 'ovNext') closeOv(true);
     else if (a === 'chest') { var sc = stById(b.getAttribute('data-st')); chestOv(sc, shinStage(), true); }
-    else if (a === 'nb') openNb();
+    else if (a === 'nb') openNb('set'); /* PS1.3.25: nút Sổ tay mở thẻ Cài đặt trước (có nút về trang chính) */
     else if (a === 'nbcd') openNb('cd');
     else if (a === 'nbClose') closeNb();
     else if (a === 'tab') { NBTAB = b.getAttribute('data-t'); drawNb(); }

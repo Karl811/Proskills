@@ -4,7 +4,18 @@
    Nguồn nội dung: Sổ quản lý học tập GDTC v10.1, chương trình GDTC TTS/Kỹ sư, tiêu chí đo lường theo nghề (KTN),
    Sổ tay sức khỏe 2.0. Kỹ thuật động tác do GV GDTC duyệt lại. Mốc thể lực: bảng thành tích Sổ quản lý v10.1.
    ========================================================= */
-var TC_VER = 'TC01.0.8';
+var TC_VER = 'TC01.1.0';
+
+/* ---------- Gợi ý thẻ Shin Routine theo bài (PS1.3.26) ----------
+   Bài có trong RT_BAI thì cuối trang bài hiện khối "Rèn mỗi ngày cùng Shin" (mã thẻ: PS_CONFIG.ROUTINE_LIB).
+   sub: lời dẫn ngắn. Học viên tự mở Shin Routine để đặt công thức. */
+var RT_BAI = {
+  b6: { ids: ['vandong', 'ngu'], sub: 'Lịch tập chỉ có ích khi bạn tập đều. Rèn thẻ Vận động mỗi ngày cùng Shin.' },
+  d4: { ids: ['anuong', 'ngu'], sub: 'Cam kết 21 ngày dễ giữ hơn khi bạn đóng dấu mỗi ngày trong Shin Routine.' },
+  n4: { ids: ['vandong', 'ngu'], sub: 'Thói quen chống mỏi cần làm mỗi ngày. Shin nhắc và đếm cùng bạn.' },
+  n5: { ids: ['horenso'], sub: 'Thấy nguy hiểm thì báo ngay. Rèn thói quen báo cáo từ bây giờ.' },
+  n6: { ids: ['vandong'], sub: 'Bài bổ trợ có tác dụng khi tập đều. Đóng dấu mỗi ngày tập trong Shin Routine.' }
+};
 var TC_YT = 'https://www.youtube.com/@THECHAT_SUCKHOE/shorts'; /* kênh video động tác của thầy cô GDTC */
 var TC_RADIO = 'https://www.youtube.com/watch?v=0xfDmrcI7OI';
 

@@ -1,6 +1,7 @@
 /* =========================================================
    PROSKILLS · TRANG CHỦ (hub.js)
-   Màn hình: Chào mừng + nhập thông tin (lần đầu) → Trang chủ (tổng điểm, thẻ module)
+   Màn hình: Chào mừng + nhập thông tin (lần đầu) → Trang chủ (tổng điểm, Rèn luyện hôm nay, Lịch học, thẻ module)
+   Cửa Rèn luyện (PS1.3.25): mở Proskills mà hôm nay chưa đóng dấu Shin Routine thì vào thẳng routine/ (mỗi phiên một lần)
    Lớp phủ: Cổng mật khẩu module · Cài đặt (thẻ chuẩn của lõi)
    Không chứa nội dung bài học. Danh sách module đọc từ config.js.
    ========================================================= */
@@ -20,7 +21,43 @@
     sz = sz || 40;
     return '<img class="hub-logo" src="' + PS.url('icons/logo.svg') + '" width="' + sz + '" height="' + sz + '" alt="">';
   }
-  function visibleMods() { return PS.modules().filter(function (m) { return m.state !== 'hidden' || SHOW_HIDDEN; }); }
+  function visibleMods() { return PS.modules().filter(function (m) { return m.kind !== 'routine' && (m.state !== 'hidden' || SHOW_HIDDEN); }); }
+
+  /* ---------------- Shin Routine: thẻ Rèn luyện hôm nay + cửa Rèn luyện ---------------- */
+  function routineMod() { var m = PS.mod('routine'); return m && m.state === 'ready' ? m : null; }
+  function routineInfo() {
+    var s = PS.summary('routine'), x = (s && s.extra) || null, t = PS.today();
+    return { x: x, isT: !!(x && x.day === t), rec: !!(x && x.day === t && x.rec) };
+  }
+  /* Vào thẳng Rèn luyện khi: có hồ sơ, hôm nay chưa đóng dấu, còn thẻ cần ghi nhận, phiên này chưa vào lần nào */
+  function doorNeeded() {
+    var m = routineMod(); if (!m || !m.door) return false;
+    if (PS.needProfile() || WANT || QS.lich || SHOW_HIDDEN) return false;
+    var t = PS.today();
+    try { if (W.sessionStorage.getItem('ps.door') === t) return false; } catch (e) { return false; }
+    var r = routineInfo();
+    if (r.rec || (r.x && r.x.need === false)) return false;
+    return true;
+  }
+  var MARK = { y: 'Đã làm', p: 'Một phần', n: 'Chưa làm', x: 'Không có dịp' };
+  function routineHTML() {
+    var m = routineMod(); if (!m) return '';
+    var r = routineInfo(), x = r.x, n = x ? (x.active || 0) : 0, st, cta, k;
+    if (!x || !x.habits) { k = 'new'; st = 'Chọn một việc nhỏ để bắt đầu rèn luyện cùng Shin.'; cta = 'Bắt đầu'; }
+    else if (r.rec) { k = 'done'; st = 'Đã đóng dấu hôm nay. Giữ nhịp nhé!'; cta = 'Mở'; }
+    else if (!n) { k = 'idle'; st = 'Chưa có thẻ đang rèn. Chọn thêm thẻ trong Thư viện.'; cta = 'Mở'; }
+    else { k = 'todo'; st = 'Hôm nay chưa đóng dấu · ' + n + ' thẻ đang rèn'; cta = 'Đóng dấu'; }
+    var chips = (x && x.cards && x.cards.length) ? '<span class="rt__chips">' + x.cards.map(function (c) {
+      var mk = r.isT && c.m ? c.m : '';
+      return '<span class="rt-chip rt-chip--' + (mk || 'none') + '" title="' + esc(MARK[mk] || 'Chưa ghi nhận') + '"><i aria-hidden="true"></i>' + esc(c.n) + '</span>';
+    }).join('') + '</span>' : '';
+    var fire = x && x.habits ? '<span class="rt__fire">' + icon('flame', 14) + ' Lửa <b>' + (x.fire || 0) + '</b></span>' : '';
+    return '<button type="button" class="rt rt--' + k + '" data-act="mod" data-id="routine" style="--i:1">' +
+      '<span class="rt__row"><img class="rt__shin" src="' + PS.url('routine/icon-192.png') + '" width="52" height="52" alt="">' +
+      '<span class="rt__tx"><small>RÈN LUYỆN MỖI NGÀY</small><b>Shin Routine</b><span class="rt__st">' + (k === 'done' ? icon('check', 15, 3) + ' ' : '') + st + '</span></span>' +
+      '<span class="rt__go">' + cta + icon('next', 16) + '</span></span>' +
+      (chips || fire ? '<span class="rt__foot">' + chips + fire + '</span>' : '') + '</button>';
+  }
 
   /* ---------------- Chào mừng + thông tin ---------------- */
   function vWelcome() {
@@ -108,7 +145,8 @@
       '<div class="st st--fire">' + icon('flame', 18) + '<b data-n="' + t.streak + '">' + t.streak + '</b><small>Chuỗi ngày</small></div>' +
       '<div class="st st--xp">' + icon('star', 18) + '<b data-n="' + t.xp + '">' + t.xp + '</b><small>Tổng XP</small></div>' +
       '<div class="st st--ins">' + icon('bulb', 18) + '<b data-n="' + t.ins + '">' + t.ins + '</b><small>Insight</small></div>' +
-      '</div><p class="hero__today">' + icon('clock', 15) + (t.todayMin ? ' Hôm nay bạn đã học ' + t.todayMin + ' phút. Giữ chuỗi nhé!' : (t.streak ? ' Học hôm nay để giữ chuỗi ' + t.streak + ' ngày.' : ' Học vài phút mỗi ngày để bắt đầu chuỗi ngày học.')) + '</p></section>' +
+      '</div><p class="hero__today">' + icon('clock', 15) + (t.todayMin ? ' Hôm nay bạn đã học và rèn luyện ' + t.todayMin + ' phút. Giữ chuỗi nhé!' : (t.streak ? ' Học hôm nay để giữ chuỗi ' + t.streak + ' ngày.' : ' Học vài phút mỗi ngày để bắt đầu chuỗi ngày học.')) + '</p></section>' +
+      routineHTML() +
       (W.PSLich ? W.PSLich.cardHTML() : '') +
       '<div style="--i:1">' + nudge() + '</div>' +
       '<h2 class="sec" style="--i:2">Khóa học của bạn</h2>' +
@@ -207,6 +245,11 @@
     var c = D.querySelector('.lc'); if (!c || !W.PSLich || D.hidden) return;
     var t = D.createElement('div'); t.innerHTML = W.PSLich.cardHTML(); var n = t.firstChild; if (n) { n.style.cssText = c.style.cssText; c.parentNode.replaceChild(n, c); }
   }, 60000);
+  if (doorNeeded()) {
+    try { W.sessionStorage.setItem('ps.door', PS.today()); } catch (e) {}
+    W.location.replace(PS.url('routine/index.html') + '?door=1');
+    return;
+  }
   render(true);
   /* ?lich=1 mở tấm Lịch học; ?lich=nhac mở phần giờ tự học (link từ các khóa) */
   if (QS.lich && !PS.needProfile() && W.PSLich) { try { history.replaceState(null, '', location.pathname); } catch (e) {} setTimeout(function () { W.PSLich.open(QS.lich === 'nhac' ? 'nhac' : '', W.PSHubRender); }, 300); }

@@ -5,6 +5,35 @@ Quy ước số phiên bản: **PS a.b.c**
 - b: giai đoạn / thêm module hoặc tính năng lớn
 - c: sửa nhỏ trong giai đoạn đó
 
+## PS1.3.26 · 17/11/2026 · Shin Routine nối với CD01, TC01 · chỉ còn sao lưu chung · Shin M.Claude.3.3.41
+- **Sao lưu**: Shin Routine bỏ sao lưu riêng. Sổ tay › Cài đặt › "Sao lưu và khôi phục" của Shin dùng tập tin chung của Proskills (Tải sao lưu → `PS.backup`, Khôi phục → `PS.restorePick`); nhắc "Đã … ngày chưa sao lưu" và chấm đỏ tính theo lần sao lưu chung. Bản sao lưu chung gồm `ps.mod.routine` (+ phút rèn luyện).
+- **Khóa gợi ý thẻ Shin** (`PS.routineSugHTML`, core): khối "Rèn mỗi ngày cùng Shin" với 1–3 thẻ; thẻ đang rèn có dấu ✓ "Đang rèn" + "Xem thẻ", thẻ chưa có "Rèn thẻ này". Chạm → Shin Routine mở thẻ (nếu đã có) hoặc màn đặt công thức (đủ 5 thẻ thì Shin hỏi cất thẻ nào); xong hiện thanh "Xong rồi? Quay lại <khóa>". Một chiều: khóa chỉ đọc tóm tắt của Shin, không tự thêm thẻ. Không hiện ở bản demo giáo viên.
+  - **CD01 (CD01.1.6)**: Ga 6 · "Biến điều còn thiếu thành thói quen", dưới 2 công thức. Thứ tự gợi ý: điều chung học viên chọn "Chưa có/Đang có dần" (`RT_GAP`: tiếng Nhật → Tận dụng 05 phút, Đúng giờ/5S → 5S, Sức khỏe → Vận động, Chi tiêu → Chi tiêu có kế hoạch), rồi theo nhóm nghề (`RT_GRP`).
+  - **TC01 (TC01.1.0)**: cuối trang 5 bài (`RT_BAI`): b6 Giãn cơ và lịch tập, d4 Lỗi ăn uống hay gặp, n4 Đứng lâu ngồi lâu, n5 An toàn kiểu Nhật (Báo cáo và xác nhận), n6 Bài bổ trợ.
+- Shin báo thêm `extra.mine` (trạng thái từng thẻ) và `extra.lib` (tên thẻ). Danh mục tên dự phòng `ROUTINE_LIB` trong config.js.
+- Shin trong Proskills đánh số tiếp **M.Claude.3.3.41** (đổi `routine/scripts/core.js`), sw.js tải lại bộ nhớ Shin theo số mới.
+- Kiểm 390: CD01 Ga 6 (nghề Cơ khí) → khối gợi ý → Shin mở màn đặt công thức; TC01 n5 → Shin → "Quay lại" về TC01; thẻ đã có → mở thẻ; Tải sao lưu từ Shin (tập tin chung gồm routine), Khôi phục mở chọn tệp; 1 service worker, mất mạng; ES5; không lỗi console.
+
+Tệp đổi: config.js, sw.js, index.html, core/core.js, core/core.css, cd01/index.html, cd01/content.js, cd01/engine.js, tc01/index.html, tc01/content.js, tc01/engine.js, tk/index.html, mau/index.html, routine/index.html, routine/habit-game.html, routine/proskills.js, routine/scripts/core.js, CHANGELOG.md, AGENTS.md.
+File cần xóa trên GitHub: không có.
+
+## PS1.3.25 · 17/11/2026 · Tích hợp Shin Routine (M.Claude.3.3.40) · cửa Rèn luyện · Sổ tay mở Cài đặt trước
+Shin Routine vào chung ứng dụng Proskills, thư mục `routine/` (thầy chốt: một app, một biểu tượng, mở thẳng vào rèn luyện nếu hôm nay chưa đóng dấu). Giao diện, luật rèn luyện của Shin giữ nguyên.
+- **Trang chủ**: thứ tự mới Lời chào + số liệu → **Rèn luyện hôm nay** (thẻ Shin Routine: đã/chưa đóng dấu, các thẻ đang rèn kèm dấu hôm nay, Lửa) → Lịch học → Khóa học. Shin Routine không nằm trong danh sách khóa học, không cần mật khẩu cổng. Dòng "Hôm nay bạn đã học và rèn luyện … phút" cộng cả phút rèn luyện.
+- **Cửa Rèn luyện**: mở Proskills mà hôm nay chưa đóng dấu (và còn thẻ đang rèn, hoặc chưa có thẻ nào) thì vào thẳng Shin Routine, mỗi phiên một lần (`sessionStorage ps.door`); về trang chủ không bị chuyển lại. Shin nhắc "Ghi nhận thói quen hôm nay, rồi vào học tiếp nhé."; đóng dấu xong hiện thanh "Đã đóng dấu hôm nay · Vào học". Tắt: `door: 0` ở module routine trong config.js.
+- **Về trang chủ Proskills**: không thêm nút trên trang Hôm nay của Shin; nút nằm ở nhóm đầu tiên "Proskills" trong Sổ tay › Cài đặt.
+- **Sổ tay mở thẻ Cài đặt trước** (có nút về trang chính): CD01 (CD01.1.5), HP05 (TK16), TC01 (TC01.0.9) và nút ⋯ của Shin Routine. Các nút mở Sổ tay với thẻ riêng (Bản Career Design, Lobby → Thẻ hội viên…) giữ như cũ.
+- **Dữ liệu dùng chung**: Shin lưu ở `ps.mod.routine` (demo `ps.demo.routine`), nên có trong bản sao lưu chung của Proskills. Lớp, thầy cô lấy từ hồ sơ Proskills (đổi trong Shin thì ghi ngược về hồ sơ); Shin chỉ còn hỏi tên gọi (tự điền tên của học viên). Danh sách thầy cô của Shin lấy từ config.js.
+- **Báo về trang chủ** `PS.report('routine')`: `extra` = day, rec (đã đóng dấu hôm nay), need, cards (tên + dấu hôm nay), active, fire (Lửa), recDays, mastered, habits; `days` = phút rèn luyện thật (đang mở và có thao tác) theo ngày → tính vào chuỗi ngày chung. Các khóa khác đọc bằng `PS.summary('routine').extra`.
+- **Lần đầu mở Shin**: giữ màn chào "Mỗi ngày, một chút." rồi mời chọn "Việc nhỏ đầu tiên"; những lần sau vào thẳng, không chờ màn chào.
+- **Một service worker** (sw.js gốc): bỏ `sw.js`, `manifest.webmanifest` riêng của Shin; Shin đăng ký `../sw.js`. Tải sẵn 51 tệp Shin chạy ngầm khi cài service worker (bộ nhớ riêng `routine-M.Claude.3.3.40`, chỉ tải lại khi đổi phiên bản Shin) → đóng dấu được cả khi mất mạng. Nút "Cập nhật" của Shin dùng chung cơ chế cập nhật Proskills.
+- **Demo giáo viên**: `routine/?demo` với mật khẩu chung; "Thoát Demo" về lại bài thật.
+- Kiểm 390 và 1280: học viên mới (trang chủ không chuyển), có hồ sơ → cửa Rèn luyện → Việc nhỏ đầu tiên; có thẻ → đóng dấu → thanh "Vào học" → trang chủ thẻ "Đã đóng dấu"; Sổ tay 3 khóa + Shin mở Cài đặt; demo Shin; 1 service worker, mất mạng mở trang chủ và Shin; ES5 cho mã Proskills; không lỗi console.
+
+Tệp đổi: config.js, sw.js, index.html, core/core.js, hub/hub.js, hub/hub.css, cd01/index.html, cd01/content.js, cd01/engine.js, tk/index.html, tk/content.js, tk/actions.js, tc01/index.html, tc01/content.js, tc01/engine.js, mau/index.html, CHANGELOG.md, AGENTS.md, HUONG-DAN-UPLOAD.md, README.md.
+**Thư mục mới:** `routine/` (62 tệp, gồm tệp mới `routine/proskills.js`; sửa `routine/index.html`, `routine/boot.js`, `routine/scripts/core.js` so với Shin M.Claude.3.3.40).
+File cần xóa trên GitHub: không có.
+
 ## PS1.3.24 · 17/11/2026 · TC01 giao diện "Shin Fitness Center", phần 2 · TC01.0.8
 TC01 · tòa nhà phòng tập, bảng tên phòng, sân trước (thầy duyệt bản phác) + chỉnh thẻ hội viên. Không đổi bài, hoạt động.
 - **Sơ đồ phòng tập = tòa nhà nhìn mặt cắt** (thay 6 ô): bảng hiệu SHIN FITNESS CENTER trên nóc; R Radio Taiso Deck (sân thượng) · 3F 301 First Aid, 302 Test Lab · 2F 201 Kitchen, 202 Work-fit · 1F 101 Workout Floor + Lobby.

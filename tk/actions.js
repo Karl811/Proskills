@@ -86,7 +86,7 @@ document.addEventListener('click', function(e){
     case 'chest': openChest(n); break;
     case 'claim': claim(n); break;
     case 'closeOv': $$('.ov').forEach(function(o){ o.remove(); }); break;
-    case 'nb': openNb(); break;
+    case 'nb': S.d.nbTab='cd'; openNb(); break; /* PS1.3.25: nút Sổ tay mở thẻ Cài đặt trước */
     case 'nbClose': closeNb(); break;
     case 'nbTab': S.d.nbTab=t.getAttribute('data-t'); save(); drawNb(S.d.seen); break;
     case 'full': toggleFull(); break;
