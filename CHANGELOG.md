@@ -5,6 +5,22 @@ Quy ước số phiên bản: **PS a.b.c**
 - b: giai đoạn / thêm module hoặc tính năng lớn
 - c: sửa nhỏ trong giai đoạn đó
 
+## PS1.3.28 · 18/11/2026 · Trang chủ mới: Shin Routine đứng đầu, nút Check-in, khóa học kiểu thẻ Labs
+Thầy chốt PA1. Chỉ đổi trang chủ và cầu nối Shin; không đổi bài học, dữ liệu học viên.
+- **Phong cách** (cảm hứng tabletop.google, labs.google): nền kem #F6F4EE, tiêu đề phông Nunito (lấy từ `routine/assets/fonts`, chạy cả khi mất mạng; trang chủ bỏ phông Google), hình mờ trang trí trôi nhẹ ở mép, thẻ trắng bo tròn.
+- **Thanh trên**: logo · Cài ứng dụng · chuỗi ngày ("12 ngày") · ảnh đại diện chữ cái đầu (chạm = Cài đặt). Bỏ banner xanh cũ.
+- **Lời chào một dòng**: "Chào buổi tối, Quỳnh Anh" (2 chữ cuối của họ tên; họ tên 2 chữ thì lấy chữ cuối). Không hiện lớp, diện, thầy cô. Shin Routine dùng cùng cách gọi tên cho học viên mới.
+- **Khối Shin Routine** đứng đầu: "RÈN LUYỆN HẰNG NGÀY CÙNG" / "Shin Routine" (gạch chân xanh vẽ dần), Shin + lời nhắn có tên in đậm, các thẻ đang rèn kèm dấu hôm nay. Bỏ dòng "… thẻ đang rèn · Lửa …". Hai tấm màu nghiêng phía sau.
+  - **Nút Check-in** (vàng #F2B21B như nút của Shin, nổi khối nhẹ 3px, kèm giờ check-in của Shin, ví dụ 21:30) → `routine/index.html?ci=1#checkin` mở thẳng check-in hôm nay. Chưa có thẻ nào: Shin báo "Thêm ít nhất một thẻ để bắt đầu nhé." và về trang Hôm nay. Check-in xong: thanh "Đã check-in hôm nay · Vào học"; trang chủ đổi nút xanh nhạt "Đã check-in hôm nay". Chạm phần còn lại của khối = mở Shin.
+- **Không tự chuyển vào Shin** khi mở trang chủ nữa (`door: 0` ở config.js).
+- **Khóa học**: dưới tiêu đề là 3 ô chỉ có số + chữ: Tổng XP · Insight · "25 phút / Hôm nay" (số có dấu chấm nghìn). Thẻ khóa học thành **băng chuyền thẻ dọc có tranh** (vé JPC → 日本, núi Phú Sĩ, tạ, la bàn), xếp quạt nghiêng, hai mảng màu lớn xanh dương, xanh lá phía sau. Vuốt ngang (thẻ chạy theo ngón tay), bấm ‹ › bên dưới, chạm thẻ bên cạnh để đưa vào giữa, phím mũi tên trên máy tính; chuyển động 0,6 giây, vòng tròn khi có từ 4 thẻ; giảm chuyển động thì không trượt. Khóa sắp ra mắt xếp cuối. Mở đầu ở khóa đang học dở; nhớ thẻ đang xem trong phiên.
+- Lịch học, nhắc sao lưu, thẻ Hướng dẫn giữ nội dung, đổi kiểu cho hợp nền mới.
+- Cầu nối Shin (`routine/proskills.js`): báo thêm `extra.ci` (đã check-in hôm nay), `extra.ciTime`; `?ci=1` hiện thanh sau khi check-in (không hiện lời nhắc đóng dấu).
+- Kiểm 360, 390, 1280: học viên mới; có thẻ Shin → Check-in → lưu → thanh "Vào học" → trang chủ "Đã check-in"; chưa có thẻ → lời báo của Shin; băng chuyền (bấm, kéo, chạm thẻ bên, mở khóa giữa); Cài đặt từ ảnh đại diện; giảm chuyển động; 1 service worker; ES5; không lỗi console.
+
+Tệp đổi: hub/hub.js, hub/hub.css, routine/proskills.js, config.js, index.html, cd01/index.html, tk/index.html, tc01/index.html, mau/index.html, routine/index.html, sw.js (số phiên bản), CHANGELOG.md, AGENTS.md.
+File cần xóa trên GitHub: không có.
+
 ## PS1.3.27 · 17/11/2026 · Trang chủ: chữ, banner gọn, Lịch học tông xanh lá
 Chỉ sửa giao diện trang chủ, không đổi dữ liệu, khóa học.
 - **Chữ**: "RÈN LUYỆN MỖI NGÀY" → "CHECK-IN RÈN LUYỆN"; bỏ dòng "Chọn một việc nhỏ để bắt đầu rèn luyện cùng Shin." (thẻ Shin khi chưa có thẻ nào chỉ còn tên + nút Bắt đầu); tiêu đề hộp "Lịch học trên lớp" / "Lịch học" → "LỊCH HỌC"; "Đặt giờ tự học e-learning mỗi ngày" → "Đặt giờ tự học mỗi ngày" (đã đặt: "Tự học 20:00 · …"); "Xem lịch học tuần này trên oden.vn" → "Xem lịch học trên oden.vn" (cả trong tấm Lịch của tôi). Câu "Lưu lịch Kỹ năng, Kiến thức nghề, Thể chất. Proskills nhắc bạn đi học." giữ nguyên.

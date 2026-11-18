@@ -1,6 +1,8 @@
 /* =========================================================
    PROSKILLS · TRANG CHỦ (hub.js)
-   Màn hình: Chào mừng + nhập thông tin (lần đầu) → Trang chủ (tổng điểm, Rèn luyện hôm nay, Lịch học, thẻ module)
+   Màn hình: Chào mừng + nhập thông tin (lần đầu) → Trang chủ
+   PS1.3.28: thanh trên (chuỗi ngày, ảnh đại diện = Cài đặt) → lời chào → khối Shin Routine (nút Check-in mở routine/?ci=1#checkin)
+             → Lịch học → Khóa học (XP, Insight, phút hôm nay + băng chuyền thẻ kiểu labs.google: KC, kcLayout, kcGo) → Hướng dẫn
    Cửa Rèn luyện (PS1.3.25): mở Proskills mà hôm nay chưa đóng dấu Shin Routine thì vào thẳng routine/ (mỗi phiên một lần)
    Lớp phủ: Cổng mật khẩu module · Cài đặt (thẻ chuẩn của lõi)
    Không chứa nội dung bài học. Danh sách module đọc từ config.js.
@@ -40,23 +42,42 @@
     return true;
   }
   var MARK = { y: 'Đã làm', p: 'Một phần', n: 'Chưa làm', x: 'Không có dịp' };
+  /* PS1.3.28: tên gọi = 2 chữ cuối (Nguyễn Thị Quỳnh Anh → Quỳnh Anh); họ tên 2 chữ thì lấy chữ cuối */
+  function shortName() {
+    var n = String(PS.profile().name || '').trim().split(/\s+/);
+    if (!n[0]) return 'bạn';
+    return n.length >= 3 ? n.slice(-2).join(' ') : n[n.length - 1];
+  }
+  /* PS1.3.28: khối Shin Routine đứng đầu trang chủ; nút Check-in mở thẳng check-in hôm nay (routine/#checkin) */
+  function ciInfo(r) {
+    var x = r.x, done = !!(r.isT && (x.ci || (x.ci === undefined && x.rec)));
+    return { done: done, time: (x && x.ciTime) || '21:00' };
+  }
   function routineHTML() {
     var m = routineMod(); if (!m) return '';
-    var r = routineInfo(), x = r.x, n = x ? (x.active || 0) : 0, st, cta, k;
-    if (!x || !x.habits) { k = 'new'; st = ''; cta = 'Bắt đầu'; }
-    else if (r.rec) { k = 'done'; st = 'Đã đóng dấu hôm nay. Giữ nhịp nhé!'; cta = 'Mở'; }
-    else if (!n) { k = 'idle'; st = 'Chưa có thẻ đang rèn. Chọn thêm thẻ trong Thư viện.'; cta = 'Mở'; }
-    else { k = 'todo'; st = 'Hôm nay chưa đóng dấu · ' + n + ' thẻ đang rèn'; cta = 'Đóng dấu'; }
-    var chips = (x && x.cards && x.cards.length) ? '<span class="rt__chips">' + x.cards.map(function (c) {
+    var r = routineInfo(), x = r.x || {}, n = x.active || 0, nm = '<b>' + esc(shortName()) + '</b>', ci = ciInfo(r), bub;
+    if (!x.habits) bub = 'Chào ' + nm + '! Mình là Shin. Cùng rèn thói quen tốt nhé.';
+    else if (ci.done) bub = 'Check-in xong rồi. Giữ nhịp nhé ' + nm + '!';
+    else if (!n) bub = 'Chưa có thẻ đang rèn. Chọn thêm thẻ nhé ' + nm + '.';
+    else bub = 'Hôm nay chưa check-in đó ' + nm + '. 30 giây thôi!';
+    var chips = (x.cards && x.cards.length) ? '<div class="shn__chips">' + x.cards.map(function (c) {
       var mk = r.isT && c.m ? c.m : '';
       return '<span class="rt-chip rt-chip--' + (mk || 'none') + '" title="' + esc(MARK[mk] || 'Chưa ghi nhận') + '"><i aria-hidden="true"></i>' + esc(c.n) + '</span>';
-    }).join('') + '</span>' : '';
-    var fire = x && x.habits ? '<span class="rt__fire">' + icon('flame', 14) + ' Lửa <b>' + (x.fire || 0) + '</b></span>' : '';
-    return '<button type="button" class="rt rt--' + k + '" data-act="mod" data-id="routine" style="--i:1">' +
-      '<span class="rt__row"><img class="rt__shin" src="' + PS.url('routine/icon-192.png') + '" width="52" height="52" alt="">' +
-      '<span class="rt__tx"><small>CHECK-IN RÈN LUYỆN</small><b>Shin Routine</b>' + (st ? '<span class="rt__st">' + (k === 'done' ? icon('check', 15, 3) + ' ' : '') + st + '</span>' : '') + '</span>' +
-      '<span class="rt__go">' + cta + icon('next', 16) + '</span></span>' +
-      (chips || fire ? '<span class="rt__foot">' + chips + fire + '</span>' : '') + '</button>';
+    }).join('') + '</div>' : '';
+    var btn = ci.done ?
+      '<button type="button" class="shn__ci shn__ci--done" data-act="ci">' + icon('check', 20, 2.6) + '<span>Đã check-in hôm nay</span></button>' :
+      '<button type="button" class="shn__ci" data-act="ci" aria-label="Check-in lúc ' + esc(ci.time) + '">' +
+        '<svg class="ps-ic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>' +
+        '<span>Check-in</span><small>' + esc(ci.time) + '</small></button>';
+    return '<section class="shn" style="--i:1"><div class="shn__card" data-act="mod" data-id="routine" role="link" tabindex="0" aria-label="Mở Shin Routine">' +
+      '<small class="shn__k">RÈN LUYỆN HẰNG NGÀY CÙNG</small>' +
+      '<h2 class="shn__t">Shin Routine<svg class="shn__sw" viewBox="0 0 200 10" preserveAspectRatio="none" aria-hidden="true"><path d="M3 7C55 2 140 1.5 197 5.5"/></svg></h2>' +
+      '<div class="shn__row"><img class="shn__shin" src="' + PS.url('routine/icon-192.png') + '" width="56" height="56" alt=""><p class="shn__bub">' + bub + '</p></div>' +
+      chips + btn + '</div></section>';
+  }
+  function goCheckin() {
+    D.body.classList.add('leaving');
+    setTimeout(function () { W.location.href = PS.url('routine/index.html') + '?ci=1#checkin'; }, noMotion ? 0 : 160);
   }
 
   /* ---------------- Chào mừng + thông tin ---------------- */
@@ -88,7 +109,7 @@
     var e = D.getElementById('fErr'); e.textContent = err;
     if (err) return;
     PS.setProfile({ name: n, by: y, sid: s, cls: c, path: pa, teacher: t });
-    PS.toast('Chào <b>' + esc(PS.given()) + '</b>! Chọn khóa học để bắt đầu nhé.');
+    PS.toast('Chào <b>' + esc(shortName()) + '</b>! Chọn khóa học để bắt đầu nhé.');
     render(true);
     if (WANT) { var w = WANT; WANT = ''; setTimeout(function () { openMod(w); }, 400); }
   }
@@ -111,21 +132,175 @@
     for (var j = 0; j < 3; j++) { var v = Math.round(x[j] + (y[j] - x[j]) * t).toString(16); o += v.length < 2 ? '0' + v : v; }
     return o;
   }
-  function cardHTML(m, i) {
-    var k = modState(m);
-    var cta = { soon: 'Sắp ra mắt', lock: icon('lock', 17) + ' Mở khóa', 'new': 'Bắt đầu ' + icon('next', 17), go: 'Học tiếp ' + icon('next', 17), done: 'Ôn lại ' + icon('next', 17) }[k.st];
-    var meta = k.st === 'soon' ? '<span class="mcard__soon">Đang xây dựng</span>' :
-      (k.st === 'lock' ? '<span class="mcard__hint">' + icon('info', 14) + ' Thầy cô cho mật khẩu khi bắt đầu khóa tại lớp</span>' :
-        '<div class="mcard__bar"><i style="width:' + k.pct + '%"></i></div><span class="mcard__meta">' + k.done + (k.total ? '/' + k.total : '') + ' hoạt động' + (k.s.xp ? ' · ' + k.s.xp + ' XP' : '') + '</span>');
-    var mc = m.color || '#24307A';
-    return '<article class="mcard mcard--' + k.st + '" style="--mc:' + esc(mc) + ';--ml:' + mix(mc, '#FFFFFF', 0.18) + ';--md:' + mix(mc, '#0B1233', 0.28) + ';--mt:' + mix(mc, '#FFFFFF', 0.9) + ';--i:' + (i + 3) + '">' +
-      '<span class="mcard__wm" aria-hidden="true">' + icon(m.icon, 124, 1.4) + '</span>' +
-      '<div class="mcard__ic">' + icon(m.icon, 26, 2) + '</div>' +
-      '<div class="mcard__tx"><span class="mcard__code">' + esc(m.code) + (m.state === 'hidden' ? ' · ẩn' : '') + '</span><h3>' + esc(m.title) + '</h3><p>' + esc(m.sub) + '</p>' + meta + '</div>' +
-      '<button type="button" class="mcard__go" data-act="mod" data-id="' + esc(m.id) + '"' + (k.st === 'soon' ? ' disabled' : '') + '>' + cta + '</button>' +
-      (k.st === 'done' ? '<span class="mcard__stamp">' + icon('check', 16, 3) + ' Hoàn thành</span>' : '') +
-      '</article>';
+  /* ---------------- PS1.3.28 · Khóa học: thẻ dọc có tranh, xếp quạt, vuốt ngang (kiểu labs.google) ---------------- */
+  var ART = {
+    cd01: '<svg viewBox="0 0 240 150" aria-hidden="true"><g class="kc-float"><rect x="22" y="34" width="196" height="88" rx="14" fill="#fff"/><path d="M168 34v88" stroke="#EBD9A6" stroke-width="2" stroke-dasharray="5 5"/><circle cx="168" cy="34" r="7" fill="#FFE29A"/><circle cx="168" cy="122" r="7" fill="#FFDA85"/>' +
+      '<text x="38" y="70" font-family="Nunito,sans-serif" font-weight="900" font-size="22" fill="#2C5BC4">JPC → 日本</text><text x="38" y="94" font-family="Be Vietnam Pro,sans-serif" font-size="10.5" fill="#7A7F8C">Vé hành trình của bạn</text>' +
+      '<circle cx="194" cy="78" r="15" fill="#2C5BC4"/><path d="m187 78 5 5 9-9" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>' +
+      '<g fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".8"><path d="M30 18l6 8M50 12l2 9M212 16l-6 8"/></g></svg>',
+    tk: '<svg viewBox="0 0 240 150" aria-hidden="true"><circle cx="168" cy="44" r="20" fill="#FF8A7A"/><path d="M28 126 96 52l26 22 22-18 70 70z" fill="#4E63E0"/><path d="m96 52-16 17 10 2 6-6 7 6 9-1z" fill="#fff"/><path d="m144 56-9 7 6 1 3-3 4 3 5-1z" fill="#fff" opacity=".9"/>' +
+      '<g class="kc-float"><path d="M40 98h44" stroke="#fff" stroke-width="6" stroke-linecap="round" opacity=".7"/><path d="M150 26h34" stroke="#fff" stroke-width="6" stroke-linecap="round" opacity=".75"/></g><path d="M20 132c40-10 80 6 120-2s60-8 82 0" stroke="#fff" stroke-width="3" fill="none" stroke-dasharray="2 8" stroke-linecap="round"/></svg>',
+    tc01: '<svg viewBox="0 0 240 150" aria-hidden="true"><g class="kc-float"><g transform="rotate(-16 120 76)"><rect x="56" y="70" width="128" height="12" rx="6" fill="#2E7D55"/><rect x="62" y="44" width="20" height="64" rx="8" fill="#348A5F"/><rect x="44" y="54" width="16" height="44" rx="7" fill="#4FA77A"/><rect x="158" y="44" width="20" height="64" rx="8" fill="#348A5F"/><rect x="180" y="54" width="16" height="44" rx="7" fill="#4FA77A"/></g></g>' +
+      '<path d="M178 104l20 32h-40z" fill="#fff"/><rect x="170" y="122" width="16" height="14" rx="2" fill="#2F3B35"/><circle cx="46" cy="30" r="9" fill="#fff" opacity=".8"/><circle cx="208" cy="28" r="5" fill="#fff" opacity=".8"/></svg>',
+    cd02: '<svg viewBox="0 0 240 150" aria-hidden="true"><g class="kc-float"><circle cx="120" cy="76" r="44" fill="#fff"/><circle cx="120" cy="76" r="44" fill="none" stroke="#0F9F98" stroke-width="5"/><path d="m138 58-10 22-22 10 10-22z" fill="#0F9F98"/><circle cx="120" cy="76" r="4" fill="#fff"/></g><path d="M40 40h22M180 116h24" stroke="#fff" stroke-width="6" stroke-linecap="round" opacity=".75"/></svg>'
+  };
+  var ART_BG = { cd01: 'linear-gradient(160deg,#FFEDB5,#FFD27A)', tk: 'linear-gradient(160deg,#E6E4FF,#C9C6FF)', tc01: 'linear-gradient(160deg,#DDF5E6,#B4E6C8)', cd02: 'linear-gradient(160deg,#D9F3F1,#AEE3DF)' };
+  function num(n) { return String(n || 0).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
+  function artHTML(m) {
+    return ART[m.id] || '<svg viewBox="0 0 240 150" aria-hidden="true"><circle class="kc-float" cx="120" cy="75" r="46" fill="#fff"/></svg><span class="kc__bigic">' + icon(m.icon, 54, 1.8) + '</span>';
   }
+  function kcardHTML(m) {
+    var k = modState(m), mc = m.color || '#24307A';
+    var cta = { soon: 'Sắp ra mắt', lock: icon('lock', 15) + ' Mở khóa', 'new': 'Bắt đầu ' + icon('next', 15, 2.4), go: 'Học tiếp ' + icon('next', 15, 2.4), done: 'Ôn lại ' + icon('next', 15, 2.4) }[k.st];
+    var meta = k.st === 'soon' ? '<span class="kc__note">Đang xây dựng</span>' :
+      (k.st === 'lock' ? '<span class="kc__note">' + icon('info', 14) + ' Thầy cô cho mật khẩu khi bắt đầu khóa tại lớp</span>' :
+        '<div class="kc__bar"><i style="width:' + k.pct + '%"></i></div>');
+    var info = (k.st === 'go' || k.st === 'new' || k.st === 'done') ? '<span>' + k.done + (k.total ? '/' + k.total : '') + ' hoạt động</span>' : '<span></span>';
+    return '<article class="kc__card kc--' + k.st + '" data-act="mod" data-id="' + esc(m.id) + '" style="--mc:' + esc(mc) + ';--md:' + mix(mc, '#0B1233', 0.28) + ';--mt:' + mix(mc, '#FFFFFF', 0.88) + ';--ma:' + mix(mc, '#FFFFFF', 0.8) + '">' +
+      '<div class="kc__art"' + (ART_BG[m.id] ? ' style="background:' + ART_BG[m.id] + '"' : '') + '>' + artHTML(m) + (k.st === 'done' ? '<span class="kc__stamp">' + icon('check', 14, 3) + ' Hoàn thành</span>' : '') + '</div>' +
+      '<div class="kc__body"><span class="kc__code">' + esc(m.code) + (m.state === 'hidden' ? ' · ẩn' : '') + '</span>' +
+      '<h3>' + esc(m.title) + '</h3><p>' + esc(m.sub) + '</p>' + meta +
+      '<div class="kc__ft">' + info + '<b class="kc__go">' + cta + '</b></div></div></article>';
+  }
+  /* thứ tự thẻ: khóa học được trước, khóa sắp ra mắt sau cùng */
+  function carMods() {
+    var a = visibleMods(), r = [], s = [];
+    a.forEach(function (m) { (m.state === 'soon' ? s : r).push(m); });
+    return r.concat(s);
+  }
+  function carouselHTML(mods) {
+    if (!mods.length) return '';
+    return '<section class="kc" style="--i:5" aria-roledescription="carousel" aria-label="Khóa học của bạn">' +
+      '<span class="kc__blob kc__blob--a" aria-hidden="true"></span><span class="kc__blob kc__blob--b" aria-hidden="true"></span>' +
+      '<div class="kc__stage" id="kcStage">' + mods.map(kcardHTML).join('') + '</div>' +
+      (mods.length > 1 ? '<div class="kc__nav"><button type="button" class="kc__arr" data-act="kcPrev" aria-label="Khóa trước">' + icon('back', 20, 2.4) + '</button>' +
+        '<button type="button" class="kc__arr" data-act="kcNext" aria-label="Khóa sau">' + icon('next', 20, 2.4) + '</button></div>' : '') +
+      '</section>';
+  }
+
+  /* băng chuyền: vị trí thẻ tính theo khoảng cách d tới thẻ giữa; vòng tròn khi có từ 4 thẻ */
+  var KC = { i: -1, st: null, n: 0, loop: false, dir: 1 };
+  function kcStart(mods) {
+    var st = D.getElementById('kcStage'); KC.st = st; if (!st) return;
+    KC.n = mods.length; KC.loop = KC.n >= 4;
+    if (KC.i < 0 || KC.i >= KC.n) {
+      var pick = -1;
+      try { var sv = W.sessionStorage.getItem('ps.kc'); if (sv) mods.forEach(function (m, j) { if (m.id === sv) pick = j; }); } catch (e) {}
+      if (pick < 0) mods.forEach(function (m, j) { if (pick < 0 && modState(m).st === 'go') pick = j; });
+      if (pick < 0) mods.forEach(function (m, j) { if (pick < 0 && modState(m).st === 'new') pick = j; });
+      KC.i = pick < 0 ? 0 : pick;
+    }
+    kcLayout(0, true);
+    kcWire(st);
+  }
+  function kcNorm(d) {
+    if (!KC.loop) return d;
+    var h = KC.n / 2;
+    if (KC.dir >= 0) { while (d < -h) d += KC.n; while (d >= h) d -= KC.n; }
+    else { while (d <= -h) d += KC.n; while (d > h) d -= KC.n; }
+    return d;
+  }
+  function kcPlace(c, d) {
+    var a = Math.abs(d), w = KC.st.offsetWidth, cw = c.offsetWidth || 262;
+    var step = w < 600 ? cw * 0.9 : cw + Math.max(14, Math.min(44, w * 0.04));
+    var ty = Math.min(a, 2) * 22, rot = d * 6, sc = 1 - Math.min(a, 2) * 0.05;
+    var op = a <= 1 ? 1 : Math.max(0, 1 - (a - 1) / 0.55);
+    var tf = 'translate(' + (d * step).toFixed(1) + 'px,' + ty.toFixed(1) + 'px) rotate(' + rot.toFixed(2) + 'deg) scale(' + sc.toFixed(3) + ')';
+    c.style.webkitTransform = tf; c.style.transform = tf; c.style.opacity = op.toFixed(3);
+    c.style.zIndex = String(20 - Math.round(a * 4));
+    c.style.visibility = op < 0.01 ? 'hidden' : 'visible';
+  }
+  /* frac: phần thẻ đang kéo (dương = kéo sang thẻ sau); instant: không chuyển động */
+  function kcLayout(frac, instant) {
+    var st = KC.st; if (!st) return;
+    var cs = st.children, i, c, d, jump = [];
+    for (i = 0; i < cs.length; i++) {
+      c = cs[i]; d = kcNorm(i - KC.i - frac);
+      if (!KC.loop) d = i - KC.i - frac;
+      var old = c._d;
+      if (!instant && old !== undefined && Math.abs(d - old) > 1.5) jump.push([c, d]);
+      else {
+        c.style.transition = instant ? 'none' : '';
+        kcPlace(c, d);
+      }
+      c._d = d;
+      var on = Math.round(d) === 0 && Math.abs(d) < 0.5;
+      if (on) c.classList.add('is-on'); else c.classList.remove('is-on');
+      c.setAttribute('aria-hidden', Math.abs(d) > 1.2 ? 'true' : 'false');
+    }
+    /* thẻ vòng lại: đặt sẵn ngoài mép (ẩn) rồi trượt vào, không bay ngang qua màn hình */
+    jump.forEach(function (j) { j[0].style.transition = 'none'; kcPlace(j[0], j[1] + (KC.dir >= 0 ? 1 : -1)); });
+    if (jump.length) {
+      void st.offsetWidth;
+      jump.forEach(function (j) { j[0].style.transition = ''; kcPlace(j[0], j[1]); });
+    }
+    var nav = st.parentNode.querySelector('.kc__nav');
+    if (nav && !KC.loop) {
+      nav.children[0].disabled = KC.i <= 0;
+      nav.children[1].disabled = KC.i >= KC.n - 1;
+    }
+  }
+  function kcGo(to) {
+    if (!KC.st) return;
+    if (!KC.loop) to = Math.max(0, Math.min(KC.n - 1, to));
+    if (to === KC.i) { kcLayout(0, false); return; }
+    KC.dir = to > KC.i ? 1 : -1;
+    KC.i = ((to % KC.n) + KC.n) % KC.n;
+    kcLayout(0, false);
+    try { var c = KC.st.children[KC.i]; if (c) W.sessionStorage.setItem('ps.kc', c.getAttribute('data-id')); } catch (e) {}
+  }
+  function kcWire(st) {
+    var x0 = 0, y0 = 0, dx = 0, axis = '', down = false, moved = false, cw = 1, t0 = 0;
+    function start(x, y) { down = true; moved = false; axis = ''; x0 = x; y0 = y; dx = 0; t0 = Date.now(); cw = (st.children[0] && st.children[0].offsetWidth) || 262; }
+    function move(x, y, ev) {
+      if (!down) return;
+      var mx = x - x0, my = y - y0;
+      if (!axis) { if (Math.abs(mx) < 7 && Math.abs(my) < 7) return; axis = Math.abs(mx) > Math.abs(my) ? 'x' : 'y'; }
+      if (axis !== 'x') return;
+      if (ev && ev.cancelable) ev.preventDefault();
+      moved = true; dx = mx;
+      var f = -dx / (cw + 30);
+      if (!KC.loop) { var lo = -KC.i, hi = KC.n - 1 - KC.i; if (f < lo) f = lo + (f - lo) * 0.3; if (f > hi) f = hi + (f - hi) * 0.3; }
+      KC.dir = f >= 0 ? 1 : -1;
+      kcLayout(f, true);
+    }
+    function end() {
+      if (!down) return; down = false;
+      if (axis !== 'x') return;
+      var f = -dx / (cw + 30), v = dx / Math.max(1, Date.now() - t0), s = Math.round(f);
+      if (s === 0 && Math.abs(v) > 0.35) s = v < 0 ? 1 : -1;
+      if (s > 1) s = 1; if (s < -1) s = -1;
+      /* giữ vị trí đang kéo làm điểm xuất phát rồi trượt về chỗ */
+      var cs = st.children; for (var i = 0; i < cs.length; i++) cs[i]._d = kcNorm(i - KC.i - f);
+      if (s) kcGo(KC.i + s); else kcLayout(0, false);
+    }
+    if (W.PointerEvent) {
+      st.addEventListener('pointerdown', function (e) { if (e.pointerType === 'mouse' && e.button !== 0) return; start(e.clientX, e.clientY); });
+      st.addEventListener('pointermove', function (e) { move(e.clientX, e.clientY, e); });
+      st.addEventListener('pointerup', end); st.addEventListener('pointercancel', end);
+      st.addEventListener('pointerleave', function (e) { if (e.pointerType === 'mouse') end(); });
+    } else {
+      st.addEventListener('touchstart', function (e) { var t = e.touches[0]; start(t.clientX, t.clientY); }, { passive: true });
+      st.addEventListener('touchmove', function (e) { var t = e.touches[0]; move(t.clientX, t.clientY, e); }, { passive: false });
+      st.addEventListener('touchend', end); st.addEventListener('touchcancel', end);
+    }
+    /* chạm thẻ bên cạnh: đưa thẻ đó vào giữa; vừa kéo xong: không mở khóa học */
+    st.addEventListener('click', function (e) {
+      if (moved) { moved = false; e.preventDefault(); e.stopPropagation(); return; }
+      var c = PS.closest(e.target, '.kc__card'); if (!c) return;
+      if (!c.classList.contains('is-on')) {
+        e.preventDefault(); e.stopPropagation();
+        var d = Math.round(c._d || 0); if (d) kcGo(KC.i + d);
+      }
+    }, true);
+    st.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowRight' || e.keyCode === 39) { e.preventDefault(); kcGo(KC.i + 1); }
+      else if (e.key === 'ArrowLeft' || e.keyCode === 37) { e.preventDefault(); kcGo(KC.i - 1); }
+    });
+  }
+  var kcRT = null;
+  W.addEventListener('resize', function () { clearTimeout(kcRT); kcRT = setTimeout(function () { if (KC.st && D.body.contains(KC.st)) kcLayout(0, true); }, 120); });
+
   function nudge() {
     var t = PS.totals(), lb = PS.prefs().lastBackup || 0;
     if (!PS.storageOK) return '<div class="nudge nudge--warn">' + icon('info', 18) + '<p>Trình duyệt này đang chặn lưu bài. Hãy mở bằng Chrome hoặc Safari, hoặc tải sao lưu trước khi tắt.</p></div>';
@@ -133,25 +308,23 @@
     return '';
   }
   function vHome() {
-    var p = PS.profile(), t = PS.totals(), tc = PS.teacher();
-    var mods = visibleMods();
-    return '<header class="hbar"><div class="hbar__brand">' + logo(34) + '<b>' + esc(CFG.APP) + '</b></div>' +
+    var t = PS.totals(), nm = shortName();
+    var mods = carMods();
+    return '<header class="hbar"><div class="hbar__brand">' + logo(32) + '<b>' + esc(CFG.APP) + '</b></div>' +
       '<div class="hbar__btns"><button type="button" class="hbar__btn hub-install" data-pwa="install" aria-label="Cài ứng dụng">' + icon('phone', 19) + '<span data-pwa-label>Cài ứng dụng</span></button>' +
-      '<button type="button" class="hbar__btn" data-act="settings" aria-label="Cài đặt">' + icon('user', 19) + '<span>Cài đặt</span></button></div></header>' +
-      '<div class="wrap enter">' +
-      '<section class="hero" style="--i:0"><small>' + greet() + ',</small><h1>' + esc(PS.given()) + '</h1>' +
-      '<p class="hero__who">' + esc(p.cls ? 'Lớp ' + p.cls : '') + (p.path ? ' · ' + esc(p.path) : '') + (tc ? ' · ' + esc(tc.name) : '') + '</p>' +
-      '<div class="stats">' +
-      '<div class="st st--fire">' + icon('flame', 18) + '<b data-n="' + t.streak + '">' + t.streak + '</b><small>Chuỗi ngày</small></div>' +
-      '<div class="st st--xp">' + icon('star', 18) + '<b data-n="' + t.xp + '">' + t.xp + '</b><small>Tổng XP</small></div>' +
-      '<div class="st st--ins">' + icon('bulb', 18) + '<b data-n="' + t.ins + '">' + t.ins + '</b><small>Insight</small></div>' +
-      '</div><p class="hero__today">' + icon('clock', 15) + (t.todayMin ? ' Hôm nay bạn đã học và rèn luyện ' + t.todayMin + ' phút. Giữ chuỗi nhé!' : (t.streak ? ' Học hôm nay để giữ chuỗi ' + t.streak + ' ngày.' : ' Học vài phút mỗi ngày để bắt đầu chuỗi ngày học.')) + '</p></section>' +
+      '<span class="hbar__fire" title="Chuỗi ngày học" aria-label="Chuỗi ' + t.streak + ' ngày">' + icon('flame', 16) + '<b>' + t.streak + '</b> ngày</span>' +
+      '<button type="button" class="hbar__av" data-act="settings" aria-label="Cài đặt">' + esc(nm.split(' ').pop().charAt(0).toUpperCase()) + '</button></div></header>' +
+      '<div class="hdeco" aria-hidden="true"><i class="hd hd--a">' + icon('bulb', 64, 1.6) + '</i><i class="hd hd--b">' + icon('rail', 58, 1.6) + '</i><i class="hd hd--c">' + icon('star', 46, 1.6) + '</i><i class="hd hd--d">' + icon('dumbbell', 52, 1.8) + '</i></div>' +
+      '<div class="wrap wrap--top enter">' +
+      '<h1 class="hi" style="--i:0"><span>' + greet() + ',</span> ' + esc(nm) + '</h1>' +
       routineHTML() +
-      (W.PSLich ? W.PSLich.cardHTML() : '') +
-      '<div style="--i:1">' + nudge() + '</div>' +
-      '<h2 class="sec" style="--i:2">Khóa học của bạn</h2>' +
-      '<div class="mlist">' + mods.map(cardHTML).join('') + '</div>' +
-      guidesHTML() +
+      '<div style="--i:2">' + (W.PSLich ? W.PSLich.cardHTML() : '') + '</div>' +
+      '<div style="--i:3">' + nudge() + '</div>' +
+      '<h2 class="sec" style="--i:4">Khóa học của bạn</h2>' +
+      '<div class="kstats" style="--i:4"><div class="ks"><b>' + num(t.xp) + '</b><small>Tổng XP</small></div><div class="ks"><b>' + num(t.ins) + '</b><small>Insight</small></div><div class="ks"><b>' + t.todayMin + ' phút</b><small>Hôm nay</small></div></div>' +
+      '</div>' +
+      '<div class="enter">' + carouselHTML(mods) + '</div>' +
+      '<div class="wrap enter">' + guidesHTML() +
       '<footer class="hfoot">' + esc(CFG.ORG) + '<br>' + esc(CFG.APP) + ' ' + esc(CFG.APP_VER) + ' · Bài làm lưu trên máy này</footer>' +
       '</div>';
   }
@@ -214,6 +387,7 @@
   /* ---------------- vẽ, sự kiện ---------------- */
   function render(enter) {
     APP.innerHTML = PS.needProfile() ? vWelcome() : vHome();
+    if (!PS.needProfile()) kcStart(carMods());
     if (!enter || noMotion) Array.prototype.forEach.call(APP.querySelectorAll('.enter'), function (e) { e.classList.remove('enter'); });
     if (PS.pwaRefresh) PS.pwaRefresh();
   }
@@ -222,12 +396,16 @@
     var a = b.getAttribute('data-act');
     if (a === 'onbGo') onbGo();
     else if (a === 'mod') openMod(b.getAttribute('data-id'));
+    else if (a === 'ci') goCheckin();
+    else if (a === 'kcPrev') kcGo(KC.i - 1);
+    else if (a === 'kcNext') kcGo(KC.i + 1);
     else if (a === 'settings') openSettings();
     else if (a === 'closeSet') closeSettings();
     else if (a === 'backup') PS.backup();
     else if (a === 'restore') PS.restorePick();
   });
   D.addEventListener('keydown', function (e) {
+    if ((e.key === 'Enter' || e.keyCode === 13) && e.target && e.target.classList && e.target.classList.contains('shn__card')) { e.preventDefault(); openMod('routine'); return; }
     if ((e.key === 'Enter' || e.keyCode === 13) && PS.closest(e.target, '.onb__form') && e.target.tagName === 'INPUT') { e.preventDefault(); onbGo(); }
     if ((e.key === 'Escape' || e.keyCode === 27) && D.querySelector('.sheet:not(.sheet--lc)') && !D.querySelector('.ps-ov')) closeSettings();
   });
