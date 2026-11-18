@@ -1,27 +1,30 @@
 /* =========================================================
    PROSKILLS · SERVICE WORKER (một cho toàn bộ ứng dụng)
    - Khi phát hành bản mới: đổi VERSION cho trùng APP_VER trong config.js.
-   - Mạng trước, bộ nhớ sau: có mạng luôn lấy bản mới nhất; mất mạng mở bản đã lưu.
+   - PS1.3.34 (mở khóa học nhanh hơn):
+     · Trang HTML: mạng trước, chờ tối đa 2 giây rồi mở bản đã lưu; mất mạng mở bản đã lưu.
+     · Tệp có ?v= (js, css theo phiên bản): lấy bộ nhớ ngay, không chờ mạng (đổi phiên bản = địa chỉ mới).
+     · Tệp khác (hình, phông, âm thanh): mở bản đã lưu ngay, đồng thời tải bản mới chạy ngầm cho lần sau.
    - Mọi tệp của module được lưu tự động sau lần mở đầu tiên có mạng.
    - Không bao giờ đụng tới bài làm (localStorage) của học viên.
    ========================================================= */
 'use strict';
-const VERSION = 'PS1.3.33';
+const VERSION = 'PS1.3.36';
 const BASE = new URL(self.registration.scope);
 const PREFIX = 'proskills-' + encodeURIComponent(BASE.pathname) + '-';
 const SHELL = PREFIX + 'shell-' + VERSION;
 const RUNTIME = PREFIX + 'runtime';
 const CORE = [
   './', 'index.html', 'offline.html', 'config.js', 'manifest.webmanifest',
-  'core/core.js', 'core/core.css', 'core/pwa.js',
-  'hub/hub.js', 'hub/lich.js', 'hub/hub.css',
+  'core/core.js', 'core/core.css', 'core/pwa.js', 'core/shin.js',
+  'hub/hub.js', 'hub/lich.js', 'hub/avatar.js', 'hub/hub.css',
   'icons/logo.svg', 'icons/app-192.png', 'icons/app-512.png', 'icons/maskable-512.png', 'icons/apple-touch-icon.png',
   'routine/index.html', 'routine/proskills.js?v=' + VERSION
 ];
 /* Shin Routine (routine/): tải sẵn chạy ngầm khi cài service worker, để đóng dấu được cả khi mất mạng.
    Bộ nhớ riêng theo phiên bản Shin: chỉ tải lại khi đổi ROUTINE_VER (trùng APP_VER trong routine/scripts/core.js
    và các ?v= trong routine/index.html). Thêm/bớt tệp trong routine/ thì sửa danh sách này. */
-const ROUTINE_VER = 'M.Claude.3.3.41';
+const ROUTINE_VER = 'M.Claude.3.4.0';
 const ROUTINE = PREFIX + 'routine-' + ROUTINE_VER;
 const ROUTINE_FILES = [
   "assets/breathing/exhale.mp3",
@@ -132,7 +135,7 @@ function networkFirst(event) {
   const request = event.request;
   const net = fetch(request).then(async response => {
     if (response && response.ok && response.type === 'basic') {
-      try { const c = await caches.open(RUNTIME); await c.put(request, response.clone()); trim(c, 200); } catch (e) {}
+      try { const c = await caches.open(RUNTIME); await c.put(request, response.clone()); trim(c, 300); } catch (e) {}
     }
     return response;
   });
@@ -144,9 +147,32 @@ function networkFirst(event) {
     }
     let timer;
     const quick = net.then(r => (r && r.ok ? r : cached), () => cached);
-    const slow = new Promise(resolve => { timer = setTimeout(() => resolve(cached), 3500); });
+    const slow = new Promise(resolve => { timer = setTimeout(() => resolve(cached), 2000); });
     return Promise.race([quick, slow]).finally(() => clearTimeout(timer));
   })();
+}
+/* tệp có ?v=: bộ nhớ trước (khớp đúng cả ?v=, không bỏ qua phần sau dấu ?) */
+async function cacheFirst(event) {
+  const request = event.request;
+  const hit = await caches.match(request);
+  if (hit) return hit;
+  const r = await fetch(request);
+  if (r && r.ok && r.type === 'basic') {
+    const copy = r.clone();
+    event.waitUntil(caches.open(RUNTIME).then(c => c.put(request, copy).then(() => trim(c, 300))).catch(() => undefined));
+  }
+  return r;
+}
+/* hình, phông, âm thanh không có ?v=: mở bản đã lưu ngay, cập nhật chạy ngầm */
+async function staleRevalidate(event) {
+  const request = event.request;
+  const hit = await fromCache(request);
+  const net = fetch(request).then(async r => {
+    if (r && r.ok && r.type === 'basic') { try { const c = await caches.open(RUNTIME); await c.put(request, r.clone()); } catch (e) {} }
+    return r;
+  });
+  if (hit) { event.waitUntil(net.then(() => undefined, () => undefined)); return hit; }
+  try { return await net; } catch (e) { return new Response('', { status: 503 }); }
 }
 self.addEventListener('fetch', event => {
   const request = event.request;
@@ -154,5 +180,9 @@ self.addEventListener('fetch', event => {
   const url = new URL(request.url);
   if (url.origin !== BASE.origin || !url.pathname.startsWith(BASE.pathname)) return;
   if (url.pathname.endsWith('/sw.js')) return;
-  event.respondWith(networkFirst(event));
+  const page = request.mode === 'navigate' || /\.html?$/.test(url.pathname) || url.pathname.endsWith('/');
+  if (page || url.pathname.endsWith('.webmanifest') || url.pathname.endsWith('/config.js')) event.respondWith(networkFirst(event));
+  else if (/(^|&)v=/.test(url.search.slice(1))) event.respondWith(cacheFirst(event));
+  else if (/\.(png|jpe?g|webp|gif|svg|woff2?|ttf|mp3|m4a|ogg|wav)$/i.test(url.pathname)) event.respondWith(staleRevalidate(event));
+  else event.respondWith(networkFirst(event));
 });

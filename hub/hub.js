@@ -18,7 +18,7 @@
   if (WANT) { try { history.replaceState(null, '', location.pathname + (SHOW_HIDDEN ? '?thu=1' : '')); } catch (e) {} }
   var noMotion = W.matchMedia && W.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* Logo Proskills: đầu tàu tiến về bình minh (icons/logo.svg) */
+  /* Logo Proskills (PS1.3.34): chữ O nảy mầm, bản nền trắng V2 (icons/logo.svg); hình app là bản nền xanh V1 */
   function logo(sz) {
     sz = sz || 40;
     return '<img class="hub-logo" src="' + PS.url('icons/logo.svg') + '" width="' + sz + '" height="' + sz + '" alt="">';
@@ -55,11 +55,13 @@
   }
   function routineHTML() {
     var m = routineMod(); if (!m) return '';
-    var r = routineInfo(), x = r.x || {}, n = x.active || 0, nm = '<b>' + esc(shortName()) + '</b>', ci = ciInfo(r), bub;
-    if (!x.habits) bub = 'Chào ' + nm + '! Mình là Shin. Cùng rèn thói quen tốt nhé.';
-    else if (ci.done) bub = 'Check-in xong rồi. Giữ nhịp nhé ' + nm + '!';
-    else if (!n) bub = 'Chưa có thẻ đang rèn. Chọn thêm thẻ nhé ' + nm + '.';
-    else bub = 'Hôm nay chưa check-in đó ' + nm + '. 30 giây thôi!';
+    var r = routineInfo(), x = r.x || {}, n = x.active || 0, nm = '<b>' + esc(shortName()) + '</b>', ci = ciInfo(r), bub, md;
+    /* PS1.3.36: Shin là gà lớn dần (core/shin.js); biểu cảm theo tình trạng hôm nay */
+    var lk = W.PSShin ? W.PSShin.look() : null;
+    if (!x.habits) { bub = 'Chào ' + nm + '! Mình là Shin' + (lk && lk.stg === 0 ? ', đang còn trong trứng. Ghi nhận đều, mình sẽ nở' : '') + '. Cùng rèn thói quen tốt nhé.'; md = 'hi'; }
+    else if (ci.done) { bub = 'Check-in xong rồi. Giữ nhịp nhé ' + nm + '!'; md = 'cheer'; }
+    else if (!n) { bub = 'Chưa có thẻ đang rèn. Chọn thêm thẻ nhé ' + nm + '.'; md = 'curious'; }
+    else { bub = 'Hôm nay chưa check-in đó ' + nm + '. 30 giây thôi!'; md = 'waiting'; }
     var chips = (x.cards && x.cards.length) ? '<div class="shn__chips">' + x.cards.map(function (c) {
       var mk = r.isT && c.m ? c.m : '';
       return '<span class="rt-chip rt-chip--' + (mk || 'none') + '" title="' + esc(MARK[mk] || 'Chưa ghi nhận') + '"><i aria-hidden="true"></i>' + esc(c.n) + '</span>';
@@ -72,7 +74,7 @@
     return '<section class="shn" style="--i:1"><div class="shn__card" data-act="mod" data-id="routine" role="link" tabindex="0" aria-label="Mở Shin Routine">' +
       '<small class="shn__k">RÈN LUYỆN HẰNG NGÀY CÙNG</small>' +
       '<h2 class="shn__t">Shin Routine<svg class="shn__sw" viewBox="0 0 200 10" preserveAspectRatio="none" aria-hidden="true"><path d="M3 7C55 2 140 1.5 197 5.5"/></svg></h2>' +
-      '<div class="shn__row"><img class="shn__shin" src="' + PS.url('routine/icon-192.png') + '" width="56" height="56" alt=""><p class="shn__bub">' + bub + '</p></div>' +
+      '<div class="shn__row">' + (lk ? '<span class="shn__shin shn__shin--g">' + W.PSShin.svg(md, { stg: lk.stg, fit: lk.fit, days: lk.days }) + '</span>' : '<img class="shn__shin" src="' + PS.url('routine/icon-192.png') + '" width="56" height="56" alt="">') + '<p class="shn__bub">' + bub + '</p></div>' +
       chips + btn + '</div></section>';
   }
   function goCheckin() {
@@ -313,7 +315,7 @@
     return '<header class="hbar"><div class="hbar__brand">' + logo(32) + '<b>' + esc(CFG.APP) + '</b></div>' +
       '<div class="hbar__btns"><button type="button" class="hbar__btn hub-install" data-pwa="install" aria-label="Cài ứng dụng">' + icon('phone', 19) + '<span data-pwa-label>Cài ứng dụng</span></button>' +
       '<span class="hbar__fire" title="Chuỗi ngày học" aria-label="Chuỗi ' + t.streak + ' ngày">' + icon('flame', 16) + '<b>' + t.streak + '</b> ngày</span>' +
-      '<button type="button" class="hbar__av" data-act="settings" aria-label="Cài đặt">' + esc(nm.split(' ').pop().charAt(0).toUpperCase()) + '</button></div></header>' +
+      '<button type="button" class="hbar__av" data-act="settings" aria-label="Cài đặt">' + (W.PSAvatar ? W.PSAvatar.html(40) : esc(nm.split(' ').pop().charAt(0).toUpperCase())) + '</button></div></header>' +
       '<div class="hdeco" aria-hidden="true"><i class="hd hd--a">' + icon('bulb', 64, 1.6) + '</i><i class="hd hd--b">' + icon('rail', 58, 1.6) + '</i><i class="hd hd--c">' + icon('star', 46, 1.6) + '</i><i class="hd hd--d">' + icon('dumbbell', 52, 1.8) + '</i></div>' +
       '<div class="wrap wrap--top enter">' +
       '<h1 class="hi" style="--i:0"><span>' + greet() + ',</span> ' + esc(nm) + '</h1>' +
@@ -371,18 +373,39 @@
   }
   function go(id) {
     if (!PS.isUnlocked(id)) return;
-    D.body.classList.add('leaving');
-    setTimeout(function () { PS.open(id); }, noMotion ? 0 : 180);
+    var m = PS.mod(id) || {};
+    if (m.kind !== 'routine') PS.setPref('lastMod', id);
+    /* PS1.3.34: hiện ngay màn "Đang mở" theo màu khóa, rồi mới chuyển trang (khóa lớn tải lâu vẫn thấy phản hồi tức thì) */
+    if (!D.querySelector('.ps-going')) {
+      var o = D.createElement('div'); o.className = 'ps-going'; o.setAttribute('role', 'status');
+      o.style.setProperty('--gc', m.color || '#0F4D98');
+      o.innerHTML = '<div><small>ĐANG MỞ</small>' + esc(m.title || '') + '</div><i aria-hidden="true"><b></b><b></b><b></b></i>';
+      D.body.appendChild(o);
+    }
+    setTimeout(function () { PS.open(id); }, noMotion ? 0 : 60);
   }
 
   /* ---------------- Cài đặt ---------------- */
   function openSettings() {
     var ov = D.createElement('div'); ov.className = 'sheet'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-label', 'Cài đặt');
-    ov.innerHTML = '<div class="sheet__in"><div class="sheet__top"><h2>Cài đặt</h2><button type="button" class="sheet__x" data-act="closeSet" aria-label="Đóng">' + icon('close', 20) + '</button></div><div id="setBody">' + PS.settingsHTML({ ctx: 'hub' }) + '</div></div>';
+    ov.innerHTML = '<div class="sheet__in"><div class="sheet__top"><h2>Cài đặt</h2><button type="button" class="sheet__x" data-act="closeSet" aria-label="Đóng">' + icon('close', 20) + '</button></div><div id="setBody">' + PS.settingsHTML({ ctx: 'hub', extra: W.PSAvatar ? [W.PSAvatar.rowHTML()] : [] }) + '</div></div>';
     D.body.appendChild(ov); D.body.classList.add('ps-lock');
     PS.wireSettings(ov.querySelector('#setBody'), { ctx: 'hub' });
+    if (W.PSAvatar) W.PSAvatar.wire(ov.querySelector('#setBody')); /* PS1.3.36: ảnh đại diện */
+    W.PSSheetPush();
   }
-  function closeSettings() { var s = D.querySelector('.sheet'); if (s) s.parentNode.removeChild(s); D.body.classList.remove('ps-lock'); render(false); }
+  function closeSettings(fromBack) { var s = D.querySelector('.sheet'); if (s) s.parentNode.removeChild(s); D.body.classList.remove('ps-lock'); if (!fromBack) W.PSSheetDone(); render(false); }
+
+  /* PS1.3.34 · nút Back (Android, cử chỉ vuốt) đóng tấm Cài đặt / Lịch học thay vì thoát ứng dụng */
+  var SHEET = 0;
+  W.PSSheetPush = function () { if (SHEET) return; try { history.pushState({ psSheet: 1 }, ''); SHEET = 1; } catch (e) {} };
+  W.PSSheetDone = function () { if (!SHEET) return; SHEET = 0; try { history.back(); } catch (e) {} };
+  W.addEventListener('popstate', function () {
+    if (!SHEET) return; SHEET = 0;
+    Array.prototype.forEach.call(D.querySelectorAll('.ps-ov'), function (o) { o.parentNode.removeChild(o); });
+    if (D.querySelector('.sheet--lc') && W.PSLich && W.PSLich.close) { W.PSLich.close(true); return; }
+    if (D.querySelector('.sheet')) closeSettings(true);
+  });
 
   /* ---------------- vẽ, sự kiện ---------------- */
   function render(enter) {
@@ -415,7 +438,7 @@
     if (hbT) return;
     hbT = setTimeout(function () { hbT = null; var hb = D.querySelector('.hbar'); if (hb) { if ((W.pageYOffset || 0) > 8) hb.classList.add('is-scrolled'); else hb.classList.remove('is-scrolled'); } }, 60);
   }, { passive: true });
-  W.addEventListener('pageshow', function (e) { if (e.persisted) { D.body.classList.remove('leaving'); render(false); } });
+  W.addEventListener('pageshow', function (e) { if (e.persisted) { D.body.classList.remove('leaving'); var g = D.querySelector('.ps-going'); if (g) g.parentNode.removeChild(g); render(false); } });
 
   W.PSHubRender = function () { if (!PS.needProfile()) render(false); };
   /* trạng thái lịch học (Đang học, Còn … phút) tự cập nhật mỗi phút */
@@ -428,7 +451,71 @@
     W.location.replace(PS.url('routine/index.html') + '?door=1');
     return;
   }
+
+  /* ---------------- PS1.3.34 · Intro: chữ O tự vẽ, hai lá nảy mầm, logo bay về thanh trên ----------------
+     Chỉ lần mở đầu tiên trong ngày (ps.intro = ngày). Không chạy khi mở bằng liên kết sâu (?lich, ?go, ?m, ?thu).
+     index.html tô nền xanh trước (lớp html.ps-intro) để không chớp trang chủ. Chạm để bỏ qua. Giảm chuyển động: hiện tĩnh rồi mờ đi. */
+  function introNeeded() {
+    if (QS.lich || QS.go || WANT || SHOW_HIDDEN) return false;
+    try { return W.localStorage.getItem('ps.intro') !== PS.today(); } catch (e) { return false; }
+  }
+  function intro() {
+    var ov = D.createElement('div'); ov.className = 'pi' + (noMotion ? ' pi--still' : ''); ov.setAttribute('aria-hidden', 'true');
+    ov.innerHTML = '<div class="pi__logo"><svg viewBox="40 30 440 440"><path class="pi__ring" d="M335.0 242.8 A116.8 116.8 0 1 1 225.9 177.3"/>' +
+      '<path class="pi__lf pi__lf1" d="M288.6 183.8 C315.7 147.5 296.2 106.6 234.3 97.0 C220.2 142.0 241.9 188.8 288.6 183.8Z" fill="#EE1D23"/><path class="pi__lf pi__lf2" d="M288.6 183.8 C324.9 230.5 384.9 220.2 420.9 145.9 C368.3 112.5 299.9 123.4 288.6 183.8Z" fill="#199F5A"/></svg></div>' +
+      '<div class="pi__word"><b>' + esc(CFG.APP) + '</b><small>Khoa Kỹ năng · JPC</small></div>';
+    D.body.appendChild(ov); D.documentElement.classList.remove('ps-intro');
+    try { W.localStorage.setItem('ps.intro', PS.today()); } catch (e) {}
+    var done = false, tm;
+    void ov.offsetWidth; ov.classList.add('go');
+    tm = setTimeout(function () { fin(false); }, noMotion ? 450 : 1650);
+    ov.addEventListener('click', function () { fin(true); });
+    function rm() { if (ov.parentNode) ov.parentNode.removeChild(ov); }
+    function replay() { Array.prototype.forEach.call(APP.querySelectorAll('.enter'), function (e) { e.classList.remove('enter'); void e.offsetWidth; e.classList.add('enter'); }); }
+    function fin(skip) {
+      if (done) return; done = true; clearTimeout(tm);
+      var lg = ov.querySelector('.pi__logo'), tg = D.querySelector('.hbar__brand .hub-logo') || D.querySelector('.onb__brand .hub-logo');
+      ov.classList.add('out'); if (!noMotion) replay();
+      if (skip || noMotion || !tg) { ov.style.opacity = '0'; setTimeout(rm, 300); return; }
+      var a = lg.getBoundingClientRect(), b = tg.getBoundingClientRect();
+      var sc = b.width / a.width * 1.02, dx = (b.left + b.width / 2) - (a.left + a.width / 2), dy = (b.top + b.height / 2) - (a.top + a.height / 2);
+      tg.style.opacity = '0';
+      lg.classList.add('fly'); lg.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(' + sc + ')';
+      setTimeout(function () { tg.style.opacity = ''; ov.style.opacity = '0'; }, 540);
+      setTimeout(rm, 760);
+    }
+  }
+
+  /* PS1.3.34 · tải sẵn các khóa (chạy ngầm, mỗi phiên bản một lần) để lần đầu mở khóa không phải chờ mạng */
+  function warm() {
+    var sw = W.navigator.serviceWorker, c = W.navigator.connection;
+    if (!sw || !sw.controller || !W.fetch || !W.URL) return;
+    if (c && (c.saveData || /2g/.test(c.effectiveType || ''))) return;
+    try { if (W.localStorage.getItem('ps.warm') === CFG.APP_VER) return; } catch (e) { return; }
+    var ids = PS.modules().filter(function (m) { return m.kind !== 'routine' && m.state === 'ready'; }).map(function (m) { return m.id; });
+    function one(i) {
+      if (i >= ids.length) { try { W.localStorage.setItem('ps.warm', CFG.APP_VER); } catch (e) {} return; }
+      var page = new W.URL(PS.url(ids[i] + '/index.html'), location.href).href;
+      W.fetch(page).then(function (r) { return r.text(); }).then(function (html) {
+        var re = /(?:src|href)="([^"]+\?v=[^"]+)"/g, m, list = [];
+        while ((m = re.exec(html))) list.push(new W.URL(m[1], page).href);
+        function f(k) { if (k >= list.length) { one(i + 1); return; } W.fetch(list[k]).then(function () { f(k + 1); }, function () { f(k + 1); }); }
+        f(0);
+      })['catch'](function () { one(i + 1); });
+    }
+    one(0);
+  }
+  var INTRO = introNeeded();
+  if (!INTRO) D.documentElement.classList.remove('ps-intro');
+  if (INTRO) intro();
   render(true);
+  setTimeout(warm, 4000);
+  /* lối tắt "Học tiếp" trên biểu tượng app (manifest shortcuts): ?go=last mở khóa học gần nhất */
+  if (QS.go === 'last' && !PS.needProfile()) {
+    try { history.replaceState(null, '', location.pathname); } catch (e) {}
+    var lm = PS.mod(PS.prefs().lastMod || '');
+    if (lm && lm.state === 'ready' && PS.isUnlocked(lm.id)) go(lm.id); else PS.toast('Chọn một khóa học để bắt đầu nhé.');
+  }
   /* ?lich=1 mở tấm Lịch học; ?lich=nhac mở phần giờ tự học (link từ các khóa) */
   if (QS.lich && !PS.needProfile() && W.PSLich) { try { history.replaceState(null, '', location.pathname); } catch (e) {} setTimeout(function () { W.PSLich.open(QS.lich === 'nhac' ? 'nhac' : '', W.PSHubRender); }, 300); }
   /* Đến từ module chưa đủ điều kiện (?m=id): hỏi thông tin trước, rồi mở cổng */

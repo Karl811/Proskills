@@ -29,7 +29,7 @@ button{font-family:inherit}
 .onb{max-width:520px;margin:0 auto;padding:max(28px,env(safe-area-inset-top)) 18px 40px}
 .onb__brand{display:flex;align-items:center;gap:14px;margin:8px 0 14px}
 .onb__brand small{display:block;font-size:12.5px;color:var(--muted);font-weight:600}
-.onb__brand h1{font:800 clamp(34px,10vw,46px)/1 var(--h);margin:2px 0 0;letter-spacing:-.02em;color:var(--c)}
+.onb__brand h1{font:800 clamp(34px,10vw,46px)/1 var(--h);margin:2px 0 0;letter-spacing:-.02em;color:#0F4D98}
 .onb__lead{font-size:16px;color:var(--ink-2);margin:0 0 16px}
 .onb__err{color:#B23A28;font-size:14px;font-weight:600;min-height:1em;margin:4px 0}
 .onb__restore{display:flex;margin:16px auto 0}
@@ -206,14 +206,27 @@ body{background:var(--bg);background-image:none}
 /* thanh trên: logo · cài app · chuỗi ngày · ảnh đại diện (chạm = Cài đặt) */
 .hbar{padding:12px max(14px,calc(50% - 346px)) 8px}
 .hbar.is-scrolled{background:rgba(246,244,238,.88);box-shadow:0 1px 0 var(--line)}
-.hbar__brand b{color:var(--ink);font:900 22px/1 var(--h);letter-spacing:-.02em}
+.hbar__brand b{color:#0F4D98;font:900 20px/1 var(--h);letter-spacing:-.02em} /* PS1.3.34: xanh dương của logo, nhỏ hơn một chút (22 → 20px) */
 .hbar__btns{align-items:center;gap:8px}
 .hbar__btn{border-color:var(--line);color:var(--ink);box-shadow:none}
 .hbar__fire{display:inline-flex;align-items:center;gap:4px;height:38px;padding:0 12px 0 10px;border-radius:999px;background:#fff;border:1.5px solid var(--line);font-size:13.5px;color:var(--ink-2);white-space:nowrap}
 .hbar__fire .ps-ic{color:#EF7A35}
 .hbar__fire b{font:900 16px/1 var(--h);color:var(--ink)}
-.hbar__av{width:40px;height:40px;flex:none;border-radius:50%;border:2.5px solid #fff;background:#FFE08F;color:#6A4A00;font:900 17px/1 var(--h);cursor:pointer;
-  box-shadow:0 0 0 1.5px var(--line);display:grid;place-items:center;padding:0;-webkit-tap-highlight-color:transparent}
+.hbar__av{width:44px;height:44px;flex:none;border-radius:50%;border:2px solid #fff;background:#fff;color:#6A4A00;font:900 17px/1 var(--h);cursor:pointer;
+  box-shadow:0 0 0 1.5px var(--line);display:grid;place-items:center;padding:0;overflow:hidden;-webkit-tap-highlight-color:transparent}
+/* PS1.3.36 · ảnh đại diện (hub/avatar.js): hình vẽ hoặc chữ cái + màu */
+.ps-av{display:grid;place-items:center;border-radius:50%;overflow:hidden;font-family:var(--h);font-weight:900;line-height:1;flex:none}
+.ps-av svg{display:block}
+.avp{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:10px 0 4px;justify-items:center}
+.avp--c{grid-template-columns:repeat(8,1fr);gap:6px}
+.avp__b{width:58px;height:58px;padding:0;border:0;border-radius:50%;background:none;cursor:pointer;display:grid;place-items:center;box-shadow:0 0 0 2px transparent;transition:transform .15s,box-shadow .15s;-webkit-tap-highlight-color:transparent}
+.avp__b svg{display:block;border-radius:50%}
+.avp__b:active{transform:scale(.92)}
+.avp__b.on{box-shadow:0 0 0 3px #fff,0 0 0 5.5px #0F4D98}
+.avp__l{width:34px;height:34px;font:900 15px/1 var(--h)}
+.avp__l.on{box-shadow:0 0 0 2px #fff,0 0 0 4px #0F4D98}
+.avp__h{margin:14px 0 2px;font-size:13px;font-weight:700;color:var(--ink-2)}
+@media (min-width:600px){.avp{grid-template-columns:repeat(6,1fr)}}
 .hbar__av:active{transform:scale(.94)}
 
 /* hình mờ trang trí (như đồ vật bay của tabletop) */
@@ -244,6 +257,18 @@ body{background:var(--bg);background-image:none}
 @keyframes swDraw{from{stroke-dashoffset:210}to{stroke-dashoffset:0}}
 .shn__row{display:flex;align-items:center;gap:12px;margin-top:18px}
 .shn__shin{width:56px;height:56px;flex:none;border-radius:18px;background:#2265C5;box-shadow:0 8px 16px -10px #2265C5}
+/* PS1.3.36: gà Shin vẽ trực tiếp (core/shin.js), nền tròn xanh nhạt; nhún nhẹ, tôn trọng giảm chuyển động */
+.shn__shin--g{width:72px;height:74px;border-radius:0;background:radial-gradient(circle at 50% 62%,#DCE8FF 0 54%,transparent 55%);box-shadow:none;margin:-8px -2px -6px -6px}
+.shn__shin--g svg{display:block;width:100%;height:100%}
+.psshin .blink{animation:psBlink 5s infinite;transform-origin:center;transform-box:fill-box}
+.psshin .bob{animation:psBob 3.6s ease-in-out infinite}
+.psshin .wave{transform-origin:30% 90%;transform-box:fill-box;animation:psWave 1.6s ease-in-out infinite}
+.psshin .tail{transform-origin:10% 90%;transform-box:fill-box;animation:psTail 2.4s ease-in-out infinite}
+@keyframes psBlink{0%,94%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}
+@keyframes psBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@keyframes psWave{0%,100%{transform:rotate(0)}50%{transform:rotate(-18deg)}}
+@keyframes psTail{0%,100%{transform:rotate(0)}50%{transform:rotate(10deg)}}
+@media (prefers-reduced-motion:reduce){.psshin *{animation:none!important}}
 .shn__bub{position:relative;margin:0;background:#F4F1E8;border-radius:18px 18px 18px 5px;padding:9px 13px;font-size:14px;line-height:1.45;color:var(--ink)}
 .shn__chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
 .shn .rt-chip{background:#F3F4F8;border-color:transparent;padding:5px 11px 5px 7px}
@@ -313,3 +338,29 @@ body{background:var(--bg);background-image:none}
 .gcard{border-width:1.5px;box-shadow:none;background:#fff}
 .wrap--top{padding-bottom:0}
 @media (max-width:380px){.hi{font-size:22px}.shn__t{font-size:29px}}
+
+/* ---- PS1.3.34 · logo mới + intro "chữ O nảy mầm" ---- */
+.hub-logo{border-radius:24%;box-shadow:0 4px 10px -6px rgba(15,77,152,.5);transition:opacity .2s}
+.pi{position:fixed;inset:0;z-index:400;background:#0F4D98;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:opacity .2s;-webkit-tap-highlight-color:transparent}
+.pi.out{background:transparent;transition:background-color .45s ease,opacity .2s}
+.pi__logo{position:relative;width:210px;height:210px}
+.pi__logo svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.pi__ring{fill:none;stroke:#fff;stroke-width:48;stroke-linecap:round;stroke-dasharray:599.3;stroke-dashoffset:599.3}
+.pi__lf{transform-box:view-box;transform-origin:288.6px 183.8px;-webkit-transform:scale(0);transform:scale(0)}
+.pi__word{margin-top:6px;text-align:center;color:#fff;opacity:0;-webkit-transform:translateY(10px);transform:translateY(10px)}
+.pi__word b{display:block;font:900 34px/1 var(--h);letter-spacing:-.015em}
+.pi__word small{display:block;margin-top:8px;font-size:13px;font-weight:600;opacity:.8;letter-spacing:.04em}
+.pi.out .pi__word{opacity:0!important;transition:opacity .2s}
+.pi.go .pi__ring{animation:piDraw .62s cubic-bezier(.65,0,.35,1) .15s forwards}
+.pi.go .pi__lf1{animation:piGrow .5s cubic-bezier(.34,1.56,.64,1) .66s forwards}
+.pi.go .pi__lf2{animation:piGrow2 .56s cubic-bezier(.34,1.56,.64,1) .78s forwards}
+.pi.go .pi__word{animation:piWord .4s ease-out 1.1s forwards}
+.pi__logo.fly{transition:-webkit-transform .55s cubic-bezier(.32,.72,0,1);transition:transform .55s cubic-bezier(.32,.72,0,1)}
+.pi__logo.fly .pi__ring{stroke:#0F4D98;transition:stroke .45s ease}
+.pi--still .pi__ring{stroke-dashoffset:0;animation:none!important}
+.pi--still .pi__lf{-webkit-transform:none;transform:none;animation:none!important}
+.pi--still .pi__word{opacity:1;-webkit-transform:none;transform:none;animation:none!important}
+@keyframes piDraw{to{stroke-dashoffset:0}}
+@keyframes piGrow{0%{transform:scale(0) rotate(-30deg)}100%{transform:scale(1) rotate(0)}}
+@keyframes piGrow2{0%{transform:scale(0) rotate(26deg)}100%{transform:scale(1) rotate(0)}}
+@keyframes piWord{to{opacity:1;transform:none}}

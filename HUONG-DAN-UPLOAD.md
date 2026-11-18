@@ -6,7 +6,7 @@
 3. Mở thư mục phiên bản mới nhất (ví dụ `PS1.2.2`) trên máy, chọn **toàn bộ nội dung bên trong** (Ctrl+A), kéo vào vùng tải lên.
    - Kéo cả các thư mục `core`, `hub`, `icons`, `mau`, `tk` (gồm cả `tk/game`). Trình duyệt Chrome/Edge giữ nguyên cấu trúc thư mục.
    - `index.html` phải nằm ngay ở gốc repository, không nằm trong thư mục `PS1.2.2`.
-   - Mỗi lần kéo tối đa 100 tệp. Proskills hiện có khoảng 113 tệp nên **lần đầu kéo 2 lần**:
+   - Mỗi lần kéo tối đa 100 tệp. Proskills hiện có khoảng 118 tệp nên **lần đầu kéo 2 lần**:
      lần 1 kéo riêng thư mục `routine` (Shin Routine, 62 tệp), lần 2 kéo phần còn lại (Ctrl+A rồi bỏ chọn `routine`).
 4. Bấm **Commit changes**.
 5. **Settings → Pages → Build and deployment → Source: Deploy from a branch → Branch: main, /(root) → Save.**

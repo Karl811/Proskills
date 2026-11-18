@@ -8,7 +8,7 @@
    ========================================================= */
 var PS_CONFIG = {
   APP: 'Proskills',
-  APP_VER: 'PS1.3.33',
+  APP_VER: 'PS1.3.36',
   ORG: 'Khoa Kỹ năng · JPC · Proskills',
 
   /* Mật khẩu bản demo giáo viên, dùng chung cho MỌI module (phân biệt hoa thường).
@@ -45,7 +45,7 @@ var PS_CONFIG = {
      open   : 1 = không cần mật khẩu cổng */
   MODULES: [
     { id: 'routine', code: 'RÈN LUYỆN', title: 'Shin Routine', sub: 'Rèn luyện thói quen tốt mỗi ngày cùng Shin',
-      icon: 'flame', color: '#2265C5', state: 'ready', kind: 'routine', open: 1, gateQ: '', pass: [], total: 0, ver: 'M.Claude.3.3.41',
+      icon: 'flame', color: '#2265C5', state: 'ready', kind: 'routine', open: 1, gateQ: '', pass: [], total: 0, ver: 'M.Claude.3.4.0',
       door: 0 /* PS1.3.28: tắt (thầy chốt 18/11). 1 = mở Proskills mà hôm nay chưa đóng dấu thì vào thẳng Shin Routine; 0 = tắt */ },
     { id: 'cd01', code: 'CD01', title: 'Career Design 1', sub: 'Hiểu mình, chọn nghề, kế hoạch JPC và 3 năm đầu ở Nhật',
       icon: 'rail', color: '#2C5BC4', state: 'ready', gateQ: 'Shin thích ăn món gì nhất?', pass: ['oden', 'おでん', 'オデン'], total: 18, ver: 'CD01.1.6' },

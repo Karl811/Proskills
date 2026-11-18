@@ -196,6 +196,53 @@
   PS.setPref = function (k, v) { var s = PS.prefs(); s[k] = v; set('ps.settings', s); fire(k); };
   PS.soundOn = function () { return PS.prefs().snd !== 0; };
 
+  /* ---------- PS1.3.36 · cỡ chữ Vừa / Lớn (PS.prefs().fs = 'l' là Lớn) ----------
+     Mọi khóa viết cỡ chữ bằng px trong tệp CSS, nên Lớn = nhân cỡ chữ của từng quy tắc CSS (đọc qua CSSOM):
+     chữ đến 24px × 1.12, 24–40px × 1.05, lớn hơn giữ nguyên. Không đụng chữ trong hình SVG (bộ chọn có svg/text),
+     biểu tượng phông (material). Áp mọi trang có nạp core.js; trang nào không muốn thì đặt window.PS_FS_OFF = 1. */
+  PS.fontBig = function () { return PS.prefs().fs === 'l'; };
+  var FS_SKIP = /svg|text|tspan|material|symbol|\.mi\b|ps-av|avp__/i;
+  function fsRules(rules, big) {
+    for (var i = 0; i < rules.length; i++) {
+      var r = rules[i];
+      try { if (r.cssRules && r.cssRules.length) fsRules(r.cssRules, big); } catch (e) {}
+      if (!r.style || !r.selectorText) continue;
+      if (r.__psFs === undefined) {
+        var v = r.style.fontSize, m = /^(\d+(?:\.\d+)?)px$/.exec(v || '');
+        r.__psFs = (m && !FS_SKIP.test(r.selectorText)) ? +m[1] : 0;
+      }
+      if (!r.__psFs) continue;
+      var n = r.__psFs, k = n <= 24 ? 1.12 : (n <= 40 ? 1.05 : 1);
+      if (k === 1) continue;
+      var want = big ? (Math.round(n * k * 10) / 10) + 'px' : n + 'px';
+      if (r.style.fontSize !== want) r.style.fontSize = want;
+    }
+  }
+  PS.applyFont = function () {
+    if (W.PS_FS_OFF) return;
+    var big = PS.fontBig(), ss = D.styleSheets;
+    D.documentElement.classList[big ? 'add' : 'remove']('ps-fs-l');
+    if (!big && !D.documentElement.__psFsUsed) return;
+    if (big) D.documentElement.__psFsUsed = 1;
+    for (var i = 0; i < ss.length; i++) { try { fsRules(ss[i].cssRules || [], big); } catch (e) {} }
+  };
+  PS.setFont = function (big) { PS.setPref('fs', big ? 'l' : 'm'); PS.applyFont(); };
+  if (D.readyState !== 'loading') setTimeout(PS.applyFont, 0);
+  else D.addEventListener('DOMContentLoaded', function () { PS.applyFont(); });
+  W.addEventListener('load', function () { PS.applyFont(); });
+  /* tệp CSS tải muộn (game, phần mở thêm): áp lại khi có thẻ link/style mới */
+  if (W.MutationObserver) {
+    try {
+      new MutationObserver(function (ms) {
+        if (!PS.fontBig()) return;
+        for (var i = 0; i < ms.length; i++) for (var j = 0; j < ms[i].addedNodes.length; j++) {
+          var nd = ms[i].addedNodes[j], tg = nd.tagName;
+          if (tg === 'LINK' || tg === 'STYLE') { if (tg === 'LINK') nd.addEventListener('load', PS.applyFont); setTimeout(PS.applyFont, 0); return; }
+        }
+      }).observe(D.documentElement, { childList: true, subtree: true });
+    } catch (e) {}
+  }
+
   /* ---------- sự kiện cho module ---------- */
   function fire(field) {
     var ev;
@@ -208,6 +255,8 @@
   /* ---------- biểu tượng (nét đơn, vẽ riêng cho Proskills) ---------- */
   var IC = {
     home: '<path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h13V10"/><path d="M10 19.5v-5h4v5"/>',
+    smile: '<circle cx="12" cy="12" r="8.5"/><path d="M8.5 14.2c.9 1.3 2.1 2 3.5 2s2.6-.7 3.5-2"/><path d="M9.2 9.6v.6M14.8 9.6v.6"/>',
+    text: '<path d="M3.5 19 8 6h1.4l4.5 13"/><path d="M5.2 14.5h7"/><path d="M15.5 12.2c.6-.9 1.6-1.4 2.7-1.4 1.6 0 2.5 1 2.5 2.6V19"/><path d="M20.7 15.2c-2.8 0-4.9.6-4.9 2.2 0 1 .8 1.7 2 1.7 1.6 0 2.9-1.2 2.9-3.1"/>',
     user: '<circle cx="12" cy="8" r="3.6"/><path d="M4.5 20c1.2-3.8 4-5.6 7.5-5.6s6.3 1.8 7.5 5.6"/>',
     people: '<circle cx="9" cy="8.5" r="3.2"/><path d="M3 19.5c.9-3.3 3.2-5 6-5s5.1 1.7 6 5"/><path d="M15.5 5.6a3 3 0 0 1 0 5.8M18 14.8c1.6.7 2.6 2.2 3 4.7"/>',
     flame: '<path d="M12 21c-3.9 0-6.5-2.6-6.5-6.1 0-3.4 2.4-5.3 3.6-8.4.4 2.1 1.6 3.3 2.9 3.8-.3-3 1.1-5.6 3.3-7.3-.2 3.3 4.2 5.7 4.2 11.9 0 3.5-3.1 6.1-7.5 6.1z"/>',
@@ -443,7 +492,7 @@
      THẺ CÀI ĐẶT CHUẨN – giống nhau ở trang chủ và mọi module
      Thứ tự cố định:
        Về trang chính (chỉ trong module) · Thông tin của bạn · Thầy cô hướng dẫn ·
-       Nhịp học và lời nhắc (nếu module có) · Âm thanh · [mục riêng của module] ·
+       Nhịp học và lời nhắc (nếu module có) · Âm thanh · Cỡ chữ (PS1.3.36) · [mục riêng của module] ·
        Sao lưu và khôi phục · Cài ứng dụng, toàn màn hình · Xóa bài làm (đỏ, cuối)
      opts = { ctx:'hub'|'module', mod:'id', pace:{status, body}, extra:[{k, ic, title, status, body}] }
      ========================================================= */
@@ -473,6 +522,9 @@
     h += row('tch', 'people', 'Thầy cô hướng dẫn', t ? esc(t.name) : 'Chưa chọn', '<div class="ps-form"><label>Thầy cô hướng dẫn lớp bạn' + PS.teacherSelect('data-psset="teacher"') + '</label></div><p class="ps-small">Dùng khi gửi báo cáo qua Teams. Đổi khi bạn chuyển lớp.</p>');
     if (opts.pace) h += row('pace', 'flame', 'Nhịp học và lời nhắc', opts.pace.status || '', opts.pace.body || '');
     h += '<div class="ps-srow ps-srow--sw"><div class="ps-srow__h"><span class="ps-srow__ic">' + PS.icon(PS.soundOn() ? 'sound' : 'mute', 18) + '</span><b>Âm thanh</b><button type="button" class="ps-sw' + (PS.soundOn() ? ' on' : '') + '" data-psact="snd" role="switch" aria-checked="' + PS.soundOn() + '" aria-label="Âm thanh"><i></i></button></div></div>';
+    h += '<div class="ps-srow ps-srow--sw"><div class="ps-srow__h"><span class="ps-srow__ic">' + PS.icon('text', 18) + '</span><b>Cỡ chữ</b><span class="ps-seg" role="radiogroup" aria-label="Cỡ chữ">' +
+      '<button type="button" data-psact="fs" data-v="m" role="radio" aria-checked="' + !PS.fontBig() + '"' + (PS.fontBig() ? '' : ' class="on"') + '>Vừa</button>' +
+      '<button type="button" data-psact="fs" data-v="l" role="radio" aria-checked="' + PS.fontBig() + '"' + (PS.fontBig() ? ' class="on"' : '') + '>Lớn</button></span></div></div>';
     (opts.extra || []).forEach(function (x) { h += row(x.k, x.ic || 'spark', x.title, x.status || '', x.body || ''); });
     h += row('safe', 'shield', 'Sao lưu và khôi phục', lb ? 'Lần cuối ' + fmtDate(lb) : 'Chưa sao lưu',
       '<p class="ps-small">Một tập tin chứa <b>thông tin của bạn và bài làm của tất cả module</b>. Khi đổi máy, xóa dữ liệu trình duyệt hay chuyển sang ứng dụng, chọn Khôi phục rồi mở lại tập tin đó.</p>' +
@@ -499,6 +551,12 @@
         if (open) { r.classList.add('open'); b.setAttribute('aria-expanded', 'true'); }
       } else if (a === 'home') PS.home();
       else if (a === 'snd') { PS.setPref('snd', PS.soundOn() ? 0 : 1); b.classList.toggle('on', PS.soundOn()); b.setAttribute('aria-checked', PS.soundOn()); var ic = $('.ps-srow__ic', closest(b, '.ps-srow')); if (ic) ic.innerHTML = PS.icon(PS.soundOn() ? 'sound' : 'mute', 18); if (opts.onChange) opts.onChange('snd'); }
+      else if (a === 'fs') {
+        var big = b.getAttribute('data-v') === 'l'; PS.setFont(big);
+        $$('[data-psact="fs"]', closest(b, '.ps-seg')).forEach(function (x) { var on = (x.getAttribute('data-v') === 'l') === big; x.classList.toggle('on', on); x.setAttribute('aria-checked', on); });
+        PS.toast(big ? 'Đã chọn chữ <b>Lớn</b> cho mọi khóa.' : 'Đã chọn chữ <b>Vừa</b>.');
+        if (opts.onChange) opts.onChange('fs');
+      }
       else if (a === 'backup') PS.backup();
       else if (a === 'restore') PS.restorePick();
       else if (a === 'full') PS.toggleFull();

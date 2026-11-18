@@ -14,8 +14,8 @@ config.js             PHIÊN BẢN, thầy cô, danh sách module, mật khẩu 
 sw.js                 service worker duy nhất (đổi VERSION mỗi lần phát hành)
 manifest.webmanifest  khai báo ứng dụng Proskills
 offline.html          trang báo mất mạng
-core/                 LÕI CHUNG, ít sửa: core.js (hồ sơ, lưu trữ, sao lưu, Cài đặt chuẩn), core.css, pwa.js
-hub/                  giao diện trang chủ: hub.js, hub.css
+core/                 LÕI CHUNG, ít sửa: core.js (hồ sơ, lưu trữ, sao lưu, Cài đặt chuẩn, cỡ chữ), core.css, pwa.js, shin.js (gà Shin dùng chung)
+hub/                  giao diện trang chủ: hub.js, hub.css, lich.js, avatar.js (ảnh đại diện)
 icons/                biểu tượng ứng dụng
 mau/                  module mẫu (ẩn với học viên, mở bằng ?thu=1) — sao chép khi làm module mới
 <id>/                 mỗi module một thư mục, id trùng với config.js (cd01, tk, tc01, ...)
@@ -31,6 +31,7 @@ App Shin Routine (bản gốc M.Claude.3.3.40; trong Proskills đánh số tiế
 - `PS.summary('routine').extra`: day, rec, need, cards [{id, n, m}], active, fire, recDays, mastered, habits, mine {mã: active|pause|keep|master|stored}, lib {mã: tên}. Phút rèn luyện: `ps.mod.routine.min`.
 - **Sao lưu (PS1.3.26):** Shin không còn sao lưu riêng; `backup` → `PS.backup()`, nút `data-act="psRestore"` → `PS.restorePick()`; `bkLast()/bkDays()` đọc `PS.prefs().lastBackup` (routine/scripts/core.js).
 - **Khóa gợi ý thẻ Shin (PS1.3.26):** `PS.routineSugHTML([mã thẻ…], {from: ID, sub: 'lời dẫn đã esc', title, max})` trả khối HTML (kiểu `.ps-rt` trong core.css); link `PS.routineURL(mã, from)` = `routine/index.html?add=<mã>&from=<id khóa>`. Shin (proskills.js) mở thẻ hoặc màn đặt công thức, rồi hiện "Quay lại <khóa>". Mã thẻ và tên dự phòng: `PS_CONFIG.ROUTINE_LIB`. Dữ liệu gợi ý đặt ở content.js của khóa: CD01 `RT_GAP`, `RT_GRP`, `RT_TXT`; TC01 `RT_BAI`. Không hiện ở demo. Khóa TK (HP05): chưa nối (thầy chốt 17/11/2026), đề xuất sẵn nếu làm sau: Ải Ký túc → 5S, Đúng giờ; Ải Xưởng Rèn → Quan sát ghi lại, Báo cáo; Ải Hồ Ly → Báo cáo; Ải Sòng Đỏ Đen → Chi tiêu.
+- **PS1.3.36 (M.Claude.3.4.0):** `shin()` trong routine/scripts/core.js đã thay bằng gà (`PSShin`), routine/index.html nạp thêm `../core/shin.js` — khi chép đè bản Shin mới, áp lại hai chỗ này cùng interaction.js (lớp `evening-shin`) và how-visual.js (`tipHTML`).
 - **Đổi mã Shin:** tăng `APP_VER` (routine/scripts/core.js), các `?v=` trong routine/index.html và routine/habit-game.html, `ROUTINE_VER` (sw.js), `ver` của module routine (config.js) cùng một số.
 - **Cập nhật bản Shin mới:** chép đè các tệp Shin vào `routine/` (trừ 3 tệp đã sửa ở trên: áp lại các chỗ sửa), đổi `ROUTINE_VER` và danh sách `ROUTINE_FILES` trong sw.js, đổi `ver` của module routine trong config.js.
 
@@ -71,6 +72,18 @@ Tư thế mới: thêm vào `POSES` (tọa độ khớp; công cụ tạo ở m�
 **Buổi tập 10 phút cùng Shin (TC01.1.5):** màn riêng `V.v = 's10'` (`viewS10()`, nút `s10Btn()` dưới "Gợi ý hôm nay"). PA A: 3 bài cố định `S10_MENU {id, n, ic, d, main[6 mã EX]}`, khung `S10 {warm: 'preshift', cool: 'midstretch', wSec 24, work 40, rest 20}` (`qSegs`), chữ `S10_TXT`. Trạng thái `QS {st 0 chọn|1 giới thiệu|2 tập|3 xong, m, segs, i, run, end, rem, act, feel, full}`, đồng hồ `qRun/qPause/qNext/qEnd`. Không đục lỗ thẻ; mặt sau thẻ có ô số buổi (`PT_IC.tm`). Lưu `S.s10.h [{d, m, sec, f, full}]`, báo `extra.s10` (`s10Sum()`: n, min, wk, pain, last 5), Sổ tay `nbS10()`. Demo: `DEMO.radio`, `DEMO.s10`.
 Màu (từ TC01.0.2): chủ đạo M4 Xanh JPC dịu `--c #348A5F`, màu phụ Kem cát `--ac*` (nút mời gọi `.btn--go`, dải dấu thẻ hội viên, `gtip`, mũi tên/vòng trên hình `#B8964F`), `--ok #2B8A86`. Không dùng lại vàng `#FFC93C` trong TC01; `--xp` giữ như mọi khóa.
 Hồ sơ tập luyện ở `S.mem` (job, g, g2, sex, inj 0/1, goal, h, w). Gợi ý nghề từ CD01: `PS.summary('cd01').extra.jobKey`. Báo về trang chủ `extra`: job, group, goal, tries, plan.
+
+### Dùng như app thật, intro, logo (PS1.3.34)
+- **Logo**: `icons/logo.svg` = bản nền trắng (V2) dùng trong trang; hình app = bản nền xanh (V1). Màu: xanh dương #0F4D98, xanh lá #199F5A, đỏ #EE1D23 (theo logo JPC).
+- **Intro** chỉ ở trang chủ (`intro()` trong hub.js, `.pi*` trong hub.css, đoạn script đầu index.html), lần mở đầu trong ngày (`ps.intro`). Module và Shin không có intro.
+- **Hành vi app** đặt chung ở cuối core.css và trong pwa.js: module mới chỉ cần nạp core.css, pwa.js như hợp đồng. Chỗ cần cho chọn chữ: thêm lớp `ps-sel`. Khu có cử chỉ riêng tự đặt `touch-action`. Viewport mọi trang: `maximum-scale=1, user-scalable=no`.
+- **Service worker**: tệp js/css PHẢI có `?v=<phiên bản>` khi nạp (được lấy từ bộ nhớ ngay, không chờ mạng); quên `?v=` thì học viên có thể giữ bản cũ đến khi mạng trả về. Hình/phông/âm thanh không cần `?v=`.
+- **Nút Back** ở trang chủ: tấm mới (giống Cài đặt, Lịch học) gọi `W.PSSheetPush()` khi mở và `W.PSSheetDone()` khi đóng bằng nút.
+
+### Ảnh đại diện, cỡ chữ, gà Shin (PS1.3.36)
+- **Ảnh đại diện**: `hub/avatar.js` (`PSAvatar`): 12 hình `AV` [mã, tên, màu nền, hình 96×96] + chữ cái 8 màu `COLS`; lưu `PS.prefs().av`. Thêm hình: thêm dòng vào `AV`, không đổi mã cũ.
+- **Cỡ chữ**: `PS.fontBig()`, `PS.setFont()`, `PS.applyFont()` trong core.js; hàng "Cỡ chữ" nằm trong `PS.settingsHTML` (mọi khóa). Cỡ chữ trong CSS phải viết bằng px để được phóng; chữ đặt bằng `style=` trong JS không được phóng. Trang không muốn phóng: `window.PS_FS_OFF = 1`.
+- **Gà Shin**: `core/shin.js` (`PSShin.svg(mood, {stg, fit, days})`, `PSShin.now(mood)`, `look()`, `stageOf()`, `FITS`, `STAGE_DAYS`). Khung 120×124. Nạp ở index.html và routine/index.html. Shin Routine: `shin()` (routine/scripts/core.js) gọi `PSShin.now`; Tủ đồ, màn "Shin đã lớn" ở routine/proskills.js. CD01 (`cd01/art.js`) và TC01 (`tc01/art.js`) vẫn dùng hình Shin riêng cùng nét vẽ; nếu cần đồng bộ sâu hơn, chuyển dần sang `PSShin`.
 
 ## 3. Hợp đồng giữa module và lõi (bắt buộc)
 1. Trang module nạp theo thứ tự: `../config.js`, `../core/core.css`, `../core/core.js`, `../core/pwa.js`, rồi file của module.

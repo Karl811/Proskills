@@ -144,6 +144,7 @@
     var ov = D.createElement('div'); ov.className = 'sheet sheet--lc'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-label', 'Lịch học của tôi');
     ov.innerHTML = '<div class="sheet__in"><div class="sheet__top"><h2>Lịch học của tôi</h2><button type="button" class="sheet__x" data-act="lcClose" aria-label="Đóng">' + icon('close', 20) + '</button></div><div id="lcBody">' + sheetBody() + '</div></div>';
     D.body.appendChild(ov); D.body.classList.add('ps-lock');
+    if (W.PSSheetPush) W.PSSheetPush(); /* PS1.3.34: nút Back đóng tấm */
     wire();
     if (to === 'nhac') setTimeout(function () { var e = D.getElementById('lcSecNhac'); if (e) e.scrollIntoView({ behavior: noMotion ? 'auto' : 'smooth', block: 'start' }); }, 120);
   }
@@ -152,8 +153,9 @@
     var e = D.getElementById('lcEnd');
     if (e) e.addEventListener('change', function () { var l = lich(); if (/^\d{4}-\d{2}-\d{2}$/.test(e.value)) { l.end = e.value; saveLich(l); } });
   }
-  function close() {
+  function close(fromBack) {
     var s = D.querySelector('.sheet--lc'); if (s) s.parentNode.removeChild(s); D.body.classList.remove('ps-lock');
+    if (fromBack !== true && W.PSSheetDone) W.PSSheetDone();
     var cb = onClose; onClose = null; if (cb) cb();
     /* lần đầu đặt lịch: hỏi thêm vào lịch điện thoại */
     if ((count() || nhac()) && !PS.prefs().lichExp && !PS.prefs().lichAsked) {
@@ -280,5 +282,5 @@
   });
   D.addEventListener('keydown', function (e) { if ((e.key === 'Escape' || e.keyCode === 27) && D.querySelector('.sheet--lc') && !D.querySelector('.ps-ov')) close(); });
 
-  W.PSLich = { cardHTML: cardHTML, open: open, buildIcs: buildIcs, count: count };
+  W.PSLich = { cardHTML: cardHTML, open: open, close: close, buildIcs: buildIcs, count: count };
 })(window, document);

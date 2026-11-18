@@ -84,6 +84,17 @@
     else if (a === 'update') { e.preventDefault(); startUpdate(); }
     else if (a === 'later') { e.preventDefault(); later = true; var el = D.getElementById('ps-update'); if (el) el.parentNode.removeChild(el); }
   });
+  /* PS1.3.34 · dùng như app thật: chặn phóng to bằng hai ngón (iPhone bỏ qua user-scalable=no), chặn menu nhấn giữ trên màn hình cảm ứng.
+     Ô nhập vẫn dùng menu chọn chữ bình thường. */
+  function isField(t) { return t && t.closest && t.closest('input,textarea,select,[contenteditable],.ps-sel'); }
+  function stop(e) { if (e.cancelable) e.preventDefault(); }
+  ['gesturestart', 'gesturechange', 'gestureend'].forEach(function (n) { D.addEventListener(n, stop, { passive: false }); });
+  D.addEventListener('touchmove', function (e) { if (e.touches && e.touches.length > 1) stop(e); }, { passive: false });
+  D.addEventListener('contextmenu', function (e) {
+    var coarse = W.matchMedia && W.matchMedia('(pointer: coarse)').matches;
+    if (coarse && !isField(e.target)) e.preventDefault();
+  });
+
   /* MutationObserver giữ nhãn nút luôn đúng khi module vẽ lại */
   if (W.MutationObserver) { var t = null; new MutationObserver(function () { clearTimeout(t); t = setTimeout(refresh, 60); }).observe(D.documentElement, { childList: true, subtree: true }); }
   refresh();
