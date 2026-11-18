@@ -100,9 +100,9 @@
       (nx && !W.DEMO ? ' Thêm ' + (nx - l.days) + ' ngày nữa, Shin thành ' + Z.STAGE_NAME[l.stg + 1] + '.' : (l.stg === 3 ? ' Shin đã trưởng thành cùng bạn!' : '')) + '</small>' +
       '<span class="psfit__bar"><i style="width:' + pct + '%"></i></span></div></div>' +
       '<div class="psfit__g">' + Z.FITS.map(function (f) {
-        var lock = f[2] > l.stg, on = f[0] === l.fit;
+        var need = !W.DEMO && Z.earned && !Z.earned(f), lock = f[2] > l.stg || need, on = f[0] === l.fit;
         return '<button type="button" class="psfit__b' + (on ? ' on' : '') + (lock ? ' lock' : '') + '" data-ps-fit="' + f[0] + '"' + (lock ? ' aria-disabled="true"' : '') + ' aria-pressed="' + on + '">' +
-          Z.svg('still', { stg: Math.max(l.stg, f[2]), fit: f[0], days: l.days }) + '<b>' + PS.esc(f[1]) + '</b><small>' + (lock ? 'Mở khi Shin là ' + Z.STAGE_NAME[f[2]] : PS.esc(f[3])) + '</small></button>';
+          Z.svg('still', { stg: Math.max(l.stg, f[2]), fit: f[0], days: l.days }) + '<b>' + PS.esc(f[1]) + '</b><small>' + (need ? 'Mở khi xong ' + PS.esc(String(f[4]).toUpperCase()) : (lock ? 'Mở khi Shin là ' + Z.STAGE_NAME[f[2]] : PS.esc(f[3]))) + '</small></button>';
       }).join('') + '</div><p class="psfit__ft">Shin lớn dần theo số ngày bạn ghi nhận: Gà con ' + Z.STAGE_DAYS[1] + ' ngày · Gà choai ' + Z.STAGE_DAYS[2] + ' ngày · Gà lớn ' + Z.STAGE_DAYS[3] + ' ngày.</p>';
     return W.setRow('psFit', 'smile', 4, 'Tủ đồ của Shin', PS.esc(F[l.fit][1]) + ' · ' + Z.STAGE_NAME[l.stg], body);
   }
@@ -112,6 +112,7 @@
     var k = b.getAttribute('data-ps-fit'), l = W.PSShin.look(), f = null;
     W.PSShin.FITS.forEach(function (x) { if (x[0] === k) f = x; });
     if (!f) return;
+    if (!W.DEMO && W.PSShin.earned && !W.PSShin.earned(f)) { W.toast('Trang phục này mở khi bạn nhận Bằng Thuyền Trưởng ở CD02 · Hải Đồ La Bàn.'); return; }
     if (f[2] > l.stg) { W.toast('Trang phục này mở khi Shin thành ' + W.PSShin.STAGE_NAME[f[2]] + '. Ghi nhận đều mỗi ngày nhé!'); return; }
     if (W.DEMO) W.PS_SHIN_FIT_TMP = k; else PS.setPref('shinFit', k);
     try { W.refreshAll(); } catch (er) {}
