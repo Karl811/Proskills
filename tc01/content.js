@@ -4,7 +4,7 @@
    Nguồn nội dung: Sổ quản lý học tập GDTC v10.1, chương trình GDTC TTS/Kỹ sư, tiêu chí đo lường theo nghề (KTN),
    Sổ tay sức khỏe 2.0. Kỹ thuật động tác do GV GDTC duyệt lại. Mốc thể lực: bảng thành tích Sổ quản lý v10.1.
    ========================================================= */
-var TC_VER = 'TC01.1.0';
+var TC_VER = 'TC01.1.5';
 
 /* ---------- Gợi ý thẻ Shin Routine theo bài (PS1.3.26) ----------
    Bài có trong RT_BAI thì cuối trang bài hiện khối "Rèn mỗi ngày cùng Shin" (mã thẻ: PS_CONFIG.ROUTINE_LIB).
@@ -56,11 +56,11 @@ var JOBS = [
 /* Phòng tập Shin Fitness Center (TC01.0.8): no = số phòng, en = tên tiếng Anh (short: bản ngắn trên tòa nhà), col = 2 màu dải trái bảng tên phòng */
 var KHU = [
   { id: 'san',   t: 'Sàn tập',        no: '101', en: 'WORKOUT FLOOR',     short: 'WORKOUT FLOOR', col: ['#3E9A6B', '#2A714D'], ic: 'dumbbell', sub: 'Động tác đúng kỹ thuật, tự tập ở nhà', ready: 1 },
-  { id: 'radio', t: 'Radio Taiso',    no: 'R',   en: 'RADIO TAISO DECK',  short: 'RADIO TAISO DECK', col: ['#C9A45A', '#9C7C38'], ic: 'radio', sub: '13 động tác buổi sáng của người Nhật' },
+  { id: 'radio', t: 'Radio Taiso',    no: 'R',   en: 'RADIO TAISO DECK',  short: 'RADIO TAISO DECK', col: ['#C9A45A', '#9C7C38'], ic: 'radio', sub: '13 động tác buổi sáng của người Nhật', ready: 1 },
   { id: 'bep',   t: 'Bếp dinh dưỡng', no: '201', en: 'NUTRITION KITCHEN', short: 'KITCHEN', col: ['#D08A60', '#A9623E'], ic: 'bowl', sub: 'Ăn vậy đủ chưa? Món Việt, món Nhật', ready: 1 },
   { id: 'nghe',  t: 'Góc nghề',       no: '202', en: 'WORK-FIT CORNER',   short: 'WORK-FIT', col: ['#5E88A8', '#406A89'], ic: 'helmet', sub: 'Thân thể cho nghề, nâng vật đúng, an toàn', ready: 1 },
-  { id: 'yte',   t: 'Phòng y tế',     no: '301', en: 'FIRST AID ROOM',    short: 'FIRST AID', col: ['#3A9C97', '#24736F'], ic: 'cross', sub: 'Choáng, say nắng, cảm lạnh, đau lưng' },
-  { id: 'test',  t: 'Phòng test',     no: '302', en: 'TEST LAB',          short: 'TEST LAB', col: ['#8C7BB0', '#66568A'], ic: 'gauge', sub: 'Test thử lý thuyết, tự test thể lực' }
+  { id: 'yte',   t: 'Phòng y tế',     no: '301', en: 'FIRST AID ROOM',    short: 'FIRST AID', col: ['#3A9C97', '#24736F'], ic: 'cross', sub: 'Choáng, say nắng, cảm lạnh, đau lưng', ready: 1 },
+  { id: 'test',  t: 'Phòng test',     no: '302', en: 'TEST LAB',          short: 'TEST LAB', col: ['#8C7BB0', '#66568A'], ic: 'gauge', sub: 'Test thử lý thuyết, tự test thể lực', ready: 1 }
 ];
 /* tầng của tòa nhà (từ trên xuống); 'lobby' = quầy lễ tân, mở Sổ tay › Thẻ hội viên */
 var FLOORS = [['radio'], ['yte', 'test'], ['bep', 'nghe'], ['san', 'lobby']];
@@ -76,8 +76,8 @@ var YARD_TIPS = {
   helm: 'Thấy nặng quá sức: nhờ người, dùng xe đẩy.',
   watch: 'Giãn cơ 2 phút giữa ca.',
   mat: 'Làm 5 động tác khởi động trước ca.',
-  radio: 'Radio Taiso ở sân thượng. Sắp mở!',
-  aid: 'Phòng y tế: sắp mở.',
+  radio: 'Radio Taiso có 13 động tác. Thuộc rồi, tập ở đâu cũng được.',
+  aid: 'Sắp ngất: ngồi hoặc nằm xuống ngay, kê chân cao.',
   shin: 'Chạm khối nào, Shin kể một mẹo cho bạn.'
 };
 
@@ -232,6 +232,13 @@ var EX = {
       { p: 'tiptoe', c: 'Bắp chân: kiễng gót', t: 'Bắp chân: kiễng gót lên rồi hạ xuống chậm, 15 lần. Đang ngồi thì nhấc mũi chân lên xuống.', a: [[96, 166], [96, 140]] }
     ],
     keys: ['Căng nhẹ là đủ, không đau', 'Thở đều, không nín thở', 'Đứng hay ngồi đều làm được'] },
+  backcare: { n: 'Ba động tác nhẹ cho cổ, vai, lưng', s: 'Cổ, vai, lưng', who: 'Đứng hoặc ngồi · khi mỏi thường, không đau nhói', yt: '',
+    frames: [
+      { p: 'neckSide', c: 'Cổ: nghiêng, giữ 10–15 giây', t: 'Cổ: ngồi hoặc đứng thẳng, nghiêng đầu sang một bên, giữ 10–15 giây. Đổi bên. Không xoay vòng mạnh.' },
+      { p: 'handsShoulder', c: 'Vai: xoay khuỷu tay ra sau', t: 'Vai: đặt các ngón tay lên vai, xoay khuỷu tay chậm ra sau 8 vòng, mở rộng ngực.', arc: [[78, 52, 9], [162, 52, 9]] },
+      { p: 'handsBack', c: 'Lưng: chống tay, ưỡn nhẹ', t: 'Lưng: hai tay chống sau thắt lưng, ưỡn nhẹ người ra sau, giữ 5 giây. Làm 3 lần.' }
+    ],
+    keys: ['Chậm, căng nhẹ là đủ, thở đều', 'Đau nhói, tê lan xuống tay chân: dừng lại', 'Làm trong giờ nghỉ và trước khi ngủ'] },
   /* bài bổ trợ lớp Kiến thức nghề (không dụng cụ) */
   dip: { n: 'Hít đất ngược trên ghế', s: 'Hít đất ngược', who: 'Tay sau, vai · cần 1 ghế chắc', yt: '',
     frames: [
@@ -1204,14 +1211,1140 @@ var BAI_NGHE = [
       vp: 'Văn phòng: tay, lưng, chân khỏe giúp ngồi thẳng, đỡ đau lưng.' } }
 ];
 
+/* =========================================================
+   PHÒNG Y TẾ · 301 FIRST AID (khu 'yte', TC01.1.1)
+   Thầy chốt 18/11/2026: PA C "Ca trực của Shin". Mỗi bài = 1 ca trực (dạng sim) + 2 hoạt động củng cố.
+   Đợt 1 (TC01.1.1): y1 Choáng, ngất · y2 Say nắng · y3 Cảm lạnh, cúm, sốt. Đợt 2 (TC01.1.2): y4 Bong gân, trầy xước · y5 Đau lưng, cổ, vai · y6 Không khỏe thì báo thế nào.
+   Đợt 2 thêm: habit có `hl` (dùng YHABITS, lưu S.yte.habit) · pick có `scale` (hiện thẻ THANG khi xong) · write có `dyn: 'yte'` (không gợi ý theo bữa ăn).
+   Dạng sim: scene {place, time, tag, ic} · intro (lời Shin, [Tên]) · steps[] { say (chuyện đang xảy ra), q, opts[] { t, ok, key (dòng phiếu sơ cứu), res (chuyện xảy ra tiếp), why } } · end.
+   Không dùng từ Sổ tay sức khỏe Ch.8: tát má, giật tóc mai, cho ngửi amoniac/giấm, bấm huyệt. Hướng dẫn sơ cứu cơ bản, không thay lời bác sĩ.
+   ========================================================= */
+var YTE_TXT = {
+  khuSay: 'Ở Phòng y tế, Shin đeo băng tay chữ thập xanh. Mỗi bài là một ca trực: bạn quyết định, Shin cho xem chuyện gì xảy ra tiếp.',
+  simLab: 'CA TRỰC', simStart: 'Bắt đầu ca trực', simSteps: '[N] tình huống · chọn sai được chọn lại',
+  meter: 'An toàn', meterLv: ['Cần cẩn thận', 'Tạm ổn', 'An toàn'],
+  next: 'Tình huống tiếp theo', toFile: 'Xem phiếu sơ cứu', retry: 'Quay lại, chọn cách khác',
+  resOk: 'Chuyện xảy ra tiếp', resNo: 'Nếu làm vậy thì…',
+  fileH: 'Phiếu sơ cứu của bạn', first: 'Chọn đúng ngay lần đầu: [N]/[T] tình huống.',
+  firstAll: 'Bạn xử lý chuẩn cả ca. Shin yên tâm giao ca trực cho bạn!', firstSome: 'Chọn lại để hiểu vì sao cũng là học. Lần sau bạn sẽ nhanh hơn.',
+  note: 'Đây là hướng dẫn sơ cứu cơ bản, không thay lời bác sĩ.',
+  y2End: 'Mùa hè, nhiều nơi ở Nhật có cảnh báo say nắng (熱中症警戒アラート). Nghe thấy 熱中症 là nhắc mình uống nước, nghỉ bóng mát.',
+  storyW3: 'Nếu là M., mình sẽ…',
+  storyW4: 'Trước ngày bay, mình sẽ…',
+  nbHab: 'Thói quen giữ lưng, cổ, vai:',
+  nbH: 'Phòng y tế của mình', nbNone: 'Chưa làm. Vào Phòng y tế (301) và nhận ca trực đầu tiên.', nbFiles: 'Phiếu sơ cứu đã có:'
+};
+
+/* Thẻ khẩn cấp (Sổ tay › Khẩn cấp). Ô tự ghi lưu ở S.kc, chỉ trên máy này, không gửi báo cáo. */
+var KC = {
+  h: 'Thẻ khẩn cấp ở Nhật',
+  sub: 'Gọi được miễn phí từ điện thoại. Chụp màn hình thẻ này để dùng cả khi không mở được ứng dụng.',
+  nums: [
+    { n: '119', j: '救急・消防', v: 'Cấp cứu, cứu hỏa', d: 'Người ngất không tỉnh, khó thở, chảy máu nhiều, có cháy.' },
+    { n: '110', j: '警察', v: 'Cảnh sát', d: 'Tai nạn giao thông, bị mất trộm, bị đe dọa.' },
+    { n: '#7119', j: '救急安心センター', v: 'Hỏi có nên gọi xe cấp cứu không', d: 'Chỉ một số nơi có. Hỏi người hỗ trợ xem nơi bạn ở có không.' }
+  ],
+  sayH: 'Khi gọi 119',
+  saySub: 'Người trực sẽ hỏi: 「火事ですか、救急ですか」 (Cháy hay cấp cứu?). Bạn trả lời:',
+  say: [
+    { j: '救急です。', k: 'きゅうきゅうです', r: 'kyūkyū desu', v: 'Tôi cần cấp cứu.' },
+    { j: '友だちが倒れました。', k: 'ともだちがたおれました', r: 'tomodachi ga taoremashita', v: 'Bạn tôi bị ngã, ngất.' },
+    { j: '住所は〇〇です。', k: 'じゅうしょは〇〇です', r: 'jūsho wa … desu', v: 'Địa chỉ là … (đọc ô bên dưới).' },
+    { j: '日本語が少しわかります。', k: 'にほんごがすこしわかります', r: 'nihongo ga sukoshi wakarimasu', v: 'Tôi hiểu một chút tiếng Nhật.' }
+  ],
+  myH: 'Thông tin của mình',
+  fields: [
+    { k: 'addr', l: 'Địa chỉ chỗ ở (chữ Nhật)', ph: 'Ví dụ: 〇〇県〇〇市〇〇町1-2-3', big: 1 },
+    { k: 'sup', l: 'Người hỗ trợ (tên, số điện thoại)', ph: 'Tên, số điện thoại' },
+    { k: 'co', l: 'Công ty, nghiệp đoàn (số điện thoại)', ph: 'Tên, số điện thoại' }
+  ],
+  saved: 'Đã lưu trên máy này.', note: 'Chưa sang Nhật thì để trống, khi có địa chỉ hãy ghi vào. Thông tin chỉ lưu trên máy này, không gửi cho ai.'
+};
+
+/* Thang 5 mức khi không khỏe (lược từ bảng của Kokateam: bỏ ý uống thuốc mang từ Việt Nam, bỏ ý mang thai). Hiện ở cuối y6b và Sổ tay › Khẩn cấp. */
+var THANG = {
+  h: 'Thang 5 mức khi không khỏe', sub: 'Thang tham khảo. Không chắc mình ở mức nào: báo người hỗ trợ.',
+  lv: [
+    { t: 'Mệt mỏi thường', e: 'Mỏi người, đau lưng nhẹ, đau bụng nhẹ, dị ứng phấn hoa', d: 'Tự chăm: ngủ sớm, uống đủ nước, tắm nước ấm' },
+    { t: 'Bệnh nhẹ', e: 'Sốt nhẹ 37–38°C, sổ mũi, ho khoảng 2 ngày; đau răng; đau lưng khó chịu', d: 'Báo người hỗ trợ biết; cần thì đi khám, nhờ dịch qua điện thoại' },
+    { t: 'Nặng hơn', e: 'Sốt từ 39°C, bong gân, sưng bất thường ở tay chân, mặt', d: 'Báo người hỗ trợ, cùng xem có cần đi khám; nghỉ ở phòng, đeo khẩu trang' },
+    { t: 'Bệnh cấp, dễ lây', e: 'Cúm, ngộ độc thực phẩm (nôn, tiêu chảy), thủy đậu', d: 'Báo ngay để được đưa đi khám; ở riêng, không dùng chung đồ' },
+    { t: 'Tai nạn, bệnh nặng', e: 'Ngã, gãy tay chân, bác sĩ báo bệnh nặng', d: 'Báo ngay người phụ trách, người hỗ trợ; làm theo hướng dẫn. Nguy hiểm tính mạng: gọi 119' }
+  ] };
+
+/* Thói quen cho y5c (dạng habit có hl): all + 1 theo nhóm */
+var YHABITS = {
+  all: [
+    { t: 'Nâng vật: gập gối, giữ vật sát người, không xoay vặn lưng', tip: 'Khi nhấc thùng, ba lô hay xô nước, mình sẽ gập gối, giữ vật sát người rồi mới đứng lên' },
+    { t: 'Xem điện thoại: đưa máy lên ngang mắt, không cúi cổ lâu', tip: 'Khi xem điện thoại, mình sẽ đưa máy lên ngang mắt, cứ 20 phút ngẩng lên giãn cổ một lần' },
+    { t: 'Trước khi ngủ: làm 3 động tác nhẹ cho cổ, vai, lưng', tip: 'Khi tắt đèn đi ngủ, mình sẽ làm 3 động tác nhẹ cho cổ, vai, lưng rồi mới nằm xuống' }
+  ],
+  xuong: { t: 'Cúi lấy đồ thấp: hạ hông, không gập lưng', tip: 'Khi cúi lấy đồ dưới thấp, mình sẽ hạ hông, gập gối thay vì gập lưng' },
+  chuyen: { t: 'Ngồi, đứng lâu: thả lỏng vai, giờ nghỉ xoay vai', tip: 'Khi chuông giờ nghỉ reo, mình sẽ xoay vai ra sau 8 vòng và giãn cổ hai bên' },
+  troi: { t: 'Vật quá nặng: nhờ người cùng bê', tip: 'Khi thấy vật nặng quá sức, mình sẽ nhờ một bạn cùng bê thay vì cố một mình' },
+  dv: { t: 'Lau dọn, đỡ đồ: chân rộng bằng vai, hạ hông', tip: 'Khi lau dọn phòng ở, mình sẽ đứng chân rộng bằng vai, hạ hông thay vì cúi gập lưng' },
+  vp: { t: 'Ngồi học: lưng tựa ghế, hai chân chạm sàn', tip: 'Khi ngồi vào bàn học, mình sẽ ngồi sát lưng ghế, hai chân chạm sàn, sách đặt ngang tầm mắt' }
+};
+
+var BAI_YTE = [
+  { id: 'y1', t: 'Choáng, sắp ngất', ic: 'heart', sub: 'Ngồi, nằm xuống ngay; khi nào gọi 119', min: 12,
+    acts: [
+      { id: 'y1a', k: 'sim', t: 'Ca trực: Bạn H. choáng ở sân tập', min: 5, xp: 15,
+        scene: { ic: 'dumbbell', place: 'Sân tập GDTC', time: '8:40', tag: 'Bạn H. chưa ăn sáng' },
+        intro: '<b class="nm">[Tên]</b> ơi, Shin đang trực Phòng y tế. Ở sân tập có chuyện rồi, mình ra xem nhé!',
+        steps: [
+          { say: 'Đang chạy nâng cao đùi, bạn H. dừng lại, ôm đầu: “Mắt mình tối sầm, chóng mặt quá.”', q: 'Bạn làm gì đầu tiên?',
+            opts: [
+              { t: 'Đỡ bạn ngồi hoặc nằm xuống ngay tại chỗ, rồi gọi to thầy cô', ok: 1, key: 'Cho ngồi hoặc nằm xuống ngay, gọi người giúp',
+                res: 'Bạn H. nằm xuống trước khi kịp ngã.', why: 'Sắp ngất mà còn đứng thì dễ ngã, đập đầu. Cho xuống thấp ngay là an toàn nhất.' },
+              { t: 'Dìu bạn đi bộ ngay lên phòng y tế ở tầng trên để được nằm nghỉ', res: 'Mới đi vài bước, bạn H. khuỵu xuống ở bậc cầu thang.', why: 'Đi lại khi đang choáng rất dễ ngã. Cho nằm xuống tại chỗ trước.' },
+              { t: 'Bảo bạn đứng yên hít thở sâu, rồi chạy nốt cho xong bài', res: 'Bạn H. lảo đảo, suýt ngã ra sân.', why: 'Choáng là cơ thể báo dừng. Tập tiếp lúc này rất nguy hiểm.' }
+            ] },
+          { say: 'Bạn H. đã nằm trên sân, mặt tái, vã mồ hôi lạnh.', q: 'Tiếp theo bạn làm gì?',
+            opts: [
+              { t: 'Kê hai chân bạn cao hơn tim, nới lỏng cổ áo, thắt lưng', ok: 1, key: 'Kê chân cao hơn tim, nới cổ áo, thắt lưng',
+                res: 'Sắc mặt bạn H. hồng dần.', why: 'Kê chân cao giúp máu về tim, lên não. Nới đồ cho bạn dễ thở.' },
+              { t: 'Kê một chiếc gối thật cao dưới đầu cho bạn nằm dễ chịu', res: 'Bạn H. vẫn tái mặt, còn chóng mặt hơn.', why: 'Kê cao đầu làm máu khó lên não. Cần kê chân, không kê đầu.' },
+              { t: 'Tát nhẹ vào má, xoa dầu vào mũi để bạn mau tỉnh lại', res: 'Bạn H. nhăn mặt, vẫn chóng mặt.', why: 'Tát, xoa dầu không đưa máu lên não, còn làm bạn khó chịu. Kê chân cao mới giúp.' }
+            ] },
+          { say: 'Mọi người xúm lại rất đông. Bạn H. nhắm mắt, gọi không trả lời.', q: 'Bạn làm gì?',
+            opts: [
+              { t: 'Nhờ mọi người lùi ra cho thoáng, xem ngực bạn có phập phồng thở không', ok: 1, key: 'Cho thoáng, xem còn thở không. Không thở, hoặc 1 phút chưa tỉnh: gọi 119',
+                res: 'Ngực bạn H. phập phồng đều. Vài giây sau bạn mở mắt.', why: 'Chỗ thoáng, có người theo dõi hơi thở. Không thở, hoặc quá 1 phút chưa tỉnh thì gọi 119 ngay.' },
+              { t: 'Đổ nước vào miệng bạn cho bạn tỉnh lại nhanh hơn', res: 'Nước trào ra, bạn H. ho sặc.', why: 'Người chưa tỉnh không nuốt được, nước có thể vào phổi. Chỉ cho uống khi đã tỉnh hẳn.' },
+              { t: 'Để mọi người đứng sát xung quanh, đông người thì nhiều tay giúp được bạn hơn', res: 'Chỗ nằm bí hẳn, không ai nhìn rõ bạn H. thở ra sao.', why: 'Đông người thì bí, khó theo dõi. Cần chỗ thoáng và một người theo dõi hơi thở.' }
+            ] },
+          { say: 'Bạn H. tỉnh lại, nói: “Mình ổn rồi, cho mình tập tiếp.”', q: 'Bạn nói gì với bạn H.?',
+            opts: [
+              { t: 'Nằm nghỉ thêm cho hết choáng, ngồi dậy từ từ. Mình báo thầy cô nhé', ok: 1, key: 'Tỉnh rồi vẫn nằm nghỉ, ngồi dậy từ từ, báo thầy cô',
+                res: 'Mười lăm phút sau, bạn H. ngồi dậy, uống nước, nghỉ hết buổi tập.', why: 'Đứng dậy nhanh dễ choáng lại. Thầy cô cần biết để theo dõi.' },
+              { t: 'Ổn rồi thì đứng dậy tập tiếp đi, nghỉ lâu kẻo bị trừ điểm chuyên cần', res: 'Vừa đứng dậy, bạn H. lại choáng.', why: 'Tập ngay dễ ngất lần nữa. Sức khỏe trước, điểm sau.' },
+              { t: 'Chuyện nhỏ thôi, đừng nói với ai cho đỡ phiền', res: 'Không ai biết để để ý bạn H. trong những buổi sau.', why: 'Giấu đi thì lần sau không ai giúp kịp. Ngất có thể là dấu hiệu cần đi khám.' }
+            ] },
+          { say: 'Ra về, bạn H. kể: “Sáng nay mình không ăn gì, tối qua thức khuya xem điện thoại.”', q: 'Bạn nói gì để bạn H. không bị lại?',
+            opts: [
+              { t: 'Ăn sáng trước giờ tập, ngủ đủ. Ngất lại lần nữa thì báo để đi khám', ok: 1, key: 'Ăn sáng, ngủ đủ. Ngất lặp lại thì đi khám',
+                res: 'Bạn H. hẹn mai ăn sáng và đi ngủ sớm hơn.', why: 'Bỏ bữa, thiếu ngủ là lý do hay gặp. Ngất lặp lại thì cần bác sĩ tìm nguyên nhân.' },
+              { t: 'Mai uống một lon nước tăng lực trước giờ tập là sẽ đủ sức tập ngay', res: 'Bạn H. uống tăng lực, vẫn bỏ bữa sáng.', why: 'Nước tăng lực không thay được bữa sáng và giấc ngủ.' },
+              { t: 'Bạn yếu quá, chắc không hợp với môn thể chất', res: 'Bạn H. buồn, không muốn đến lớp nữa.', why: 'Nói bạn “yếu” không giúp gì. Tìm nguyên nhân, sửa thói quen mới giúp được.' }
+            ] }
+        ],
+        end: 'Sắp ngất: xuống thấp ngay, kê chân, cho thoáng, theo dõi hơi thở. Không thở, hoặc 1 phút chưa tỉnh: gọi 119.' },
+      { id: 'y1b', k: 'order', t: 'Khi chính mình sắp ngất', min: 3, xp: 10,
+        q: 'Bạn thấy mắt tối sầm, chóng mặt. Xếp 4 việc theo thứ tự.', sub: 'Chạm lần lượt từ việc làm đầu tiên.',
+        items: ['Ngồi hoặc nằm xuống ngay, dựa tường hoặc vịn tay vịn', 'Nói với người bên cạnh: “Mình chóng mặt quá”', 'Nằm kê chân cao, thở chậm, nghỉ đến khi hết choáng', 'Ngồi dậy từ từ, uống nước, báo thầy cô hoặc người phụ trách'],
+        ok: 'Xuống thấp trước để không ngã, rồi mới nhờ người giúp.', hint: 'Việc đầu tiên là làm sao để mình không ngã. Rồi mới đến nhờ người.' },
+      { id: 'y1c', k: 'pick', t: 'Gọi 119 hay theo dõi?', min: 4, xp: 10,
+        rounds: [
+          { q: 'Bạn cùng lớp ngất, hơn 1 phút vẫn chưa tỉnh.',
+            opts: [
+              { t: 'Gọi 119 ngay, rồi báo thầy cô hoặc người hỗ trợ', ok: 1, why: 'Đúng rồi! Quá 1 phút chưa tỉnh là dấu hiệu nặng. Gọi 119 ngay.' },
+              { t: 'Cho nằm nghỉ, theo dõi thêm, báo thầy cô hoặc người hỗ trợ', why: 'Quá 1 phút chưa tỉnh thì không chờ thêm. Gọi 119.' },
+              { t: 'Để bạn tự về phòng ngủ một giấc, mai gặp lại thì hỏi thăm sau', why: 'Người chưa tỉnh không thể tự về. Cần gọi 119 ngay.' }
+            ] },
+          { q: 'Bạn ngất chừng 5 giây, tỉnh ngay, nói chuyện rõ, chỉ hơi mệt.',
+            opts: [
+              { t: 'Gọi 119 ngay, rồi báo thầy cô hoặc người hỗ trợ', why: 'Tỉnh nhanh, nói rõ thì thường chưa cần xe cấp cứu. Cho nằm nghỉ, có người theo dõi.' },
+              { t: 'Cho nằm nghỉ, theo dõi thêm, báo thầy cô hoặc người hỗ trợ', ok: 1, why: 'Đúng rồi! Nằm nghỉ, có người theo dõi, báo người phụ trách. Ngất lại thì đi khám.' },
+              { t: 'Để bạn tự về phòng ngủ một giấc, mai gặp lại thì hỏi thăm sau', why: 'Vừa ngất thì không để bạn đi một mình. Cần có người theo dõi.' }
+            ] },
+          { q: 'Bạn ngã khi ngất, đầu đập xuống sàn, có chảy máu.',
+            opts: [
+              { t: 'Gọi 119 ngay, rồi báo thầy cô hoặc người hỗ trợ', ok: 1, why: 'Đúng rồi! Đập đầu khi ngã có thể bị thương bên trong. Gọi 119.' },
+              { t: 'Cho nằm nghỉ, theo dõi thêm, báo thầy cô hoặc người hỗ trợ', why: 'Đập đầu, chảy máu thì cần cấp cứu, không chỉ theo dõi.' },
+              { t: 'Để bạn tự về phòng ngủ một giấc, mai gặp lại thì hỏi thăm sau', why: 'Đập đầu mà ngủ một mình thì không ai biết nếu bạn nặng lên.' }
+            ] },
+          { q: 'Trước khi ngất, bạn kêu đau ngực, khó thở.',
+            opts: [
+              { t: 'Gọi 119 ngay, rồi báo thầy cô hoặc người hỗ trợ', ok: 1, why: 'Đúng rồi! Đau ngực, khó thở trước khi ngất có thể là bệnh tim. Gọi 119.' },
+              { t: 'Cho nằm nghỉ, theo dõi thêm, báo thầy cô hoặc người hỗ trợ', why: 'Đau ngực, khó thở là dấu hiệu nguy hiểm. Không chờ, gọi 119.' },
+              { t: 'Để bạn tự về phòng ngủ một giấc, mai gặp lại thì hỏi thăm sau', why: 'Đây là dấu hiệu nguy hiểm, cần cấp cứu ngay.' }
+            ] }
+        ],
+        end: 'Không chắc thì gọi. Ở Nhật có nơi có số #7119 để hỏi có nên gọi xe cấp cứu không. Xem Sổ tay › Khẩn cấp.' }
+    ],
+    gtip: {
+      xuong: 'Xưởng nóng, đứng lâu dễ choáng: ăn sáng trước ca, thấy choáng thì ngồi xuống, báo ngay.',
+      chuyen: 'Đứng một chỗ cả ca dễ choáng: thỉnh thoảng nhón gót, co duỗi chân cho máu lưu thông.',
+      troi: 'Ngoài trời nắng nóng dễ choáng: nghỉ bóng mát, uống nước đều.',
+      dv: 'Bưng bê, đi lại cả ca: đừng bỏ bữa trước giờ làm.',
+      vp: 'Ngồi lâu rồi đứng dậy đột ngột dễ choáng: đứng dậy từ từ.' } },
+
+  { id: 'y2', t: 'Say nắng (熱中症)', ic: 'sun', sub: 'Vào chỗ mát, làm mát, uống nước; lơ mơ thì gọi 119', min: 12,
+    acts: [
+      { id: 'y2a', k: 'sim', t: 'Ca trực: Buổi chiều nắng ở công trường', min: 5, xp: 15,
+        scene: { ic: 'sun', place: 'Công trường ở Nhật', time: '14:00', tag: 'Tháng 8 · 35°C' },
+        intro: '<b class="nm">[Tên]</b> ơi, mùa hè ở Nhật có ngày trên 35 độ, lại ẩm. Hôm nay mình đi cùng anh K. ra công trường nhé.',
+        steps: [
+          { say: 'Anh K. làm ngoài nắng từ trưa. Anh đổ mồ hôi nhiều, chóng mặt, bắp chân bị chuột rút.', q: 'Bạn làm gì trước?',
+            opts: [
+              { t: 'Bảo anh dừng việc, đưa vào chỗ râm mát, báo người phụ trách ngay', ok: 1, key: 'Dừng việc, vào chỗ mát, báo người phụ trách',
+                res: 'Anh K. ngồi dưới mái che có quạt.', why: 'Chóng mặt, chuột rút giữa trời nóng là dấu hiệu say nắng. Rời chỗ nóng là việc đầu tiên.' },
+              { t: 'Bảo anh cố làm nốt 30 phút cho xong việc rồi hãy vào nghỉ cho thoải mái', res: 'Anh K. càng lúc càng choáng, tay run.', why: 'Ở lại chỗ nóng thêm, say nắng nặng lên rất nhanh.' },
+              { t: 'Đưa anh lon cà phê lạnh cho tỉnh táo rồi làm tiếp', res: 'Anh K. uống xong vẫn chóng mặt.', why: 'Cà phê không làm mát người. Cần dừng việc, vào chỗ mát.' }
+            ] },
+          { say: 'Anh K. đã ngồi chỗ mát, người vẫn nóng ran.', q: 'Làm mát cho anh thế nào?',
+            opts: [
+              { t: 'Nới quần áo, chườm lạnh ở cổ, nách, bẹn, quạt cho anh', ok: 1, key: 'Nới đồ, chườm lạnh cổ, nách, bẹn, quạt',
+                res: 'Người anh K. bớt nóng dần.', why: 'Cổ, nách, bẹn có mạch máu lớn gần da. Chườm khăn lạnh, chai nước lạnh ở đó làm mát người nhanh.' },
+              { t: 'Khoác thêm áo cho anh để khỏi bị cảm lạnh vì gió quạt thổi vào', res: 'Anh K. càng nóng, mồ hôi vã ra.', why: 'Mặc thêm làm nhiệt không thoát ra được.' },
+              { t: 'Bảo anh đi tắm nước nóng cho ra mồ hôi, hết mệt', res: 'Anh K. choáng hơn khi đứng dậy.', why: 'Nước nóng làm người nóng thêm. Cần làm mát.' }
+            ] },
+          { say: 'Anh K. tỉnh táo, tự cầm chai được.', q: 'Cho anh uống gì?',
+            opts: [
+              { t: 'Nước bù muối khoáng (経口補水液) hoặc đồ uống thể thao, từng ngụm', ok: 1, key: 'Còn tỉnh, tự uống được: nước có muối khoáng, từng ngụm',
+                res: 'Anh K. uống từng ngụm, đỡ chuột rút.', why: 'Đổ mồ hôi nhiều là mất cả nước và muối. Chỉ cho uống khi người đó tự uống được.' },
+              { t: 'Một lon bia lạnh cho mát người, đỡ mệt nhanh', res: 'Anh K. thấy mệt hơn.', why: 'Rượu bia làm cơ thể mất thêm nước.' },
+              { t: 'Một ly cà phê đá thật đậm cho anh tỉnh táo trở lại để làm tiếp', res: 'Anh K. vẫn chuột rút.', why: 'Cà phê không bù được muối khoáng đã mất theo mồ hôi.' }
+            ] },
+          { say: 'Một lúc sau, anh K. nói lẫn lộn, hỏi không trả lời rõ, không tự uống được nữa.', q: 'Bạn làm gì?',
+            opts: [
+              { t: 'Gọi 119 ngay, vẫn tiếp tục làm mát cho anh trong lúc chờ', ok: 1, key: 'Lơ mơ, không tự uống được: gọi 119, vẫn làm mát',
+                res: 'Xe cấp cứu đến, anh K. được đưa đi viện kịp lúc.', why: 'Lơ mơ là say nắng nặng, nguy hiểm tính mạng. Gọi 119 và làm mát liên tục.' },
+              { t: 'Đổ thật nhiều nước vào miệng cho anh tỉnh lại', res: 'Anh K. sặc nước, ho dữ dội.', why: 'Người lơ mơ dễ sặc. Không ép uống, gọi 119.' },
+              { t: 'Để anh nằm ngủ một giấc ở chỗ mát, chiều mát trời sẽ tự khỏe lại', res: 'Anh K. lịm dần.', why: 'Say nắng nặng không tự khỏi. Chờ là mất thời gian quý.' }
+            ] },
+          { say: 'Hôm sau anh K. đã khỏe, hỏi: “Làm sao để không bị lại?”', q: 'Bạn nói gì với anh?',
+            opts: [
+              { t: 'Uống đều cả khi chưa khát, nghỉ bóng mát, ngủ đủ; thấy lạ thì báo ngay', ok: 1, key: 'Phòng say nắng: uống đều, nghỉ bóng mát, ngủ đủ, báo sớm',
+                res: 'Anh K. để sẵn chai nước ở chỗ làm, đặt giờ nhắc uống.', why: 'Say nắng hay đến khi thiếu ngủ, bỏ bữa, ít uống. Báo sớm là cách giữ an toàn.' },
+              { t: 'Khát mới uống, cho đỡ mất thời gian đi vệ sinh', res: 'Mấy hôm sau anh K. lại chóng mặt.', why: 'Thấy khát là cơ thể đã thiếu nước rồi.' },
+              { t: 'Ráng chịu nắng vài tuần là người sẽ quen dần, không cần nghỉ thêm giờ nào', res: 'Anh K. bỏ giờ nghỉ, lại mệt lả.', why: 'Cơ thể có quen dần, nhưng vẫn cần nghỉ, uống nước. Ráng chịu là cách dẫn tới tai nạn.' }
+            ] }
+        ],
+        end: 'Say nắng: dừng việc, vào chỗ mát, làm mát cổ, nách, bẹn, cho uống nếu còn tỉnh. Lơ mơ: gọi 119.' },
+      { id: 'y2b', k: 'match', t: 'Từ tiếng Nhật ngày nắng', min: 3, xp: 10,
+        q: 'Ghép nghĩa tiếng Việt với chữ Nhật.', sub: 'Chạm một nghĩa, rồi chạm chữ Nhật hợp với nó.',
+        sel: 'kwSel', no: 'kwNo', end: 'y2End',
+        pairs: [
+          { v: 'Say nắng', j: '熱中症', k: 'ねっちゅうしょう', r: 'necchūshō', why: 'Mùa hè ở Nhật, từ này nghe rất nhiều ở chỗ làm, trên tivi.' },
+          { v: 'Bổ sung nước', j: '水分補給', k: 'すいぶんほきゅう', r: 'suibun hokyū', why: 'Hay thấy trên biển nhắc ở công trường, nhà xưởng.' },
+          { v: 'Nghỉ giải lao', j: '休憩', k: 'きゅうけい', r: 'kyūkei', why: 'Nghỉ đúng giờ là một phần của an toàn.' },
+          { v: 'Tôi thấy không khỏe', j: '気分が悪いです', k: 'きぶんがわるいです', r: 'kibun ga warui desu', why: 'Nói ngay khi thấy chóng mặt, buồn nôn.' },
+          { v: 'Tôi bị chóng mặt', j: 'めまいがします', r: 'memai ga shimasu', why: 'Nói rõ dấu hiệu để người khác giúp đúng.' },
+          { v: 'Xe cấp cứu', j: '救急車', k: 'きゅうきゅうしゃ', r: 'kyūkyūsha', why: 'Gọi số 119.' }
+        ] },
+      { id: 'y2c', k: 'pick', t: 'Ngày nắng của nhóm mình', min: 4, xp: 10,
+        rounds: [
+          { q: 'Ở chỗ làm, bạn báo cho ai khi thấy mình hoặc bạn có dấu hiệu say nắng?',
+            opts: [
+              { t: 'Người phụ trách mà chỗ làm đã chỉ định, hỏi rõ ngay từ ngày đầu', ok: 1, why: 'Đúng rồi! Từ tháng 6/2025, luật Nhật yêu cầu chỗ làm nóng phải định sẵn người nhận báo say nắng. Hỏi trước: báo ai, bằng cách nào.' },
+              { t: 'Không cần báo ai, tự nghỉ một lát rồi làm tiếp', why: 'Say nắng có thể nặng lên rất nhanh. Phải có người biết để theo dõi.' },
+              { t: 'Đợi hết ca rồi kể với bạn cùng phòng để cả hai cùng rút kinh nghiệm', why: 'Đợi hết ca là quá muộn. Báo ngay cho người phụ trách.' }
+            ] },
+          { q: 'Làm ở chỗ nóng, lúc nào nên uống nước?',
+            opts: [
+              { t: 'Uống đều từng chút, khoảng 20–30 phút một lần, cả khi chưa khát', ok: 1, why: 'Đúng rồi! Uống đều, ít một. Đổ mồ hôi nhiều thì uống thêm nước có muối khoáng.' },
+              { t: 'Chỉ uống khi thấy khát, uống thật nhiều một lần', why: 'Thấy khát là cơ thể đã thiếu nước. Uống đều trước khi khát.' },
+              { t: 'Đợi đến giờ nghỉ trưa uống một lần cho đỡ phải đi vệ sinh giữa ca', why: 'Nhịn uống cả buổi sáng ở chỗ nóng rất dễ say nắng.' }
+            ] },
+          { q: 'Công trường giữa trưa hè, mái tôn hắt nóng. Bạn làm gì để không bị say nắng?',
+            opts: [
+              { t: 'Đội mũ, uống nước theo giờ, nghỉ bóng mát, thấy chóng mặt thì báo ngay', ok: 1, why: 'Đúng rồi! Mũ, nước, bóng mát, báo sớm: bốn việc giữ an toàn ngày nắng.' },
+              { t: 'Cởi áo cho mát, làm liền một mạch cho xong hết việc rồi mới nghỉ luôn một thể', why: 'Cởi áo ngoài nắng làm da nóng hơn. Làm liền không nghỉ dễ say nắng.' },
+              { t: 'Ráng chịu, vì ai cũng nóng như mình cả', why: 'Ai cũng nóng không có nghĩa là an toàn. Nghỉ, uống nước, báo sớm.' }
+            ] }
+        ],
+        byGroup: {
+          xuong: { q: 'Xưởng có lò, máy chạy nóng, mùa hè không có điều hòa. Bạn mặc đồ bảo hộ dài tay. Bạn làm gì?',
+            opts: [
+              { t: 'Để nước gần chỗ làm, uống theo giờ, nghỉ chỗ thoáng, chóng mặt thì báo', ok: 1, why: 'Đúng rồi! Đồ bảo hộ vẫn mặc đủ, còn nước và giờ nghỉ giúp bạn không say nắng.' },
+              { t: 'Cởi bớt đồ bảo hộ cho mát, khi nào có người kiểm tra thì mặc lại cho đủ', why: 'Bỏ đồ bảo hộ là nguy cơ tai nạn. Giữ đồ bảo hộ, uống nước, nghỉ đúng giờ.' },
+              { t: 'Làm liền một mạch cho xong việc rồi nghỉ', why: 'Làm liền ở chỗ nóng rất dễ say nắng. Nghỉ và uống theo giờ.' }
+            ] },
+          chuyen: { q: 'Khu nấu, hấp của dây chuyền thực phẩm nóng và ẩm. Bạn làm gì?',
+            opts: [
+              { t: 'Uống ở chỗ cho phép vào giờ nghỉ, ra chỗ mát, chóng mặt thì báo ngay', ok: 1, why: 'Đúng rồi! Khu thực phẩm có chỗ được uống riêng. Nghỉ ra chỗ mát và báo sớm.' },
+              { t: 'Mang chai nước vào uống ngay trên dây chuyền cho tiện, khỏi phải đi ra ngoài', why: 'Khu thực phẩm thường cấm mang đồ uống vào để giữ vệ sinh. Uống ở chỗ cho phép.' },
+              { t: 'Ráng chịu đến hết ca vì dây chuyền không được dừng', why: 'Chóng mặt thì phải báo, người phụ trách sẽ cho người thay.' }
+            ] },
+          troi: { q: 'Công trường giữa trưa hè, mái tôn hắt nóng. Bạn làm gì để không bị say nắng?',
+            opts: [
+              { t: 'Đội mũ, uống nước theo giờ, nghỉ bóng mát, thấy chóng mặt thì báo ngay', ok: 1, why: 'Đúng rồi! Mũ, nước, bóng mát, báo sớm: bốn việc giữ an toàn ngày nắng.' },
+              { t: 'Cởi áo cho mát, làm liền một mạch cho xong hết việc rồi mới nghỉ luôn một thể', why: 'Cởi áo ngoài nắng làm da nóng hơn. Làm liền không nghỉ dễ say nắng.' },
+              { t: 'Ráng chịu, vì ai cũng nóng như mình cả', why: 'Ai cũng nóng không có nghĩa là an toàn. Nghỉ, uống nước, báo sớm.' }
+            ] },
+          dv: { q: 'Bếp nhà hàng giờ cao điểm, lửa nóng, đi lại liên tục. Bạn làm gì?',
+            opts: [
+              { t: 'Uống nước giữa các lượt, ra chỗ mát khi được nghỉ, chóng mặt thì báo', ok: 1, why: 'Đúng rồi! Bếp nóng cũng gây say nắng. Uống đều, báo sớm.' },
+              { t: 'Đông khách quá, nhịn uống đến khi hết giờ cao điểm', why: 'Nhịn uống ở bếp nóng rất dễ say nắng.' },
+              { t: 'Ráng làm tiếp, chóng mặt một chút rồi sẽ hết, không cần nói với ai cả', why: 'Chóng mặt ở chỗ nóng là dấu hiệu say nắng. Báo ngay.' }
+            ] },
+          vp: { q: 'Bạn làm thêm giao hàng bằng xe đạp vào buổi trưa hè. Bạn làm gì?',
+            opts: [
+              { t: 'Mang nước, đội mũ, nghỉ chỗ râm giữa các đơn, thấy lạ thì dừng lại', ok: 1, why: 'Đúng rồi! Làm một mình càng cần tự chủ động nghỉ, uống nước.' },
+              { t: 'Chạy liền một mạch cho nhanh xong để nhận thêm được nhiều đơn hơn nữa', why: 'Chạy liền giữa trưa nắng rất dễ say nắng, lại dễ tai nạn.' },
+              { t: 'Uống một lon nước tăng lực trước khi đi là đủ', why: 'Nước tăng lực không thay được nước, mũ và giờ nghỉ.' }
+            ] }
+        },
+        end: 'Ngày đầu ở chỗ làm, hỏi trước: say nắng thì báo ai, chỗ nghỉ mát ở đâu, nước để ở đâu.' }
+    ],
+    gtip: {
+      xuong: 'Xưởng có lò, máy nóng: để nước gần chỗ làm, uống theo giờ.',
+      chuyen: 'Khu nấu, hấp nóng ẩm: ra chỗ mát đúng giờ nghỉ, uống ở chỗ cho phép.',
+      troi: 'Công trường mùa hè: đội mũ, nghỉ bóng mát, báo ngay khi thấy lạ.',
+      dv: 'Bếp nhà hàng rất nóng giờ cao điểm: uống nước giữa các lượt.',
+      vp: 'Làm thêm ngoài trời mùa hè: mang nước, đội mũ, nghỉ chỗ râm.' } },
+
+  { id: 'y3', t: 'Cảm lạnh, cúm, sốt', ic: 'drop', sub: 'Báo sớm, không lây cho bạn, khi nào đi khám', min: 13,
+    acts: [
+      { id: 'y3a', k: 'sim', t: 'Ca trực: Sáng thức dậy bị sốt', min: 5, xp: 15,
+        scene: { ic: 'timer', place: 'Phòng ký túc xá', time: '6:30', tag: 'Nhiệt kế: 38,5°C' },
+        intro: '<b class="nm">[Tên]</b> ơi, ca này người bị ốm chính là bạn. Thử xem mình xử lý thế nào nhé.',
+        steps: [
+          { say: 'Sáng nay bạn thức dậy, người nóng, đau nhức. Nhiệt kế báo 38,5°C. 8 giờ có lớp.', q: 'Bạn làm gì trước?',
+            opts: [
+              { t: 'Báo thầy cô chủ nhiệm trước giờ học: sốt bao nhiêu độ, từ lúc nào', ok: 1, key: 'Báo trước giờ học: sốt bao nhiêu độ, từ lúc nào',
+                res: 'Thầy cô biết, dặn bạn nghỉ ở phòng và theo dõi.', why: 'Báo sớm, nói rõ để thầy cô sắp xếp và giúp bạn. Đó là Hō-Ren-Sō.' },
+              { t: 'Tắt điện thoại ngủ tiếp, chiều khỏe thì báo sau cũng được', res: 'Cả buổi sáng thầy cô gọi không được, rất lo.', why: 'Không báo thì không ai biết để giúp, lại bị tính là vắng không báo.' },
+              { t: 'Uống thuốc hạ sốt rồi ráng đi học như thường, không cần nói với ai cả', res: 'Đến trưa bạn mệt lả, cả bàn ngồi cạnh bắt đầu ho.', why: 'Đi học khi sốt dễ lây cho cả lớp, lại mệt thêm.' }
+            ] },
+          { say: 'Bạn cùng phòng chuẩn bị đi học.', q: 'Bạn làm gì để không lây cho bạn?',
+            opts: [
+              { t: 'Đeo khẩu trang, dùng cốc, khăn riêng, mở cửa sổ cho thoáng', ok: 1, key: 'Khẩu trang, đồ dùng riêng, phòng thoáng',
+                res: 'Bạn cùng phòng vẫn khỏe đi học.', why: 'Bệnh lây qua giọt bắn và đồ dùng chung. Vài việc nhỏ giữ cả phòng khỏe.' },
+              { t: 'Nằm chung chăn với bạn cho ấm, đỡ lạnh run', res: 'Hai hôm sau bạn cùng phòng cũng sốt.', why: 'Nằm sát nhau là cách lây nhanh nhất.' },
+              { t: 'Đóng kín hết cửa, bật máy sưởi thật nóng cho chóng ra mồ hôi', res: 'Phòng bí hơi, cả phòng thấy mệt.', why: 'Phòng bí làm bệnh lây dễ hơn. Ủ thật nóng không làm khỏi nhanh hơn.' }
+            ] },
+          { say: 'Chiều, bạn sốt 39,5°C, đau nhức khắp người, mệt rã rời.', q: 'Bạn làm gì?',
+            opts: [
+              { t: 'Báo người hỗ trợ để được đưa đi khám, vì có thể là cúm', ok: 1, key: 'Sốt cao, đau nhức khắp người: báo để đi khám',
+                res: 'Người hỗ trợ đưa bạn đi khám ngay chiều đó.', why: 'Sốt cao, đau nhức toàn thân giống cúm. Cần bác sĩ khám sớm.' },
+              { t: 'Chờ thêm 3–4 ngày xem có tự hết không rồi mới tính', res: 'Đêm đó bạn sốt cao hơn, mê mệt.', why: 'Sốt cao mà chờ lâu dễ nặng thêm, lây thêm người.' },
+              { t: 'Nhờ bạn ra hiệu thuốc mua kháng sinh về uống cho mau khỏi', res: 'Uống xong bạn vẫn sốt, còn đau bụng.', why: 'Cảm, cúm do vi rút. Kháng sinh không chữa được, tự uống còn có hại.' }
+            ] },
+          { say: 'Bác sĩ nói bạn bị cúm (インフルエンザ), dặn nghỉ ở nhà.', q: 'Mấy ngày nghỉ, bạn làm gì?',
+            opts: [
+              { t: 'Nghỉ đủ ngày bác sĩ dặn, ở trong phòng, không sang phòng bạn chơi', ok: 1, key: 'Nghỉ đủ ngày bác sĩ dặn, không sang phòng khác',
+                res: 'Không ai trong ký túc xá bị lây.', why: 'Hết sốt chưa chắc hết lây. Nghỉ đủ là giữ an toàn cho cả nhóm.' },
+              { t: 'Hết sốt là đi làm thêm ngay hôm sau, đỡ phải mất thêm buổi lương nào', res: 'Hai người ở chỗ làm thêm bị sốt theo.', why: 'Đi sớm có thể lây cho cả chỗ làm. Làm theo lời bác sĩ.' },
+              { t: 'Buồn quá, sang phòng bạn ngủ chung một đêm cho vui', res: 'Bạn phòng bên bắt đầu ho, sốt.', why: 'Đang lây mà sang phòng khác ngủ là đem bệnh cho bạn.' }
+            ] },
+          { say: 'Trong mấy ngày nghỉ, bạn tự chăm mình.', q: 'Cách nào đúng nhất?',
+            opts: [
+              { t: 'Uống đủ nước, ăn cháo, súp dễ tiêu, ngủ nhiều, đo nhiệt độ sáng tối', ok: 1, key: 'Uống đủ nước, ăn dễ tiêu, ngủ nhiều, đo nhiệt độ',
+                res: 'Ba hôm sau bạn hết sốt, ăn ngon trở lại.', why: 'Nước, ăn dễ tiêu, ngủ giúp cơ thể hồi phục. Đo nhiệt độ để biết mình đỡ hay nặng lên.' },
+              { t: 'Thức khuya xem phim cho đỡ buồn, ăn mì gói cho nhanh', res: 'Bạn mệt dai dẳng cả tuần.', why: 'Thiếu ngủ, ăn thiếu chất làm bệnh lâu khỏi.' },
+              { t: 'Nhịn ăn cho nhẹ bụng, chỉ cần uống thuốc hạ sốt đúng giờ là đủ để khỏi', res: 'Bạn đuối sức, đứng dậy là choáng.', why: 'Đang ốm càng cần ăn, uống đủ để có sức.' }
+            ] }
+        ],
+        end: 'Sốt: báo sớm, đeo khẩu trang, dùng đồ riêng. Sốt cao, đau nhức khắp người: đi khám. Nghỉ đủ ngày bác sĩ dặn.' },
+      { id: 'y3b', k: 'pick', t: 'Nghỉ ở phòng hay đi khám?', min: 4, xp: 10,
+        rounds: [
+          { q: 'Hắt hơi, sổ mũi, đau họng nhẹ, không sốt.',
+            opts: [
+              { t: 'Nghỉ ngơi, uống đủ nước, đeo khẩu trang, tự theo dõi thêm', ok: 1, why: 'Đúng rồi! Giống cảm lạnh nhẹ. Giữ ấm, uống nước, ngủ đủ. Nặng lên thì báo.' },
+              { t: 'Báo người hỗ trợ, nhờ đưa đi khám bệnh ngay trong hôm nay', why: 'Cảm lạnh nhẹ thường tự khỏi. Cứ báo cho người hỗ trợ biết, đi khám khi nặng lên.' },
+              { t: 'Gọi 119 ngay', why: 'Đây không phải lúc cấp cứu. Số 119 để dành cho người nguy hiểm.' }
+            ] },
+          { q: 'Sốt cao 39°C đến nhanh, đau nhức khắp người, mệt rã rời.',
+            opts: [
+              { t: 'Nghỉ ngơi, uống đủ nước, đeo khẩu trang, tự theo dõi thêm', why: 'Sốt cao, đau nhức toàn thân giống cúm. Cần bác sĩ khám.' },
+              { t: 'Báo người hỗ trợ, nhờ đưa đi khám bệnh ngay trong hôm nay', ok: 1, why: 'Đúng rồi! Có thể là cúm. Đi khám sớm, đeo khẩu trang để không lây.' },
+              { t: 'Gọi 119 ngay', why: 'Còn tỉnh táo, thở được thì báo người hỗ trợ đưa đi khám.' }
+            ] },
+          { q: 'Sổ mũi đã 3 ngày, nay sốt 38°C và ho nhiều hơn.',
+            opts: [
+              { t: 'Nghỉ ngơi, uống đủ nước, đeo khẩu trang, tự theo dõi thêm', why: 'Bệnh đang nặng lên, không chỉ tự theo dõi nữa.' },
+              { t: 'Báo người hỗ trợ, nhờ đưa đi khám bệnh ngay trong hôm nay', ok: 1, why: 'Đúng rồi! Bệnh kéo dài và nặng lên thì báo người hỗ trợ, đi khám.' },
+              { t: 'Gọi 119 ngay', why: 'Chưa phải cấp cứu. Báo người hỗ trợ để đi khám.' }
+            ] },
+          { q: 'Sốt cao, khó thở, môi tái, hỏi chỉ trả lời lơ mơ.',
+            opts: [
+              { t: 'Nghỉ ngơi, uống đủ nước, đeo khẩu trang, tự theo dõi thêm', why: 'Khó thở, lơ mơ là dấu hiệu nguy hiểm. Gọi 119.' },
+              { t: 'Báo người hỗ trợ, nhờ đưa đi khám bệnh ngay trong hôm nay', why: 'Không chờ người đưa đi. Khó thở, lơ mơ thì gọi 119 trước.' },
+              { t: 'Gọi 119 ngay', ok: 1, why: 'Đúng rồi! Khó thở, môi tái, lơ mơ là cấp cứu. Gọi 119, rồi báo người hỗ trợ.' }
+            ] }
+        ],
+        end: 'Không chắc nên làm gì: báo người hỗ trợ trước. Nói rõ dấu hiệu, từ khi nào, nhiệt độ bao nhiêu.' },
+      { id: 'y3c', k: 'story', kl: 'Chuyện đã xảy ra', t: 'Chuyện bạn M. ở trung tâm đào tạo', min: 5, xp: 15, w: 'storyW3',
+        story: ['Tháng đầu sang Nhật, bạn M. học tập trung ở trung tâm đào tạo. Trời lạnh, nhân viên nhắc nhiều lần: ra ngoài nhớ mặc ấm.', 'M. thấy mặc nhiều vướng víu, chỉ mặc áo mỏng. Ít hôm sau M. sốt, ho.', 'Nhân viên xếp M. ở một phòng riêng để nghỉ và không lây cho người khác.', 'Ở một mình buồn quá, tối đó M. sang phòng bạn chơi, rồi ngủ lại luôn.'],
+        end: 'Giữ sức khỏe của mình cũng là giữ cho cả nhóm. Một người ốm lây cả phòng thì cả chỗ làm thiếu người.',
+        tips: ['Nếu là M., mình sẽ mặc ấm ngay khi được nhắc, không đợi đến lúc ốm', 'Nếu là M., mình sẽ ở yên phòng riêng, buồn thì gọi điện cho bạn thay vì sang phòng'],
+        rounds: [
+          { q: 'Vì sao M. bị ốm?',
+            opts: [
+              { t: 'Vì ở Nhật lạnh hơn ở Việt Nam, ai mới sang cũng sẽ bị ốm', why: 'Trời lạnh là thật, nhưng mặc gì là M. chọn. Các bạn mặc ấm thì không ốm.' },
+              { t: 'Vì M. không nghe lời nhắc mặc ấm, chủ quan với sức mình', ok: 1, why: 'Đúng rồi! Lời nhắc có sẵn, nhưng M. nghĩ mình chịu được.' },
+              { t: 'Vì phòng riêng không ai chăm sóc M.', why: 'M. ốm trước, rồi mới được xếp phòng riêng.' }
+            ] },
+          { q: 'Vì sao nhân viên xếp M. ở phòng riêng?',
+            opts: [
+              { t: 'Để phạt M. vì không chịu nghe lời nhắc mặc ấm', why: 'Phòng riêng không phải để phạt. Đó là để giữ an toàn cho mọi người.' },
+              { t: 'Vì phòng chung đã hết chỗ nên M. phải ở tạm một mình vài hôm', why: 'Phòng riêng là để M. được nghỉ và không lây cho người khác.' },
+              { t: 'Để M. được nghỉ ngơi và không lây bệnh cho các bạn ở chung', ok: 1, why: 'Đúng rồi! Đó là cách bảo vệ cả M. và cả nhóm.' }
+            ] },
+          { q: 'Vì sao việc M. sang phòng bạn ngủ là không ổn?',
+            opts: [
+              { t: 'Vì M. có thể lây bệnh cho bạn, cả nhóm phải nghỉ học, nghỉ làm theo', ok: 1, why: 'Đúng rồi! Một người không giữ ý thì cả nhóm chịu hậu quả.' },
+              { t: 'Vì ngủ chung phòng thì chật và ồn, làm phiền giờ ngủ, giờ học của bạn', why: 'Ồn là chuyện nhỏ. Điều đáng lo là lây bệnh.' },
+              { t: 'Không sao cả, bạn thân ngủ chung mấy hôm cũng được', why: 'Đang ốm thì bạn càng thân càng nên giữ khoảng cách.' }
+            ] }
+        ] }
+    ],
+    gtip: {
+      xuong: 'Mùa đông xưởng lạnh: mặc ấm bên trong đồ bảo hộ.',
+      chuyen: 'Dây chuyền thực phẩm lạnh, ẩm: mặc đủ lớp. Sốt, tiêu chảy thì báo, không vào khu thực phẩm.',
+      troi: 'Làm ngoài trời mùa đông: giữ ấm tay, chân, cổ.',
+      dv: 'Kaigo, nhà hàng gặp nhiều người: ốm thì báo nghỉ để không lây cho người già, cho khách.',
+      vp: 'Văn phòng, lớp học kín và đông người: ho thì đeo khẩu trang.' } },
+
+  /* ---------- Đợt 2 (TC01.1.2) ---------- */
+  { id: 'y4', t: 'Bong gân, trầy xước', ic: 'leg', sub: 'Chườm lạnh, băng ép, giữ vết thương sạch', min: 13,
+    acts: [
+      { id: 'y4a', k: 'sim', t: 'Ca trực: Trận bóng chiều chủ nhật', min: 5, xp: 15,
+        scene: { ic: 'leg', place: 'Sân bóng gần ký túc xá', time: '16:30', tag: 'Còn 1 tháng nữa bay' },
+        intro: '<b class="nm">[Tên]</b> ơi, chiều chủ nhật cả phòng rủ nhau đá bóng. Shin đi theo trực, mang sẵn túi sơ cứu nhé.',
+        steps: [
+          { say: 'Bạn T. bật lên đánh đầu, tiếp đất lệch chân. T. ngồi ôm cổ chân, đầu gối trầy rướm máu.', q: 'Bạn làm gì đầu tiên?',
+            opts: [
+              { t: 'Cho T. dừng chơi, ngồi yên, không cố đứng dậy đi tiếp', ok: 1, key: 'Dừng chơi ngay, ngồi yên, không cố đi',
+                res: 'T. ngồi xuống mép sân, cổ chân được để yên.', why: 'Cố đi trên cổ chân vừa trẹo dễ làm dây chằng rách thêm. Dừng ngay là bước đầu tiên.' },
+              { t: 'Bảo T. đứng dậy chạy thử vài vòng cho cổ chân giãn ra rồi đá tiếp', res: 'Mới chạy vài bước, T. khuỵu xuống, đau hơn lúc nãy.', why: 'Chạy trên chân vừa trẹo làm tổn thương nặng thêm.' },
+              { t: 'Nắn, bóp mạnh cổ chân cho khớp về chỗ cũ', res: 'T. kêu đau, cổ chân sưng nhanh hơn.', why: 'Nắn bóp mạnh làm chỗ bị thương chảy máu bên trong nhiều hơn, sưng thêm.' }
+            ] },
+          { say: 'Mười phút sau, cổ chân T. bắt đầu sưng, chạm vào thấy đau.', q: 'Chườm thế nào?',
+            opts: [
+              { t: 'Chườm lạnh: đá bọc trong khăn, mỗi lần khoảng 15–20 phút', ok: 1, key: 'Chườm lạnh: đá bọc khăn, mỗi lần khoảng 15–20 phút',
+                res: 'Cổ chân T. đỡ đau, sưng chậm lại.', why: 'Lạnh làm co mạch, bớt sưng, bớt đau. Bọc khăn để đá không làm bỏng lạnh da.' },
+              { t: 'Chườm nóng, xoa dầu nóng thật kỹ cho máu lưu thông để mau tan sưng', res: 'Tối đó cổ chân T. sưng to hơn.', why: 'Mới bị thương mà chườm nóng, xoa dầu nóng thì sưng thêm. Lúc đầu cần lạnh.' },
+              { t: 'Đắp lá giã nát theo cách người quen mách', res: 'Lá dính bẩn vào vết trầy ở đầu gối, cổ chân vẫn sưng.', why: 'Đắp lá không làm bớt sưng, còn dễ làm bẩn vết thương.' }
+            ] },
+          { say: 'Chườm xong, T. được dìu về phòng.', q: 'Tiếp theo làm gì cho cổ chân?',
+            opts: [
+              { t: 'Băng ép vừa chặt bằng băng thun, khi nằm kê chân cao hơn tim', ok: 1, key: 'Băng ép vừa chặt, kê chân cao hơn tim',
+                res: 'Sáng hôm sau, cổ chân T. đỡ sưng nhiều.', why: 'Băng ép, kê cao giúp bớt sưng. Ngón chân tê, tím là băng quá chặt, cần nới ra.' },
+              { t: 'Quấn băng thật chặt, càng chặt càng mau hết sưng, để nguyên đến sáng', res: 'Nửa đêm, ngón chân T. tê buốt, tím lại.', why: 'Băng quá chặt làm máu không lưu thông. Chỉ băng vừa chặt.' },
+              { t: 'Để chân thõng xuống giường, đi lại bình thường', res: 'Cổ chân T. sưng căng, đi lại càng đau.', why: 'Để chân thấp, đi lại nhiều làm máu dồn xuống, sưng thêm.' }
+            ] },
+          { say: 'Giờ đến vết trầy ở đầu gối, còn dính đất cát.', q: 'Xử lý vết trầy thế nào?',
+            opts: [
+              { t: 'Rửa sạch bằng nước sạch cho hết đất cát, thấm khô, che băng sạch', ok: 1, key: 'Vết trầy: rửa nước sạch cho hết đất cát, thấm khô, che băng sạch',
+                res: 'Vết trầy sạch sẽ, được che kín.', why: 'Đất cát còn trong vết thương là nguồn nhiễm trùng. Rửa nước sạch là việc quan trọng nhất.' },
+              { t: 'Bôi kem đánh răng lên cho mát, mau khô vết thương', res: 'Vết trầy rát hơn, đất cát vẫn còn bên dưới lớp kem.', why: 'Kem đánh răng không làm sạch vết thương, còn gây rát, dễ nhiễm trùng.' },
+              { t: 'Để nguyên như vậy, vết thương tự đóng vảy rồi sẽ khỏi, khỏi phải rửa', res: 'Đất cát bị đóng vảy bên trong vết thương.', why: 'Không rửa thì đất cát nằm lại bên trong, rất dễ nhiễm trùng.' }
+            ] },
+          { say: 'Hai hôm sau, đầu gối T. đỏ lan rộng, sưng nóng, có mủ. T. hơi sốt, sợ báo thầy cô sẽ ảnh hưởng ngày bay.', q: 'Bạn nói gì với T.?',
+            opts: [
+              { t: 'Báo thầy cô ngay để đi khám, vết thương đã có dấu hiệu nhiễm trùng', ok: 1, key: 'Đỏ lan, sưng nóng, có mủ, sốt, hoặc không đi được: báo, đi khám',
+                res: 'T. đi khám, được rửa vết thương, uống thuốc theo đơn, một tuần sau lành.', why: 'Khám sớm thì khỏi sớm. Giấu đi, vết thương nặng thêm, mới thật sự ảnh hưởng ngày bay.' },
+              { t: 'Giấu đi cho chắc, tự mua thuốc mỡ bôi thêm, chờ một tuần nữa xem sao', res: 'Vết thương lan rộng, T. sốt cao hơn.', why: 'Nhiễm trùng không tự hết khi chờ. Cần bác sĩ khám.' },
+              { t: 'Tự nặn hết mủ ra là khỏi', res: 'Vết thương sưng đỏ thêm, đau hơn.', why: 'Tự nặn mủ đẩy vi khuẩn vào sâu hơn. Để bác sĩ xử lý.' }
+            ] }
+        ],
+        end: 'Bong gân: dừng, chườm lạnh, băng ép, kê cao. Vết trầy: rửa nước sạch, che băng sạch. Đỏ lan, sưng nóng, mủ, sốt, hoặc không đi được: đi khám.' },
+      { id: 'y4b', k: 'order', t: 'Bốn việc khi trẹo cổ chân', min: 3, xp: 10,
+        q: 'Cổ chân vừa bị trẹo. Xếp 4 việc theo thứ tự.', sub: 'Chạm lần lượt từ việc làm đầu tiên.',
+        items: ['Nghỉ: dừng chơi, ngồi yên, không cố đi', 'Lạnh: chườm đá bọc khăn khoảng 15–20 phút', 'Ép: băng thun vừa chặt quanh cổ chân', 'Kê cao: nằm kê chân cao hơn tim'],
+        ok: 'Nghỉ – Lạnh – Ép – Kê cao. Nhớ 4 chữ này là sơ cứu được bong gân.', hint: 'Việc đầu tiên là để chân bị thương được yên. Việc cuối cùng làm khi đã nằm nghỉ.' },
+      { id: 'y4c', k: 'story', kl: 'Chuyện đã xảy ra', t: 'Chuyện bạn Q. trước ngày bay', min: 5, xp: 15, w: 'storyW4',
+        story: ['Còn ba tuần nữa bay, bạn Q. chạy xe máy đi chơi buổi tối. Trời mưa, đường trơn, Q. té xe, trầy tay và chân.', 'Q. sợ thầy cô biết sẽ ảnh hưởng ngày bay nên không báo. Q. không rửa vết thương, chỉ đắp thuốc theo lời người quen mách.', 'Mấy hôm sau, vết trầy ở chân sưng đỏ, có mủ, Q. bị sốt. Bạn cùng phòng thấy, báo thầy cô.', 'Q. phải nghỉ học đi điều trị, lo mãi không biết có kịp ngày bay không.'],
+        end: 'Vết thương nhỏ báo sớm thì xử lý nhanh. Giấu đi mới làm chuyện nhỏ thành chuyện lớn.',
+        tips: ['Trước ngày bay, mình sẽ hạn chế chạy xe buổi tối, trời mưa và các trò dễ chấn thương', 'Nếu bị thương, mình sẽ rửa sạch vết thương và báo thầy cô ngay, dù là vết nhỏ'],
+        rounds: [
+          { q: 'Vì sao vết trầy nhỏ của Q. thành nặng?',
+            opts: [
+              { t: 'Vì vết thương do té xe máy lúc nào cũng nặng, không ai tránh được', why: 'Lúc đầu chỉ là vết trầy. Nó nặng lên vì cách Q. xử lý sau đó.' },
+              { t: 'Vì Q. không rửa sạch, đắp thuốc theo lời mách, lại không đi khám', ok: 1, why: 'Đúng rồi! Vết thương bẩn, để lâu không khám thì nhiễm trùng.' },
+              { t: 'Vì trời mưa nên vết thương bị ướt', why: 'Ướt không phải lý do chính. Không rửa sạch, không khám mới là lý do.' }
+            ] },
+          { q: 'Vì sao Q. không báo thầy cô?',
+            opts: [
+              { t: 'Vì Q. sợ ảnh hưởng ngày bay, nghĩ giấu đi thì không ai biết', ok: 1, why: 'Đúng rồi! Nỗi sợ làm Q. chọn cách giấu.' },
+              { t: 'Vì Q. không biết số điện thoại của thầy cô', why: 'Q. gặp thầy cô mỗi ngày ở trường. Q. chọn không báo.' },
+              { t: 'Vì Q. nghĩ thầy cô bận, không muốn làm phiền thầy cô vì chuyện nhỏ của mình', why: 'Thầy cô cần biết để giúp. Điều Q. thật sự sợ là ảnh hưởng ngày bay.' }
+            ] },
+          { q: 'Vì sao giấu đi lại càng ảnh hưởng ngày bay hơn?',
+            opts: [
+              { t: 'Vì thầy cô sẽ phạt nặng khi phát hiện bạn giấu', why: 'Chuyện chính không phải bị phạt. Đó là vết thương nặng thêm.' },
+              { t: 'Không đúng, giấu đi thì không ai biết nên không ảnh hưởng gì', why: 'Vết thương không tự biến mất khi giấu. Nó nặng thêm, rồi ai cũng biết.' },
+              { t: 'Vì báo sớm thì khỏi sớm; giấu đi thì nặng thêm, lâu khỏi', ok: 1, why: 'Đúng rồi! Báo sớm là cách bảo vệ ngày bay tốt nhất.' }
+            ] }
+        ] }
+    ],
+    gtip: {
+      xuong: 'Xưởng có nhiều cạnh sắc: vết cắt, trầy nhỏ cũng rửa sạch, báo người phụ trách.',
+      chuyen: 'Khu thực phẩm: có vết thương ở tay phải báo trước khi vào làm, băng kín, đeo găng.',
+      troi: 'Công trường mặt đất gồ ghề: mang giày bảo hộ đúng cỡ, buộc chặt dây.',
+      dv: 'Sàn ướt dễ trượt: đi chậm, mang giày chống trơn.',
+      vp: 'Làm thêm ở kho, giao hàng: đi đứng cẩn thận ở cầu thang, sàn trơn.' } },
+
+  { id: 'y5', t: 'Đau lưng, cổ, vai', ic: 'core', sub: 'Mỏi thường hay cần đi khám?', min: 12,
+    acts: [
+      { id: 'y5a', k: 'sim', t: 'Ca trực: Sau ca bê hàng', min: 5, xp: 15,
+        scene: { ic: 'core', place: 'Kho hàng ở Nhật', time: '17:30', tag: 'Hết ca bê thùng' },
+        intro: '<b class="nm">[Tên]</b> ơi, đau lưng, mỏi cổ vai là chuyện nhiều anh chị ở Nhật hay gặp. Ca này mình đi cùng anh D. nhé.',
+        steps: [
+          { say: 'Hết ca bê thùng, anh D. kêu lưng mỏi, căng cứng. Anh vẫn đi lại, cúi người bình thường.', q: 'Bạn khuyên anh thế nào?',
+            opts: [
+              { t: 'Nghỉ ngơi, ngủ đủ, giãn nhẹ; mai nâng vật thì gập gối, lưng thẳng', ok: 1, key: 'Mỏi thường: nghỉ, ngủ đủ, giãn nhẹ, nâng vật đúng cách',
+                res: 'Sáng hôm sau, lưng anh D. đỡ mỏi.', why: 'Mỏi sau một ngày làm nặng là bình thường. Nghỉ ngơi và nâng đúng cách giúp lưng hồi lại.' },
+              { t: 'Tối nay ra phòng tập tạ nặng thêm cho lưng quen dần, mai sẽ hết mỏi', res: 'Hôm sau anh D. đau lưng hơn.', why: 'Lưng đang mỏi mà tập nặng thì dễ chấn thương. Cần nghỉ cho cơ hồi lại.' },
+              { t: 'Nhờ bạn bẻ lưng cho kêu “rắc” là hết', res: 'Anh D. thấy nhói ở lưng.', why: 'Bẻ, vặn lưng mạnh có thể làm đau thêm. Không tự làm, không nhờ người không có chuyên môn.' }
+            ] },
+          { say: 'Sáng hôm sau, lưng anh D. đau nhiều hơn, cúi xuống buộc dây giày cũng khó. Ca hôm nay vẫn bê hàng.', q: 'Anh D. nên làm gì?',
+            opts: [
+              { t: 'Báo người phụ trách trước giờ làm, xin việc nhẹ hơn hôm nay', ok: 1, key: 'Đau nhiều: báo trước giờ làm, xin việc nhẹ hơn',
+                res: 'Người phụ trách cho anh D. làm việc kiểm hàng, không bê nặng.', why: 'Báo sớm thì người phụ trách sắp xếp được. Bê nặng khi đang đau dễ chấn thương nặng hơn.' },
+              { t: 'Không nói gì, cứ bê như thường để khỏi bị người phụ trách đánh giá là yếu', res: 'Giữa ca, anh D. đau nhói, phải ngồi xuống giữa kho.', why: 'Giấu đau rồi bị chấn thương thì cả nhóm thiếu người lâu hơn.' },
+              { t: 'Tự nghỉ ở phòng, không báo ai', res: 'Người phụ trách gọi mãi không được, rất lo.', why: 'Nghỉ không báo là mất uy tín. Đau thì vẫn phải báo.' }
+            ] },
+          { say: 'Lưng vẫn đau nhiều. Anh D. định xem video trên mạng để tự tập.', q: 'Bạn nói gì?',
+            opts: [
+              { t: 'Đang đau nhiều thì chưa tự tập; chỉ cử động nhẹ trong mức không đau', ok: 1, key: 'Đang đau nhiều: chưa tự tập, cử động nhẹ trong mức không đau',
+                res: 'Anh D. đi lại nhẹ nhàng, vài hôm sau đỡ dần.', why: 'Đang đau nhiều mà tập mạnh dễ đau thêm. Nằm im cả ngày cũng không tốt, cử động nhẹ là vừa.' },
+              { t: 'Tập liền 30 phút các bài kéo giãn thật mạnh trong video cho mau hết đau', res: 'Tập xong, anh D. đau đến mức không đứng thẳng được.', why: 'Kéo giãn mạnh lúc đang đau nhiều làm đau thêm.' },
+              { t: 'Nằm im trên giường cả tuần, không đứng dậy', res: 'Một tuần sau, người anh D. cứng đờ, càng khó cử động.', why: 'Nằm im quá lâu làm cơ cứng, yếu đi. Nên cử động nhẹ trong mức không đau.' }
+            ] },
+          { say: 'Hai hôm sau, anh D. kể: đau lan xuống mông, xuống chân, chân tê, bước đi thấy yếu.', q: 'Bạn làm gì?',
+            opts: [
+              { t: 'Đây là dấu hiệu cần đi khám: báo người hỗ trợ để được đưa đi khám', ok: 1, key: 'Tê lan xuống chân, yếu chân, đau sau té ngã: đi khám',
+                res: 'Anh D. được khám, bác sĩ hướng dẫn điều trị và cách làm việc phù hợp.', why: 'Tê, yếu chân có thể là dây thần kinh bị chèn. Cần bác sĩ khám sớm.' },
+              { t: 'Dán miếng dán giảm đau, chờ thêm vài tuần cho tự hết rồi tính sau', res: 'Chân anh D. tê nhiều hơn, đi lại khó.', why: 'Tê, yếu chân không nên chờ. Đi khám sớm.' },
+              { t: 'Nhờ người quen nắn cột sống cho đỡ', res: 'Anh D. đau nhói, tê lan rộng hơn.', why: 'Nắn cột sống khi đang tê, yếu chân rất nguy hiểm. Để bác sĩ khám.' }
+            ] },
+          { say: 'Anh D. đã khỏe lại, hỏi: “Làm sao để không bị lại?”', q: 'Bạn nói gì với anh?',
+            opts: [
+              { t: 'Nâng vật sát người, gập gối; giãn cơ giữa ca; tập lưng bụng đều', ok: 1, key: 'Phòng đau lưng: nâng đúng cách, giãn giữa ca, tập lưng bụng đều',
+                res: 'Anh D. giãn cơ mỗi giờ nghỉ, tập lưng bụng 3 buổi một tuần.', why: 'Nâng đúng cách, giãn cơ, cơ lưng bụng khỏe là ba việc giữ lưng lâu dài.' },
+              { t: 'Đeo đai lưng thật chặt cả ngày là đủ, không cần đổi cách nâng hay tập gì thêm', res: 'Vài tháng sau anh D. lại đau lưng.', why: 'Đai lưng không thay được cách nâng đúng và cơ lưng bụng khỏe.' },
+              { t: 'Né hết việc nặng, nhờ người khác bê hộ', res: 'Đồng nghiệp bắt đầu ngại làm cùng anh D.', why: 'Né việc không lâu dài được. Học cách nâng đúng và làm cơ khỏe lên.' }
+            ] }
+        ],
+        end: 'Mỏi thường: nghỉ, giãn nhẹ, nâng đúng cách. Đau nhiều: báo, xin việc nhẹ. Tê, yếu chân, đau sau té ngã: đi khám.' },
+      { id: 'y5b', k: 'how', t: 'Ba động tác nhẹ cho cổ, vai, lưng', min: 3, xp: 10, ex: ['backcare'],
+        more: 'Chỉ làm khi mỏi thường. Đang đau nhiều, đau nhói, hoặc tê lan xuống tay chân thì không tự tập, báo để đi khám.' },
+      { id: 'y5c', k: 'habit', t: 'Một thói quen giữ lưng, cổ, vai', min: 4, xp: 15, hl: 'YHABITS' }
+    ],
+    gtip: {
+      xuong: 'Cúi lấy chi tiết thấp cả ca: hạ hông, gập gối, đừng gập lưng.',
+      chuyen: 'Ngồi, đứng dây chuyền cả ca: giờ nghỉ xoay vai, giãn cổ.',
+      troi: 'Bê vật nặng ở công trường: giữ vật sát người, nặng quá thì hai người cùng bê.',
+      dv: 'Đỡ người, lau sàn: chân rộng bằng vai, hạ hông, không xoay vặn lưng.',
+      vp: 'Ngồi máy tính lâu: màn hình ngang mắt, lưng tựa ghế, mỗi giờ đứng dậy.' } },
+
+  { id: 'y6', t: 'Không khỏe thì báo thế nào', ic: 'pen', sub: 'Thang 5 mức, câu tiếng Nhật, tin nhắn báo ốm', min: 13,
+    acts: [
+      { id: 'y6a', k: 'sim', t: 'Ca trực: Báo ốm bằng tiếng Nhật', min: 5, xp: 15,
+        scene: { ic: 'timer', place: 'Ký túc xá ở Nhật', time: '6:00', tag: 'Ca làm bắt đầu lúc 8:00' },
+        intro: '<b class="nm">[Tên]</b> ơi, ở Nhật, ốm thì phải tự báo, báo đúng lúc, nói rõ ràng. Ca này người ốm là bạn nhé.',
+        steps: [
+          { say: 'Từ nửa đêm bạn đau bụng, nôn hai lần, đi ngoài nhiều lần. Bây giờ là 6 giờ sáng, 8 giờ vào ca.', q: 'Bạn báo lúc nào, báo ai?',
+            opts: [
+              { t: 'Gọi người phụ trách trước giờ vào ca, rồi nhắn người hỗ trợ', ok: 1, key: 'Báo trước giờ vào ca: gọi người phụ trách, nhắn người hỗ trợ',
+                res: 'Người phụ trách biết sớm, kịp xếp người làm thay.', why: 'Báo trước giờ làm để chỗ làm kịp sắp xếp. Ốm nặng thì gọi điện, không chỉ nhắn tin.' },
+              { t: 'Nhờ bạn cùng phòng nói giúp khi đến xưởng, mình ngủ tiếp cho khỏe', res: 'Bạn cùng phòng quên, đến trưa người phụ trách mới biết.', why: 'Nhờ nói lại dễ sót, dễ sai. Tự báo là phép lịch sự và trách nhiệm.' },
+              { t: 'Đợi 9 giờ, khi đỡ mệt hơn thì nhắn tin', res: 'Đến giờ vào ca không thấy bạn, cả tổ phải chờ.', why: 'Báo sau giờ vào ca là quá muộn. Ở Nhật, báo trước giờ làm rất quan trọng.' }
+            ] },
+          { say: 'Người phụ trách nghe máy: 「はい、〇〇工場です。」', q: 'Bạn mở đầu thế nào?',
+            opts: [
+              { t: '「おはようございます。〇〇です。体調が悪いので、今日は休ませてください。」', ok: 1, key: 'Chào, nói tên, xin nghỉ: 「体調が悪いので、今日は休ませてください」',
+                res: 'Người phụ trách hiểu ngay, hỏi thêm bạn bị sao.', why: 'Chào, nói tên, nói lý do, xin nghỉ: đủ ý, lịch sự.' },
+              { t: '「休みます。」', res: 'Người phụ trách chưa hiểu bạn là ai, vì sao nghỉ.', why: 'Quá ngắn, thiếu tên, thiếu lý do. Nghe giống thông báo, không phải xin phép.' },
+              { t: 'Nói tiếng Việt thật nhanh, mong người phụ trách đoán ra ý mình', res: 'Người phụ trách không hiểu, phải gọi người hỗ trợ.', why: 'Học sẵn vài câu tiếng Nhật đơn giản để tự báo được.' }
+            ] },
+          { say: 'Người phụ trách hỏi: 「どうしましたか。」 (Bạn bị sao vậy?)', q: 'Bạn trả lời thế nào?',
+            opts: [
+              { t: '「夜中からお腹が痛くて、2回吐きました。下痢もあります。」', ok: 1, key: 'Nói rõ dấu hiệu và từ khi nào',
+                res: 'Người phụ trách dặn: 「病院に行ってください。」 (Hãy đi khám.)', why: 'Dấu hiệu, từ khi nào, nặng ra sao: người nghe mới biết cần làm gì.' },
+              { t: '「ちょっと…」 rồi im lặng', res: 'Người phụ trách không biết bạn bị gì, rất lo.', why: 'Nói không rõ thì người khác không giúp đúng được.' },
+              { t: 'Nói thật nặng thêm để chắc chắn được nghỉ, kể cả những dấu hiệu mình không có', res: 'Người phụ trách gọi xe cấp cứu, rồi biết bạn nói quá.', why: 'Nói quá làm mất lòng tin. Nói đúng điều mình đang bị.' }
+            ] },
+          { say: 'Bạn chưa biết bệnh viện nào gần, lo không đủ tiếng Nhật để nói với bác sĩ.', q: 'Bạn làm gì?',
+            opts: [
+              { t: 'Hỏi người hỗ trợ đi khám ở đâu; viết sẵn dấu hiệu bằng tiếng Nhật', ok: 1, key: 'Hỏi người hỗ trợ bệnh viện nào; viết sẵn dấu hiệu bằng tiếng Nhật',
+                res: 'Bạn tự đi khám, đưa tờ giấy ghi dấu hiệu cho bác sĩ. Chỗ nào chưa rõ, người hỗ trợ dịch qua điện thoại.', why: 'Tự làm được phần mình là chủ động. Người hỗ trợ giúp đúng lúc cần.' },
+              { t: 'Không đi khám, tự ra hiệu thuốc mua thuốc uống cho đỡ tốn thời gian chờ', res: 'Chiều đó bạn mệt lả vì mất nước.', why: 'Nôn, tiêu chảy nhiều dễ mất nước. Người phụ trách đã dặn đi khám.' },
+              { t: 'Đòi người hỗ trợ đến đưa đi và ngồi cùng cả buổi', res: 'Người hỗ trợ phải bỏ việc của nhiều bạn khác để ngồi chờ cùng bạn.', why: 'Người hỗ trợ lo cho nhiều người. Học câu đơn giản, nhờ dịch qua điện thoại khi cần.' }
+            ] },
+          { say: 'Bác sĩ nói bạn bị ngộ độc thực phẩm (食中毒), dặn nghỉ 2 ngày.', q: 'Khám xong, bạn làm gì?',
+            opts: [
+              { t: 'Báo lại: bị gì, nghỉ mấy ngày, khi nào đi làm lại', ok: 1, key: 'Khám xong báo lại: bị gì, nghỉ mấy ngày, khi nào đi làm lại',
+                res: 'Chỗ làm biết rõ, xếp lịch cho 2 ngày tới. Bạn yên tâm nghỉ.', why: 'Báo, liên lạc, bàn bạc (Hō-Ren-Sō) gồm cả báo lại kết quả. Chỗ làm cần biết để sắp xếp.' },
+              { t: 'Sáng nay đã báo nghỉ rồi, không cần báo thêm gì nữa', res: 'Hôm sau người phụ trách lại phải gọi hỏi bạn có đi làm không.', why: 'Báo nghỉ mới là một nửa. Báo lại kết quả khám mới đủ.' },
+              { t: 'Đăng lên mạng xã hội kể bệnh, ai cần biết sẽ tự đọc', res: 'Người phụ trách không đọc, vẫn không biết bạn nghỉ mấy ngày.', why: 'Mạng xã hội không phải kênh báo cáo. Báo trực tiếp người cần biết.' }
+            ] }
+        ],
+        end: 'Báo ốm: báo trước giờ làm, tự mình báo, nói rõ dấu hiệu và từ khi nào. Khám xong báo lại kết quả.' },
+      { id: 'y6b', k: 'pick', t: 'Thang 5 mức: mức nào, làm gì?', min: 4, xp: 10, scale: 1,
+        rounds: [
+          { q: 'Mỏi người, đau lưng nhẹ sau một ngày làm nhiều.',
+            opts: [
+              { t: 'Tự chăm: ngủ sớm, uống đủ nước, tắm nước ấm', ok: 1, why: 'Đúng rồi! Mức 1: mệt mỏi thường. Tự chăm, nghỉ sớm là đủ.' },
+              { t: 'Xin nghỉ làm ngày mai, nhờ người hỗ trợ đưa đi bệnh viện khám ngay', why: 'Mỏi thường thì chưa cần đi viện. Tự chăm, nặng lên mới báo.' },
+              { t: 'Gọi 119', why: 'Số 119 để dành cho người nguy hiểm tính mạng.' }
+            ] },
+          { q: 'Sốt nhẹ 37,5°C, sổ mũi, ho đã 2 ngày.',
+            opts: [
+              { t: 'Tự chăm thêm, không cần nói với ai', why: 'Bệnh đã kéo dài 2 ngày. Cần cho người hỗ trợ biết, phòng khi nặng lên.' },
+              { t: 'Báo người hỗ trợ biết; cần thì đi khám, nhờ dịch qua điện thoại', ok: 1, why: 'Đúng rồi! Mức 2: bệnh nhẹ. Báo để có người biết, đi khám nếu cần.' },
+              { t: 'Gọi 119 ngay, rồi báo người phụ trách ở công ty để người phụ trách biết', why: 'Sốt nhẹ, còn tỉnh táo thì không gọi 119.' }
+            ] },
+          { q: 'Trẹo cổ chân lúc đá bóng, sưng to, đi lại đau.',
+            opts: [
+              { t: 'Báo người hỗ trợ, cùng xem có cần đi khám; nghỉ, chườm lạnh, kê cao', ok: 1, why: 'Đúng rồi! Mức 3: nặng hơn. Báo người hỗ trợ để cùng quyết định có đi khám không.' },
+              { t: 'Tự chăm, mai vẫn đi làm, cố đứng cả ca như thường cho khỏi bị đánh giá', why: 'Sưng to, đi lại đau thì cần báo, nghỉ, có thể phải đi khám.' },
+              { t: 'Gọi 119', why: 'Bong gân thường không cần xe cấp cứu. Báo người hỗ trợ để đi khám.' }
+            ] },
+          { q: 'Sau bữa ăn chung, nôn nhiều lần, tiêu chảy, đau bụng.',
+            opts: [
+              { t: 'Uống nước, nằm nghỉ ở phòng, đợi sáng mai xem đỡ chưa rồi mới báo người hỗ trợ', why: 'Có thể là ngộ độc thực phẩm, còn lây được. Cần báo ngay, đi khám.' },
+              { t: 'Gọi 119 ngay', why: 'Còn tỉnh táo, tự đi được thì báo người hỗ trợ đưa đi khám.' },
+              { t: 'Báo ngay người hỗ trợ để đi khám; ở riêng, không dùng chung đồ', ok: 1, why: 'Đúng rồi! Mức 4: bệnh cấp, có thể lây (cúm, ngộ độc thực phẩm, thủy đậu). Báo ngay, đi khám, tránh lây.' }
+            ] },
+          { q: 'Ngã từ thang ở chỗ làm, tay đau dữ dội, cong lệch.',
+            opts: [
+              { t: 'Giữ yên tay, báo ngay người phụ trách để đi viện; nặng thì gọi 119', ok: 1, why: 'Đúng rồi! Mức 5: tai nạn, bệnh nặng. Báo ngay, làm theo hướng dẫn của công ty và người hỗ trợ.' },
+              { t: 'Băng tạm, làm nốt ca rồi về phòng nghỉ', why: 'Tay cong lệch có thể gãy xương. Không làm tiếp, báo ngay.' },
+              { t: 'Tự nắn tay cho thẳng lại rồi băng chặt, mai báo người hỗ trợ cũng được', why: 'Tự nắn làm tổn thương nặng thêm. Giữ yên, báo ngay.' }
+            ] }
+        ],
+        end: 'Không chắc mình ở mức nào: báo người hỗ trợ. Thang 5 mức có trong Sổ tay › Khẩn cấp.' },
+      { id: 'y6c', k: 'write', t: 'Tin nhắn báo ốm của mình', min: 4, xp: 15, dyn: 'yte',
+        say: 'Viết sẵn một tin nhắn báo ốm. Lúc ốm thật, mệt lắm, chỉ cần sửa vài chữ là gửi được.',
+        q: 'Viết tin nhắn báo ốm gửi người phụ trách (tiếng Nhật hoặc tiếng Việt)',
+        sub: 'Đủ 4 ý: chào và tên · bị gì, từ khi nào · xin nghỉ hoặc đi muộn · khám xong sẽ báo lại.',
+        tips: ['おはようございます。〇〇です。熱が38度あるので、今日は休ませてください。病院に行ってから、また連絡します。', 'Chào anh/chị, em là …. Em bị sốt 38 độ từ tối qua, em xin nghỉ hôm nay. Em đi khám xong sẽ báo lại ạ.'] }
+    ],
+    gtip: {
+      xuong: 'Hỏi ngay ngày đầu: ốm thì gọi ai, số nào, trước mấy giờ.',
+      chuyen: 'Dây chuyền thực phẩm: nôn, tiêu chảy, sốt thì phải báo, không vào khu thực phẩm.',
+      troi: 'Công trường bắt đầu sớm: báo ốm trước giờ tập trung, không đợi đến giờ làm.',
+      dv: 'Kaigo, nhà hàng: ốm thì báo sớm để có người thay, không lây cho người già, cho khách.',
+      vp: 'Đi học, làm thêm: báo cả trường và chỗ làm thêm.' } }
+];
+
+/* =========================================================
+   PHÒNG TEST (khu 'test', phòng 302) · đợt 1: t1–t3 (TC01.1.3) · đợt 2: t4–t6 (TC01.1.4)
+   Theo bảng đánh giá lớp GDTC (Chương trình TTS 30 tiết, Bảng 3.2): Dinh dưỡng 20 câu, Sức khỏe & Bệnh lý 20 câu, Cuối khóa 30 câu.
+   Mốc Đạt: từ 15/20, từ 25/30 (bảng gốc ghi ngược dấu < >, đã báo thầy).
+   Ngân hàng câu Claude soạn từ bài TC01 (s = mã bài để ôn) và Sổ tay sức khỏe 2.0 (ghi chú cuối dòng: Ch. = chương).
+   Quy ước: o[0] là đáp án đúng, máy xáo khi hiện. Mỗi câu có ít nhất 1 đáp án sai dài bằng hoặc hơn đáp án đúng.
+   Rào chắn: không câu về giảm cân, calo mục tiêu, lịch "thải độc", 50/25/25, thuốc; số liệu chỉ để tham khảo.
+   ========================================================= */
+var TEST_TXT = {
+  khuSay: 'Ở Phòng test, đề giống bài kiểm tra lý thuyết của lớp GDTC. Làm thử bao nhiêu lần cũng được, mỗi lần đề xáo khác. Câu nào chưa đúng, Shin chỉ bài để ôn.',
+  qzInfo: '[N] câu · chọn 1 đáp án · không tính giờ', qzMark: 'Mốc Đạt của lớp GDTC: đúng từ [P]/[N] câu.',
+  qzSay: 'Đọc kỹ từng câu. Chưa chắc thì chọn đáp án bạn thấy hợp nhất, cuối bài Shin giải thích hết.',
+  qzStart: 'Bắt đầu làm bài', qzLast: 'Lần trước', qzBest: 'Tốt nhất', qzTries: 'Số lần làm',
+  qzPrev: 'Câu trước', qzNext: 'Câu tiếp', qzSubmit: 'Nộp bài', qzLeft: 'Còn [N] câu chưa chọn. Chạm số câu để quay lại.',
+  qzAll: 'Đã chọn đủ [N] câu. Xem lại rồi nộp bài nhé.',
+  pass: 'Đạt mốc lớp', fail: 'Chưa đạt mốc lớp',
+  passSay: 'Đạt mốc lớp rồi! Xem lại câu chưa đúng để lần sau chắc hơn.',
+  failSay: 'Chưa đạt cũng không sao, đây là test thử. Xem lại câu chưa đúng, ôn bài Shin chỉ, rồi làm đề khác nhé.',
+  allSay: 'Đúng hết! Bạn nắm bài rất chắc.',
+  revH: 'Câu cần xem lại', revYou: 'Bạn chọn:', revOk: 'Đáp án:', revGo: 'Ôn:', again: 'Làm đề khác',
+  tfQ: 'Câu này đúng hay sai?', tfYes: 'Đúng', tfNo: 'Sai', tfIs: 'Câu này [V].', tfNext: 'Câu tiếp', tfEnd: 'Xem kết quả',
+  tfRes: 'Bạn trả lời đúng [N]/[T] câu.', tfSay: 'Khởi động xong rồi. Giờ làm Test thử để xem mình nắm bài đến đâu nhé.', tfAgain: 'Làm lượt khác',
+  rdNone: 'Bạn chưa có câu nào cần ôn. Làm Test thử trước, hoặc ôn nhanh 10 câu ngẫu nhiên.',
+  rdHave: 'Bạn có [N] câu từng chọn chưa đúng. Mỗi lượt ôn tối đa 10 câu. Chọn đúng ngay lần đầu thì câu đó rời khỏi danh sách.',
+  rdGo: 'Ôn các câu này', rdRand: 'Ôn nhanh 10 câu ngẫu nhiên', rdRetry: 'Thử chọn lại một đáp án khác.',
+  rdEnd: 'Đã ôn [N] câu. Đúng ngay lần đầu: [F] câu.', rdLeft: 'Còn [N] câu trong danh sách cần ôn.', rdClear: 'Danh sách câu cần ôn đã trống. Giỏi lắm!',
+  nbH: 'Phòng test của mình', nbNone: 'Chưa làm. Vào Phòng test (302) và làm thử một đề.', nbWrong: 'Câu cần ôn'
+};
+
+/* Ngân hàng câu Dinh dưỡng (dd) · s = bài để ôn */
+var QB = {
+  dd: [
+    { id: 'dd01', s: 'd1', q: 'Bốn nhóm cần có trong một ngày là gì?', o: ['Tinh bột, đạm, rau, trái cây và sữa', 'Tinh bột, đạm, nước ngọt và bánh kẹo các loại', 'Cơm, mì gói, cà phê, nước tăng lực'], why: 'Bữa chính có tinh bột, đạm, rau. Trái cây, sữa thì trong ngày.' },
+    { id: 'dd02', s: 'd1', q: 'Nhóm nào nuôi cơ, giúp cơ thể phục hồi sau giờ làm, giờ tập?', o: ['Đạm: thịt, cá, trứng, đậu phụ', 'Tinh bột: cơm, bánh mì, mì', 'Đồ ngọt: bánh, kẹo, nước ngọt có ga'], why: 'Đạm nuôi cơ. Làm việc nặng, tập nhiều thì cần đủ đạm.' },
+    { id: 'dd03', s: 'd1', q: 'Một bữa chính đủ chất cần có gì?', o: ['Tinh bột, đạm và rau', 'Chỉ cần thật nhiều cơm cho no lâu', 'Một ly trà sữa lớn và một cái bánh'], why: 'Nhìn đĩa cơm: có đủ tinh bột, đạm, rau chưa?' },
+    { id: 'dd04', s: 'd1', q: 'Rau cho cơ thể điều gì?', o: ['Vitamin và chất xơ', 'Chủ yếu là chất béo', 'Nhiều năng lượng để làm việc nặng'], why: 'Rau cho vitamin, chất xơ. Bữa chính nào cũng nên có rau.' },
+    { id: 'dd05', s: 'd1', q: 'Nước ngọt, trà sữa, snack là loại đồ ăn thế nào?', o: ['Nhiều đường hoặc dầu, ít chất: thỉnh thoảng thôi', 'Thuộc nhóm trái cây, sữa: uống mỗi ngày càng tốt', 'Thay được nước lọc và bữa phụ'], why: 'No nhanh, đói nhanh, ít chất. Để làm món thưởng thỉnh thoảng.' },
+    { id: 'dd06', s: 'd4', q: 'Mì gói thiếu những gì nhất?', o: ['Đạm và rau', 'Tinh bột', 'Muối và dầu'], why: 'Mì gói chủ yếu là tinh bột và dầu. Thêm trứng, rau thì đủ chất hơn.' },
+    { id: 'dd07', s: 'd2', q: 'Bạn nặng 55 kg. Theo cách tính “cân nặng × 0,04 lít”, mỗi ngày cần khoảng bao nhiêu nước?', o: ['Khoảng 2,2 lít', 'Khoảng 0,5 lít', 'Khoảng 5,5 lít'], why: '55 × 0,04 = 2,2 lít. Ngày nóng, ca nặng, giờ tập thì uống thêm.' },
+    { id: 'dd08', s: 'd5', q: 'Uống nước thế nào là đúng?', o: ['Uống từng ngụm, chia đều trong ngày, cả khi chưa khát', 'Chờ đến lúc thật khát rồi uống một lần thật nhiều cho đã', 'Uống nước ngọt có ga thay nước lọc cho mát người'], why: 'Chờ khát mới uống là cơ thể đã thiếu nước. Uống dồn một lúc khó hấp thu.' },
+    { id: 'dd09', s: 'd5', q: 'Làm ở xưởng lạnh, bạn ít thấy khát. Nên làm gì?', o: ['Vẫn uống nước đều trong giờ nghỉ', 'Không cần uống vì không đổ mồ hôi', 'Uống thật nhiều cà phê nóng cho ấm'], why: 'Trời lạnh vẫn mất nước qua hơi thở, đi vệ sinh. Ít khát không có nghĩa là đủ nước.' },
+    { id: 'dd10', s: 'd5', q: 'Trời nóng, làm ngoài trời đổ nhiều mồ hôi. Cần bù gì?', o: ['Cả nước và muối khoáng', 'Chỉ cần nước ngọt có ga thật lạnh', 'Không cần bù, tối về uống một lần'], why: 'Mồ hôi mất cả nước lẫn muối, nên bù cả hai.' },
+    { id: 'dd11', s: 'd2', q: 'Chỉ số BMI tính từ những số nào?', o: ['Cân nặng và chiều cao', 'Số giờ ngủ và số bữa ăn mỗi ngày', 'Tuổi và giới tính'], why: 'BMI = cân nặng (kg) chia bình phương chiều cao (m).' },
+    { id: 'dd12', s: 'd2', q: 'Điều nào đúng về BMI?', o: ['Không phân biệt cơ và mỡ, chỉ để tham khảo', 'Càng thấp càng tốt cho sức khỏe', 'Cho biết chính xác cơ thể bạn đang khỏe hay yếu'], why: 'Người tập nhiều, cơ nhiều có thể có BMI cao hơn. So với chính mình là chính.' },
+    { id: 'dd13', s: 'd4', q: 'Muốn giữ dáng, cách nào đúng?', o: ['Ăn đủ 3 bữa, bớt đồ chiên, nước ngọt, vận động đều', 'Bỏ bữa tối, chỉ uống nước cho nhẹ bụng', 'Uống trà giảm cân mua trên mạng, quảng cáo giảm 5 kg một tuần'], why: 'Nhịn ăn dễ choáng rồi lại ăn bù. Cần giảm cân thì hỏi thầy cô hoặc nhân viên y tế.' },
+    { id: 'dd14', s: 'd4', q: 'Không kịp ăn sáng. Cách nào hợp nhất?', o: ['Ăn ổ bánh mì trứng hoặc hộp sữa trước giờ học', 'Uống một ly cà phê sữa đá thật đậm cho tỉnh, trưa ăn bù', 'Nhịn đến trưa, quen dần sẽ hết thấy đói'], why: 'Có chút tinh bột và đạm lót dạ. Cà phê để sau bữa ăn.' },
+    { id: 'dd15', s: 'd4', q: 'Uống cà phê lúc bụng còn đói dễ bị gì?', o: ['Cồn cào, đau bụng', 'Ăn ngon miệng hơn', 'Có thêm sức làm việc'], why: 'Bụng rỗng gặp cà phê dễ cồn cào, đau bụng. Ăn trước, uống sau.' },
+    { id: 'dd16', s: 'd4', q: 'Tập xong thấy mệt và khát. Uống gì tốt nhất?', o: ['Nước lọc', 'Một lon nước tăng lực', 'Một ly trà sữa thật lớn'], why: 'Sau giờ tập thông thường, nước lọc bù nước tốt nhất.' },
+    { id: 'dd17', s: 'd5', q: 'Vì sao không dùng nước tăng lực thay bữa ăn khi làm ca?', o: ['Nhiều đường, caffeine, chỉ tỉnh một lúc', 'Vì nó làm no lâu, không ăn được bữa chính nữa', 'Vì giá đắt hơn một bữa cơm'], why: 'Nước tăng lực không cho đủ năng lượng và chất, còn làm khó ngủ sau ca.' },
+    { id: 'dd18', s: 'd5', q: 'Ca đêm từ 22 giờ đến 7 giờ sáng. Ăn thế nào?', o: ['Bữa chính trước ca, giữa ca ăn nhẹ, về không ăn quá no', 'Nhịn cả ca cho tỉnh táo, về phòng ăn một bữa thật no rồi ngủ luôn', 'Uống cà phê, nước tăng lực suốt ca thay bữa'], why: 'Có năng lượng suốt ca. Về ăn nhẹ thì vẫn ngủ được.' },
+    { id: 'dd19', s: 'd5', q: 'Ăn trưa quá no, chiều đứng máy buồn ngủ. Nên làm gì?', o: ['Ăn vừa no, đủ cơm, đạm, rau', 'Ăn thật nhiều cơm cho có sức cả chiều', 'Bỏ bữa trưa, ăn bánh ngọt với cà phê'], why: 'Ăn quá no làm người nặng nề. Vừa đủ thì chiều vẫn tỉnh.' },
+    { id: 'dd20', s: 'd4', q: 'Ăn tối nên cách giờ đi ngủ bao lâu?', o: ['Ít nhất 3 tiếng', 'Khoảng 30 phút', 'Ăn ngay trước khi ngủ cho đỡ đói'], why: 'Ăn no sát giờ ngủ dễ khó tiêu, khó ngủ. (Sổ tay sức khỏe, Ch.1)' },
+    { id: 'dd21', s: 'd5', q: 'Trời lạnh, làm ngoài công trường. Uống rượu cho ấm người trước ca được không?', o: ['Không: rượu làm phản xạ chậm, rất nguy hiểm', 'Được, chỉ một ly nhỏ thôi cho ấm người và tỉnh táo', 'Được, nếu uống cùng bữa sáng'], why: 'Không bao giờ uống rượu bia trước và trong ca làm.' },
+    { id: 'dd22', s: 'd6', q: '消費期限 (shōhi kigen) trên bao bì là gì?', o: ['Hạn an toàn: qua ngày là không ăn', 'Hạn ngon nhất: qua vài ngày vẫn ăn được', 'Ngày sản xuất'], why: 'Đồ nhanh hỏng (cơm hộp, bánh mì kẹp, thịt cá tươi) ghi 消費期限.' },
+    { id: 'dd23', s: 'd6', q: '賞味期限 (shōmi kigen) trên bao bì là gì?', o: ['Hạn ngon nhất của đồ để lâu', 'Hạn an toàn: qua một ngày là phải bỏ', 'Ngày nhập hàng vào cửa hàng'], why: 'Đồ để lâu (mì ly, đồ hộp). Chưa mở, cất đúng cách thì qua ít ngày vẫn ăn được.' },
+    { id: 'dd24', s: 'd6', q: 'Cơm hộp còn hạn nhưng để ngoài tủ lạnh cả ngày. Ăn được không?', o: ['Không nên: hạn chỉ đúng khi cất đúng cách', 'Được, vì vẫn còn hạn ghi trên nắp hộp cơm', 'Được, nếu hâm nóng bằng lò vi sóng'], why: 'Hạn dùng chỉ đúng khi chưa mở và cất đúng cách. Không chắc thì đừng ăn.' },
+    { id: 'dd25', s: 'd3', q: 'Trên nhãn Nhật, たんぱく質 là gì?', o: ['Đạm', 'Đường', 'Chất béo'], why: 'たんぱく質 (tanpakushitsu) là đạm.' },
+    { id: 'dd26', s: 'd3', q: 'Trên nhãn Nhật, 食塩相当量 cho biết gì?', o: ['Lượng muối', 'Lượng đường', 'Lượng nước'], why: 'Mì ly, canh miso thường khá mặn. Xem dòng này để ăn vừa phải.' },
+    { id: 'dd27', s: 'd3', q: 'Nhãn ghi 1個当たり. Các con số tính cho bao nhiêu?', o: ['Cho 1 cái', 'Cho 100 g', 'Cho cả hộp'], why: 'Ăn 2 cái thì nhân đôi các số.' },
+    { id: 'dd28', s: 'd6', q: 'Cất thịt sống trong tủ lạnh chung thế nào?', o: ['Bọc kín, để ngăn dưới cùng', 'Để ngăn trên cùng cho dễ lấy', 'Để chung hộp với đồ đã nấu chín'], why: 'Nước thịt sống dễ nhỏ xuống đồ chín bên dưới.' },
+    { id: 'dd29', s: 'd6', q: 'Đồ ăn để trong tủ lạnh chung cần ghi gì?', o: ['Tên và ngày cất', 'Chỉ cần ghi giá tiền', 'Không cần ghi gì cả'], why: 'Không biết để bao lâu thì đừng ăn.' },
+    { id: 'dd30', s: 'd6', q: 'Vừa cắt thịt sống, giờ cắt đồ đã nấu chín. Dao thớt thế nào?', o: ['Dùng riêng, hoặc rửa sạch trước', 'Dùng luôn, lau sơ bằng khăn là được', 'Không sao, vì đồ chín đã nấu kỹ'], why: 'Vi khuẩn từ thịt sống dễ dính sang đồ chín. (Sổ tay sức khỏe, Ch.2)' },
+    { id: 'dd31', s: 'd6', q: 'Thức ăn đã nấu, nhiều giờ sau mới ăn. Làm gì?', o: ['Cất tủ lạnh, đun sôi lại trước khi ăn', 'Để ngoài cả ngày, ăn nguội cho nhanh', 'Đậy nắp, để qua đêm trong phòng là được'], why: 'Để ở nhiệt độ phòng lâu, vi khuẩn phát triển. (Sổ tay sức khỏe, Ch.2)' },
+    { id: 'dd32', s: 'd6', q: 'Rửa rau, trái cây thế nào?', o: ['Ngâm nước sạch, rửa kỹ dưới vòi nước chảy', 'Lau bằng khăn ẩm cho sạch đất, không cần nước', 'Rửa qua một lần nước là đủ'], why: 'Rửa kỹ với nước sạch để bớt đất cát, thuốc trừ sâu. (Sổ tay sức khỏe, Ch.2)' },
+    { id: 'dd33', s: 'd6', q: 'Hộp cơm mang đi làm cần chú ý gì?', o: ['Nấu chín, để nguội rồi đậy, giữ mát, ăn trong buổi', 'Đậy nắp ngay khi còn nóng, để cạnh máy cho ấm đến trưa', 'Nấu từ hôm trước, để trong túi xách cả đêm'], why: 'Thấy mùi, vị lạ thì bỏ, đừng tiếc.' },
+    { id: 'dd34', s: 'd6', q: 'Sáng nay đau bụng, đi ngoài 2 lần sau khi ăn hộp cơm để lâu. Việc đầu tiên?', o: ['Uống nước từng ngụm, nghỉ, báo ngay thầy cô hoặc quản lý', 'Cố đi học như thường, chờ cơn đau tự hết, không nói với ai cho khỏi phiền', 'Xin bạn cùng phòng vài viên thuốc đau bụng'], why: 'Đi ngoài nhiều dễ mất nước. Báo sớm để được hướng dẫn, đưa đi khám nếu cần.' },
+    { id: 'dd35', s: 'd3', q: 'Bữa trưa ở konbini, chọn giỏ nào đủ chất?', o: ['Cơm nắm, trứng luộc, salad rau', 'Hai gói snack và một chai nước ngọt lớn', 'Một ly mì cay và bánh ngọt'], why: 'Đủ tinh bột (cơm nắm), đạm (trứng), rau (salad).' },
+    { id: 'dd36', s: 'd2', q: 'Cùng 100 g khoai tây, món nào nhiều năng lượng hơn?', o: ['Khoai tây chiên', 'Khoai tây luộc', 'Như nhau, vì cùng là khoai tây'], why: 'Chiên qua dầu thì năng lượng cao hơn nhiều.' }
+  ],
+  /* Ngân hàng câu Sức khỏe & Bệnh lý (sk) */
+  sk: [
+    { id: 'sk01', s: 'y1', q: 'Bạn thấy mắt tối sầm, chóng mặt như sắp ngất. Việc đầu tiên?', o: ['Ngồi hoặc nằm xuống ngay tại chỗ', 'Cố đi về phòng y tế để nằm nghỉ', 'Đứng yên, hít thở sâu rồi làm tiếp'], why: 'Còn đứng thì dễ ngã, đập đầu. Xuống thấp ngay là an toàn nhất.' },
+    { id: 'sk02', s: 'y1', q: 'Bạn cùng lớp ngất, đã nằm xuống. Tiếp theo làm gì?', o: ['Kê chân cao hơn tim, nới cổ áo, thắt lưng', 'Đỡ bạn ngồi dậy ngay cho mau tỉnh', 'Cho bạn uống thật nhiều nước ngay khi bạn chưa tỉnh hẳn'], why: 'Kê chân cao giúp máu về não. Chưa tỉnh hẳn thì không cho uống, dễ sặc.' },
+    { id: 'sk03', s: 'y1', q: 'Người ngất cần gọi 119 khi nào?', o: ['Không thở, hoặc hơn 1 phút chưa tỉnh', 'Ngất 5 giây, tỉnh ngay, nói chuyện rõ', 'Chỉ khi người đó tự xin gọi xe cấp cứu'], why: 'Không chắc thì gọi. Ngã đập đầu chảy máu, đau ngực, khó thở cũng gọi 119.' },
+    { id: 'sk04', s: 'y1', q: 'Bạn hay bị choáng, ngất lặp lại nhiều lần. Nên làm gì?', o: ['Báo thầy cô và đi khám', 'Uống cà phê mỗi sáng cho tỉnh', 'Tự khỏi thôi, không cần nói với ai'], why: 'Ăn sáng, ngủ đủ. Ngất lặp lại thì đi khám để biết nguyên nhân.' },
+    { id: 'sk05', s: 'y2', q: '熱中症 (nechūshō) nghĩa là gì?', o: ['Say nắng, sốc nhiệt', 'Cảm cúm mùa đông', 'Ngộ độc thực phẩm mùa hè'], why: 'Mùa hè nhiều nơi ở Nhật có cảnh báo 熱中症. Nghe thấy là nhắc mình uống nước, nghỉ bóng mát.' },
+    { id: 'sk06', s: 'y2', q: 'Đang làm, bạn thấy đau đầu, chóng mặt vì nóng. Việc đầu tiên?', o: ['Dừng việc, vào chỗ mát, báo người phụ trách', 'Cố làm cho xong phần việc còn lại rồi mới đi nghỉ ngơi', 'Uống một lon nước ngọt lạnh rồi làm tiếp'], why: 'Say nắng nặng lên rất nhanh. Dừng sớm, báo sớm.' },
+    { id: 'sk07', s: 'y2', q: 'Làm mát người bị say nắng thế nào?', o: ['Nới đồ, chườm lạnh cổ, nách, bẹn, quạt', 'Đắp chăn kín cho người ra thật nhiều mồ hôi', 'Cho ngồi ngoài nắng, uống nước nóng'], why: 'Chườm lạnh ở cổ, nách, bẹn giúp hạ nhiệt nhanh.' },
+    { id: 'sk08', s: 'y2', q: 'Người say nắng lơ mơ, không tự uống được. Làm gì?', o: ['Gọi 119, vẫn tiếp tục làm mát', 'Cố đổ nước vào miệng cho bằng được', 'Để nằm nghỉ một mình cho yên tĩnh'], why: 'Lơ mơ là say nắng nặng. Gọi 119, không ép uống vì dễ sặc.' },
+    { id: 'sk09', s: 'y2', q: 'Say nắng có thể xảy ra ở đâu?', o: ['Cả trong xưởng nóng, bếp, nơi kín gió', 'Chỉ khi làm việc ngoài trời vào giữa trưa', 'Chỉ ở những nơi có nắng chiếu thẳng'], why: 'Nóng và ẩm, kín gió thì trong nhà cũng bị say nắng.' },
+    { id: 'sk10', s: 'y3', q: 'Bạn bị sốt, sổ mũi. Làm gì để không lây cho bạn cùng phòng?', o: ['Đeo khẩu trang, dùng đồ riêng, mở phòng thoáng', 'Sang phòng bạn thân ngủ nhờ cho có người chăm sóc mình', 'Dùng chung cốc, khăn cho tiện'], why: 'Một người ốm lây cả phòng thì cả chỗ làm thiếu người.' },
+    { id: 'sk11', s: 'y3', q: 'Sốt cao 39°C đến nhanh, đau nhức khắp người. Làm gì?', o: ['Báo người hỗ trợ để được đi khám', 'Uống thuốc của bạn rồi đi làm như thường', 'Chờ vài ngày xem có tự khỏi không'], why: 'Có thể là cúm, dễ lây. Báo sớm để đi khám.' },
+    { id: 'sk12', s: 'y3', q: 'Sốt cao, khó thở, môi tái, hỏi chỉ trả lời lơ mơ. Làm gì?', o: ['Gọi 119 ngay', 'Nhắn hỏi bạn bè ở Việt Nam nên làm gì', 'Cho ngủ một giấc thật dài rồi tính tiếp'], why: 'Khó thở, lơ mơ là dấu hiệu nguy hiểm tính mạng.' },
+    { id: 'sk13', s: 'y3', q: 'Bác sĩ dặn nghỉ 5 ngày. Ngày thứ 3 bạn thấy đỡ. Làm gì?', o: ['Nghỉ đủ ngày bác sĩ dặn', 'Đi làm lại ngay cho khỏi mất lòng công ty', 'Sang phòng khác chơi cho đỡ chán'], why: 'Thấy đỡ chưa chắc đã hết lây. Làm theo lời bác sĩ.' },
+    { id: 'sk14', s: 'y3', q: 'Cách đơn giản nhất để phòng cảm cúm lây lan?', o: ['Rửa tay bằng xà phòng thường xuyên', 'Uống thật nhiều nước tăng lực mỗi ngày', 'Ngủ chung chăn cho ấm'], why: 'Rửa tay sạch là cách phòng lây đơn giản, hiệu quả. (Sổ tay sức khỏe, Ch.9)' },
+    { id: 'sk15', s: 'y4', q: 'Đá bóng bị trẹo cổ chân. Việc đầu tiên?', o: ['Dừng chơi ngay, ngồi yên, không cố đi', 'Cố chạy tiếp cho đỡ đau', 'Xoa bóp thật mạnh chỗ sưng cho tan máu bầm'], why: 'Cố đi tiếp làm chấn thương nặng thêm.' },
+    { id: 'sk16', s: 'y4', q: 'Chườm lạnh chỗ bong gân thế nào?', o: ['Đá bọc khăn, mỗi lần khoảng 15–20 phút', 'Áp đá trực tiếp lên da thật lâu, càng lạnh càng nhanh khỏi', 'Chườm nóng ngay cho máu lưu thông'], why: 'Bọc khăn để không bỏng lạnh. Chườm lạnh giúp đỡ sưng, đỡ đau.' },
+    { id: 'sk17', s: 'y4', q: 'Xử lý bong gân theo thứ tự nào?', o: ['Nghỉ – Lạnh – Ép – Kê cao', 'Xoa bóp – Chườm nóng – Đi lại', 'Băng thật chặt – Chạy tiếp'], why: 'Dừng, chườm lạnh, băng ép vừa chặt, kê chân cao hơn tim.' },
+    { id: 'sk18', s: 'y4', q: 'Băng ép xong, ngón chân tê và tím. Làm gì?', o: ['Nới băng ra', 'Băng chặt thêm cho chắc', 'Kệ, lát sẽ tự hết'], why: 'Băng quá chặt làm máu khó lưu thông. Băng ép vừa chặt thôi.' },
+    { id: 'sk19', s: 'y4', q: 'Bị trầy chân, vết thương dính đất cát. Làm gì?', o: ['Rửa bằng nước sạch cho hết đất cát, che băng sạch', 'Để hở cho mau khô, không cần rửa vì rửa nước dễ nhiễm trùng', 'Bôi kem đánh răng lên cho mát'], why: 'Đất cát còn trong vết thương dễ làm nhiễm trùng.' },
+    { id: 'sk20', s: 'y4', q: 'Dấu hiệu nào cho thấy vết thương cần đi khám?', o: ['Đỏ lan, sưng nóng, có mủ, sốt', 'Đóng vảy khô, hơi ngứa khi đang lành', 'Hơi đau trong ngày đầu'], why: 'Đây là dấu hiệu nhiễm trùng. Báo sớm, đi khám.' },
+    { id: 'sk21', s: 'y5', q: 'Đau lưng kèm dấu hiệu nào thì cần đi khám?', o: ['Tê lan xuống chân, yếu chân, đau sau té ngã', 'Mỏi lưng nhẹ sau một ngày làm nhiều, nghỉ thì đỡ dần', 'Hơi cứng lưng lúc mới ngủ dậy'], why: 'Mỏi thường thì nghỉ, giãn nhẹ. Tê, yếu chân, đau sau té ngã thì đi khám.' },
+    { id: 'sk22', s: 'y5', q: 'Lưng đang đau nhiều. Nên làm gì?', o: ['Chưa tự tập, cử động nhẹ trong mức không đau, báo người phụ trách', 'Tập thật nhiều động tác lưng bụng ngay hôm đó cho cơ lưng quen dần với cơn đau', 'Cố làm như thường, không nói với ai'], why: 'Đau nhiều thì báo trước giờ làm, xin việc nhẹ hơn.' },
+    { id: 'sk23', s: 'n3', q: 'Nhấc thùng hàng từ dưới sàn lên thế nào?', o: ['Hạ hông, gập gối, giữ vật sát người', 'Đứng thẳng hai chân, cúi gập lưng rồi xoay người nhấc lên', 'Gập lưng cúi xuống, nhấc thật nhanh'], why: 'Dùng sức chân, giữ lưng thẳng, không xoay vặn lưng.' },
+    { id: 'sk24', s: 'n3', q: 'Vật quá nặng so với sức mình. Làm gì?', o: ['Nhờ người cùng bê hoặc dùng xe đẩy', 'Cố bê một mình cho nhanh, khỏi làm phiền người khác', 'Kéo lê vật trên sàn'], why: 'Cố một mình dễ đau lưng, dễ tai nạn.' },
+    { id: 'sk25', s: 'y5', q: 'Xem điện thoại thế nào để đỡ mỏi cổ?', o: ['Đưa máy lên ngang mắt, cứ 20 phút ngẩng lên giãn cổ', 'Cúi thấp đầu xuống xem cho đỡ mỏi tay, xem liền nhiều giờ', 'Nằm nghiêng xem cả tối'], why: 'Cúi cổ lâu làm cổ, vai mỏi.' },
+    { id: 'sk26', s: 'y6', q: 'Ốm, không đi làm được. Báo lúc nào?', o: ['Trước giờ vào ca', 'Sau khi ca đã bắt đầu', 'Hôm sau đi làm lại mới báo'], why: 'Báo trước giờ làm để chỗ làm kịp sắp xếp người thay.' },
+    { id: 'sk27', s: 'y6', q: 'Tin nhắn báo ốm cần có gì?', o: ['Bị gì, từ khi nào, xin nghỉ, khám xong báo lại', 'Một lời xin lỗi thật dài và lễ phép, không cần nói mình bị gì', 'Chỉ cần ghi “Em mệt, em nghỉ”'], why: 'Nói rõ thì người nhận biết bạn nặng hay nhẹ, giúp được gì.' },
+    { id: 'sk28', s: 'y6', q: '「体調が悪いので、今日は休ませてください」 nghĩa là gì?', o: ['Tôi không khỏe, xin cho tôi nghỉ hôm nay', 'Tôi sẽ đến muộn khoảng 30 phút vào sáng hôm nay', 'Tôi muốn đổi ca làm vào ngày mai'], why: 'Câu xin nghỉ ốm lịch sự, dùng được khi gọi điện hoặc nhắn tin.' },
+    { id: 'sk29', s: 'y1', q: 'Ở Nhật, số gọi xe cấp cứu là số nào?', o: ['119', '110', '113'], why: '119 là cấp cứu, cứu hỏa. 110 là cảnh sát.' },
+    { id: 'sk30', s: 'y1', q: 'Gọi 119, người trực hỏi 「火事ですか、救急ですか」. Bạn cần xe cấp cứu thì trả lời gì?', o: ['救急です', '火事です', 'わかりません'], why: '救急です (kyūkyū desu): Tôi cần cấp cứu. Xem Sổ tay › Khẩn cấp.' },
+    { id: 'sk31', s: 'y6', q: 'Nôn, tiêu chảy sau bữa ăn chung. Theo Thang 5 mức, đây là mức nào?', o: ['Bệnh cấp, dễ lây: báo ngay, ở riêng', 'Mệt mỏi thường: tự nghỉ ở phòng, không cần báo', 'Bệnh nhẹ: đợi vài ngày rồi báo'], why: 'Có thể là ngộ độc thực phẩm, còn lây được. Báo ngay để đi khám.' },
+    { id: 'sk32', s: 'y6', q: 'Không chắc mình ốm ở mức nào. Làm gì?', o: ['Báo người hỗ trợ', 'Tự mua thuốc theo lời quảng cáo về uống', 'Chờ thêm vài ngày'], why: 'Báo sớm để có người cùng xem có cần đi khám không.' },
+    { id: 'sk33', s: 'b1', q: 'Khởi động trước khi tập để làm gì?', o: ['Làm ấm khớp và tim, giảm chấn thương', 'Không cần thiết, vì người còn trẻ khỏe thì cơ đã sẵn sàng', 'Cho mệt trước để tập nhẹ hơn'], why: 'Không khởi động là nguyên nhân lớn gây đau cơ, chấn thương. (Sổ tay sức khỏe, Ch.7)' },
+    { id: 'sk34', s: 'b2', q: 'Đang tập thử, bạn thấy đau (không phải mỏi). Làm gì?', o: ['Dừng lại, báo thầy cô', 'Cố thêm vài cái cho cơ quen dần', 'Uống thuốc giảm đau rồi tập tiếp'], why: 'Đau là tín hiệu cơ thể cần dừng. Mỏi thì nghỉ rồi tập tiếp.' },
+    { id: 'sk35', s: 'b6', q: 'Dấu hiệu nào cho thấy đang tập quá sức?', o: ['Mệt suốt ngày, đau cơ dai dẳng, khó ngủ', 'Ngủ ngon hơn, ăn ngon hơn, người khỏe khoắn cả ngày', 'Hơi thở nhanh khi đang tập'], why: 'Tập quá sức thì cơ không kịp hồi phục. Giảm bớt, nghỉ đủ. (Sổ tay sức khỏe, Ch.7)' },
+    { id: 'sk36', s: 'b6', q: 'Hôm sau buổi tập đầu tiên, cơ hơi đau nhức. Thường là sao?', o: ['Thường gặp, vài ngày sẽ đỡ; giãn cơ, tập nhẹ lại', 'Là đã bị chấn thương nặng, phải nghỉ tập hẳn cả tháng', 'Phải tập gấp đôi cho cơ quen'], why: 'Đau nhức nhẹ sau buổi tập mới thường tự đỡ. Đau nhiều, sưng thì báo thầy cô. (Sổ tay sức khỏe, Ch.7)' },
+    { id: 'sk37', s: 'b6', q: 'Người trưởng thành nên ngủ khoảng bao lâu mỗi đêm?', o: ['7–8 tiếng', '4–5 tiếng là đủ nếu uống cà phê', '12 tiếng trở lên'], why: 'Ngủ đủ, ngủ sâu giúp cơ thể hồi sức. (Sổ tay sức khỏe, Ch.3)' },
+    { id: 'sk38', s: 'b6', q: 'Làm gì để dễ ngủ sâu hơn?', o: ['Tắt đèn, cất điện thoại, tắm nước ấm trước khi ngủ', 'Nằm lướt điện thoại trong bóng tối đến khi thật buồn ngủ thì thôi', 'Uống cà phê buổi tối cho đỡ mệt'], why: 'Ánh sáng làm não khó nghỉ. (Sổ tay sức khỏe, Ch.3)' }
+  ]
+};
+
+/* Câu Đúng/Sai (phản hồi ngay) · v: 1 đúng, 0 sai */
+var QTF = {
+  dd: [
+    { id: 'td01', s: 'd5', t: 'Chờ khát rồi mới uống nước là đủ.', v: 0, why: 'Khát là cơ thể đã thiếu nước. Uống từng ngụm, đều trong ngày.' },
+    { id: 'td02', s: 'd5', t: 'Làm ở nơi lạnh vẫn cần uống nước đều.', v: 1, why: 'Trời lạnh vẫn mất nước qua hơi thở, đi vệ sinh.' },
+    { id: 'td03', s: 'd4', t: 'Nhịn ăn là cách giữ dáng an toàn.', v: 0, why: 'Nhịn ăn dễ choáng, rồi lại ăn bù nhiều hơn.' },
+    { id: 'td04', s: 'd1', t: 'Bữa chính nên có tinh bột, đạm và rau.', v: 1, why: 'Đủ ba nhóm này là bữa chính tốt.' },
+    { id: 'td05', s: 'd5', t: 'Làm ca đêm, nước tăng lực thay được bữa ăn.', v: 0, why: 'Chỉ tỉnh một lúc, cơ thể vẫn thiếu năng lượng.' },
+    { id: 'td06', s: 'd6', t: '消費期限 đã qua 1 ngày, ngửi không có mùi lạ thì vẫn ăn được.', v: 0, why: '消費期限 là hạn an toàn. Qua ngày là không ăn.' },
+    { id: 'td07', s: 'd6', t: '賞味期限 là hạn ngon nhất, không phải hạn an toàn.', v: 1, why: 'Chưa mở, cất đúng cách thì qua ít ngày vẫn ăn được.' },
+    { id: 'td08', s: 'd6', t: 'Thịt sống nên bọc kín, để ngăn dưới cùng tủ lạnh.', v: 1, why: 'Để nước thịt không nhỏ xuống đồ khác.' },
+    { id: 'td09', s: 'd4', t: 'Một gói mì là đủ chất cho một bữa chính.', v: 0, why: 'Mì gói ít đạm, ít rau. Thêm trứng, rau nhé.' },
+    { id: 'td10', s: 'd4', t: 'Uống cà phê lúc bụng rỗng dễ cồn cào, đau bụng.', v: 1, why: 'Ăn trước, uống cà phê sau.' },
+    { id: 'td11', s: 'd2', t: 'Đồ chiên nhiều năng lượng hơn đồ luộc cùng loại.', v: 1, why: 'Dầu chiên làm năng lượng tăng nhiều.' },
+    { id: 'td12', s: 'd6', t: 'Thức ăn đã nấu, đậy nắp để ngoài cả ngày vẫn an toàn.', v: 0, why: 'Để lâu ở nhiệt độ phòng, vi khuẩn phát triển. Cất tủ lạnh.' },
+    { id: 'td13', s: 'd2', t: 'BMI phân biệt được cơ và mỡ.', v: 0, why: 'BMI không phân biệt cơ và mỡ, chỉ để tham khảo.' },
+    { id: 'td14', s: 'd5', t: 'Uống rượu trước ca làm giúp ấm người, an toàn hơn.', v: 0, why: 'Rượu làm phản xạ chậm, rất nguy hiểm khi làm việc.' },
+    { id: 'td15', s: 'd4', t: 'Ăn thật no ngay trước khi ngủ giúp ngủ ngon hơn.', v: 0, why: 'Ăn no sát giờ ngủ dễ khó tiêu, khó ngủ.' },
+    { id: 'td16', s: 'd6', t: 'Đồ ăn trong tủ lạnh chung nên ghi tên và ngày cất.', v: 1, why: 'Biết đã để bao lâu thì mới biết còn ăn được không.' }
+  ],
+  sk: [
+    { id: 'ts01', s: 'y1', t: 'Sắp ngất thì nên cố đứng dậy đi lại cho tỉnh.', v: 0, why: 'Ngồi hoặc nằm xuống ngay để không ngã.' },
+    { id: 'ts02', s: 'y1', t: 'Người ngất không thở: gọi 119 ngay.', v: 1, why: 'Không thở, hoặc hơn 1 phút chưa tỉnh: gọi 119.' },
+    { id: 'ts03', s: 'y2', t: 'Say nắng chỉ xảy ra khi làm ngoài trời.', v: 0, why: 'Xưởng nóng, bếp, nơi kín gió cũng dễ bị.' },
+    { id: 'ts04', s: 'y2', t: 'Say nắng mà lơ mơ, không tự uống được là dấu hiệu nặng.', v: 1, why: 'Gọi 119, vẫn tiếp tục làm mát.' },
+    { id: 'ts05', s: 'y4', t: 'Bong gân thì chườm nóng ngay cho mau khỏi.', v: 0, why: 'Chườm lạnh: đá bọc khăn, mỗi lần khoảng 15–20 phút.' },
+    { id: 'ts06', s: 'y4', t: 'Vết trầy nhỏ cũng nên rửa sạch và che băng.', v: 1, why: 'Giấu đi, để bẩn thì chuyện nhỏ thành chuyện lớn.' },
+    { id: 'ts07', s: 'y3', t: 'Đang sốt nên sang phòng bạn ngủ cho có người chăm.', v: 0, why: 'Dễ lây cho bạn. Ở phòng mình, đeo khẩu trang, báo người hỗ trợ.' },
+    { id: 'ts08', s: 'y5', t: 'Đau lưng kèm tê lan xuống chân thì nên đi khám.', v: 1, why: 'Tê, yếu chân, đau sau té ngã: đi khám.' },
+    { id: 'ts09', s: 'n3', t: 'Nâng vật nặng: gập lưng đỡ tốn sức hơn gập gối.', v: 0, why: 'Hạ hông, gập gối, giữ lưng thẳng để bảo vệ lưng.' },
+    { id: 'ts10', s: 'y6', t: 'Ốm không đi làm được thì báo trước giờ vào ca.', v: 1, why: 'Để chỗ làm kịp sắp xếp người thay.' },
+    { id: 'ts11', s: 'y1', t: '110 là số gọi xe cấp cứu ở Nhật.', v: 0, why: '119 là cấp cứu, cứu hỏa. 110 là cảnh sát.' },
+    { id: 'ts12', s: 'b1', t: 'Khởi động giúp giảm chấn thương khi tập.', v: 1, why: 'Làm ấm khớp và tim trước khi tập.' },
+    { id: 'ts13', s: 'b2', t: 'Tập thấy đau (không phải mỏi) thì cố thêm cho quen.', v: 0, why: 'Đau thì dừng lại, báo thầy cô.' },
+    { id: 'ts14', s: 'b6', t: 'Ngủ đủ giấc giúp cơ thể hồi sức sau ngày làm việc.', v: 1, why: 'Người trưởng thành nên ngủ khoảng 7–8 tiếng.' },
+    { id: 'ts15', s: 'y6', t: 'Không chắc mình ốm ở mức nào thì cứ chờ thêm vài ngày.', v: 0, why: 'Báo người hỗ trợ để cùng xem có cần đi khám không.' },
+    { id: 'ts16', s: 'y3', t: 'Rửa tay bằng xà phòng giúp phòng cảm cúm lây lan.', v: 1, why: 'Cách phòng lây đơn giản, làm được mỗi ngày.' }
+  ]
+};
+
+/* ---------- tự test thể lực (t4, t5) · TC01.1.4 ----------
+   Mốc Đạt theo Chương trình TTS 30 tiết, Bảng 3.1 (dòng "Đạt"; bảng gốc ghi ngược dấu "<=", app hiểu là "từ … trở lên"). Chờ GV GDTC xác nhận.
+   Sức bền chưa có trong Bảng 3.1: dùng thang Yếu · Trung bình · Tốt của MOC (Sổ quản lý v10.1).
+   ex: động tác trong EX (hình, 3 điểm chính); {nam, nu} nếu khác theo mốc · u: 'rep' đếm cái | 's' giây liên tục · dat: mốc Đạt · lad: dùng thang MOC */
+var FT = {
+  push:  { n: 'Hít đất', ex: { nam: 'pushup', nu: 'kneepush' }, u: 'rep', dat: { nam: 35, nu: 30 }, nuN: 'Hít đất khuỵu gối' },
+  plank: { n: 'Plank', ex: 'plank', u: 's', dat: { nam: 180, nu: 90 } },
+  squat: { n: 'Squat', ex: 'squat', u: 'rep', dat: { nam: 100, nu: 80 } },
+  push2: { n: 'Hít đất (nâng cao)', ex: 'pushup', u: 'rep', dat: { nam: 40, nu: 25 } },
+  abs2:  { n: 'Gập bụng nâng cao', ex: 'legraise', u: 'rep', dat: { nam: 50, nu: 40 } },
+  sq1:   { n: 'Squat 1 chân', ex: '', u: 'rep', dat: { nam: 20, nu: 15 }, how: 'Làm và đếm theo đúng cách thầy cô GDTC dạy trên lớp. Chưa chắc cách làm thì bỏ qua bài này, hỏi thầy cô trước.' },
+  sqw:   { n: 'Squat bình nước', ex: '', u: 'rep', dat: { nam: 80, nu: 50 }, how: 'Cầm bình nước theo cách thầy cô GDTC dạy trên lớp. Lưng thẳng, gối hướng theo mũi chân. Chưa chắc thì bỏ qua, hỏi thầy cô trước.' },
+  knee:  { n: 'Nâng cao đùi', ex: 'kneehigh', u: 's', lad: 1 },
+  jj:    { n: 'Jumping jack', ex: 'jj', u: 's', lad: 1 }
+};
+var FT_LV = { cb: 'Cơ bản', nc: 'Nâng cao', sb: 'Sức bền' };
+var FT_TXT = {
+  inSay: 'Khởi động xong chưa? Làm từng bài, mỗi bài làm liên tục đến khi hết sức hoặc sai tư thế. Giữa hai bài nghỉ khoảng 2 phút.',
+  inSrc: 'Mốc Đạt của lớp GDTC (Bảng thành tích, mốc [S]). Chỉ để tham khảo, so với chính mình là chính.',
+  ladSrc: 'Thang của Sổ quản lý học tập GDTC (mốc [S]). Chỉ để tham khảo, so với chính mình là chính.',
+  go: 'Bắt đầu test', warm: 'Xem khởi động',
+  rep: 'Mỗi cái đúng tư thế, chạm vào nút tròn. Hoặc nhập số ở dưới.', sec: 'Bấm Bắt đầu rồi vào tư thế. Chậm hẳn, sai tư thế hoặc phải dừng thì bấm Dừng.',
+  sDone: 'Xong bài này', sSkip: 'Bỏ qua bài này',
+  dat: 'Đạt mốc lớp', near: 'Còn [N] nữa tới mốc', last: 'Lần trước', skip: 'Đã bỏ qua',
+  rest: 'Nghỉ khoảng 2 phút, đi lại nhẹ, uống vài ngụm nước.', restGo: 'Làm bài tiếp', toEnd: 'Xem kết quả',
+  sumH: 'Kết quả buổi test', feelQ: 'Sau buổi test, bạn thấy thế nào?',
+  sumSay: 'Kết quả đã vào Bảng thành tích (bài 6). Lần sau test lại để so với chính mình nhé.',
+  again: 'Test lại từ đầu', noData: 'Bạn chưa làm bài nào. Thử ít nhất một bài, hoặc bỏ qua nếu thấy đau.',
+  bdNone: 'Bạn chưa có kết quả test nào. Làm Test Cơ bản (bài 4) hoặc Test sức bền (bài 5) trước nhé.',
+  bdSay: 'Đây là thẻ thành tích của <b class="nm">[Tên]</b>. Chụp màn hình thẻ này gửi thầy cô GDTC nhé.',
+  bdShot: 'Chụp màn hình thẻ này để gửi thầy cô.', bdUp: 'Tăng so với lần trước', bdBest: 'Tốt nhất',
+  bdH: 'Thẻ thành tích', bdGoal: 'Mục tiêu lần tới', bdTests: 'Số buổi test',
+  nbH: 'Thể lực tự test', nbNone: 'Chưa test. Vào Phòng test › Tự test sức mạnh.'
+};
+
+/* 6 bài của Phòng test. quiz: bank, n câu, pass mốc Đạt · tf: bank, n câu · redo: ôn câu đã sai (S.test.w) */
+var BAI_TEST = [
+  { id: 't1', t: 'Test thử Dinh dưỡng', ic: 'bowl', sub: '20 câu như đề lớp GDTC, làm lại thoải mái', min: 14,
+    acts: [
+      { id: 't1a', k: 'tf', t: 'Khởi động: Đúng hay sai?', min: 3, xp: 10, bank: 'dd', n: 10 },
+      { id: 't1b', k: 'quiz', t: 'Test thử Dinh dưỡng 20 câu', min: 10, xp: 20, bank: 'dd', n: 20, pass: 15 }
+    ],
+    gtip: {
+      xuong: 'Xưởng nóng: câu về nước và muối khoáng là chuyện hằng ngày của bạn.',
+      chuyen: 'Dây chuyền thực phẩm: để ý các câu về hạn dùng, tủ lạnh, dao thớt.',
+      troi: 'Ngoài trời: để ý các câu về bù nước, ăn sáng trước ca sớm.',
+      dv: 'Ca nhà hàng, kaigo hay lệch giờ ăn: để ý các câu về ăn theo ca.',
+      vp: 'Ngồi nhiều: để ý các câu về đồ ngọt, nước ngọt, ăn vừa no.' } },
+  { id: 't2', t: 'Test thử Sức khỏe & Bệnh lý', ic: 'cross', sub: '20 câu: sơ cứu, ốm đau, báo ốm, tập an toàn', min: 14,
+    acts: [
+      { id: 't2a', k: 'tf', t: 'Khởi động: Đúng hay sai?', min: 3, xp: 10, bank: 'sk', n: 10 },
+      { id: 't2b', k: 'quiz', t: 'Test thử Sức khỏe & Bệnh lý 20 câu', min: 10, xp: 20, bank: 'sk', n: 20, pass: 15 }
+    ],
+    gtip: {
+      xuong: 'Nhà xưởng: để ý các câu về say nắng trong xưởng, nâng vật đúng.',
+      chuyen: 'Dây chuyền: để ý các câu về báo ốm, nôn, tiêu chảy (không vào khu thực phẩm).',
+      troi: 'Ngoài trời: để ý các câu về say nắng, bong gân, trầy xước.',
+      dv: 'Kaigo, nhà hàng: để ý các câu về không lây bệnh, đau lưng.',
+      vp: 'Ngồi nhiều: để ý các câu về cổ, vai, giấc ngủ.' } },
+  { id: 't3', t: 'Test tổng', ic: 'gauge', sub: '30 câu cả hai phần, ôn lại câu đã sai', min: 20,
+    acts: [
+      { id: 't3a', k: 'quiz', t: 'Test tổng 30 câu', min: 15, xp: 30, bank: 'mix', n: 30, pass: 25 },
+      { id: 't3b', k: 'redo', t: 'Ôn lại câu đã sai', min: 5, xp: 15, n: 10 }
+    ],
+    gtip: {} },
+  { id: 't4', t: 'Tự test sức mạnh', ic: 'arm', sub: 'Hít đất, plank, squat theo bảng lớp GDTC', min: 15,
+    acts: [
+      { id: 't4a', k: 'pick', t: 'Tự test sao cho đúng', min: 3, xp: 10,
+        rounds: [
+          { q: 'Sắp tự test hít đất, plank, squat. Việc đầu tiên bạn làm là gì?',
+            opts: [
+              { t: 'Làm ngay khi cơ còn khỏe để được số cao nhất', why: 'Cơ còn lạnh mà dồn hết sức ngay thì dễ chấn thương.' },
+              { t: 'Khởi động khoảng 10 phút cho ấm khớp và tim', ok: 1, why: 'Đúng rồi! Cơ ấm thì làm được nhiều hơn và ít đau hơn.' },
+              { t: 'Uống thật nhiều nước cho no rồi mới bắt đầu test', why: 'Uống vài ngụm là đủ. Bụng quá no thì khó thở khi tập.' }
+            ] },
+          { q: 'Đang hít đất, đến cái thứ 18 thì hông bắt đầu võng xuống. Bạn đếm thế nào?',
+            opts: [
+              { t: 'Dừng lại, chỉ tính những cái làm đúng tư thế', ok: 1, why: 'Đúng rồi! Số đúng tư thế mới là sức thật của bạn.' },
+              { t: 'Cố làm tiếp cho đủ mốc, sai một chút cũng tính', why: 'Đếm cả cái sai thì số đẹp mà sức không tăng, lại dễ đau lưng.' },
+              { t: 'Nằm nghỉ trên sàn một lúc rồi làm tiếp, cộng dồn', why: 'Test là làm liên tục. Nghỉ giữa chừng thì số không còn đúng.' }
+            ] },
+          { q: 'Đang plank thì thấy đau nhói ở lưng dưới. Bạn làm gì?',
+            opts: [
+              { t: 'Cắn răng giữ thêm cho bằng thời gian lần trước', why: 'Đau nhói là dấu hiệu phải dừng. Cố thêm dễ bị nặng hơn.' },
+              { t: 'Dừng ngay, nghỉ, ghi lại và báo thầy cô GDTC', ok: 1, why: 'Đúng rồi! Kết quả để lần sau. Lưng của bạn quan trọng hơn.' },
+              { t: 'Đổi sang squat để test tiếp cho xong buổi', why: 'Đang đau thì dừng cả buổi, hỏi thầy cô trước khi tập lại.' }
+            ] }
+        ],
+        end: 'Ba điều nhớ khi tự test: khởi động trước, chỉ đếm cái đúng, đau thì dừng.' },
+      { id: 't4b', k: 'ft', t: 'Test Cơ bản: hít đất, plank, squat', min: 6, xp: 20, lv: 'cb', items: ['push', 'plank', 'squat'] },
+      { id: 't4c', k: 'ft', t: 'Test Nâng cao', min: 6, xp: 20, lv: 'nc', items: ['push2', 'abs2', 'sq1', 'sqw'], note: 'Nên làm khi đã gần đạt mốc Cơ bản. Squat 1 chân và squat bình nước: làm đúng cách thầy cô GDTC dạy trên lớp.' }
+    ],
+    gtip: {
+      xuong: 'Nhà xưởng hay bê, đẩy hàng: tay, vai, lưng khỏe thì làm ca nhẹ hơn.',
+      chuyen: 'Đứng dây chuyền cả ca: bụng và chân khỏe giúp đứng lâu ít mỏi.',
+      troi: 'Ngoài trời mang vác nhiều: chân, lưng, bụng là ba chỗ cần khỏe nhất.',
+      dv: 'Kaigo, nhà hàng: đỡ người, bưng bê cần chân và lưng khỏe.',
+      vp: 'Ngồi nhiều: test để biết sức mình, rồi tập đều mỗi tuần.' } },
+  { id: 't5', t: 'Tự test sức bền', ic: 'heart', sub: 'Nâng cao đùi, jumping jack', min: 9,
+    acts: [
+      { id: 't5a', k: 'ft', t: 'Test nâng cao đùi, jumping jack', min: 5, xp: 20, lv: 'sb', items: ['knee', 'jj'] },
+      { id: 't5b', k: 'pick', t: 'Tăng sức bền an toàn', min: 3, xp: 10,
+        rounds: [
+          { q: 'Lần này bạn nâng cao đùi được 40 giây. Bạn muốn lên 60 giây. Bạn tập thế nào?',
+            opts: [
+              { t: 'Tập 3–4 buổi mỗi tuần, mỗi tuần thêm vài giây', ok: 1, why: 'Đúng rồi! Tăng chậm, đều đặn thì tim và chân quen dần.' },
+              { t: 'Ngày nào cũng tập hết sức cho đến khi đủ 60 giây', why: 'Ngày nào cũng hết sức thì cơ không kịp hồi, dễ mệt, dễ đau.' },
+              { t: 'Chờ hôm nào thấy khỏe thì thử lại một lần', why: 'Không tập thì sức bền không tăng. Cần tập đều mỗi tuần.' }
+            ] },
+          { q: 'Vừa test jumping jack xong, bạn thở dốc, tim đập nhanh. Bạn làm gì?',
+            opts: [
+              { t: 'Nằm xuống sàn ngay và uống một chai nước lạnh', why: 'Dừng đột ngột dễ choáng. Uống từng ngụm nhỏ thôi.' },
+              { t: 'Đi bộ chậm, thở đều cho đến khi hơi thở dịu lại', ok: 1, why: 'Đúng rồi! Đi chậm vài phút giúp tim chậm lại từ từ.' },
+              { t: 'Test ngay bài tiếp theo luôn để tim quen dần với mệt', why: 'Nghỉ đủ rồi mới làm bài tiếp. Mệt chồng mệt dễ chấn thương.' }
+            ] },
+          { q: 'Đang test, bạn thấy choáng, tức ngực, khó thở hơn bình thường. Bạn làm gì?',
+            opts: [
+              { t: 'Dừng ngay, ngồi xuống nghỉ và báo thầy cô hoặc bạn bên cạnh', ok: 1, why: 'Đúng rồi! Đây là dấu hiệu phải dừng. Xem lại bài Choáng, sắp ngất ở Phòng y tế.' },
+              { t: 'Chậm lại một chút rồi cố làm cho hết thời gian của bài test', why: 'Choáng, tức ngực thì không cố. Dừng và báo người bên cạnh ngay.' },
+              { t: 'Không nói với ai để khỏi làm mọi người lo lắng', why: 'Báo ngay để có người giúp. Đó là việc đúng, không phải làm phiền.' }
+            ] }
+        ],
+        end: 'Sức bền tăng nhờ tập đều, tăng chậm. Mệt thì đi chậm, choáng thì dừng.' }
+    ],
+    gtip: {
+      xuong: 'Ca 8 tiếng đứng máy: sức bền giúp cuối ca vẫn tỉnh táo, làm chắc tay.',
+      chuyen: 'Dây chuyền chạy đều cả ca: sức bền giúp bạn theo kịp nhịp chuyền.',
+      troi: 'Ngoài trời nóng, lạnh, đi lại nhiều: sức bền là thứ dùng hằng ngày.',
+      dv: 'Đi lại, lên xuống cầu thang cả ngày: sức bền giúp ít mỏi chân.',
+      vp: 'Đi học, làm thêm: sức bền giúp bạn khỏe cả ngày dài.' } },
+  { id: 't6', t: 'Bảng thành tích', ic: 'stamp', sub: 'So với lần trước, gửi ảnh cho thầy cô', min: 6,
+    acts: [
+      { id: 't6a', k: 'board', t: 'Thẻ thành tích của mình', min: 3, xp: 10 },
+      { id: 't6b', k: 'write', t: 'Mục tiêu lần test tới', min: 3, xp: 10, dyn: 'ft',
+        say: 'Nhìn bảng thành tích rồi chọn một bài để cải thiện. Mục tiêu nhỏ, cụ thể là dễ đạt nhất.',
+        q: 'Lần test tới, bạn muốn tăng bài nào, tăng bao nhiêu?',
+        sub: 'Viết một câu cho chính bạn. Viết từ 10 chữ trở lên được thêm Insight.',
+        tips: ['Lần tới mình sẽ hít đất thêm 3 cái, giữ lưng thẳng', 'Lần tới mình sẽ plank lâu hơn 15 giây', 'Mỗi tuần mình sẽ tập squat 3 buổi'] }
+    ],
+    gtip: {} }
+
+];
+
 /* ---------- bản demo giáo viên ---------- */
+/* =========================================================
+   RADIO TAISO DECK (TC01.1.5) · Radio Taiso số 1 (ラジオ体操第一), 13 động tác
+   Tên 13 động tác theo Viện Khoa học Tuổi thọ Nhật Bản (tyojyu.or.jp). Hình nhìn thẳng, lật như soi gương.
+   Nhạc thật: mở video TC_RADIO. Trong app chỉ có tiếng đếm nhịp (không nhúng nhạc vì bản quyền).
+   n8 = số lần 8 nhịp mỗi động tác khi tập theo nhịp trong app (GV GDTC kiểm, sửa số ở đây).
+   ========================================================= */
+var RT = [
+  { n: 'Vươn người', j: '伸びの運動', k: 'のびのうんどう', n8: 2, cue: 'Tay lên cao, vươn hết cỡ' },
+  { n: 'Vung tay, nhún gối', j: '腕を振って脚を曲げ伸ばす運動', k: 'うでをふってあしをまげのばすうんどう', n8: 2, cue: 'Nhún gối, tay vung chéo rồi mở' },
+  { n: 'Xoay tay', j: '腕を回す運動', k: 'うでをまわすうんどう', n8: 2, cue: 'Xoay vòng tay thật to' },
+  { n: 'Ưỡn ngực', j: '胸を反らす運動', k: 'むねをそらすうんどう', n8: 2, cue: 'Mở tay, ưỡn ngực, nhìn lên' },
+  { n: 'Nghiêng người sang bên', j: '体を横に曲げる運動', k: 'からだをよこにまげるうんどう', n8: 2, cue: 'Tay qua đầu, nghiêng người, đổi bên' },
+  { n: 'Cúi trước, ngửa sau', j: '体を前後に曲げる運動', k: 'からだをぜんごにまげるうんどう', n8: 2, cue: 'Cúi thả lỏng, rồi chống hông ngửa nhẹ' },
+  { n: 'Vặn người', j: '体をねじる運動', k: 'からだをねじるうんどう', n8: 2, cue: 'Vung tay, vặn eo sang hai bên' },
+  { n: 'Duỗi tay lên xuống', j: '腕を上下に伸ばす運動', k: 'うでをじょうげにのばすうんどう', n8: 2, cue: 'Tay về vai, đẩy thẳng lên cao' },
+  { n: 'Cúi chéo, ưỡn ngực', j: '体を斜め下に曲げ、胸を反らす運動', k: 'からだをななめしたにまげ、むねをそらすうんどう', n8: 2, cue: 'Cúi chéo về một chân, đứng lên ưỡn ngực' },
+  { n: 'Xoay vòng cả thân mình', j: '体を回す運動', k: 'からだをまわすうんどう', n8: 2, cue: 'Tay cao, xoay thân thành vòng to' },
+  { n: 'Bật nhảy tại chỗ', j: '両脚で跳ぶ運動', k: 'りょうあしでとぶうんどう', n8: 2, cue: 'Bật nhẹ, mở chân rồi khép chân' },
+  { n: 'Vung tay, nhún gối', j: '腕を振って脚を曲げ伸ばす運動', k: 'うでをふってあしをまげのばすうんどう', n8: 2, cue: 'Giống động tác 2, hạ nhịp dần' },
+  { n: 'Hít thở sâu', j: '深呼吸', k: 'しんこきゅう', n8: 2, cue: 'Tay lên, hít vào; tay xuống, thở ra' }
+];
+/* 13 động tác cho dạng how (Xem cách làm): 2 khung mỗi động tác, 3 điểm chính */
+(function () {
+  var F = [
+    [{ p: 'rtStand', t: 'Đứng thẳng, hai tay xuôi theo người.' }, { p: 'rtUp', t: 'Đưa hai tay từ phía trước lên cao, vươn người hết cỡ. Rồi hạ tay sang hai bên xuống.', a: [[96, 6], [96, -14]] }],
+    [{ p: 'rtBendCross', t: 'Nhún gối nhẹ, hai tay vung chéo trước bụng.' }, { p: 'rtSwingOpen', t: 'Duỗi gối, hai tay vung rộng sang hai bên. Làm đều theo nhịp.' }],
+    [{ p: 'rtCrossLow', t: 'Hai tay bắt chéo trước người, gối hơi chùng.' }, { p: 'rtUp', t: 'Xoay hai tay thành vòng tròn to qua đầu. Xoay vòng ra ngoài, rồi vòng vào trong.', arc: [[84, 18, 12], [156, 18, 12]] }],
+    [{ p: 'rtWideLow', t: 'Bước một chân sang ngang, rộng bằng vai. Hai tay thả trước người.' }, { p: 'rtArch', t: 'Mở hai tay chếch lên cao, ưỡn ngực, mắt nhìn chếch lên.' }],
+    [{ p: 'rtSideL', t: 'Một tay đưa qua đầu, tay kia chống hông. Nghiêng người sang bên, nhún 2 nhịp.' }, { p: 'rtSideR', t: 'Đổi bên: nghiêng sang phía bên kia.' }],
+    [{ p: 'rtFwd', t: 'Cúi người ra trước, thả lỏng tay về phía sàn, nhún nhẹ 3 nhịp.' }, { p: 'rtBack', t: 'Đứng lên, chống tay vào hông, ngửa người ra sau vừa sức.' }],
+    [{ p: 'rtTwistL', t: 'Vung hai tay sang một bên, vặn eo theo tay. Hông giữ yên.', arc: [[120, 92, 14]] }, { p: 'rtTwistR', t: 'Vung tay, vặn eo sang bên kia.', arc: [[120, 92, 14]] }],
+    [{ p: 'rtShoulder', t: 'Co tay, đặt các ngón tay lên vai.' }, { p: 'rtUp', t: 'Đẩy thẳng hai tay lên cao. Về vai, rồi duỗi tay xuống. Làm nhanh, gọn.' }],
+    [{ p: 'rtDiag', t: 'Chân rộng. Cúi chéo xuống, hai tay chạm về phía một bàn chân, nhún 2 nhịp.' }, { p: 'rtArch', t: 'Đứng lên, mở tay, ưỡn ngực. Rồi cúi về phía chân bên kia.' }],
+    [{ p: 'rtSideUpL', t: 'Hai tay đưa cao. Nghiêng người, bắt đầu xoay thân thành vòng tròn to.', arc: [[120, 40, 34]] }, { p: 'rtSideUpR', t: 'Xoay hết một vòng. Rồi xoay theo chiều ngược lại.', arc: [[120, 40, 34]] }],
+    [{ p: 'rtJump', t: 'Bật nhảy nhẹ tại chỗ bằng hai chân, tiếp đất bằng mũi chân.' }, { p: 'rtJumpOpen', t: 'Bật mở chân, tay mở sang hai bên. Rồi bật khép chân lại.' }],
+    [{ p: 'rtBendCross', t: 'Giống động tác 2: nhún gối, hai tay vung chéo trước bụng.' }, { p: 'rtSwingOpen', t: 'Duỗi gối, tay vung rộng. Làm chậm dần để hạ nhịp tim.' }],
+    [{ p: 'rtBreathUp', t: 'Đưa hai tay từ hai bên lên cao, hít vào bằng mũi.' }, { p: 'rtStand', t: 'Hạ tay xuống chậm, thở ra từ từ.' }]
+  ];
+  var K = [
+    ['Vươn đến tận đầu ngón tay', 'Hít vào khi đưa tay lên', 'Lưng thẳng, không ưỡn bụng'],
+    ['Nhún gối nhẹ, gót không nhấc cao', 'Tay vung thả lỏng theo nhịp', 'Giữ lưng thẳng'],
+    ['Vòng tay càng to càng tốt', 'Vai thả lỏng, không gồng', 'Gối nhún nhẹ theo nhịp'],
+    ['Mở rộng ngực, hít vào', 'Nhìn chếch lên, không ngửa cổ quá', 'Đứng vững, gót sát sàn'],
+    ['Nghiêng sang ngang, không cúi về trước', 'Căng lườn bên tay giơ cao', 'Hai chân đứng vững'],
+    ['Cúi thả lỏng, không gồng', 'Ngửa vừa sức, tay đỡ hông', 'Đau lưng thì làm nhẹ, bỏ phần ngửa'],
+    ['Vặn từ eo, hông giữ yên', 'Tay vung thả lỏng', 'Mắt nhìn theo tay'],
+    ['Duỗi thẳng hết tay', 'Nhanh, gọn theo nhịp', 'Vai không nhún lên tai'],
+    ['Cúi theo đường chéo về phía bàn chân', 'Hít vào khi đứng lên, ưỡn ngực', 'Làm đều hai bên'],
+    ['Vòng xoay to, chậm và đều', 'Chân đứng vững, không nhấc gót', 'Chóng mặt thì xoay vòng nhỏ lại'],
+    ['Nhảy thấp, nhẹ, tiếp đất bằng mũi chân', 'Gối hơi chùng khi chạm đất', 'Đau chân, có chấn thương: nhún gối tại chỗ thay bật nhảy'],
+    ['Nhún gối nhẹ, tay vung thả lỏng', 'Làm chậm dần', 'Thở đều'],
+    ['Hít vào khi đưa tay lên', 'Thở ra chậm khi hạ tay', 'Thả lỏng toàn thân']
+  ];
+  RT.forEach(function (r, i) {
+    var id = 'rt' + (i < 9 ? '0' : '') + (i + 1);
+    r.id = id;
+    EX[id] = { n: (i + 1) + '. ' + r.n, s: (i + 1) + '. ' + r.n, who: r.j, yt: '', frames: F[i], keys: K[i] };
+  });
+})();
+var RT_COUNT = ['いち', 'に', 'さん', 'し', 'ご', 'ろく', 'しち', 'はち'];
+var RT_TEMPO = [{ n: 'Chậm', ms: 800 }, { n: 'Vừa', ms: 650 }];
+var RT_TXT = {
+  khuSay: 'Radio Taiso là 13 động tác người Nhật tập buổi sáng. Học từng cụm, rồi ráp lại cả bài nhé!',
+  mirror: 'Hình như soi gương: hình nghiêng, vặn về bên nào thì bạn làm về bên đó.',
+  kwSel: 'Bạn chọn [Món]. Giờ chạm chữ Nhật hợp với nó.',
+  kwNo: 'Chưa khớp. Thử chữ khác nhé.',
+  rtEnd: 'Nghe người hướng dẫn đếm いち、に、さん、し là bạn bắt nhịp được ngay.',
+  /* bắt nhịp */
+  btIntro: 'Shin đếm 8 nhịp mẫu. Sau đó, bạn chạm vòng tròn đúng lúc Shin đếm, 16 nhịp.',
+  btSound: 'Bật âm thanh của máy để nghe tiếng đếm.',
+  btGo: 'Bắt đầu',
+  btListen: 'Nghe nhịp…',
+  btTap: 'Chạm theo nhịp!',
+  btHit: 'Đúng nhịp',
+  btMiss: 'Lệch',
+  btRes: ['Thử lại nhé. Nghe tiếng đếm rồi chạm cùng lúc.', 'Khá rồi! Thêm một lượt nữa sẽ đều hơn.', 'Nhịp rất đều! Tập theo nhạc sẽ dễ lắm đây.'],
+  /* thẻ nhanh */
+  qPic: 'Hình này là động tác nào?',
+  qNext: 'Sau động tác “[Đ]” là động tác nào?',
+  qOk: 'Đúng rồi!',
+  qNo: 'Thử lại nhé.',
+  qEnd: 'Bạn nhớ cụm này rồi đó. Tập theo nhịp để tay chân nhớ luôn nhé!',
+  /* tập theo nhịp */
+  flIntro: 'Đứng chỗ rộng, cách đồ vật một sải tay. Shin đếm nhịp, bạn làm theo hình.',
+  flNote: 'Đây là nhịp đếm để tập. Nhạc thật nghe ở video.',
+  flTempo: 'Tốc độ đếm',
+  flStart: 'Bắt đầu cùng Shin',
+  flSet: 'Lần [n]/[m]',
+  flCheer: ['Làm to, rõ từng động tác.', 'Tốt lắm, giữ nhịp nhé.', 'Thở đều, đừng nín thở.', 'Tay duỗi thẳng hết cỡ.', 'Sắp xong rồi!'],
+  flDone: 'Xong rồi! Người bạn thấy thế nào?',
+  flFeel: ['Người ấm, tỉnh hơn', 'Còn lúng túng vài chỗ', 'Có chỗ bị đau'],
+  flSay: ['Đúng vậy. Tập mỗi sáng vài phút là người tỉnh hẳn.', 'Bình thường thôi. Xem lại hình động tác đó rồi tập chậm vài lần.', 'Dừng động tác làm đau. Đau không đỡ thì báo thầy cô GDTC.'],
+  vidBtn: 'Mở video Radio Taiso số 1',
+  vidSub: 'Tập theo nhạc thật trên YouTube',
+  /* tự chấm */
+  sfQ: 'Tập theo video ít nhất một lần, rồi tự chấm theo 3 tiêu chí của lớp GDTC.',
+  sfC: ['Thuộc 13 động tác', 'Nghe nhạc, làm đúng nhịp', 'Tập cùng nhóm, cả nhóm đều'],
+  sfLv: ['Chưa được', 'Gần được', 'Được rồi'],
+  sfLv3: 'Chưa tập nhóm',
+  sfNeed: 'Động tác mình cần tập thêm (không bắt buộc)',
+  sfSay: ['Chưa sao. Học lại từng cụm, mỗi ngày một cụm là thuộc.', 'Gần được rồi! Tập theo video vài buổi nữa nhé.', 'Giỏi lắm! Thử tập cùng các bạn trong lớp xem cả nhóm đã đều chưa.'],
+  sfMark: 'Mốc Đạt của lớp: thuộc 13 động tác, nghe nhạc đi đúng, cả nhóm đều. Thầy cô GDTC chấm trên lớp.',
+  /* hẹn 7 buổi sáng */
+  s7Q: 'Bạn sẽ tập Radio Taiso vào lúc nào?',
+  s7Slots: ['Sáng, trước khi đến lớp', 'Đầu giờ học GDTC', 'Trước ca làm thêm', 'Tối, sau khi học'],
+  s7W: 'Viết lời hẹn: “Khi …, mình sẽ tập Radio Taiso.”',
+  s7Sub: 'Viết cụ thể: lúc nào, ở đâu. Từ 10 chữ trở lên được thêm Insight.',
+  s7Tips: ['Khi đánh răng xong buổi sáng, mình sẽ tập Radio Taiso ở hành lang', 'Khi đến lớp sớm 10 phút, mình sẽ rủ bạn tập Radio Taiso'],
+  s7H: '7 buổi Radio Taiso',
+  s7Btn: 'Hôm nay mình đã tập',
+  s7Done: 'Hôm nay đã đóng dấu',
+  s7Toast: 'Giỏi lắm! Thêm một buổi Radio Taiso.',
+  s7Full: 'Đủ 7 buổi rồi! Cứ tập tiếp, Shin vẫn đếm cùng bạn.',
+  nbH: 'Radio Taiso của mình'
+};
+var RT_GTIP = {
+  xuong: 'Đứng máy cả ca: Radio Taiso làm ấm vai, hông, gối trước khi vào việc.',
+  chuyen: 'Lặp một động tác cả ngày: Radio Taiso giúp vai, cổ tay, lưng linh hoạt hơn.',
+  troi: 'Mang vác, cúi nhiều: làm ấm cơ thể trước để lưng đỡ mỏi.',
+  dv: 'Đỡ người, bưng bê: tập đều giúp lưng, vai dẻo dai hơn.',
+  vp: 'Ngồi lâu: Radio Taiso là cách nhanh để đứng dậy, vận động vài phút.'
+};
+var BAI_RT = [
+  { id: 'r1', t: 'Radio Taiso là gì?', ic: 'radio', sub: 'Bài thể dục buổi sáng của người Nhật', min: 9, gtip: RT_GTIP,
+    acts: [
+      { id: 'r1a', k: 'pick', t: 'Radio Taiso ở Nhật', min: 3, xp: 10,
+        rounds: [
+          { q: 'Radio Taiso là gì?', opts: [
+            { t: 'Bài thể dục ngắn theo nhạc, người Nhật hay tập buổi sáng', ok: 1, why: 'Đúng rồi! Có từ năm 1928. Đến nay đài và tivi NHK vẫn phát mỗi sáng.' },
+            { t: 'Chương trình ca nhạc buổi sáng trên đài phát thanh Nhật Bản', why: 'Có nhạc và phát trên đài, nhưng đây là bài để tập theo.' },
+            { t: 'Bài kiểm tra thể lực trước khi vào công ty', why: 'Không phải bài kiểm tra. Ai cũng tập được, tập để khỏe.' } ] },
+          { q: 'Ở Nhật, bạn có thể gặp Radio Taiso ở đâu?', opts: [
+            { t: 'Ở trường học, ngày hội thể thao, nhiều chỗ làm trước giờ vào ca', ok: 1, why: 'Đúng rồi! Nhiều công ty cho cả nhóm tập trước giờ làm để làm ấm cơ thể.' },
+            { t: 'Chỉ ở phòng tập gym, phải đăng ký và trả phí mới được tập cùng mọi người', why: 'Radio Taiso không cần phòng tập. Đứng ở đâu cũng tập được.' },
+            { t: 'Chỉ ở bệnh viện, dành cho người đang điều trị', why: 'Người khỏe, người lớn tuổi, học sinh đều tập.' } ] },
+          { q: 'Vì sao nên thuộc Radio Taiso trước khi sang Nhật?', opts: [
+            { t: 'Để tập cùng mọi người ngay từ ngày đầu, người ấm lên trước khi làm', ok: 1, why: 'Đúng rồi! Thuộc bài thì bạn hòa vào nhóm ngay, không bỡ ngỡ.' },
+            { t: 'Để được miễn những việc nặng trong suốt thời gian thực tập ở công ty', why: 'Thuộc bài không thay đổi công việc. Bài giúp cơ thể sẵn sàng.' },
+            { t: 'Vì thuộc bài thì được tăng lương ngay tháng đầu', why: 'Không liên quan đến lương. Lợi ích là sức khỏe và hòa nhập.' } ] }
+        ] },
+      { id: 'r1b', k: 'match', t: 'Từ tiếng Nhật của bài', min: 3, xp: 10,
+        q: 'Ghép nghĩa tiếng Việt với chữ Nhật.', sub: 'Chạm một nghĩa, rồi chạm chữ Nhật hợp với nó.',
+        sel: 'kwSel', no: 'kwNo', end: 'rtEnd',
+        pairs: [
+          { v: 'Thể dục theo đài', j: 'ラジオ体操', k: 'らじおたいそう', r: 'rajio taisō', why: 'Tên của bài. Nghe là biết sắp tập cùng nhau.' },
+          { v: 'Một, hai, ba, bốn', j: 'いち、に、さん、し', r: 'ichi, ni, san, shi', why: 'Người hướng dẫn đếm nhịp như vậy.' },
+          { v: 'Hít thở sâu', j: '深呼吸', k: 'しんこきゅう', r: 'shinkokyū', why: 'Động tác 13, cuối bài.' },
+          { v: 'Cánh tay', j: '腕', k: 'うで', r: 'ude', why: 'Có trong tên động tác 2, 3, 8.' },
+          { v: 'Ngực', j: '胸', k: 'むね', r: 'mune', why: 'Động tác 4 là 胸を反らす: ưỡn ngực.' },
+          { v: 'Thân người', j: '体', k: 'からだ', r: 'karada', why: 'Có trong tên động tác 5, 6, 7, 9, 10.' }
+        ] },
+      { id: 'r1c', k: 'beat', t: 'Bắt nhịp 1–8', min: 3, xp: 15 }
+    ] },
+  { id: 'r2', t: 'Cụm 1: Động tác 1–3', ic: 'arm', sub: 'Vươn người · Vung tay, nhún gối · Xoay tay', min: 10, gtip: RT_GTIP,
+    acts: [
+      { id: 'r2a', k: 'how', t: 'Xem 3 động tác', min: 4, xp: 10, ex: ['rt01', 'rt02', 'rt03'], more: RT_TXT.mirror },
+      { id: 'r2b', k: 'rtq', t: 'Thẻ nhanh', min: 3, xp: 10, mv: [1, 2, 3] },
+      { id: 'r2c', k: 'rflow', t: 'Tập theo nhịp', min: 3, xp: 15, mv: [1, 2, 3] }
+    ] },
+  { id: 'r3', t: 'Cụm 2: Động tác 4–7', ic: 'core', sub: 'Ưỡn ngực · Nghiêng người · Cúi, ngửa · Vặn người', min: 11, gtip: RT_GTIP,
+    acts: [
+      { id: 'r3a', k: 'how', t: 'Xem 4 động tác', min: 4, xp: 10, ex: ['rt04', 'rt05', 'rt06', 'rt07'], more: RT_TXT.mirror },
+      { id: 'r3b', k: 'rtq', t: 'Thẻ nhanh', min: 3, xp: 10, mv: [4, 5, 6, 7] },
+      { id: 'r3c', k: 'rflow', t: 'Tập theo nhịp', min: 4, xp: 15, mv: [4, 5, 6, 7] }
+    ] },
+  { id: 'r4', t: 'Cụm 3: Động tác 8–10', ic: 'stretch', sub: 'Duỗi tay lên xuống · Cúi chéo, ưỡn ngực · Xoay thân', min: 10, gtip: RT_GTIP,
+    acts: [
+      { id: 'r4a', k: 'how', t: 'Xem 3 động tác', min: 4, xp: 10, ex: ['rt08', 'rt09', 'rt10'], more: RT_TXT.mirror },
+      { id: 'r4b', k: 'rtq', t: 'Thẻ nhanh', min: 3, xp: 10, mv: [8, 9, 10] },
+      { id: 'r4c', k: 'rflow', t: 'Tập theo nhịp', min: 3, xp: 15, mv: [8, 9, 10] }
+    ] },
+  { id: 'r5', t: 'Cụm 4: Động tác 11–13', ic: 'leg', sub: 'Bật nhảy · Vung tay, nhún gối · Hít thở sâu', min: 11, gtip: RT_GTIP,
+    acts: [
+      { id: 'r5a', k: 'how', t: 'Xem 3 động tác', min: 4, xp: 10, ex: ['rt11', 'rt12', 'rt13'], more: RT_TXT.mirror },
+      { id: 'r5b', k: 'order', t: 'Xếp đủ 13 động tác', min: 4, xp: 15,
+        q: 'Xếp 13 động tác Radio Taiso theo thứ tự.', sub: 'Chạm lần lượt từ động tác đầu đến động tác cuối.',
+        items: ['Vươn người', 'Vung tay, nhún gối', 'Xoay tay', 'Ưỡn ngực', 'Nghiêng người sang bên', 'Cúi trước, ngửa sau', 'Vặn người', 'Duỗi tay lên xuống', 'Cúi chéo, ưỡn ngực', 'Xoay vòng cả thân mình', 'Bật nhảy tại chỗ', 'Vung tay, nhún gối (lặp lại)', 'Hít thở sâu'],
+        hint: 'Gợi ý: mở đầu bằng vươn người, kết thúc bằng hít thở sâu. “Vung tay, nhún gối” có 2 lần: số 2 và số 12.',
+        ok: 'Bạn thuộc thứ tự cả bài rồi! Giờ tập theo nhịp để tay chân nhớ luôn.' },
+      { id: 'r5c', k: 'rflow', t: 'Tập theo nhịp', min: 3, xp: 15, mv: [11, 12, 13] }
+    ] },
+  { id: 'r6', t: 'Trọn bài 13 động tác', ic: 'stamp', sub: 'Tập theo nhịp, theo nhạc, tự chấm', min: 12, gtip: RT_GTIP,
+    acts: [
+      { id: 'r6a', k: 'rflow', t: 'Tập trọn bài theo nhịp', min: 4, xp: 15, mv: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] },
+      { id: 'r6b', k: 'rself', t: 'Tập theo nhạc, tự chấm', min: 5, xp: 15 },
+      { id: 'r6c', k: 'sang7', t: 'Hẹn 7 buổi Radio Taiso', min: 3, xp: 15 }
+    ] }
+];
+
+/* =========================================================
+   BUỔI TẬP 10 PHÚT CÙNG SHIN (TC01.1.5) · PA A: 3 bài cố định để chọn
+   Khởi động 2 phút (preshift 5 × 24 giây) → bài chính 6 phút (6 động tác × làm 40 giây, nghỉ 20 giây) → giãn 2 phút (midstretch 5 × 24 giây).
+   Nữ: pushup tự đổi thành kneepush. Không đục lỗ thẻ; thẻ ghi số buổi.
+   ========================================================= */
+var S10 = { warm: 'preshift', cool: 'midstretch', wSec: 24, work: 40, rest: 20 };
+var S10_MENU = [
+  { id: 'sang', n: 'Tỉnh táo buổi sáng', ic: 'warm', d: 'Tim đập nhanh hơn, người tỉnh táo', main: ['jj', 'squat', 'kneehigh', 'lunge', 'jj', 'kneehigh'] },
+  { id: 'luc', n: 'Sức mạnh', ic: 'arm', d: 'Tay, bụng, lưng, chân', main: ['pushup', 'squat', 'plank', 'superman', 'lunge', 'legraise'] },
+  { id: 'nghe', n: 'Chống mỏi nghề', ic: 'helmet', d: 'Lưng, hông, chân cho ca làm dài', main: ['hinge', 'sidelunge', 'superman', 'plank', 'crunch', 'squat'] }
+];
+var S10_TXT = {
+  btn: 'Buổi tập 10 phút cùng Shin',
+  btnSub: '3 bài để chọn',
+  hi: 'Chọn một bài 10 phút. Shin đếm giờ, bạn làm theo hình.',
+  inj: 'Bạn có chấn thương cũ: làm nhẹ, động tác nào đau thì bỏ qua.',
+  plan: ['Khởi động', 'Bài chính', 'Giãn cơ'],
+  planD: ['2 phút', '6 động tác · làm 40 giây, nghỉ 20 giây', '2 phút'],
+  start: 'Bắt đầu buổi tập',
+  ph: { warm: 'Khởi động', main: 'Bài chính', rest: 'Nghỉ', cool: 'Giãn cơ' },
+  restNext: 'Tiếp theo: ',
+  work: 'Làm đều, đúng tư thế. Mệt thì làm chậm lại.',
+  pause: 'Tạm dừng', go: 'Tiếp tục', skip: 'Bỏ qua', stop: 'Dừng buổi tập', pain: 'Thấy đau? Dừng ngay',
+  done: 'Xong buổi tập! Người bạn thấy thế nào?',
+  doneShort: 'Bạn dừng sớm. Vẫn lưu lại nhé. Người bạn thấy thế nào?',
+  feel: ['Nhẹ nhàng', 'Vừa sức', 'Mệt', 'Có chỗ bị đau'],
+  say: ['Lần sau thử bài khác hoặc làm nhanh hơn một chút nhé.', 'Vừa sức là đúng nhịp. Tập đều mỗi ngày nhé.', 'Mệt là bình thường. Uống nước, nghỉ ngơi. Lần sau làm chậm hơn.', 'Dừng tập hôm nay. Đau kéo dài hoặc đau nhói thì báo thầy cô GDTC.'],
+  save: 'Lưu buổi tập',
+  toast: 'Đã lưu buổi tập thứ [n]. Giỏi lắm!',
+  week: 'Tuần này',
+  nbH: 'Buổi tập 10 phút',
+  nbNone: 'Chưa có buổi nào. Ở trang chính, chạm “Buổi tập 10 phút cùng Shin”.'
+};
+
 var DEMO = {
   mem: { job: 'co-khi', g: 'xuong', sex: 'nam', inj: 0, goal: 'Chống đẩy được 30 cái liên tục trước khi bay', h: 168, w: 60, at: 0 },
   done: ['b1a', 'b1b', 'b1c', 'b2a', 'b2b', 'b2c', 'b4a'],
   log: { pushup: [{ n: 18, f: 2 }, { n: 22, f: 2 }], squat: [{ n: 30, f: 1 }] },
   refl: { b2c: 'Lần tới mình sẽ siết bụng, siết mông từ đầu đến cuối, không để hông võng xuống.',
     d1c: 'Bữa sáng mai mình sẽ ăn thêm một quả trứng và uống sữa thay cà phê.' },
-  bepDone: ['d1a', 'd1b', 'd1c', 'd2a', 'd3a', 'd5b', 'n1a', 'n1b', 'n2a', 'n4a'],
+  bepDone: ['d1a', 'd1b', 'd1c', 'd2a', 'd3a', 'd5b', 'n1a', 'n1b', 'n2a', 'n4a', 'y1a', 'y1b', 'y2b', 't1a', 't1b', 'r1a', 'r1b', 'r1c', 'r2a', 'r2b', 'r2c', 'r3a', 'r6b', 'r6c'],
+  radio: { beat: 13, fl: { r2c: 2 }, self: { c: [2, 1, 0], need: [5, 8], at: 0 }, s7: { slot: 0, txt: 'Khi đánh răng xong buổi sáng, mình sẽ tập Radio Taiso ở hành lang', ago: 3, done: [0, 1, 3] } },
+  s10: [{ ago: 6, m: 'luc', sec: 600, f: 1 }, { ago: 4, m: 'sang', sec: 600, f: 1 }, { ago: 2, m: 'nghe', sec: 420, f: 2 }, { ago: 1, m: 'luc', sec: 600, f: 1 }],
+  yte: { sim: { y1a: { f: 4, n: 5 } } },
+  test: { q: { t1b: { b: 16, l: 16, n: 20, k: 2 } }, w: { dd15: 1, dd20: 1, dd23: 1, sk16: 1 }, tf: { t1a: { b: 8, n: 10 } } },
+  ft: [{ ago: 9, a: 't4b', lv: 'cb', r: { push: 24, plank: 110, squat: 60 }, f: 1 }, { ago: 2, a: 't4b', lv: 'cb', r: { push: 29, plank: 135, squat: 72 }, f: 1 }, { ago: 2, a: 't5a', lv: 'sb', r: { knee: 50, jj: 70 }, f: 1 }],
   nghe: { body: ['lung', 'tay', 'chan'], lad: { nvt: 1, bl: 2, ch: 1, tm: 2 }, ca: { g: 'xuong', sel: [3, 5], sch: 1 } },
   food: { meal: { sang: ['Bánh mì không'], trua: ['Cơm', 'Cá', 'Canh rau'], toi: ['Mì gói'], skip: {} },
     calc: { h: 168, w: 60, age: 20, sex: 'nam', lv: 2 },

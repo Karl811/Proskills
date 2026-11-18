@@ -6,7 +6,7 @@
    - Không bao giờ đụng tới bài làm (localStorage) của học viên.
    ========================================================= */
 'use strict';
-const VERSION = 'PS1.3.28';
+const VERSION = 'PS1.3.33';
 const BASE = new URL(self.registration.scope);
 const PREFIX = 'proskills-' + encodeURIComponent(BASE.pathname) + '-';
 const SHELL = PREFIX + 'shell-' + VERSION;

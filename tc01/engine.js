@@ -3,7 +3,7 @@
    Trạng thái, gắn lõi Proskills, điều hướng, các dạng hoạt động, Sổ tay, demo.
    Chữ nằm ở content.js, hình ở art.js. ES5: var, function, nối chuỗi.
    Màn hình: join (làm thẻ hội viên) · home (phòng tập) · khu · bai · act.
-   Khu đang mở: Sàn tập (BAI), Bếp dinh dưỡng (BAI_BEP), Góc nghề (BAI_NGHE). Dữ liệu Bếp của học viên ở S.food (meal, calc, commit).
+   Khu đang mở: Sàn tập (BAI), Bếp dinh dưỡng (BAI_BEP), Góc nghề (BAI_NGHE), Phòng y tế (BAI_YTE, từ TC01.1.1; đủ 6 bài từ TC01.1.2), Phòng test (BAI_TEST, từ TC01.1.3; đủ 6 bài từ TC01.1.4), Radio Taiso Deck (BAI_RT, TC01.1.5) + Buổi tập 10 phút (màn 's10', S.s10). Dữ liệu Bếp của học viên ở S.food (meal, calc, commit).
    ========================================================= */
 (function (W, D) {
   'use strict';
@@ -19,7 +19,7 @@
   function ic(k, sz, sw) { return TC_ICONS[k] ? tcIcon(k, sz, sw) : PS.icon(k, sz, sw); }
   function today() { return PS.today ? PS.today() : new Date().toISOString().slice(0, 10); }
   function dmy(t) { var d = new Date(t || Date.now()); return (d.getDate() < 10 ? '0' : '') + d.getDate() + '/' + (d.getMonth() < 9 ? '0' : '') + (d.getMonth() + 1) + '/' + d.getFullYear(); }
-  function words(s) { s = String(s || '').replace(/^\s+|\s+$/g, ''); return s ? s.split(/\s+/).length : 0; }
+  function words(s) { s = String(s || '').replace(/^\s+|\s+$/g, ''); if (!s) return 0; var cj = s.match(/[\u3040-\u30ff\u4e00-\u9fff]/g); return s.split(/\s+/).length + (cj ? Math.floor(cj.length / 3) : 0); }
   function given() { return PS.given(); }
   function fill(s) { return String(s).replace(/\[Tên\]/g, esc(given())); }
   function seedShuffle(arr, seed) { var a = arr.slice(), x = 0, i; for (i = 0; i < seed.length; i++) x = (x * 31 + seed.charCodeAt(i)) % 9973; for (i = a.length - 1; i > 0; i--) { x = (x * 7 + 13) % 9973; var j = x % (i + 1), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
@@ -27,7 +27,7 @@
   function fmtClock(ms) { var s = Math.floor(ms / 1000), m = Math.floor(s / 60); s = s % 60; return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s; }
 
   /* ---------- trạng thái ---------- */
-  function blank() { return { v: 1, created: Date.now(), done: {}, xp: {}, ins: {}, days: {}, mem: null, log: {}, refl: {}, plan: null, d: {}, food: {}, nghe: {} }; }
+  function blank() { return { v: 1, created: Date.now(), done: {}, xp: {}, ins: {}, days: {}, mem: null, log: {}, refl: {}, plan: null, d: {}, food: {}, nghe: {}, yte: {}, kc: {}, test: {}, ft: { h: [] }, radio: {}, s10: { h: [] } }; }
   function demoState() {
     var s = blank(), m = DEMO.mem; s.demo = 1; s.mem = { job: m.job, g: m.g, sex: m.sex, inj: m.inj, goal: m.goal, h: m.h, w: m.w, at: Date.now() - 20 * 864e5 };
     DEMO.done.concat(DEMO.bepDone || []).forEach(function (id, i) { var a = actById(id); s.done[id] = Date.now() - (12 - i) * 864e5; s.xp[id] = a ? a.xp : 10; });
@@ -36,6 +36,12 @@
     if (cs) { var cr = calcRes(cs); s.food.calc = { h: cs.h, w: cs.w, age: cs.age, sex: cs.sex, lv: cs.lv, bmi: cr.bmi, bmr: cr.bmr, tdee: cr.tdee, water: cr.water, at: Date.now() - 3 * 864e5 }; }
     if (F.shift) s.food.shift = { s: F.shift.s, l: F.shift.l, pre: F.shift.pre, at: Date.now() - 864e5 };
     if (DEMO.nghe) s.nghe = JSON.parse(JSON.stringify(DEMO.nghe));
+    if (DEMO.yte) s.yte = JSON.parse(JSON.stringify(DEMO.yte));
+    if (DEMO.test) s.test = JSON.parse(JSON.stringify(DEMO.test));
+    if (DEMO.radio) { var DR = DEMO.radio; s.radio = { beat: DR.beat, fl: JSON.parse(JSON.stringify(DR.fl)), self: { c: DR.self.c.slice(), need: DR.self.need.slice(), at: Date.now() - 864e5 } };
+      var s7t = new Date(); s7t.setHours(8, 0, 0, 0); s7t = new Date(s7t.getTime() - DR.s7.ago * 864e5); s.radio.s7 = { slot: DR.s7.slot, txt: DR.s7.txt, at: s7t.getTime(), days: {} }; DR.s7.done.forEach(function (d) { s.radio.s7.days[dayKeyFrom(s7t, d)] = 1; }); }
+    if (DEMO.s10) s.s10 = { h: DEMO.s10.map(function (e) { return { d: Date.now() - e.ago * 864e5, m: e.m, sec: e.sec, f: e.f, full: e.sec >= 600 ? 1 : 0 }; }) };
+    if (DEMO.ft) s.ft = { h: DEMO.ft.map(function (e) { return { d: Date.now() - e.ago * 864e5, a: e.a, lv: e.lv, r: e.r, f: e.f }; }) };
     if (cm) { var st = new Date(); st.setHours(8, 0, 0, 0); st = new Date(st.getTime() - cm.ago * 864e5); s.food.commit = { h: cm.h, txt: cm.txt, at: st.getTime(), days: {} }; cm.done.forEach(function (d) { s.food.commit.days[dayKeyFrom(st, d)] = 1; }); }
     for (var k in DEMO.log) if (DEMO.log.hasOwnProperty(k)) s.log[k] = DEMO.log[k].map(function (e, i) { return { d: Date.now() - (5 - i) * 864e5, n: e.n, f: e.f }; });
     for (var r in DEMO.refl) if (DEMO.refl.hasOwnProperty(r)) { s.refl[r] = DEMO.refl[r]; s.ins[r] = 1; }
@@ -50,11 +56,17 @@
     if (!S.done) S = blank();
     if (!S.food) S.food = {};
     if (!S.nghe) S.nghe = {};
+    if (!S.yte) S.yte = {};
+    if (!S.kc) S.kc = {};
+    if (!S.test) S.test = {};
+    if (!S.ft) S.ft = { h: [] };
+    if (!S.radio) S.radio = {};
+    if (!S.s10 || !S.s10.h) S.s10 = { h: [] };
   }
   function xpTotal() { var t = 0; for (var k in S.xp) if (S.xp.hasOwnProperty(k)) t += S.xp[k]; return t; }
   function insTotal() { var t = 0; for (var k in S.ins) if (S.ins.hasOwnProperty(k)) t += S.ins[k]; return t; }
   function doneCount() { var n = 0; ALLACTS.forEach(function (a) { if (S.done[a.id]) n++; }); return n; }
-  function tryCount() { var n = 0; for (var k in S.log) if (S.log.hasOwnProperty(k)) n += S.log[k].length; return n; }
+  function tryCount() { var n = 0; for (var k in S.log) if (S.log.hasOwnProperty(k)) S.log[k].forEach(function (e) { if (!e.t) n++; }); return n; }
   var saveT = null;
   function save(now) {
     clearTimeout(saveT);
@@ -63,13 +75,13 @@
       if (IS_DEMO) { rawSet(DEMO_KEY, S); return; }
       PS.save(ID, S);
       PS.report(ID, { xp: xpTotal(), ins: insTotal(), done: doneCount(), total: ALLACTS.length, days: S.days, ver: TC_VER,
-        extra: { job: S.mem ? S.mem.job : '', group: S.mem ? S.mem.g : '', goal: S.mem ? S.mem.goal : '', tries: tryCount(), plan: S.plan || null, food: foodSum(), nghe: ngheSum() } });
+        extra: { job: S.mem ? S.mem.job : '', group: S.mem ? S.mem.g : '', goal: S.mem ? S.mem.goal : '', tries: tryCount(), plan: S.plan || null, food: foodSum(), nghe: ngheSum(), yte: yteSum(), test: testSum(), radio: radioSum(), s10: s10Sum() } });
     };
     if (now) w(); else saveT = setTimeout(w, 250);
   }
   W.addEventListener('ps:change', function (e) { var f = e.detail && e.detail.field; if (f === 'beforeBackup' || f === 'beforeRestore') save(true); if (f === 'profile' || f === 'teacher') render(); });
   W.addEventListener('pagehide', function () { save(true); });
-  D.addEventListener('visibilitychange', function () { if (D.visibilityState === 'hidden') { save(true); if (T && T.fl && T.fl.run) { flPause(); render(); } } });
+  D.addEventListener('visibilitychange', function () { if (D.visibilityState === 'hidden') { save(true); if (T && T.fl && T.fl.run) { flPause(); render(); } if ((T && T.rf && T.rf.run) || (T && T.rb && T.rb.st === 1) || (QS && QS.run)) { rtPauseAll(); render(); } } });
   var lastAct = Date.now();
   ['pointerdown', 'keydown', 'scroll', 'touchstart'].forEach(function (ev) { W.addEventListener(ev, function () { lastAct = Date.now(); }, { passive: true }); });
   setInterval(function () {
@@ -82,10 +94,13 @@
   BAI.forEach(function (b) { b.khu = 'san'; });
   BAI_BEP.forEach(function (b) { b.khu = 'bep'; });
   BAI_NGHE.forEach(function (b) { b.khu = 'nghe'; });
-  var ALLBAI = BAI.concat(BAI_BEP, BAI_NGHE), ALLACTS = [], ACT = {}, BAI_BY = {};
+  BAI_YTE.forEach(function (b) { b.khu = 'yte'; });
+  BAI_TEST.forEach(function (b) { b.khu = 'test'; });
+  BAI_RT.forEach(function (b) { b.khu = 'radio'; });
+  var ALLBAI = BAI.concat(BAI_BEP, BAI_NGHE, BAI_YTE, BAI_TEST, BAI_RT), ALLACTS = [], ACT = {}, BAI_BY = {};
   ALLBAI.forEach(function (b) { BAI_BY[b.id] = b; b.acts.forEach(function (a) { a.bai = b.id; ALLACTS.push(a); ACT[a.id] = a; }); });
   function actById(id) { return ACT[id]; }
-  function baisOf(k) { return k === 'bep' ? BAI_BEP : (k === 'nghe' ? BAI_NGHE : BAI); }
+  function baisOf(k) { return k === 'bep' ? BAI_BEP : (k === 'nghe' ? BAI_NGHE : (k === 'yte' ? BAI_YTE : (k === 'test' ? BAI_TEST : (k === 'radio' ? BAI_RT : BAI)))); }
   function baiDone(b) { if (b.soon || !b.acts.length) return false; for (var i = 0; i < b.acts.length; i++) if (!S.done[b.acts[i].id]) return false; return true; }
   function baiN(b) { var n = 0; b.acts.forEach(function (a) { if (S.done[a.id]) n++; }); return n; }
   function baiCount(k) { var n = 0; baisOf(k || 'san').forEach(function (b) { if (baiDone(b)) n++; }); return n; }
@@ -129,11 +144,12 @@
     if (!S.mem && V.v !== 'join') { V = { v: 'join', step: 0 }; J = J || {}; }
     var h = '';
     if (W.TCYard) TCYard.unmount();
-    SHIN_OUTFIT = curKhu() === 'bep' ? 'apron' : (curKhu() === 'nghe' ? 'helmet' : '');
+    SHIN_OUTFIT = curKhu() === 'bep' ? 'apron' : (curKhu() === 'nghe' ? 'helmet' : (curKhu() === 'yte' ? 'aid' : ''));
     if (V.v === 'join') h = viewJoin();
     else if (V.v === 'khu') h = viewKhu();
     else if (V.v === 'bai') h = viewBai();
     else if (V.v === 'act') h = viewAct();
+    else if (V.v === 's10') h = viewS10();
     else h = viewHome();
     APP.innerHTML = (V.v === 'join' ? '' : topnav()) + '<div class="wrap enter' + (IS_DEMO ? ' wrap--demo' : '') + '">' + h + '</div>' + demoStrip();
     var kids = $$('.wrap.enter > *'); kids.forEach(function (el, i) { el.style.setProperty('--i', Math.min(i, 8)); });
@@ -142,7 +158,7 @@
     if (V.v === 'home') mountYard();
   }
   function afterRender() {
-    if (V.v === 'act') { var a = actById(V.a); if (a && a.k === 'try' && V.step === 1) drawCounter(); }
+    if (V.v === 'act') { var a = actById(V.a); if (a && a.k === 'try' && V.step === 1) drawCounter(); if (a && a.k === 'ft' && T.ft) { if (T.ft.st === 1) drawCounter(); if (T.ft.st === 2) ftDrawRest(); } }
   }
 
   /* =========================================================
@@ -225,7 +241,7 @@
 
   /* ---------- thẻ hội viên (TC01.0.7): thẻ nhựa phòng gym, mặt trước thông tin, mặt sau thẻ đục lỗ ---------- */
   var TIERS = [[0, 'STARTER'], [6, 'REGULAR'], [18, 'ATHLETE'], [36, 'CHAMPION']];
-  var PUNCH = [['san', 'FLOOR'], ['bep', 'KITCHEN'], ['nghe', 'WORK']];
+  var PUNCH = [['san', 'FLOOR'], ['bep', 'KITCHEN'], ['nghe', 'WORK'], ['yte', 'AID'], ['test', 'TEST'], ['radio', 'DECK']];
   function pad2(n) { return (n < 10 ? '0' : '') + n; }
   function stampTotal() { var n = 0; PUNCH.forEach(function (x) { n += baiCount(x[0]); }); return n; }
   function tier() { var n = stampTotal(), t = TIERS[0][1]; TIERS.forEach(function (x) { if (n >= x[0]) t = x[1]; }); return t; }
@@ -243,7 +259,8 @@
   var PT_IC = {
     fl: '<svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c1 4 6 6 6 12a6 6 0 0 1-12 0c0-3 2-5 3-6 0 2 1 3 2 3 0-4-1-6 1-9z" fill="#E8743B"/></svg>',
     st: '<svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17l-5.9 3.3 1.3-6.5L2.5 9.3l6.6-.8z" fill="#D9A514"/></svg>',
-    bu: '<svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z" fill="#7A55D3"/><rect x="8.5" y="18.5" width="7" height="3" rx="1.5" fill="#7A55D3"/></svg>'
+    bu: '<svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z" fill="#7A55D3"/><rect x="8.5" y="18.5" width="7" height="3" rx="1.5" fill="#7A55D3"/></svg>',
+    tm: '<svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13.5" r="8" fill="#348A5F"/><path d="M12 13.5V9.5" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><path d="M10 2.5h4" stroke="#348A5F" stroke-width="2.4" stroke-linecap="round"/></svg>'
   };
   function cardFront() {
     var p = PS.profile(), m = S.mem || {}, t = tier(), nm = p.name || (IS_DEMO ? 'Học viên demo' : given());
@@ -259,7 +276,7 @@
     return '<span class="mc__b"><span class="mc__mag"></span><span class="mc__bin"><span class="punch"><span class="punch__h">PUNCH CARD</span>' +
       PUNCH.map(function (x) { return punchRow(x[0], x[1]); }).join('') + '</span>' +
       '<span class="mc__side"><small>MỤC TIÊU</small><span class="mc__goal">' + esc(m.goal || 'Chưa viết') + '</span>' +
-      '<span class="mc__pts"><span title="Chuỗi ngày">' + PT_IC.fl + (IS_DEMO ? 5 : PS.streak()) + '</span><span title="XP">' + PT_IC.st + xpTotal() + '</span><span title="Insight">' + PT_IC.bu + insTotal() + '</span></span></span></span>' +
+      '<span class="mc__pts"><span title="Chuỗi ngày">' + PT_IC.fl + (IS_DEMO ? 5 : PS.streak()) + '</span><span title="XP">' + PT_IC.st + xpTotal() + '</span><span title="Insight">' + PT_IC.bu + insTotal() + '</span><span title="Buổi tập 10 phút">' + PT_IC.tm + S.s10.h.length + '</span></span></span></span>' +
       '<span class="mc__sig">' + SHIN_SIG + 'HLV SHIN</span></span>';
   }
   /* big: thẻ trong Sổ tay (không móc); still: thẻ ở cảnh trao thẻ (không lật) */
@@ -336,12 +353,13 @@
      ========================================================= */
   function viewHome() {
     var hi = TXT.homeHi[new Date().getDate() % TXT.homeHi.length], cand = [];
-    ['san', 'bep', 'nghe'].forEach(function (k) { var x = nextBai(k); if (x) cand.push(x); });
+    ['san', 'radio', 'bep', 'nghe', 'yte', 'test'].forEach(function (k) { var x = nextBai(k); if (x) cand.push(x); });
     var nb = cand.length ? cand[new Date().getDate() % cand.length] : null;
     return '<button type="button" class="pshome" data-act="psHome">' + ic('arrowL', 15, 2.4) + 'Proskills</button>' +
       shinSays('hi', fill(hi) + (S.mem && S.mem.inj ? '<br><span class="warn-s">' + esc(TXT.injHome) + '</span>' : '')) +
       memCard() +
       (nb ? '<button type="button" class="btn btn--go btn--w glow" data-act="bai" data-id="' + nb.id + '">Gợi ý hôm nay: ' + esc(nb.t) + '</button>' : '<button type="button" class="btn btn--go btn--w" data-act="khu" data-id="san">Ôn lại Sàn tập</button>') +
+      s10Btn() +
       '<h2 class="sec-h">Sơ đồ phòng tập</h2><p class="sec-sub">Chọn phòng nào tập trước cũng được</p>' +
       building(nb ? nb.khu : '') + yardHTML() +
       '<p class="foot">Proskills · TC01 Huấn luyện thể chất · ' + esc(TC_VER) + '<br>Bài làm tự lưu trên trình duyệt của máy này</p>';
@@ -400,6 +418,9 @@
     return back('Sơ đồ phòng tập', 'home') + zoneHead(k, '<div class="zh__bar"><i style="width:' + Math.round(n / L.length * 100) + '%;background:' + (k.col ? k.col[0] : '') + '"></i></div><div class="zh__meta"><b>' + n + '/' + L.length + ' bài xong</b><span>Chọn bài nào trước cũng được</span></div>') +
       (k.id === 'bep' ? shinSays('hi', esc(BEP_TXT.khuSay)) + commitCard() : '') +
       (k.id === 'nghe' ? shinSays('hi', esc(NGHE_TXT.khuSay)) : '') +
+      (k.id === 'yte' ? shinSays('hi', esc(YTE_TXT.khuSay)) : '') +
+      (k.id === 'test' ? shinSays('hi', esc(TEST_TXT.khuSay)) : '') +
+      (k.id === 'radio' ? shinSays('hi', esc(RT_TXT.khuSay)) + s7Card() : '') +
       '<div class="bais">' + L.map(function (b) {
         var dn = baiDone(b), nd = baiN(b);
         if (b.soon) return '<button type="button" class="bai bai--soon" data-act="baiSoon"><span class="bai__ic">' + ic(b.ic, 24) + '</span><span class="bai__tx"><b>' + esc(b.t) + '</b><small>' + esc(b.sub) + '</small><span class="bai__meta"><span class="badge badge--soon">Sắp mở</span></span></span></button>';
@@ -419,7 +440,7 @@
       (S.mem && S.mem.g2 && b.gtip[S.mem.g2] ? '<div class="gtip"><span class="gtip__ic">' + ic(GROUPS[S.mem.g2].ic, 20) + '</span><div><small>Khi làm thêm · ' + esc(GROUPS[S.mem.g2].n) + '</small>' + esc(b.gtip[S.mem.g2]) + '</div></div>' : '') +
       '<div class="acts">' + b.acts.map(function (a, i) {
         var dn = !!S.done[a.id];
-        return '<button type="button" class="act' + (dn ? ' act--done' : '') + '" data-act="act" data-id="' + a.id + '"><span class="act__n">' + (dn ? PS.icon('check', 18, 3) : (i + 1)) + '</span><span><b>' + esc(a.t) + '</b><small>' + esc(KIND[a.k]) + ' · ' + a.min + ' phút · +' + a.xp + ' XP</small></span>' + (dn ? '<span class="badge badge--ok">Xong</span>' : '') + '</button>';
+        return '<button type="button" class="act' + (dn ? ' act--done' : '') + '" data-act="act" data-id="' + a.id + '"><span class="act__n">' + (dn ? PS.icon('check', 18, 3) : (i + 1)) + '</span><span><b>' + esc(a.t) + '</b><small>' + esc(a.kl || KIND[a.k]) + ' · ' + a.min + ' phút · +' + a.xp + ' XP</small></span>' + (dn ? '<span class="badge badge--ok">Xong</span>' : '') + '</button>';
       }).join('') + '</div>' +
       (baiDone(b) ? '<div class="stampbox">' + ic('stamp', 20) + '<span>Bài này đã đục lỗ trên thẻ hội viên. ' + (b.khu === 'san' ? 'Tập lại' : 'Làm lại') + ' lúc nào cũng được.</span></div>' : '') +
       rtSug(b);
@@ -433,7 +454,8 @@
   var KIND = { how: 'Xem cách làm', spot: 'Tìm điểm chưa đúng', 'try': 'Tập thử', order: 'Xếp thứ tự', pick: 'Chọn cách đúng', plan: 'Lên lịch',
     plate: 'Xếp đĩa', meal: 'Bữa của bạn', write: 'Viết ra', calc: 'Máy tính', hilo: 'Cao hay thấp', day: 'Tìm việc chưa ổn', commit: 'Cam kết',
     body: 'Bản đồ cơ thể', ladder: 'Tự định vị', story: 'Senpai kể', flow: 'Tập theo Shin', ca: 'Một ca của mình', habit: 'Chọn thói quen', week: 'Lịch tập tuần',
-    match: 'Ghép cặp', basket: 'Giỏ konbini', label: 'Đọc nhãn', shift: 'Giờ ăn theo ca', bento: 'Xếp hộp cơm', date: 'Đọc hạn dùng' };
+    match: 'Ghép cặp', sim: 'Ca trực', basket: 'Giỏ konbini', label: 'Đọc nhãn', shift: 'Giờ ăn theo ca', bento: 'Xếp hộp cơm', date: 'Đọc hạn dùng', tf: 'Đúng hay sai', quiz: 'Test thử', redo: 'Ôn câu sai', ft: 'Tự test', board: 'Bảng thành tích',
+    beat: 'Bắt nhịp', rtq: 'Thẻ nhanh', rflow: 'Tập theo nhịp', rself: 'Tự chấm', sang7: 'Hẹn tập' };
 
   /* =========================================================
      HOẠT ĐỘNG
@@ -444,10 +466,12 @@
       plan: S.plan ? JSON.parse(JSON.stringify(S.plan)) : { k: '', days: [], slot: -1, txt: '' }, sel: -1, placed: {}, wrong: '', mtab: 0, meal: null, mres: false, hp: {}, okTap: {}, hab: -1, own: '', c: null,
       ms: -1, mm: {}, mw: -1, mlast: -1, bk: {}, lk: {}, lw: '', lseen: {}, sh: null, bt: {}, bw: null,
       bz: (S.nghe && S.nghe.body) ? S.nghe.body.slice() : [], bres: false, lad: {}, lres: false,
-      fl: { i: -1, run: false, rem: -1, end: 0, feel: -1 }, cs: [], cres: false, sch: -1, hb: -1, hown: '', wk: { days: [], slot: -1 } };
+      fl: { i: -1, run: false, rem: -1, end: 0, feel: -1 }, cs: [], cres: false, sch: -1, hb: -1, hown: '', wk: { days: [], slot: -1 }, sm: { i: -1, pick: -1, tried: {}, first: 0, met: 60 },
+      rb: { st: 0, n: 0, hits: {}, taps: 0 }, rq: { i: 0, pick: -1, tried: {}, first: 0 }, rf: { st: 0, tp: 1, mi: 0, g: 0, run: false, feel: -1 }, rs: { c: [-1, -1, -1], need: {} }, s7: { slot: -1 } };
     var NG = S.nghe || {};
     if (a.k === 'ca' && NG.ca && NG.ca.g === grp()) { t.cs = NG.ca.sel.slice(); t.cres = true; t.sch = NG.ca.sch; }
-    if (a.k === 'habit' && NG.habit) { t.txt = NG.habit.txt; t.hb = -2; }
+    var HB0 = a.hl ? (S.yte || {}).habit : NG.habit;
+    if (a.k === 'habit' && HB0) { t.txt = HB0.txt; t.hb = -2; }
     if (a.k === 'week' && NG.week) { t.wk = { days: NG.week.days.slice(), slot: NG.week.slot }; t.txt = NG.week.txt; }
     if (a.k === 'ladder' && S.nghe && S.nghe.lad) { var ol = S.nghe.lad; for (var lk0 in ol) if (ol.hasOwnProperty(lk0)) t.lad[lk0] = ol[lk0]; }
     if (a.k === 'meal') { var m = S.food.meal; t.meal = m ? { sang: m.sang.slice(), trua: m.trua.slice(), toi: m.toi.slice(), skip: JSON.parse(JSON.stringify(m.skip || {})) } : { sang: [], trua: [], toi: [], skip: {} }; }
@@ -459,14 +483,16 @@
     if (a.k === 'bento' && S.food.bento) { var ob = S.food.bento; for (var bk in ob) if (ob.hasOwnProperty(bk)) t.bt[bk] = ob[bk]; }
     if (a.k === 'basket' && S.food.konbini) S.food.konbini.sel.forEach(function (i) { t.bk[i] = 1; });
     if (a.k === 'commit' && S.food.commit) { var cm = S.food.commit; t.txt = cm.txt; t.hab = HABITS.length; t.own = cm.h; HABITS.forEach(function (x, i) { if (x.t === cm.h) { t.hab = i; t.own = ''; } }); }
-    if (t.hb === -2) { var HL = habList(); t.hb = HL.length; t.hown = NG.habit.h; HL.forEach(function (x, i) { if (x.t === NG.habit.h) { t.hb = i; t.hown = ''; } }); }
+    if (a.k === 'rself' && S.radio.self) { t.rs.c = S.radio.self.c.slice(); S.radio.self.need.forEach(function (m) { t.rs.need[m] = 1; }); }
+    if (a.k === 'sang7' && S.radio.s7) { t.s7.slot = S.radio.s7.slot; t.txt = S.radio.s7.txt; }
+    if (t.hb === -2) { var HL = habList(a); t.hb = HL.length; t.hown = HB0.h; HL.forEach(function (x, i) { if (x.t === HB0.h) { t.hb = i; t.hown = ''; } }); }
     return t;
   }
   function openAct(id) { var a = actById(id); T = newT(a); go({ v: 'act', a: id, b: a.bai, step: 0 }); }
   function defaultTryEx(a) { var L = exOf(a); if (L.indexOf('kneepush') >= 0 && sexKey() === 'nu') return 'kneepush'; return L[0]; }
   function actHead(a) {
     var b = BAI_BY[a.bai];
-    return back(b.t, 'bai', ' data-id="' + b.id + '"') + '<div class="ah"><span class="ah__lab">' + esc(khuById(b.khu).t) + ' · ' + esc(KIND[a.k]) + '</span><h1>' + esc(a.t) + '</h1></div>' +
+    return back(b.t, 'bai', ' data-id="' + b.id + '"') + '<div class="ah"><span class="ah__lab">' + esc(khuById(b.khu).t) + ' · ' + esc(a.kl || KIND[a.k]) + '</span><h1>' + esc(a.t) + '</h1></div>' +
       (S.done[a.id] ? '<div class="redo">' + PS.icon('check', 16, 3) + 'Bạn đã làm xong. Làm lại thoải mái, không mất điểm.</div>' : '');
   }
   function viewAct() {
@@ -499,6 +525,17 @@
     else if (a.k === 'ca') h += viewCa(a);
     else if (a.k === 'habit') h += viewHabit(a);
     else if (a.k === 'week') h += viewWeek(a);
+    else if (a.k === 'sim') h += viewSim(a);
+    else if (a.k === 'quiz') h += viewQuiz(a);
+    else if (a.k === 'tf') h += viewTf(a);
+    else if (a.k === 'redo') h += viewRedo(a);
+    else if (a.k === 'ft') h += viewFt(a);
+    else if (a.k === 'board') h += viewBoard(a);
+    else if (a.k === 'beat') h += viewBeat(a);
+    else if (a.k === 'rtq') h += viewRtq(a);
+    else if (a.k === 'rflow') h += viewRflow(a);
+    else if (a.k === 'rself') h += viewRself(a);
+    else if (a.k === 'sang7') h += viewSang7(a);
     return h;
   }
 
@@ -525,7 +562,7 @@
       '<span class="dots">' + E.frames.map(function (f, i) { return '<i class="' + (i === T.fr ? 'on' : (T.seen[exId + i] ? 'seen' : '')) + '"></i>'; }).join('') + '</span>' +
       '<button type="button" class="btn btn--sm" data-act="howFr" data-d="1"' + (T.fr < n - 1 ? '' : ' disabled') + '>Tiếp' + PS.icon('next', 16) + '</button></div></div>' +
       '<div class="card keys"><b class="keys__h">' + ic('stamp', 16) + 'Ba điểm chính</b><ul>' + E.keys.map(function (k) { return '<li>' + esc(k) + '</li>'; }).join('') + '</ul>' +
-      '<a class="ytbtn" href="' + esc(E.yt ? 'https://www.youtube.com/watch?v=' + E.yt : TC_YT) + '" target="_blank" rel="noopener">' + ic('play', 18) + '<span><b>Xem video của thầy cô GDTC</b><small>' + (E.yt ? 'Mở đúng video động tác' : 'Mở kênh video động tác của khóa') + '</small></span>' + PS.icon('ext', 16) + '</a></div>' +
+      (/^rt\d/.test(exId) ? vidBtn() : '<a class="ytbtn" href="' + esc(E.yt ? 'https://www.youtube.com/watch?v=' + E.yt : TC_YT) + '" target="_blank" rel="noopener">' + ic('play', 18) + '<span><b>Xem video của thầy cô GDTC</b><small>' + (E.yt ? 'Mở đúng video động tác' : 'Mở kênh video động tác của khóa') + '</small></span>' + PS.icon('ext', 16) + '</a>') + '</div>' +
       (a.more ? '<p class="morenote">' + esc(a.more) + '</p>' : '') +
       '<button type="button" class="btn btn--go btn--w" data-act="finish"' + (anyDone ? '' : ' disabled') + '>' + (anyDone ? 'Mình xem xong rồi' : 'Xem hết các bước để hoàn thành') + '</button>';
   }
@@ -548,7 +585,7 @@
 
   /* ---------- tập thử cùng Shin ---------- */
   var TIMER = null;
-  function stopTimer() { if (TIMER) { clearInterval(TIMER); TIMER = null; } if (T && T.run) { T.el += Date.now() - T.t0; T.run = false; } if (T && T.fl && T.fl.run) flPause(); }
+  function stopTimer() { if (TIMER) { clearInterval(TIMER); TIMER = null; } if (T && T.run) { T.el += Date.now() - T.t0; T.run = false; } if (T && T.fl && T.fl.run) flPause(); rtPauseAll(); }
   function viewTry(a) {
     var exId = T.tryEx, E = EX[exId], M = MOC[exId] || {}, timeMode = M.u === 's', st = V.step || 0;
     var bar = '<div class="stepbar">' + [0, 1, 2, 3].map(function (i) { return '<i class="' + (i < st ? 'on' : (i === st ? 'cur' : '')) + '"></i>'; }).join('') + '</div>';
@@ -628,7 +665,7 @@
       var o = R.opts[i], on = P === i;
       return '<button type="button" class="opt' + (on ? (o.ok ? ' opt--ok' : ' opt--no') : '') + '" data-act="pick" data-i="' + i + '"' + (chosen && chosen.ok ? ' disabled' : '') + '><span class="dot">' + (on ? PS.icon(o.ok ? 'check' : 'close', 13, 3) : '') + '</span>' + esc(o.t) + '</button>';
     }).join('') + '</div></div>' +
-      (chosen ? (chosen.ok ? '<div class="fb fb--ok">' + esc(chosen.why) + '</div>' + (last ? (a.end ? shinSays('think', esc(a.end), 46) : '') + '<button type="button" class="btn btn--go btn--w" data-act="finish">Hoàn thành</button>' : '<button type="button" class="btn btn--w" data-act="pickNext">Câu tiếp theo</button>') :
+      (chosen ? (chosen.ok ? '<div class="fb fb--ok">' + esc(chosen.why) + '</div>' + (last ? (a.scale ? thangCard() : '') + (a.end ? shinSays('think', esc(a.end), 46) : '') + '<button type="button" class="btn btn--go btn--w" data-act="finish">Hoàn thành</button>' : '<button type="button" class="btn btn--w" data-act="pickNext">Câu tiếp theo</button>') :
         '<div class="fb fb--no"><b>Thử lại nhé.</b> ' + esc(chosen.why) + '</div><p class="qsub" style="text-align:center">Thử chọn lại một cách khác.</p>') : '');
   }
 
@@ -665,12 +702,17 @@
     if (a.k === 'story') { S.refl[a.id] = T.txt; if (words(T.txt) >= 10 && T.txt !== T.tipUsed) ins = 1; }
     if (a.k === 'flow') { S.nghe.fl = S.nghe.fl || {}; S.nghe.fl[a.id] = (S.nghe.fl[a.id] || 0) + 1; }
     if (a.k === 'ca') S.nghe.ca = { g: grp(), sel: T.cs.slice(), sch: T.sch };
-    if (a.k === 'habit') { S.nghe.habit = { h: habName(), txt: T.txt, at: Date.now() }; S.refl[a.id] = T.txt; if (words(T.txt) >= 10 && T.txt !== T.tipUsed) ins = 1; }
+    if (a.k === 'sim') { S.yte.sim = S.yte.sim || {}; S.yte.sim[a.id] = { f: T.sm.first, n: a.steps.length, at: Date.now() }; }
+    if (a.k === 'habit') { (a.hl ? S.yte : S.nghe).habit = { h: habName(), txt: T.txt, at: Date.now() }; S.refl[a.id] = T.txt; if (words(T.txt) >= 10 && T.txt !== T.tipUsed) ins = 1; }
     if (a.k === 'week') { S.nghe.week = { days: T.wk.days.slice().sort(), slot: T.wk.slot, txt: T.txt, at: Date.now() }; if (words(T.txt) >= 10 && T.txt !== T.tipUsed) ins = 1; }
     if (a.k === 'shift' && T.sh) S.food.shift = { s: T.sh.s, l: T.sh.l, pre: T.sh.pre, at: Date.now() };
     if (a.k === 'bento') { S.food.bento = {}; for (var bk2 in T.bt) if (T.bt.hasOwnProperty(bk2)) S.food.bento[bk2] = T.bt[bk2]; }
     if (a.k === 'basket') { var BS = bkSum(a, T.bk), sel = []; for (var bi in T.bk) if (T.bk.hasOwnProperty(bi) && T.bk[bi]) sel.push(+bi); S.food.konbini = { sel: sel, t: BS.t, at: Date.now() }; }
     if (a.k === 'plan') { S.plan = { k: T.plan.k, days: T.plan.days.slice().sort(), slot: T.plan.slot, txt: T.plan.txt, at: Date.now() }; if (words(T.plan.txt) >= 10 && T.plan.txt !== T.tipUsed) ins = 1; }
+    if (a.k === 'beat') S.radio.beat = Math.max(S.radio.beat || 0, T.rb.n || 0);
+    if (a.k === 'rflow') { S.radio.fl = S.radio.fl || {}; S.radio.fl[a.id] = (S.radio.fl[a.id] || 0) + 1; }
+    if (a.k === 'rself') { var nd = []; for (var nk in T.rs.need) if (T.rs.need.hasOwnProperty(nk) && T.rs.need[nk]) nd.push(+nk); S.radio.self = { c: T.rs.c.slice(), need: nd.sort(function (x, y) { return x - y; }), at: Date.now() }; }
+    if (a.k === 'sang7') { var o7 = S.radio.s7; S.radio.s7 = { slot: T.s7.slot, txt: T.txt, at: o7 ? o7.at : Date.now(), days: o7 ? o7.days : {} }; S.refl[a.id] = T.txt; if (words(T.txt) >= 10 && T.txt !== T.tipUsed) ins = 1; }
     if (ins) S.ins[a.id] = 1;
     if (first) { S.done[a.id] = Date.now(); S.xp[a.id] = a.xp; }
     markDay(); save(true);
@@ -808,8 +850,9 @@
 
   /* ---------- viết ra ---------- */
   function writeTips(a) {
-    var tips = [], f = a.dyn === 'nghe' ? null : S.food.meal;
+    var tips = [], f = a.dyn ? null : S.food.meal;
     if (a.dyn === 'nghe') tips = ngheTips();
+    if (a.dyn === 'ft') tips = ftTips();
     if (f) {
       var R = mealReport(f);
       R.gaps.forEach(function (g) {
@@ -914,9 +957,9 @@
       L.map(function (i) { var d = T.mm[i]; return '<button type="button" class="mt__b' + (d ? ' mt__b--ok' : '') + (T.ms === i ? ' on' : '') + '" data-act="mtV" data-i="' + i + '"' + (d ? ' disabled' : '') + '><b>' + esc(a.pairs[i].v) + '</b></button>'; }).join('') +
       '</div><div class="mt__col">' +
       R.map(function (i) { var d = T.mm[i]; return '<button type="button" class="mt__b mt__b--j' + (d ? ' mt__b--ok' : '') + (T.mw === i ? ' mt__b--no' : '') + (T.ms >= 0 && !d ? ' mt__b--ready' : '') + '" data-act="mtJ" data-i="' + i + '"' + (d ? ' disabled' : '') + '>' + jpName(a.pairs[i]) + '</button>'; }).join('') +
-      '</div></div>' + (T.ms >= 0 ? '<p class="pfl">' + (a.sel ? NGHE_TXT[a.sel] : BEP2_TXT.matchSel).replace('[Món]', '<b>' + esc(a.pairs[T.ms].v) + '</b>') + '</p>' : '') + '</div>' +
-      (T.mw >= 0 ? '<div class="fb fb--no">' + esc(a.no ? NGHE_TXT[a.no] : BEP2_TXT.matchNo) + '</div>' : (last ? '<div class="fb fb--ok"><b>Đúng rồi!</b> ' + esc(last.v) + ' ≈ <span class="jp">' + esc(last.j) + '</span>. ' + esc(last.why) + '</div>' : '')) +
-      (all ? shinSays('cheer', esc(a.end ? NGHE_TXT[a.end] : BEP2_TXT.matchEnd), 50) + '<button type="button" class="btn btn--go btn--w" data-act="finish">Hoàn thành</button>' : '');
+      '</div></div>' + (T.ms >= 0 ? '<p class="pfl">' + (a.sel ? TK(a.sel) : BEP2_TXT.matchSel).replace('[Món]', '<b>' + esc(a.pairs[T.ms].v) + '</b>') + '</p>' : '') + '</div>' +
+      (T.mw >= 0 ? '<div class="fb fb--no">' + esc(a.no ? TK(a.no) : BEP2_TXT.matchNo) + '</div>' : (last ? '<div class="fb fb--ok"><b>Đúng rồi!</b> ' + esc(last.v) + ' ≈ <span class="jp">' + esc(last.j) + '</span>. ' + esc(last.why) + '</div>' : '')) +
+      (all ? shinSays('cheer', esc(a.end ? TK(a.end) : BEP2_TXT.matchEnd), 50) + '<button type="button" class="btn btn--go btn--w" data-act="finish">Hoàn thành</button>' : '');
   }
 
   /* ---------- giỏ konbini ---------- */
@@ -1101,7 +1144,7 @@
           '<div class="fb fb--no"><b>Thử lại nhé.</b> ' + esc(ch.why) + '</div><p class="qsub" style="text-align:center">Thử chọn lại một cách khác.</p>') : '');
       return h;
     }
-    return h + shinSays('think', esc(a.end), 48) + writeBox(NGHE_TXT.storyW, NGHE_TXT.storySub, a.tips) +
+    return h + shinSays('think', esc(a.end), 48) + writeBox(a.w ? TK(a.w) : NGHE_TXT.storyW, NGHE_TXT.storySub, a.tips) +
       '<button type="button" class="btn btn--go btn--w" data-act="finish" id="wDone"' + (words(T.txt) >= 3 ? '' : ' disabled') + '>Lưu và hoàn thành</button>';
   }
   function kgInfo() {
@@ -1196,7 +1239,7 @@
   }
 
   /* ---------- chọn 1 thói quen ---------- */
-  function habList() { var g = grp() || 'xuong'; return NHABITS.all.concat([NHABITS[g]]); }
+  function habList(a) { a = a || actById(V.a); var H = a && a.hl ? YHABITS : NHABITS, g = grp() || 'xuong'; return H.all.concat([H[g]]); }
   function viewHabit(a) {
     var L = habList(), own = T.hb === L.length;
     return shinSays('encourage', esc(NGHE2_TXT.habSay), 50) +
@@ -1223,8 +1266,668 @@
   }
   function weekLine(w) { if (!w || !w.days) return ''; return w.days.map(function (i) { return DAYS7[i]; }).join(', ') + ' · ' + (SLOTS[w.slot] || ''); }
 
+
   /* =========================================================
-     SỔ TAY: Tổng quan | Thẻ hội viên | Cài đặt
+     PHÒNG Y TẾ (TC01.1.1): sim "Ca trực" (rẽ nhánh: mỗi lựa chọn có chuyện xảy ra tiếp riêng; chọn chưa đúng thì xem hậu quả rồi quay lại chọn)
+     T.sm = { i: -1 chưa bắt đầu | 0..n-1 tình huống | n xong, pick, tried {i.j: 1}, first (số lần đúng ngay), met (đồng hồ An toàn 10–100) }
+     Lưu ở S.yte.sim[id] = { f, n, at } · Thẻ khẩn cấp ở S.kc (chỉ trên máy, không gửi báo cáo)
+     ========================================================= */
+  function TK(k) { return (RT_TXT[k] != null && BAI_BY[V.b] && BAI_BY[V.b].khu === 'radio' ? RT_TXT[k] : (YTE_TXT[k] != null ? YTE_TXT[k] : NGHE_TXT[k])) || ''; }
+  function smMeter(v) {
+    var lv = v < 40 ? 0 : (v < 70 ? 1 : 2);
+    return '<div class="smm smm--' + lv + '"><span class="smm__l">' + ic('heart', 14) + esc(YTE_TXT.meter) + '</span><span class="smm__bar"><i style="width:' + v + '%"></i></span><b>' + esc(YTE_TXT.meterLv[lv]) + '</b></div>';
+  }
+  function smScene(a) {
+    var c = a.scene || {};
+    return '<div class="sms"><span class="sms__tag">' + PS.icon('bell', 12) + esc(YTE_TXT.simLab) + '</span><span class="sms__p">' + ic(c.ic || 'cross', 15) + esc(c.place || '') + '</span>' +
+      (c.time ? '<span class="sms__t">' + esc(c.time) + '</span>' : '') + (c.tag ? '<span class="sms__x">' + esc(c.tag) + '</span>' : '') + '</div>';
+  }
+  function viewSim(a) {
+    var M = T.sm, n = a.steps.length;
+    if (M.i < 0) {
+      return '<div class="card smc">' + smScene(a) + shinSays('hi', fill(a.intro), 56) +
+        '<p class="qsub" style="text-align:center;margin:8px 0 0">' + esc(YTE_TXT.simSteps.replace('[N]', n)) + '</p></div>' +
+        '<button type="button" class="btn btn--go btn--w" data-act="smGo">' + ic('play', 18) + esc(YTE_TXT.simStart) + '</button>' +
+        '<p class="ps-small" style="text-align:center">' + esc(YTE_TXT.note) + '</p>';
+    }
+    var bar = '<div class="stepbar">' + a.steps.map(function (s, j) { return '<i class="' + (j < M.i ? 'on' : (j === M.i ? 'cur' : '')) + '"></i>'; }).join('') + '</div>';
+    if (M.i >= n) {
+      var all = M.first === n;
+      return '<div class="card smd">' + shin('party', 84, 'hop') + '<p class="q">' + esc(YTE_TXT.first.replace('[N]', M.first).replace('[T]', n)) + '</p>' + smMeter(M.met) + '</div>' +
+        shinSays(all ? 'cheer' : 'encourage', esc(all ? YTE_TXT.firstAll : YTE_TXT.firstSome), 48) +
+        '<div class="card smf"><b class="smf__h">' + ic('cross', 18) + esc(YTE_TXT.fileH) + '</b><ol>' + a.steps.map(function (s) { var k = ''; s.opts.forEach(function (o) { if (o.ok) k = o.key || o.t; }); return '<li>' + esc(k) + '</li>'; }).join('') + '</ol>' +
+        '<p class="smf__end">' + esc(a.end) + '</p></div>' +
+        '<button type="button" class="btn btn--go btn--w" data-act="finish">Hoàn thành</button>';
+    }
+    var S0 = a.steps[M.i], ord = seedShuffle(S0.opts.map(function (o, i) { return i; }), a.id + 'm' + M.i), P = M.pick, ch = P >= 0 ? S0.opts[P] : null;
+    var h = bar + '<div class="card smc">' + smScene(a) + smMeter(M.met) + '<p class="sm__say">' + esc(S0.say) + '</p></div>' +
+      '<div class="card"><p class="qsub">Tình huống ' + (M.i + 1) + '/' + n + '</p><p class="q">' + esc(S0.q) + '</p><div class="opts">' + ord.map(function (i) {
+        var o = S0.opts[i], on = P === i, tr = !on && M.tried[M.i + '.' + i];
+        return '<button type="button" class="opt' + (on ? (o.ok ? ' opt--ok' : ' opt--no') : '') + (tr ? ' opt--tried' : '') + '" data-act="smPick" data-i="' + i + '"' + (ch ? ' disabled' : '') + '><span class="dot">' + (on || tr ? PS.icon(o.ok ? 'check' : 'close', 13, 3) : '') + '</span>' + esc(o.t) + '</button>';
+      }).join('') + '</div></div>';
+    if (!ch) return h;
+    var last = M.i >= n - 1;
+    return h + '<div class="card smr smr--' + (ch.ok ? 'ok' : 'no') + '" id="smRes"><span class="smr__h">' + esc(ch.ok ? YTE_TXT.resOk : YTE_TXT.resNo) + '</span><p class="smr__t">' + esc(ch.res) + '</p>' +
+      '<div class="fb ' + (ch.ok ? 'fb--ok"><b>Đúng rồi!</b> ' : 'fb--no"><b>Thử lại nhé.</b> ') + esc(ch.why) + '</div></div>' +
+      (ch.ok ? '<button type="button" class="btn btn--go btn--w" data-act="smNext">' + esc(last ? YTE_TXT.toFile : YTE_TXT.next) + '</button>' :
+        '<button type="button" class="btn btn--w" data-act="smBack">' + ic('arrowL', 15, 2.4) + esc(YTE_TXT.retry) + '</button>');
+  }
+  function smPick(i) {
+    var a = actById(V.a), M = T.sm, o = a.steps[M.i].opts[i], k = M.i + '.' + i, firstTry = true, kk;
+    for (kk in M.tried) if (M.tried.hasOwnProperty(kk) && kk.indexOf(M.i + '.') === 0) firstTry = false;
+    M.pick = i;
+    if (o.ok) { if (firstTry) M.first++; M.met = Math.min(100, M.met + (firstTry ? 10 : 4)); sfx('ting'); }
+    else { if (!M.tried[k]) M.met = Math.max(10, M.met - 15); M.tried[k] = 1; sfx('pop'); }
+    render();
+    var el = $('#smRes'); if (el && el.scrollIntoView) { try { el.scrollIntoView({ behavior: RM ? 'auto' : 'smooth', block: 'center' }); } catch (er) { el.scrollIntoView(false); } }
+  }
+  function yteSum() {
+    var y = S.yte || {}, sim = y.sim || {}, o = {}, k;
+    for (k in sim) if (sim.hasOwnProperty(k)) o[k] = sim[k].f + '/' + sim[k].n;
+    return { sim: o, bai: baiCount('yte'), habit: y.habit ? y.habit.h : '' };
+  }
+  function nbYte() {
+    var y = S.yte || {}, sim = y.sim || {}, L = [], h = '<div class="nbsec"><h3>' + esc(YTE_TXT.nbH) + '</h3>';
+    BAI_YTE.forEach(function (b) { b.acts.forEach(function (a) { if (a.k === 'sim' && sim[a.id]) L.push('<li><span>' + esc(b.t) + '</span><b>' + sim[a.id].f + '/' + sim[a.id].n + ' đúng ngay</b></li>'); }); });
+    var hb = y.habit ? '<p class="ps-small" style="margin-top:8px">' + esc(YTE_TXT.nbHab) + ' <b>' + esc(y.habit.h) + '</b></p>' : '';
+    if (!L.length) return h + '<p class="ps-small">' + esc(YTE_TXT.nbNone) + '</p>' + hb + '</div>';
+    return h + '<p class="ps-small">' + esc(YTE_TXT.nbFiles) + '</p><ul class="kv">' + L.join('') + '</ul>' + hb + '</div>';
+  }
+  function thangCard() {
+    return '<div class="card thang"><b class="thang__h">' + ic('gauge', 18) + esc(THANG.h) + '</b><p class="ps-small">' + esc(THANG.sub) + '</p><ol>' +
+      THANG.lv.map(function (L, i) { return '<li class="thang__i thang__i--' + (i + 1) + '"><span class="thang__n">' + (i + 1) + '</span><span><b>' + esc(L.t) + '</b><small>' + esc(L.e) + '</small><span class="thang__d">' + esc(L.d) + '</span></span></li>'; }).join('') + '</ol></div>';
+  }
+  function nbKc() {
+    var c = S.kc || {};
+    return '<div class="kc"><div class="kc__h">' + ic('cross', 22, 2.4) + '<div><b>' + esc(KC.h) + '</b><small>' + esc(KC.sub) + '</small></div></div>' +
+      KC.nums.map(function (x) { return '<div class="kc__n"><span class="kc__no">' + esc(x.n) + '</span><span><b>' + esc(x.v) + '</b> <span class="jp">' + esc(x.j) + '</span><small>' + esc(x.d) + '</small></span></div>'; }).join('') + '</div>' +
+      '<div class="nbsec"><h3>' + esc(KC.sayH) + '</h3><p class="ps-small">' + esc(KC.saySub) + '</p><ul class="kcs">' +
+      KC.say.map(function (x) { return '<li><span class="jp">' + esc(x.j) + '</span><small class="kana">' + esc(x.k + ' · ' + x.r) + '</small><span>' + esc(x.v) + '</span></li>'; }).join('') + '</ul></div>' +
+      '<div class="nbsec"><h3>' + esc(KC.myH) + '</h3>' + KC.fields.map(function (f) {
+        return '<label class="kcf"><span>' + esc(f.l) + '</span><textarea class="inp' + (f.big ? ' kcf__big' : '') + '" rows="' + (f.big ? 2 : 1) + '" maxlength="160" data-kc="' + f.k + '" placeholder="' + esc(f.ph) + '">' + esc(c[f.k] || '') + '</textarea></label>';
+      }).join('') + '<p class="ps-small" id="kcMsg">' + esc(KC.note) + '</p></div>' + thangCard();
+  }
+
+  /* =========================================================
+     PHÒNG TEST (TC01.1.3): tf (Đúng hay sai, phản hồi ngay) · quiz (test thử như đề lớp GDTC, chấm khi nộp) · redo (ôn câu đã sai)
+     Ngân hàng QB.dd / QB.sk, câu Đúng/Sai QTF.dd / QTF.sk (content.js). o[0] là đáp án đúng, xáo khi hiện.
+     T.qz = { st: 0 giới thiệu | 1 làm bài | 2 kết quả, L [{id, ord}], i, ans {chỉ số câu: chỉ số đáp án}, sc, pr, miss }
+     T.tq = { L [id], i, pick (-1 | 0 Sai | 1 Đúng), ok }   T.rd = { st, L [{id, ord}], i, pick, tried {}, first, n }
+     Lưu S.test = { q: {id hoạt động: {b tốt nhất, l lần cuối, n số câu, k số lần, at}}, w: {mã câu: 1} câu cần ôn, tf: {id: {b, n}} }
+     ========================================================= */
+  var QBY = {}, TFY = {};
+  ['dd', 'sk'].forEach(function (k) { QB[k].forEach(function (q) { q.bk = k; QBY[q.id] = q; }); QTF[k].forEach(function (q) { TFY[q.id] = q; }); });
+  function shuf(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  function qItem(q) { return { id: q.id, ord: shuf(q.o.map(function (x, i) { return i; })) }; }
+  function qDraw(a) {
+    var L = a.bank === 'mix' ? shuf(shuf(QB.dd).slice(0, a.n / 2).concat(shuf(QB.sk).slice(0, a.n / 2))) : shuf(QB[a.bank]).slice(0, a.n);
+    return L.map(qItem);
+  }
+  function TT() { if (!S.test) S.test = {}; var t = S.test; if (!t.q) t.q = {}; if (!t.w) t.w = {}; if (!t.tf) t.tf = {}; return t; }
+  function wrongIds() { var w = TT().w, L = [], k; for (k in w) if (w.hasOwnProperty(k) && QBY[k]) L.push(k); return L; }
+  function srcBtn(q) {
+    var b = BAI_BY[q.s]; if (!b || b.soon) return '';
+    return '<button type="button" class="qsrc" data-act="bai" data-id="' + b.id + '">' + ic(b.ic, 14) + '<span>' + esc(TEST_TXT.revGo) + ' ' + esc(khuById(b.khu).t) + ' › ' + esc(b.t) + '</span></button>';
+  }
+  function tFill(s, o) { s = String(s); for (var k in o) if (o.hasOwnProperty(k)) s = s.split('[' + k + ']').join(o[k]); return s; }
+
+  /* ---------- quiz: test thử ---------- */
+  function viewQuiz(a) {
+    if (!T.qz) T.qz = { st: 0, L: [], i: 0, ans: {}, sc: 0, pr: false, miss: false };
+    var Q = T.qz, R = TT().q[a.id], X = TEST_TXT;
+    if (Q.st === 0) {
+      return '<div class="card qzin"><span class="qzin__ic">' + ic(BAI_BY[a.bai].ic, 30) + '</span><p class="q">' + esc(a.t) + '</p>' +
+        '<p class="qsub">' + esc(tFill(X.qzInfo, { N: a.n })) + '</p><p class="qzin__mark">' + PS.icon('star', 14) + esc(tFill(X.qzMark, { P: a.pass, N: a.n })) + '</p>' +
+        (R ? '<ul class="kv qzin__kv"><li><span>' + esc(X.qzLast) + '</span><b>' + R.l + '/' + R.n + '</b></li><li><span>' + esc(X.qzBest) + '</span><b>' + R.b + '/' + R.n + (R.b >= a.pass ? ' · ' + esc(X.pass) : '') + '</b></li><li><span>' + esc(X.qzTries) + '</span><b>' + R.k + '</b></li></ul>' : '') + '</div>' +
+        shinSays('think', esc(X.qzSay), 48) +
+        '<button type="button" class="btn btn--go btn--w" data-act="qzGo">' + ic('play', 18) + esc(X.qzStart) + '</button>';
+    }
+    if (Q.st === 2) return quizResult(a);
+    var n = Q.L.length, it = Q.L[Q.i], q = QBY[it.id], P = Q.ans[Q.i], nA = 0, k;
+    for (k in Q.ans) if (Q.ans.hasOwnProperty(k)) nA++;
+    var last = Q.i >= n - 1, all = nA >= n;
+    return '<div class="qzhd"><b>Câu ' + (Q.i + 1) + '/' + n + '</b><span>Đã chọn ' + nA + '/' + n + '</span></div><div class="qzbar"><i style="width:' + Math.round(nA / n * 100) + '%"></i></div>' +
+      '<div class="card"><p class="q">' + esc(q.q) + '</p><div class="opts">' + it.ord.map(function (oi) {
+        return '<button type="button" class="opt opt--q' + (P === oi ? ' on' : '') + '" data-act="qzPick" data-i="' + oi + '" aria-pressed="' + (P === oi) + '"><span class="dot"><i></i></span>' + esc(q.o[oi]) + '</button>';
+      }).join('') + '</div></div>' +
+      '<div class="btnrow"><button type="button" class="btn btn--soft" data-act="qzMove" data-d="-1"' + (Q.i ? '' : ' disabled') + '>' + PS.icon('back', 16) + esc(X.qzPrev) + '</button>' +
+      (last ? '<button type="button" class="btn btn--go" data-act="qzSubmit">' + esc(X.qzSubmit) + '</button>' : '<button type="button" class="btn" data-act="qzMove" data-d="1"' + (P >= 0 ? '' : ' disabled') + '>' + esc(X.qzNext) + PS.icon('next', 16) + '</button>') + '</div>' +
+      '<div class="qzgrid" aria-label="Chọn câu">' + Q.L.map(function (x, j) { var on = Q.ans[j] >= 0; return '<button type="button" class="' + (on ? 'on' : (Q.miss ? 'miss' : '')) + (j === Q.i ? ' cur' : '') + '" data-act="qzJump" data-i="' + j + '" aria-label="Câu ' + (j + 1) + '">' + (j + 1) + '</button>'; }).join('') + '</div>' +
+      '<p class="qsub qzleft">' + esc(all ? tFill(X.qzAll, { N: n }) : tFill(X.qzLeft, { N: n - nA })) + '</p>' +
+      (all && !last ? '<button type="button" class="btn btn--go btn--w" data-act="qzSubmit">' + esc(X.qzSubmit) + '</button>' : '');
+  }
+  function quizSubmit() {
+    var a = actById(V.a), Q = T.qz, n = Q.L.length, nA = 0, k;
+    for (k in Q.ans) if (Q.ans.hasOwnProperty(k)) nA++;
+    if (nA < n) { Q.miss = true; for (var j = 0; j < n; j++) if (!(Q.ans[j] >= 0)) { Q.i = j; break; } render(true); PS.toast(tFill(TEST_TXT.qzLeft, { N: n - nA }), 2600); return; }
+    var sc = 0, t = TT();
+    Q.L.forEach(function (it, j) { if (Q.ans[j] === 0) { sc++; delete t.w[it.id]; } else t.w[it.id] = 1; });
+    var R = t.q[a.id] || { b: 0, l: 0, n: n, k: 0 };
+    Q.pr = R.k > 0 && sc > R.b;
+    t.q[a.id] = { b: Math.max(R.b, sc), l: sc, n: n, k: R.k + 1, at: Date.now() };
+    Q.sc = sc; Q.st = 2; markDay(); save(true);
+    sfx(sc >= a.pass ? 'ting' : 'pop');
+    render(true);
+  }
+  function quizResult(a) {
+    var Q = T.qz, X = TEST_TXT, n = Q.L.length, ok = Q.sc >= a.pass, W = [];
+    Q.L.forEach(function (it, j) { if (Q.ans[j] !== 0) W.push({ q: QBY[it.id], p: Q.ans[j] }); });
+    var mk = '<div class="qmark"><div class="qmark__bar"><i style="width:' + Math.round(Q.sc / n * 100) + '%"></i><span style="left:' + (a.pass / n * 100) + '%"></span></div><p class="ps-small">' + esc(tFill(X.qzMark, { P: a.pass, N: n })) + '</p></div>';
+    return '<div class="card res qres">' + shin(ok ? 'party' : 'encourage', 76, 'hop') + '<span class="ah__lab">Kết quả</span><div class="res__n">' + Q.sc + '<small>/' + n + '</small></div>' +
+      '<span class="qpass' + (ok ? ' qpass--ok' : '') + '">' + PS.icon(ok ? 'check' : 'info', 14, 2.6) + esc(ok ? X.pass : X.fail) + '</span>' + (Q.pr ? ' <span class="prtag">' + PS.icon('star', 14) + esc(TXT.pr) + '</span>' : '') + mk + '</div>' +
+      shinSays(ok ? 'cheer' : 'encourage', esc(!W.length ? X.allSay : (ok ? X.passSay : X.failSay)), 46) +
+      (W.length ? '<div class="card qrev"><b class="qrev__h">' + PS.icon('bulb', 16) + esc(X.revH) + ' (' + W.length + ')</b><ol>' + W.map(function (w) {
+        return '<li><p class="qrev__q">' + esc(w.q.q) + '</p><p class="qrev__you">' + esc(X.revYou) + ' ' + esc(w.q.o[w.p]) + '</p><p class="qrev__ok">' + esc(X.revOk) + ' <b>' + esc(w.q.o[0]) + '</b></p><p class="qrev__why">' + esc(w.q.why) + '</p>' + srcBtn(w.q) + '</li>';
+      }).join('') + '</ol></div>' : '') +
+      '<div class="btnrow"><button type="button" class="btn btn--soft" data-act="qzAgain">' + esc(X.again) + '</button><button type="button" class="btn btn--go" data-act="finish">Hoàn thành</button></div>';
+  }
+
+  /* ---------- tf: Đúng hay sai ---------- */
+  function viewTf(a) {
+    if (!T.tq) T.tq = { L: shuf(QTF[a.bank]).slice(0, a.n).map(function (x) { return x.id; }), i: 0, pick: -1, ok: 0 };
+    var Q = T.tq, X = TEST_TXT, n = Q.L.length;
+    if (Q.i >= n) {
+      var R = TT().tf[a.id];
+      return '<div class="card res qres">' + shin(Q.ok >= n - 2 ? 'party' : 'cheer', 76, 'hop') + '<span class="ah__lab">Kết quả</span><div class="res__n">' + Q.ok + '<small>/' + n + '</small></div>' +
+        '<p class="qsub">' + esc(tFill(X.tfRes, { N: Q.ok, T: n })) + (R ? ' · Tốt nhất ' + R.b + '/' + R.n : '') + '</p></div>' +
+        shinSays('think', esc(X.tfSay), 46) +
+        '<div class="btnrow"><button type="button" class="btn btn--soft" data-act="tfAgain">' + esc(X.tfAgain) + '</button><button type="button" class="btn btn--go" data-act="finish">Hoàn thành</button></div>';
+    }
+    var q = TFY[Q.L[Q.i]], P = Q.pick, done = P >= 0, right = done && P === q.v;
+    return '<div class="stepbar">' + Q.L.map(function (x, j) { return '<i class="' + (j < Q.i ? 'on' : (j === Q.i ? 'cur' : '')) + '"></i>'; }).join('') + '</div>' +
+      '<div class="card tfc' + (done ? (right ? ' tfc--ok' : ' tfc--no') : '') + '"><span class="qsub">Câu ' + (Q.i + 1) + '/' + n + ' · ' + esc(X.tfQ) + '</span><p class="tfc__t">' + esc(q.t) + '</p></div>' +
+      '<div class="tfb">' + [[1, X.tfYes, 'check'], [0, X.tfNo, 'close']].map(function (b) {
+        var cls = done ? (b[0] === q.v ? ' tfb__b--ok' : (b[0] === P ? ' tfb__b--no' : ' tfb__b--off')) : '';
+        return '<button type="button" class="tfb__b tfb__b--' + (b[0] ? 'y' : 'n') + cls + '" data-act="tfPick" data-v="' + b[0] + '"' + (done ? ' disabled' : '') + '>' + PS.icon(b[2], 22, 3) + '<b>' + esc(b[1]) + '</b></button>';
+      }).join('') + '</div>' +
+      (done ? '<div class="fb ' + (right ? 'fb--ok"><b>Đúng rồi!</b> ' : 'fb--no"><b>Thử lại nhé.</b> ' + esc(tFill(X.tfIs, { V: q.v ? 'đúng' : 'sai' })) + ' ') + esc(q.why) + '</div>' +
+        '<button type="button" class="btn btn--w' + (Q.i >= n - 1 ? ' btn--go' : '') + '" data-act="tfNext">' + esc(Q.i >= n - 1 ? X.tfEnd : X.tfNext) + '</button>' : '');
+  }
+  function tfEnd(a) { var Q = T.tq, t = TT(), R = t.tf[a.id]; t.tf[a.id] = { b: Math.max(R ? R.b : 0, Q.ok), n: Q.L.length, at: Date.now() }; markDay(); save(true); }
+
+  /* ---------- redo: ôn câu đã sai ---------- */
+  function viewRedo(a) {
+    if (!T.rd) T.rd = { st: 0, L: [], i: 0, pick: -1, tried: {}, first: 0, n: 0 };
+    var M = T.rd, X = TEST_TXT, W = wrongIds();
+    if (M.st === 0) {
+      return '<div class="card qzin"><span class="qzin__ic">' + ic('stamp', 30) + '</span><p class="q">' + esc(a.t) + '</p>' +
+        (W.length ? '<p class="qsub">' + esc(tFill(X.rdHave, { N: W.length })) + '</p>' : '') + '</div>' +
+        (W.length ? '<button type="button" class="btn btn--go btn--w" data-act="rdGo" data-m="w">' + ic('play', 18) + esc(X.rdGo) + '</button>' +
+          '<button type="button" class="link" data-act="rdGo" data-m="r">' + esc(X.rdRand) + '</button>' :
+          shinSays('think', esc(X.rdNone), 46) + '<button type="button" class="btn btn--go btn--w" data-act="rdGo" data-m="r">' + ic('play', 18) + esc(X.rdRand) + '</button>');
+    }
+    var n = M.L.length;
+    if (M.i >= n) {
+      var left = wrongIds().length;
+      return '<div class="card res qres">' + shin('party', 76, 'hop') + '<span class="ah__lab">Kết quả</span><div class="res__n">' + M.first + '<small>/' + n + '</small></div>' +
+        '<p class="qsub">' + esc(tFill(X.rdEnd, { N: n, F: M.first })) + '</p></div>' +
+        shinSays(left ? 'encourage' : 'cheer', esc(left ? tFill(X.rdLeft, { N: left }) : X.rdClear), 46) +
+        '<button type="button" class="btn btn--go btn--w" data-act="finish">Hoàn thành</button>';
+    }
+    var it = M.L[M.i], q = QBY[it.id], P = M.pick, ch = P >= 0, ok = ch && P === 0;
+    return '<div class="stepbar">' + M.L.map(function (x, j) { return '<i class="' + (j < M.i ? 'on' : (j === M.i ? 'cur' : '')) + '"></i>'; }).join('') + '</div>' +
+      '<div class="card"><p class="qsub">Câu ' + (M.i + 1) + '/' + n + '</p><p class="q">' + esc(q.q) + '</p><div class="opts">' + it.ord.map(function (oi) {
+        var on = P === oi, tr = !on && M.tried[M.i + '.' + oi];
+        return '<button type="button" class="opt' + (on ? (oi === 0 ? ' opt--ok' : ' opt--no') : '') + (tr ? ' opt--tried' : '') + '" data-act="rdPick" data-i="' + oi + '"' + (ok ? ' disabled' : '') + '><span class="dot">' + (on || tr ? PS.icon(oi === 0 ? 'check' : 'close', 13, 3) : '') + '</span>' + esc(q.o[oi]) + '</button>';
+      }).join('') + '</div></div>' +
+      (ch ? (ok ? '<div class="fb fb--ok"><b>Đúng rồi!</b> ' + esc(q.why) + '</div>' + srcBtn(q) + '<button type="button" class="btn btn--w' + (M.i >= n - 1 ? ' btn--go' : '') + '" data-act="rdNext">' + esc(M.i >= n - 1 ? TEST_TXT.tfEnd : TEST_TXT.tfNext) + '</button>' :
+        '<div class="fb fb--no"><b>Thử lại nhé.</b> ' + esc(X.rdRetry) + '</div>') : '');
+  }
+  function rdPick(i) {
+    var M = T.rd, it = M.L[M.i], t = TT(), firstTry = true, k;
+    for (k in M.tried) if (M.tried.hasOwnProperty(k) && k.indexOf(M.i + '.') === 0) firstTry = false;
+    M.pick = i;
+    if (i === 0) { if (firstTry) { M.first++; delete t.w[it.id]; save(); } sfx('ting'); }
+    else { M.tried[M.i + '.' + i] = 1; t.w[it.id] = 1; save(); sfx('pop'); }
+    render();
+  }
+  function testSum() {
+    var t = S.test || {}, q = t.q || {}, o = {}, k;
+    for (k in q) if (q.hasOwnProperty(k)) o[k] = q[k].b + '/' + q[k].n + ' · ' + q[k].k + ' lần';
+    return { best: o, wrong: wrongIds().length, bai: baiCount('test'), ft: ftSum() };
+  }
+  function nbTest() {
+    var t = S.test || {}, q = t.q || {}, tf = t.tf || {}, L = [], h = '<div class="nbsec"><h3>' + esc(TEST_TXT.nbH) + '</h3>';
+    BAI_TEST.forEach(function (b) { b.acts.forEach(function (a) {
+      if (a.k === 'quiz' && q[a.id]) L.push('<li><span>' + esc(a.t) + '</span><b>' + q[a.id].b + '/' + q[a.id].n + (q[a.id].b >= a.pass ? ' · Đạt' : '') + '</b></li>');
+      if (a.k === 'tf' && tf[a.id]) L.push('<li><span>' + esc(b.t.replace('Test thử ', '')) + ' · Đúng hay sai</span><b>' + tf[a.id].b + '/' + tf[a.id].n + '</b></li>');
+    }); });
+    var w = wrongIds().length;
+    if (!L.length) return h + '<p class="ps-small">' + esc(TEST_TXT.nbNone) + '</p></div>';
+    return h + '<ul class="kv">' + L.join('') + '<li><span>' + esc(TEST_TXT.nbWrong) + '</span><b>' + w + '</b></li></ul></div>';
+  }
+
+
+  /* =========================================================
+     TỰ TEST THỂ LỰC (TC01.1.4): ft (một buổi test nhiều bài) · board (thẻ thành tích)
+     FT, FT_TXT ở content.js. T.ft = { st: 0 giới thiệu | 1 đang làm bài i | 2 kết quả bài i, nghỉ | 3 tổng kết, i, r {khóa: số | -1 bỏ qua}, rs (giờ bắt đầu nghỉ), feel, rec (đã lưu) }
+     Lưu S.ft = { h: [{ d, a: id hoạt động, lv, r {khóa: số}, f }] } (tối đa 40 buổi). Mỗi số cũng ghi vào S.log[ex] (t: 1) để Kỷ lục cá nhân cập nhật.
+     ========================================================= */
+  function FTS() { if (!S.ft) S.ft = { h: [] }; if (!S.ft.h) S.ft.h = []; return S.ft; }
+  function ftEx(k) { var f = FT[k], e = f.ex; return e && typeof e === 'object' ? e[sexKey()] : e; }
+  function ftName(k) { var f = FT[k]; return sexKey() === 'nu' && f.nuN ? f.nuN : f.n; }
+  function ftFmt(k, v) { return FT[k].u === 's' ? fmtT(v) : v + ' cái'; }
+  function ftGoal(k) { var f = FT[k]; if (f.dat) return f.dat[sexKey()]; var M = MOC[ftEx(k)]; return M && M[sexKey()] ? M[sexKey()][1] : 0; }
+  function ftHist(k) { var L = []; FTS().h.forEach(function (e) { if (e.r && e.r[k] > 0) L.push(e.r[k]); }); return L; }
+  function ftBest(k) { var b = 0; ftHist(k).forEach(function (v) { if (v > b) b = v; }); return b; }
+  function ftMark(k, v) {
+    var g = ftGoal(k), f = FT[k];
+    if (!g || !(v > 0)) return '';
+    if (f.lad) { var mk = MOC[ftEx(k)][sexKey()], lv = v >= mk[2] ? 2 : (v >= mk[1] ? 1 : 0); return '<span class="qpass' + (lv ? ' qpass--ok' : '') + '">' + esc(MOC_LAB[lv]) + '</span>'; }
+    return v >= g ? '<span class="qpass qpass--ok">' + PS.icon('check', 13, 2.6) + esc(FT_TXT.dat) + '</span>' : '<span class="qpass">' + esc(tFill(FT_TXT.near, { N: f.u === 's' ? fmtT(g - v) : (g - v) + ' cái' })) + '</span>';
+  }
+  function ftLadder(k, v) {
+    var f = FT[k], ex = ftEx(k), M = MOC[ex] || {}, sx = sexKey() === 'nu' ? 'nữ' : 'nam';
+    if (f.lad && M[sexKey()]) {
+      var mk = M[sexKey()], mx = mk[2] * 1.25, pos = Math.min(100, v / mx * 100);
+      return '<div class="moc"><div class="moc__bar"><i style="width:' + pos + '%"></i>' + mk.map(function (x, i) { return '<span class="moc__m moc__m--' + i + '" style="left:' + (x / mx * 100) + '%"></span>'; }).join('') + '</div>' +
+        '<div class="moc__leg">' + mk.map(function (x, i) { return '<span class="moc__l moc__l--' + i + '"><i></i>' + MOC_LAB[i] + ' <b>' + ftFmt(k, x) + '</b></span>'; }).join('') + '</div></div>';
+    }
+    var g = ftGoal(k); if (!g) return '';
+    var mx2 = g * 1.25, p2 = Math.min(100, v / mx2 * 100);
+    return '<div class="moc"><div class="moc__bar"><i style="width:' + p2 + '%"></i><span class="moc__m moc__m--2" style="left:' + (g / mx2 * 100) + '%"></span></div>' +
+      '<div class="moc__leg"><span class="moc__l moc__l--2"><i></i>Mốc Đạt <b>' + ftFmt(k, g) + '</b></span></div></div>';
+  }
+  function ftSrc(a) { var sx = sexKey() === 'nu' ? 'nữ' : 'nam'; return tFill(a.lv === 'sb' ? FT_TXT.ladSrc : FT_TXT.inSrc, { S: sx }); }
+  function ftFig(k, w) { var ex = ftEx(k); return ex && EX[ex] ? frameFig(EX[ex].frames[0], w) : '<span class="ft__noimg">' + ic(BAI_BY.t4.ic, 34) + '</span>'; }
+  function viewFt(a) {
+    if (!T.ft) T.ft = { st: 0, i: 0, r: {}, rs: 0, feel: -1, rec: -1 };
+    var F = T.ft, X = FT_TXT, n = a.items.length;
+    var bar = '<div class="stepbar">' + a.items.map(function (x, j) { return '<i class="' + (F.st === 3 || j < F.i || (j === F.i && F.st === 2) ? 'on' : (j === F.i && F.st ? 'cur' : '')) + '"></i>'; }).join('') + '</div>';
+    if (F.st === 0) {
+      return '<div class="card qzin"><span class="qzin__ic">' + ic(BAI_BY[a.bai].ic, 30) + '</span><p class="q">' + esc(a.t) + '</p>' +
+        '<ul class="ftl">' + a.items.map(function (k, j) { var b = ftBest(k), g = ftGoal(k); return '<li><span class="ftl__n">' + (j + 1) + '</span><span class="ftl__t"><b>' + esc(ftName(k)) + '</b><small>' + (FT[k].lad ? 'Thang Yếu · Trung bình · Tốt' : 'Mốc Đạt ' + ftFmt(k, g)) + (b ? ' · Tốt nhất ' + ftFmt(k, b) : '') + '</small></span></li>'; }).join('') + '</ul>' +
+        '<p class="ps-small">' + esc(ftSrc(a)) + '</p>' + (a.note ? '<p class="ps-small">' + esc(a.note) + '</p>' : '') + '</div>' +
+        (S.mem && S.mem.inj ? shinSays('encourage', esc(TXT.injHome), 46) : '') +
+        shinSays('think', esc(X.inSay), 46) +
+        '<div class="btnrow"><button type="button" class="btn btn--soft" data-act="act" data-id="b1a">' + esc(X.warm) + '</button><button type="button" class="btn btn--go" data-act="ftGo">' + esc(X.go) + '</button></div>';
+    }
+    if (F.st === 3) return bar + ftSummary(a);
+    var k = a.items[F.i], f = FT[k], ex = ftEx(k), E = ex ? EX[ex] : null, tm = f.u === 's';
+    var head = '<div class="qzhd"><b>Bài ' + (F.i + 1) + '/' + n + ' · ' + esc(ftName(k)) + '</b><span>' + (f.lad ? '' : 'Mốc Đạt ' + ftFmt(k, ftGoal(k))) + '</span></div>';
+    if (F.st === 1) {
+      return bar + head + '<div class="card"><div class="mini">' + ftFig(k, 140) + (E ? '<ul>' + E.keys.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' : '<p class="ps-small">' + esc(f.how) + '</p>') + '</div></div>' +
+        '<div class="card cnt">' +
+        (tm ? '<p class="qsub">' + esc(X.sec) + '</p><div class="clock" id="cClock">' + fmtClock(T.el) + '</div>' +
+          '<div class="btnrow"><button type="button" class="btn btn--go" data-act="tStart" id="cStart">' + (T.run ? 'Dừng' : (T.el ? 'Tiếp tục' : 'Bắt đầu')) + '</button><button type="button" class="btn btn--soft" data-act="tReset">Làm lại</button></div>' :
+          '<p class="qsub">' + esc(X.rep) + '</p><button type="button" class="tap" data-act="tap" id="cTap"><b id="cN">' + T.n + '</b><small>chạm +1</small></button>' +
+          '<div class="btnrow btnrow--c"><button type="button" class="btn btn--soft btn--sm" data-act="tapMinus">Bớt 1</button><label class="numin">Nhập số<input class="inp" id="cNin" inputmode="numeric" maxlength="3" value=""></label></div>') +
+        '</div><button type="button" class="btn btn--w" data-act="ftDone">' + esc(X.sDone) + '</button><button type="button" class="link" data-act="ftSkip">' + esc(X.sSkip) + '</button>';
+    }
+    var v = F.r[k], H = ftHist(k), prev = H.length ? H[H.length - 1] : 0, lastItem = F.i >= n - 1;
+    return bar + head + '<div class="card res"><span class="ah__lab">Kết quả</span>' +
+      (v > 0 ? '<div class="res__n">' + (tm ? fmtT(v) : v + ' <small>cái</small>') + '</div>' + ftMark(k, v) + (prev && v > prev ? ' <span class="prtag">' + PS.icon('star', 14) + esc(FT_TXT.bdUp) + '</span>' : '') + ftLadder(k, v) +
+        (prev ? '<p class="ps-small">' + esc(X.last) + ': <b>' + ftFmt(k, prev) + '</b></p>' : '') : '<div class="res__n res__n--sm">' + esc(X.skip) + '</div>') + '</div>' +
+      (lastItem ? '' : '<div class="card ftrest"><span class="ftrest__ic">' + ic('timer', 22) + '</span><div><p class="qsub">' + esc(X.rest) + '</p><div class="clock clock--sm" id="rClock">02:00</div></div></div>') +
+      '<button type="button" class="btn btn--w' + (lastItem ? ' btn--go' : '') + '" data-act="ftNext">' + esc(lastItem ? X.toEnd : X.restGo + ': ' + ftName(a.items[F.i + 1])) + '</button>';
+  }
+  function ftSummary(a) {
+    var F = T.ft, X = FT_TXT, feels = ['Nhẹ nhàng', 'Vừa sức', 'Hơi quá sức', 'Thấy đau'], say = ['easySay', 'okSay', 'hardSay', 'painStop'];
+    var rows = a.items.map(function (k) {
+      var v = F.r[k], H = ftHist(k), prev = H.length > 1 ? H[H.length - 2] : 0;
+      return '<tr><th>' + esc(ftName(k)) + '</th><td><b>' + (v > 0 ? ftFmt(k, v) : '—') + '</b>' + (v > 0 && prev ? '<small class="' + (v > prev ? 'up' : (v < prev ? 'dn' : '')) + '">' + (v > prev ? '+' : (v < prev ? '−' : '±')) + (FT[k].u === 's' ? fmtT(Math.abs(v - prev)) : Math.abs(v - prev)) + '</small>' : '') + '</td><td>' + (v > 0 ? ftMark(k, v) : '') + '</td></tr>';
+    }).join('');
+    return '<div class="card res qres">' + shin('cheer', 70, 'hop') + '<span class="ah__lab">' + esc(X.sumH) + '</span><table class="fts">' + rows + '</table><p class="ps-small">' + esc(ftSrc(a)) + '</p></div>' +
+      '<div class="card"><p class="q">' + esc(X.feelQ) + '</p><div class="chips">' + feels.map(function (f, i) { return '<button type="button" class="chip' + (F.feel === i ? ' on' : '') + (i === 3 ? ' chip--pain' : '') + '" data-act="ftFeel" data-i="' + i + '">' + f + '</button>'; }).join('') + '</div>' +
+      (F.feel >= 0 ? shinSays(F.feel === 3 ? 'sad' : (F.feel === 2 ? 'think' : 'cheer'), esc(TXT[say[F.feel]]), 46) : '') + '</div>' +
+      shinSays('think', esc(X.sumSay), 46) +
+      '<div class="btnrow"><button type="button" class="btn btn--soft" data-act="ftAgain">' + esc(X.again) + '</button><button type="button" class="btn btn--go" data-act="finish"' + (F.feel >= 0 ? '' : ' disabled') + '>Hoàn thành</button></div>';
+  }
+  function ftRecord(a) {
+    var F = T.ft, r = {}, any = false, now = Date.now();
+    a.items.forEach(function (k) { if (F.r[k] > 0) { r[k] = F.r[k]; any = true; var ex = ftEx(k); if (ex) { (S.log[ex] = S.log[ex] || []).push({ d: now, n: F.r[k], f: -1, t: 1 }); if (S.log[ex].length > 60) S.log[ex].shift(); } } });
+    if (!any) return;
+    var h = FTS().h; h.push({ d: now, a: a.id, lv: a.lv, r: r, f: -1 }); if (h.length > 40) h.shift();
+    F.rec = h.length - 1; markDay(); save(true);
+  }
+  function ftDrawRest() {
+    if (TIMER || !T.ft || T.ft.st !== 2) return;
+    var el0 = $('#rClock'); if (!el0) return;
+    var up = function () { var el = $('#rClock'); if (!el || !T.ft || T.ft.st !== 2) { stopTimer(); return; } var left = Math.max(0, 120 - Math.floor((Date.now() - T.ft.rs) / 1000)); el.textContent = fmtClock(left * 1000); if (!left) { el.className += ' clock--ok'; stopTimer(); } };
+    up(); TIMER = setInterval(up, 500);
+  }
+  /* các khóa đã có kết quả, theo thứ tự FT */
+  function ftKeys() { var L = []; for (var k in FT) if (FT.hasOwnProperty(k) && ftHist(k).length) L.push(k); return L; }
+  function ftCard() {
+    var p = PS.profile(), nm = p.name || (IS_DEMO ? 'Học viên demo' : given()), K = ftKeys(), h = FTS().h, g = S.refl.t6b;
+    return '<div class="ach"><div class="ach__top"><span class="mc__logo">' + PS.icon('dumbbell', 15, 2.6) + '</span><span class="ach__br"><b>SHIN FITNESS</b><small>CENTER · 302 TEST LAB</small></span><span class="ach__dt">' + esc(dmy(h.length ? h[h.length - 1].d : Date.now())) + '</span></div>' +
+      '<div class="ach__nm"><small>' + esc(FT_TXT.bdH).toUpperCase() + '</small><b>' + esc(nm.toUpperCase()) + '</b><span>' + esc([p.cls, sexKey() === 'nu' ? 'Mốc nữ' : 'Mốc nam', FT_TXT.bdTests + ' ' + h.length].filter(function (x) { return x; }).join(' · ')) + '</span></div>' +
+      '<div class="ach__t">' + K.map(function (k) {
+        var H = ftHist(k), v = H[H.length - 1], pv = H.length > 1 ? H[H.length - 2] : 0, f = FT[k], gl = ftGoal(k), chip = '';
+        if (f.lad) { var mk = MOC[ftEx(k)][sexKey()], lv = v >= mk[2] ? 2 : (v >= mk[1] ? 1 : 0); chip = '<span class="qpass' + (lv ? ' qpass--ok' : '') + '">' + esc(MOC_LAB[lv]) + '</span>'; }
+        else if (gl && v >= gl) chip = '<span class="qpass qpass--ok">' + PS.icon('check', 12, 2.6) + 'Đạt mốc</span>';
+        var sub = [pv ? 'Lần trước ' + ftFmt(k, pv) : 'Lần đầu', f.lad ? '' : 'Mốc Đạt ' + ftFmt(k, gl)].filter(function (x) { return x; }).join(' · ');
+        return '<div class="ach__r"><div class="ach__h"><b>' + esc(ftName(k)) + '</b><span class="ach__v">' + ftFmt(k, v) + (pv && v !== pv ? '<small class="' + (v > pv ? 'up' : 'dn') + '">' + (v > pv ? '▲' : '▼') + '</small>' : '') + '</span></div>' +
+          '<div class="ach__s"><span>' + esc(sub) + '</span>' + chip + '</div></div>';
+      }).join('') + '</div>' +
+      (g ? '<div class="ach__goal"><small>' + esc(FT_TXT.bdGoal) + '</small><span>' + esc(g) + '</span></div>' : '') +
+      '<div class="ach__sig">' + SHIN_SIG + 'HLV SHIN</div></div>';
+  }
+  function viewBoard(a) {
+    if (!ftKeys().length) return shinSays('think', esc(FT_TXT.bdNone), 50) +
+      '<div class="btnrow"><button type="button" class="btn btn--soft" data-act="act" data-id="t5a">Test sức bền</button><button type="button" class="btn btn--go" data-act="act" data-id="t4b">Test Cơ bản</button></div>';
+    return shinSays('cheer', fill(FT_TXT.bdSay), 48) + ftCard() + '<p class="ps-small ach__shot">' + PS.icon('info', 14) + ' ' + esc(FT_TXT.bdShot) + '</p>' +
+      '<button type="button" class="btn btn--go btn--w" data-act="finish">Hoàn thành</button>';
+  }
+  function ftTips() {
+    var L = [];
+    ftKeys().forEach(function (k) {
+      var H = ftHist(k), v = H[H.length - 1], g = ftGoal(k), f = FT[k];
+      if (L.length >= 2 || !g || v >= g) return;
+      L.push(f.u === 's' ? 'Lần tới mình sẽ ' + ftName(k).toLowerCase() + ' lâu hơn 10 giây' : 'Lần tới mình sẽ ' + ftName(k).toLowerCase() + ' thêm 3 cái, giữ đúng tư thế');
+    });
+    return L;
+  }
+  function ftSum() {
+    var o = {}, h = FTS().h;
+    ftKeys().forEach(function (k) { var H = ftHist(k); o[k] = H[H.length - 1] + (FT[k].u === 's' ? 's' : '') + (ftGoal(k) && H[H.length - 1] >= ftGoal(k) && !FT[k].lad ? ' Đạt' : ''); });
+    return { last: o, n: h.length, at: h.length ? h[h.length - 1].d : 0, goal: S.refl.t6b || '' };
+  }
+  function nbFt() {
+    var K = ftKeys(), h = '<div class="nbsec"><h3>' + esc(FT_TXT.nbH) + '</h3>';
+    if (!K.length) return h + '<p class="ps-small">' + esc(FT_TXT.nbNone) + '</p></div>';
+    return h + '<ul class="kv">' + K.map(function (k) { var H = ftHist(k), v = H[H.length - 1]; return '<li><span>' + esc(ftName(k)) + '</span><b>' + ftFmt(k, v) + (!FT[k].lad && v >= ftGoal(k) ? ' · Đạt' : '') + '</b></li>'; }).join('') + '</ul>' +
+      (S.refl.t6b ? '<p class="ps-small"><b>' + esc(FT_TXT.bdGoal) + ':</b> ' + esc(S.refl.t6b) + '</p>' : '') + '</div>';
+  }
+
+
+  /* =========================================================
+     RADIO TAISO DECK (TC01.1.5): beat (bắt nhịp) · rtq (thẻ nhanh) · rflow (tập theo nhịp) · rself (tự chấm) · sang7 (hẹn 7 buổi)
+     Máy đếm nhịp dùng chung (MT). Tiếng đếm vẫn kêu khi máy bật "giảm chuyển động" (đây là âm thanh, không phải chuyển động).
+     ========================================================= */
+  var MT = null;
+  function mtStop() { if (MT) { clearTimeout(MT.tm); MT = null; } }
+  function mtStart(ms, cb, k0) {
+    mtStop(); k0 = k0 || 0;
+    MT = { t0: Date.now() - k0 * ms, ms: ms, k: k0, cb: cb };
+    mtStep();
+  }
+  function mtStep() { var m = MT; if (!m) return; var k = m.k; m.k++; m.tm = setTimeout(mtStep, Math.max(0, m.t0 + m.k * m.ms - Date.now())); m.cb(k); }
+  function beep(hi) {
+    if (!PS.soundOn()) return;
+    try {
+      var C = W.AudioContext || W.webkitAudioContext; if (!C) return;
+      var c = beep.c || (beep.c = new C()); if (c.state === 'suspended' && c.resume) c.resume();
+      var o = c.createOscillator(), g = c.createGain(); o.frequency.value = hi ? 1320 : 880;
+      g.gain.setValueAtTime(hi ? 0.12 : 0.08, c.currentTime); g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + 0.09);
+      o.connect(g); g.connect(c.destination); o.start(); o.stop(c.currentTime + 0.1);
+    } catch (e) {}
+  }
+  function rtPauseAll() { if (T && T.rf && T.rf.run) rfPause(); if (T && T.rb && T.rb.st === 1) { mtStop(); T.rb = { st: 0, n: 0, hits: {}, taps: 0 }; } if (QS && QS.run) qPause(); }
+  function rtName(m) { return RT[m - 1].n; }
+  function rtFigs(ex, ms) {
+    var E = EX[ex], f0 = E.frames[0], f1 = E.frames[1] || f0;
+    if (RM) return '<div class="tgs">' + frameFig(f0) + frameFig(f1) + '</div>';
+    return '<div class="tg" style="--tgd:' + (ms || 3000) + 'ms">' + frameFig(f0).replace('class="fig', 'class="fig tg1') + frameFig(f1).replace('class="fig', 'class="fig tg2') + '</div>';
+  }
+  function vidBtn() { return '<a class="ytbtn" href="' + esc(TC_RADIO) + '" target="_blank" rel="noopener">' + ic('play', 18) + '<span><b>' + esc(RT_TXT.vidBtn) + '</b><small>' + esc(RT_TXT.vidSub) + '</small></span>' + PS.icon('ext', 16) + '</a>'; }
+
+  /* ---------- bắt nhịp 1–8 ---------- */
+  var BT_MS = 750, BT_L = 8, BT_N = 16;
+  function viewBeat(a) {
+    var B = T.rb;
+    if (B.st === 0) {
+      return '<div class="card cnt"><div class="bt bt--idle"><span class="bt__n">1</span><span class="bt__jp">いち</span></div><p class="q">' + esc(RT_TXT.btIntro) + '</p><p class="qsub">' + ic('play', 13) + ' ' + esc(RT_TXT.btSound) + '</p>' +
+        (S.radio.beat ? '<p class="ps-small">Kỷ lục của bạn: <b>' + S.radio.beat + '/' + BT_N + '</b> nhịp đúng</p>' : '') + '</div>' +
+        '<button type="button" class="btn btn--go btn--w" data-act="btGo">' + ic('play', 18) + esc(RT_TXT.btGo) + '</button>';
+    }
+    if (B.st === 1) {
+      return '<div class="card cnt"><p class="ah__lab" id="btPh">' + esc(RT_TXT.btListen) + '</p>' +
+        '<button type="button" class="bt" id="btTap" data-act="btTap" aria-label="Chạm theo nhịp"><span class="bt__n" id="btN">1</span><span class="bt__jp" id="btJp">いち</span></button>' +
+        '<p class="bt__fb" id="btFb" aria-live="polite">&nbsp;</p><p class="qsub" id="btSc">Đúng nhịp: 0/' + BT_N + '</p></div>';
+    }
+    var lv = B.n >= 12 ? 2 : (B.n >= 8 ? 1 : 0);
+    return '<div class="card cnt">' + shin(lv === 2 ? 'party' : (lv ? 'cheer' : 'encourage'), 90, 'hop') + '<p class="q">Đúng nhịp ' + B.n + '/' + BT_N + '</p>' +
+      '<div class="btbar"><i style="width:' + Math.round(B.n / BT_N * 100) + '%"></i></div>' +
+      (B.n >= (S.radio.beat || 0) && B.n ? '<p class="ps-small"><b>' + esc(TXT.pr) + '</b></p>' : '') + '</div>' +
+      shinSays(lv === 2 ? 'cheer' : 'think', esc(RT_TXT.btRes[lv]), 46) +
+      '<div class="btnrow"><button type="button" class="btn btn--soft" data-act="btGo">Chơi lại</button><button type="button" class="btn btn--go" data-act="finish">Hoàn thành</button></div>';
+  }
+  function btStart() {
+    T.rb = { st: 1, n: 0, hits: {}, taps: 0, t0: 0 }; render();
+    mtStart(BT_MS, function (k) {
+      var B = T.rb; if (!B || B.st !== 1 || V.v !== 'act') { mtStop(); return; }
+      if (k === 0) B.t0 = MT.t0;
+      if (k >= BT_L + BT_N) { mtStop(); B.st = 2; S.radio.beat = Math.max(S.radio.beat || 0, B.n); save(); render(); return; }
+      var c = k % 8, n = $('#btN'), j = $('#btJp'), ph = $('#btPh'), bt = $('#btTap');
+      beep(c === 0);
+      if (n) n.textContent = c + 1; if (j) j.textContent = RT_COUNT[c];
+      if (ph && k === BT_L) ph.textContent = RT_TXT.btTap;
+      if (bt && !RM) { bt.className = 'bt' + (k >= BT_L ? ' bt--go' : '') ; void bt.offsetWidth; bt.className = 'bt pulse' + (k >= BT_L ? ' bt--go' : ''); }
+    });
+  }
+  function btTap() {
+    var B = T.rb; if (!B || B.st !== 1 || !MT) return;
+    var now = Date.now(), idx = Math.round((now - B.t0) / BT_MS), fb = $('#btFb'), sc = $('#btSc');
+    if (idx < BT_L) { if (fb) { fb.textContent = 'Nghe trước đã nhé'; fb.className = 'bt__fb'; } return; }
+    var off = Math.abs(now - (B.t0 + idx * BT_MS)), hit = idx < BT_L + BT_N && off <= 170 && !B.hits[idx];
+    if (hit) { B.hits[idx] = 1; B.n++; }
+    if (fb) { fb.textContent = hit ? RT_TXT.btHit : RT_TXT.btMiss; fb.className = 'bt__fb ' + (hit ? 'ok' : 'no'); }
+    if (sc) sc.textContent = 'Đúng nhịp: ' + B.n + '/' + BT_N;
+  }
+
+  /* ---------- thẻ nhanh: hình này là động tác nào / động tác tiếp theo ---------- */
+  function rtqRounds(a) { return a.mv.map(function (m, i) { return i % 2 ? { t: 'next', m: m, from: a.mv[i - 1] } : { t: 'pic', m: m }; }); }
+  function rtqOpts(a, i) {
+    var R = rtqRounds(a)[i], ok = rtName(R.m), seen = {}, cand = [];
+    seen[ok] = 1;
+    RT.forEach(function (r) { if (!seen[r.n]) { seen[r.n] = 1; cand.push(r.n); } });
+    cand = seedShuffle(cand, a.id + 'q' + i);
+    var lg = null, other = null;
+    cand.forEach(function (n) { if (!lg && n.length >= ok.length) lg = n; });
+    lg = lg || cand[0];
+    cand.forEach(function (n) { if (!other && n !== lg) other = n; });
+    return seedShuffle([ok, lg, other], a.id + 'o' + i);
+  }
+  function rtJp(n) { for (var i = 0; i < RT.length; i++) if (RT[i].n === n) return RT[i].j; return ''; }
+  function viewRtq(a) {
+    var RR = rtqRounds(a), Rq = T.rq, R = RR[Rq.i], ok = rtName(R.m), O = rtqOpts(a, Rq.i), P = Rq.pick, right = P >= 0 && O[P] === ok, last = Rq.i >= RR.length - 1;
+    var top = R.t === 'pic' ? '<div class="figbox figbox--sm">' + frameFig(EX[RT[R.m - 1].id].frames[1]) + '</div><p class="q">' + esc(RT_TXT.qPic) + '</p>' :
+      '<p class="q">' + esc(RT_TXT.qNext.replace('[Đ]', rtName(R.from))) + '</p>';
+    return '<div class="stepbar">' + RR.map(function (r, j) { return '<i class="' + (j < Rq.i ? 'on' : (j === Rq.i ? 'cur' : '')) + '"></i>'; }).join('') + '</div>' +
+      '<div class="card">' + top + '<div class="opts">' + O.map(function (n, i) {
+        var on = P === i, tr = Rq.tried[i];
+        return '<button type="button" class="opt' + (on ? (n === ok ? ' opt--ok' : ' opt--no') : (tr ? ' opt--tried' : '')) + '" data-act="rqPick" data-i="' + i + '"' + (right || tr ? ' disabled' : '') + '><span class="dot">' + (on ? PS.icon(n === ok ? 'check' : 'close', 13, 3) : '') + '</span><span>' + esc(n) + '<small class="jpr">' + esc(rtJp(n)) + '</small></span></button>';
+      }).join('') + '</div></div>' +
+      (P >= 0 ? (right ? '<div class="fb fb--ok"><b>' + esc(RT_TXT.qOk) + '</b> ' + esc((R.m) + '. ' + ok + ': ' + RT[R.m - 1].cue + '.') + '</div>' +
+        (last ? shinSays('cheer', esc(RT_TXT.qEnd), 46) + '<button type="button" class="btn btn--go btn--w" data-act="finish">Hoàn thành</button>' : '<button type="button" class="btn btn--w" data-act="rqNext">Câu tiếp theo</button>') :
+        '<div class="fb fb--no"><b>' + esc(RT_TXT.qNo) + '</b> Xem lại hình và thứ tự, rồi chọn lại.</div>') : '');
+  }
+
+  /* ---------- tập theo nhịp (Shin đếm 1–8, hình đổi theo nhịp) ---------- */
+  function rfPlan(a) { var st = [], t = 0; a.mv.forEach(function (m) { st.push(t); t += RT[m - 1].n8 * 8; }); return { st: st, tot: t }; }
+  function rfMs() { return RT_TEMPO[T.rf.tp].ms; }
+  function rfPause() { var F = T.rf; if (MT) F.g = MT.k - 1; F.run = false; mtStop(); }
+  function rfRun(g0) {
+    var a = actById(V.a), F = T.rf, PL = rfPlan(a); F.run = true;
+    mtStart(rfMs(), function (g) {
+      var A = actById(V.a); if (!A || A.k !== 'rflow' || !T.rf || !T.rf.run) { mtStop(); return; }
+      T.rf.g = g;
+      if (g >= PL.tot) { mtStop(); T.rf.run = false; T.rf.st = 2; tick(); render(true); return; }
+      var mi = 0; PL.st.forEach(function (s, i) { if (g >= s) mi = i; });
+      var lb = g - PL.st[mi], c = lb % 8, m = A.mv[mi];
+      beep(c === 0);
+      if (mi !== T.rf.mi || !$('#rfCnt')) { T.rf.mi = mi; render(); }
+      var n = $('#rfCnt'), j = $('#rfJp'), s = $('#rfSet');
+      if (n) n.textContent = c + 1; if (j) j.textContent = RT_COUNT[c];
+      if (s) s.textContent = RT_TXT.flSet.replace('[n]', Math.floor(lb / 8) + 1).replace('[m]', RT[m - 1].n8);
+    }, g0 || 0);
+  }
+  function viewRflow(a) {
+    var F = T.rf, PL = rfPlan(a), n = a.mv.length;
+    if (F.st === 0) {
+      return '<div class="card"><p class="q">' + n + ' động tác · Shin đếm nhịp 1–8</p><p class="qsub">' + esc(RT_TXT.flNote) + '</p><ol class="fll">' +
+        a.mv.map(function (m) { var r = RT[m - 1]; return '<li><span class="fll__f">' + frameFig(EX[r.id].frames[1], 74) + '</span><span><b>' + m + '. ' + esc(r.n) + '</b><small>' + esc(r.cue) + ' · ' + r.n8 + ' lần 8 nhịp</small></span></li>'; }).join('') + '</ol>' +
+        '<p class="q" style="margin-top:12px">' + esc(RT_TXT.flTempo) + '</p><div class="chips">' + RT_TEMPO.map(function (t, i) { return '<button type="button" class="chip' + (F.tp === i ? ' on' : '') + '" data-act="rfTp" data-i="' + i + '">' + esc(t.n) + '</button>'; }).join('') + '</div></div>' +
+        shinSays('hi', esc(RT_TXT.flIntro) + '<br><small>' + esc(RT_TXT.mirror) + '</small>' + (a.mv.indexOf(11) >= 0 && S.mem && S.mem.inj ? '<br><span class="warn-s">' + esc(EX.rt11.keys[2]) + '</span>' : ''), 50) +
+        '<button type="button" class="btn btn--go btn--w" data-act="rfStart">' + ic('play', 18) + esc(RT_TXT.flStart) + '</button>' + vidBtn();
+    }
+    if (F.st === 2) {
+      return '<div class="card cnt">' + shin('party', 96, 'hop') + '<p class="q">' + esc(RT_TXT.flDone) + '</p><div class="chips" style="justify-content:center">' +
+        RT_TXT.flFeel.map(function (f, i) { return '<button type="button" class="chip' + (F.feel === i ? ' on' : '') + (i === 2 ? ' chip--pain' : '') + '" data-act="rfFeel" data-i="' + i + '">' + esc(f) + '</button>'; }).join('') + '</div></div>' +
+        (F.feel >= 0 ? shinSays(F.feel === 2 ? 'sad' : (F.feel === 1 ? 'think' : 'cheer'), esc(RT_TXT.flSay[F.feel]), 46) : '') +
+        (F.feel === 0 ? vidBtn() : '') +
+        '<div class="btnrow"><button type="button" class="btn btn--soft" data-act="rfAgain">Tập lại</button><button type="button" class="btn btn--go" data-act="finish"' + (F.feel >= 0 ? '' : ' disabled') + '>Hoàn thành</button></div>';
+    }
+    var mi = F.mi, m = a.mv[mi], r = RT[m - 1], lb = Math.max(0, F.g - PL.st[mi]), c = lb % 8;
+    return '<div class="stepbar">' + a.mv.map(function (x, j) { return '<i class="' + (j < mi ? 'on' : (j === mi ? 'cur' : '')) + '"></i>'; }).join('') + '</div>' +
+      '<div class="card cnt flc rfc"><span class="ah__lab">Động tác ' + m + '/13' + (n < 13 ? ' · ' + (mi + 1) + '/' + n + ' trong cụm' : '') + '</span><p class="q">' + esc(r.n) + '</p><p class="rfc__jp">' + esc(r.j) + '</p>' +
+      '<div class="figbox">' + rtFigs(r.id, rfMs() * 4) + '</div>' +
+      '<div class="rfc__c"><b id="rfCnt">' + (c + 1) + '</b><span id="rfJp">' + RT_COUNT[c] + '</span><small id="rfSet">' + esc(RT_TXT.flSet.replace('[n]', Math.floor(lb / 8) + 1).replace('[m]', r.n8)) + '</small></div>' +
+      '<p class="howc__t">' + esc(r.cue) + '.</p></div>' +
+      shinSays('encourage', esc(RT_TXT.flCheer[mi % RT_TXT.flCheer.length]), 42) +
+      '<div class="btnrow"><button type="button" class="btn btn--soft" data-act="rfPause">' + esc(F.run ? NGHE2_TXT.flPause : NGHE2_TXT.flGo) + '</button><button type="button" class="btn" data-act="rfSkip">' + esc(NGHE2_TXT.flSkip) + PS.icon('next', 16) + '</button></div>';
+  }
+
+  /* ---------- tập theo nhạc, tự chấm 3 tiêu chí (Bảng 3.3) ---------- */
+  function rsLevel(c) { var lv = 2; c.forEach(function (v, i) { if (i === 2 && v === 3) return; if (v >= 0 && v < lv) lv = v; }); return lv; }
+  function viewRself(a) {
+    var R = T.rs, all = R.c[0] >= 0 && R.c[1] >= 0 && R.c[2] >= 0;
+    return '<div class="card"><p class="q">' + esc(RT_TXT.sfQ) + '</p>' + vidBtn() + '<p class="ps-small">' + esc(RT_TXT.sfMark) + '</p></div>' +
+      RT_TXT.sfC.map(function (cName, ci) {
+        var L = RT_TXT.sfLv.slice(); if (ci === 2) L.push(RT_TXT.sfLv3);
+        return '<div class="card"><p class="q">' + (ci + 1) + '. ' + esc(cName) + '</p><div class="chips">' + L.map(function (l, li) { return '<button type="button" class="chip' + (R.c[ci] === li ? ' on' : '') + '" data-act="rsC" data-c="' + ci + '" data-i="' + li + '">' + esc(l) + '</button>'; }).join('') + '</div></div>';
+      }).join('') +
+      '<div class="card"><p class="q">' + esc(RT_TXT.sfNeed) + '</p><div class="chips chips--sm">' + RT.map(function (r, i) { return i === 11 ? '' : '<button type="button" class="chip' + (R.need[i + 1] ? ' on' : '') + '" data-act="rsNeed" data-i="' + (i + 1) + '">' + (i + 1) + '. ' + esc(r.n) + '</button>'; }).join('') + '</div></div>' +
+      (all ? shinSays(rsLevel(R.c) === 2 ? 'cheer' : 'think', esc(RT_TXT.sfSay[rsLevel(R.c)]), 46) + '<button type="button" class="btn btn--go btn--w" data-act="finish">Lưu tự chấm</button>' :
+        '<p class="ps-small" style="text-align:center">Chọn đủ 3 tiêu chí để lưu.</p>');
+  }
+
+  /* ---------- hẹn 7 buổi Radio Taiso ---------- */
+  function viewSang7(a) {
+    var X = T.s7;
+    return '<div class="card"><p class="q">' + esc(RT_TXT.s7Q) + '</p><div class="chips">' + RT_TXT.s7Slots.map(function (s, i) { return '<button type="button" class="chip' + (X.slot === i ? ' on' : '') + '" data-act="s7Slot" data-i="' + i + '">' + esc(s) + '</button>'; }).join('') + '</div></div>' +
+      (X.slot >= 0 ? writeBox(RT_TXT.s7W, RT_TXT.s7Sub, RT_TXT.s7Tips) + '<button type="button" class="btn btn--go btn--w" data-act="finish" id="wDone"' + (words(T.txt) >= 3 ? '' : ' disabled') + '>Lưu lời hẹn</button>' : '');
+  }
+  function s7Info() {
+    var X = S.radio && S.radio.s7; if (!X) return null;
+    var n = 0; for (var k in X.days) if (X.days.hasOwnProperty(k)) n++;
+    return { n: n, td: !!X.days[today()], x: X };
+  }
+  function s7Card() {
+    var I = s7Info(); if (!I) return '';
+    var dots = ''; for (var i = 0; i < 7; i++) dots += '<i class="' + (i < I.n ? 'on' : '') + '"></i>';
+    return '<div class="card s7"><div class="s7__h">' + ic('radio', 18) + '<b>' + esc(RT_TXT.s7H) + '</b><span>' + Math.min(I.n, 7) + '/7' + (I.n > 7 ? ' · ' + I.n + ' buổi' : '') + '</span></div>' +
+      '<div class="s7__d">' + dots + '</div><p class="goal">' + esc(I.x.txt) + '</p>' +
+      (I.n >= 7 ? '<p class="ps-small">' + esc(RT_TXT.s7Full) + '</p>' : '') +
+      (I.td ? '<p class="s7__ok">' + PS.icon('check', 15, 3) + esc(RT_TXT.s7Done) + '</p>' : '<button type="button" class="btn btn--go btn--w btn--sm" data-act="s7Tick">' + esc(RT_TXT.s7Btn) + '</button>') + '</div>';
+  }
+  function radioSum() {
+    var R = S.radio || {}, fl = 0, k, I = s7Info();
+    for (k in (R.fl || {})) if (R.fl.hasOwnProperty(k)) fl += R.fl[k];
+    return { bai: baiCount('radio'), beat: R.beat || 0, fl: fl,
+      self: R.self ? RT_TXT.sfC.map(function (c, i) { var v = R.self.c[i]; return c + ': ' + (v === 3 ? RT_TXT.sfLv3 : RT_TXT.sfLv[v]); }) : null,
+      need: R.self ? R.self.need.map(function (m) { return m + '. ' + rtName(m); }) : [], s7: I ? { n: I.n, txt: I.x.txt } : null };
+  }
+  function nbRadio() {
+    var R = radioSum(), h = '<div class="nbsec"><h3>' + esc(RT_TXT.nbH) + '</h3>';
+    if (!R.bai && !R.beat && !R.fl && !R.self && !R.s7) return h + '<p class="ps-small">Chưa làm. Vào Radio Taiso › Radio Taiso là gì?</p></div>';
+    h += '<ul class="kv"><li><span>Bài đã đục lỗ</span><b>' + R.bai + '/' + BAI_RT.length + '</b></li>' + (R.beat ? '<li><span>Bắt nhịp tốt nhất</span><b>' + R.beat + '/' + BT_N + '</b></li>' : '') +
+      (R.fl ? '<li><span>Tập theo nhịp</span><b>' + R.fl + ' lần</b></li>' : '') + (R.s7 ? '<li><span>' + esc(RT_TXT.s7H) + '</span><b>' + R.s7.n + ' buổi</b></li>' : '') + '</ul>';
+    if (R.self) h += '<p class="ps-small"><b>Tự chấm:</b> ' + esc(R.self.join(' · ')) + '</p>' + (R.need.length ? '<p class="ps-small"><b>Cần tập thêm:</b> ' + esc(R.need.join(', ')) + '</p>' : '');
+    return h + '</div>';
+  }
+
+  /* =========================================================
+     BUỔI TẬP 10 PHÚT CÙNG SHIN (TC01.1.5): màn riêng V.v = 's10'
+     ========================================================= */
+  var QS = null, QST = null;
+  function qMenu(id) { for (var i = 0; i < S10_MENU.length; i++) if (S10_MENU[i].id === id) return S10_MENU[i]; return S10_MENU[0]; }
+  function qEx(x) { return x === 'pushup' && sexKey() === 'nu' ? 'kneepush' : x; }
+  function qSegs(m) {
+    var L = [], M = qMenu(m), main = M.main.map(qEx);
+    EX[S10.warm].frames.forEach(function (fr, i) { L.push({ ph: 'warm', ex: S10.warm, fi: i, sec: S10.wSec }); });
+    main.forEach(function (x, i) { L.push({ ph: 'main', ex: x, sec: S10.work }); L.push({ ph: 'rest', next: main[i + 1] || '', sec: S10.rest }); });
+    EX[S10.cool].frames.forEach(function (fr, i) { L.push({ ph: 'cool', ex: S10.cool, fi: i, sec: S10.wSec }); });
+    return L;
+  }
+  function qNew() { QS = { st: 0, m: '', segs: [], i: 0, run: false, end: 0, rem: -1, act: 0, last: 0, feel: -1, full: 0, ls: -1 }; }
+  function qStop() { if (QST) { clearInterval(QST); QST = null; } }
+  function qPause() { if (!QS || !QS.run) return; QS.rem = Math.max(0, QS.end - Date.now()); QS.act += Date.now() - QS.last; QS.run = false; qStop(); }
+  function qRun() {
+    var sg = QS.segs[QS.i]; QS.end = Date.now() + (QS.rem >= 0 ? QS.rem : sg.sec * 1000); QS.rem = -1; QS.run = true; QS.last = Date.now(); qStop();
+    QST = setInterval(function () {
+      if (!QS || !QS.run || V.v !== 's10') { qStop(); return; }
+      var now = Date.now(), left = Math.max(0, QS.end - now), s = QS.segs[QS.i], c = $('#qClock'), b = $('#qBar'), sec = Math.ceil(left / 1000);
+      QS.act += now - QS.last; QS.last = now;
+      if (c) c.textContent = sec; if (b) b.style.width = (100 - left / (s.sec * 1000) * 100) + '%';
+      if (sec <= 3 && sec > 0 && sec !== QS.ls) { QS.ls = sec; beep(false); }
+      if (left <= 0) qNext();
+    }, 250);
+  }
+  function qNext() {
+    QS.i++; QS.rem = -1; QS.ls = -1; beep(true);
+    if (QS.i >= QS.segs.length) { QS.run = false; qStop(); QS.full = 1; QS.st = 3; render(true); return; }
+    qRun(); render();
+  }
+  function qEnd() { qPause(); QS.st = 3; QS.full = 0; render(true); }
+  function s10Week() { var d = new Date(), wd = (d.getDay() + 6) % 7, st = new Date(d.getFullYear(), d.getMonth(), d.getDate() - wd).getTime(), n = 0; (S.s10.h || []).forEach(function (e) { if (e.d >= st) n++; }); return n; }
+  function s10Btn() {
+    var n = (S.s10.h || []).length;
+    return '<button type="button" class="s10b" data-act="s10">' + '<span class="s10b__ic">' + ic('timer', 24) + '</span><span class="s10b__tx"><b>' + esc(S10_TXT.btn) + '</b><small>' + esc(S10_TXT.btnSub) + (n ? ' · ' + esc(S10_TXT.week) + ': ' + s10Week() + ' buổi' : '') + '</small></span>' + PS.icon('next', 18) + '</button>';
+  }
+  function viewS10() {
+    if (!QS) qNew();
+    var h = back('Sơ đồ phòng tập', 'home') + '<div class="ah"><span class="ah__lab">SHIN FITNESS CENTER · 10 phút</span><h1>' + esc(S10_TXT.btn) + '</h1></div>';
+    if (QS.st === 0) {
+      return h + shinSays('hi', esc(S10_TXT.hi) + (S.mem && S.mem.inj ? '<br><span class="warn-s">' + esc(S10_TXT.inj) + '</span>' : '')) +
+        '<div class="s10m">' + S10_MENU.map(function (M) {
+          return '<button type="button" class="s10m__b" data-act="qMenu" data-id="' + M.id + '"><span class="s10m__ic">' + ic(M.ic, 26) + '</span><span><b>' + esc(M.n) + '</b><small>' + esc(M.d) + '</small><span class="s10m__ex">' + M.main.map(function (x) { return esc(EX[qEx(x)].s || EX[qEx(x)].n); }).join(' · ') + '</span></span></button>';
+        }).join('') + '</div>' + (S.s10.h.length ? '<p class="ps-small" style="text-align:center">Bạn đã tập ' + S.s10.h.length + ' buổi · ' + esc(S10_TXT.week) + ': ' + s10Week() + ' buổi</p>' : '');
+    }
+    var M = qMenu(QS.m);
+    if (QS.st === 1) {
+      return h + '<div class="card"><p class="q">' + ic(M.ic, 18) + ' ' + esc(M.n) + '</p><ol class="s10p">' + S10_TXT.plan.map(function (p, i) { return '<li><b>' + esc(p) + '</b><small>' + esc(S10_TXT.planD[i]) + '</small>' + (i === 1 ? '<span>' + M.main.map(function (x) { return esc(EX[qEx(x)].n); }).join(' · ') + '</span>' : '') + '</li>'; }).join('') + '</ol></div>' +
+        shinSays('hi', esc(NGHE2_TXT.flIntro), 48) +
+        '<button type="button" class="btn btn--go btn--w" data-act="qStart">' + ic('play', 18) + esc(S10_TXT.start) + '</button><button type="button" class="link" data-act="qBack">Chọn bài khác</button>';
+    }
+    if (QS.st === 3) {
+      var mins = Math.max(1, Math.round(QS.act / 60000));
+      return h + '<div class="card cnt">' + shin('party', 96, 'hop') + '<p class="q">' + esc(QS.full ? S10_TXT.done : S10_TXT.doneShort) + '</p><p class="qsub">' + esc(M.n) + ' · khoảng ' + mins + ' phút</p><div class="chips" style="justify-content:center">' +
+        S10_TXT.feel.map(function (f, i) { return '<button type="button" class="chip' + (QS.feel === i ? ' on' : '') + (i === 3 ? ' chip--pain' : '') + '" data-act="qFeel" data-i="' + i + '">' + esc(f) + '</button>'; }).join('') + '</div></div>' +
+        (QS.feel >= 0 ? shinSays(QS.feel === 3 ? 'sad' : (QS.feel === 2 ? 'think' : 'cheer'), esc(S10_TXT.say[QS.feel]), 46) : '') +
+        '<button type="button" class="btn btn--go btn--w" data-act="qSave"' + (QS.feel >= 0 ? '' : ' disabled') + '>' + esc(S10_TXT.save) + '</button>';
+    }
+    var sg = QS.segs[QS.i], left = QS.run ? Math.max(0, QS.end - Date.now()) : (QS.rem >= 0 ? QS.rem : sg.sec * 1000), body = '', lab = S10_TXT.ph[sg.ph];
+    var cnt = 0, pos = 0; QS.segs.forEach(function (x, j) { if (x.ph === sg.ph) { cnt++; if (j <= QS.i) pos++; } });
+    if (sg.ph === 'rest') {
+      var nx = sg.next ? EX[sg.next] : null;
+      body = '<p class="q">' + esc(lab) + '</p><p class="qsub">' + esc(S10_TXT.restNext) + esc(nx ? nx.n : S10_TXT.ph.cool) + '</p><div class="figbox figbox--sm">' + (nx ? frameFig(nx.frames[0]) : frameFig(EX[S10.cool].frames[0])) + '</div>';
+    } else if (sg.ph === 'main') {
+      var E = EX[sg.ex];
+      body = '<p class="q">' + esc(E.n) + '</p><div class="figbox">' + rtFigs(sg.ex, 3000) + '</div><p class="howc__t">' + esc(E.keys[0]) + '. ' + esc(S10_TXT.work) + '</p>';
+    } else {
+      var fr = EX[sg.ex].frames[sg.fi];
+      body = '<p class="q">' + esc(fr.c || fr.t) + '</p><div class="figbox">' + frameFig(fr) + '</div><p class="howc__t">' + esc(fr.t) + '</p>';
+    }
+    var done = 0; for (var j = 0; j < QS.i; j++) done += QS.segs[j].sec;
+    return h + '<div class="qtop"><span>' + esc(M.n) + '</span><b>' + fmtClock(done * 1000) + ' / 10:00</b></div><div class="qph">' + ['warm', 'main', 'cool'].map(function (p) { return '<i class="' + (sg.ph === p || (p === 'main' && sg.ph === 'rest') ? 'cur' : '') + '">' + esc(S10_TXT.ph[p]) + '</i>'; }).join('') + '</div>' +
+      '<div class="card cnt flc' + (sg.ph === 'rest' ? ' qrest' : '') + '"><span class="ah__lab">' + esc(lab) + (sg.ph === 'rest' ? '' : ' ' + pos + '/' + cnt) + '</span>' + body +
+      '<div class="flc__t"><b id="qClock">' + Math.ceil(left / 1000) + '</b><small>giây</small></div><div class="flbar"><i id="qBar" style="width:' + (100 - left / (sg.sec * 1000) * 100) + '%"></i></div></div>' +
+      '<div class="btnrow"><button type="button" class="btn btn--soft" data-act="qPause">' + esc(QS.run ? S10_TXT.pause : S10_TXT.go) + '</button><button type="button" class="btn" data-act="qSkip">' + esc(S10_TXT.skip) + PS.icon('next', 16) + '</button></div>' +
+      '<div class="qfoot"><button type="button" class="link" data-act="qEnd">' + esc(S10_TXT.stop) + '</button><button type="button" class="link link--pain" data-act="qPain">' + esc(S10_TXT.pain) + '</button></div>';
+  }
+  function qSave() {
+    var n = S.s10.h.push({ d: Date.now(), m: QS.m, sec: Math.round(QS.act / 1000), f: QS.feel, full: QS.full });
+    markDay(); save(true); sfx('punch');
+    PS.toast(S10_TXT.toast.replace('[n]', n), 2600);
+    QS = null; go({ v: 'home' }, true);
+  }
+  function s10Sum() {
+    var H = S.s10.h || [], sec = 0, pain = 0;
+    H.forEach(function (e) { sec += e.sec || 0; if (e.f === 3) pain++; });
+    return { n: H.length, min: Math.round(sec / 60), wk: s10Week(), pain: pain,
+      last: H.slice(-5).map(function (e) { return { d: dmy(e.d), m: qMenu(e.m).n, min: Math.round((e.sec || 0) / 60), f: S10_TXT.feel[e.f] || '' }; }) };
+  }
+  function nbS10() {
+    var X = s10Sum(), h = '<div class="nbsec"><h3>' + esc(S10_TXT.nbH) + '</h3>';
+    if (!X.n) return h + '<p class="ps-small">' + esc(S10_TXT.nbNone) + '</p></div>';
+    return h + '<ul class="kv"><li><span>Số buổi</span><b>' + X.n + '</b></li><li><span>Tổng thời gian</span><b>' + X.min + ' phút</b></li><li><span>' + esc(S10_TXT.week) + '</span><b>' + X.wk + ' buổi</b></li></ul>' +
+      '<ul class="notes">' + X.last.slice().reverse().map(function (e) { return '<li><small>' + esc(e.d) + ' · ' + e.min + ' phút</small>' + esc(e.m) + ' · ' + esc(e.f) + '</li>'; }).join('') + '</ul></div>';
+  }
+
+  /* =========================================================
+     SỔ TAY: Tổng quan | Thẻ hội viên | Khẩn cấp | Cài đặt
      ========================================================= */
   var nbOpen = false, TAB = 'tq';
   function nbOverview() {
@@ -1232,6 +1935,8 @@
     var CI = commitInfo();
     return '<div class="tiles"><div class="tl">' + ic('stamp', 16) + '<b>' + baiCount('san') + '/' + BAI.length + '</b><small>Dấu Sàn tập</small></div><div class="tl">' + ic('bowl', 16) + '<b>' + baiCount('bep') + '/' + BAI_BEP.length + '</b><small>Dấu Bếp dinh dưỡng</small></div>' +
       '<div class="tl">' + ic('helmet', 16) + '<b>' + baiCount('nghe') + '/' + BAI_NGHE.length + '</b><small>Dấu Góc nghề</small></div>' +
+      '<div class="tl">' + ic('cross', 16) + '<b>' + baiCount('yte') + '/' + BAI_YTE.length + '</b><small>Dấu Phòng y tế</small></div>' +
+      '<div class="tl">' + ic('gauge', 16) + '<b>' + baiCount('test') + '/' + BAI_TEST.length + '</b><small>Dấu Phòng test</small></div><div class="tl">' + ic('radio', 16) + '<b>' + baiCount('radio') + '/' + BAI_RT.length + '</b><small>Dấu Radio Taiso</small></div><div class="tl">' + ic('timer', 16) + '<b>' + S.s10.h.length + '</b><small>Buổi tập 10 phút</small></div><div class="tl">' + PS.icon('bulb', 16) + '<b>' + wrongIds().length + '</b><small>Câu cần ôn</small></div>' +
       '<div class="tl">' + PS.icon('check', 16) + '<b>' + doneCount() + '/' + ALLACTS.length + '</b><small>Hoạt động</small></div><div class="tl">' + ic('cal', 16) + '<b>' + (CI ? CI.n + '/' + COMMIT_DAYS : '—') + '</b><small>Ngày giữ cam kết</small></div>' +
       '<div class="tl tl--xp">' + PS.icon('star', 16) + '<b>' + xpTotal() + '</b><small>XP</small></div><div class="tl tl--ins">' + PS.icon('bulb', 16) + '<b>' + insTotal() + '</b><small>Insight</small></div>' +
       '<div class="tl tl--fire">' + PS.icon('flame', 16) + '<b>' + (IS_DEMO ? 5 : PS.streak()) + '</b><small>Chuỗi ngày (chung)</small></div><div class="tl">' + ic('timer', 16) + '<b>' + tryCount() + '</b><small>Lần tập thử</small></div></div>' +
@@ -1248,7 +1953,7 @@
       '<button type="button" class="btn btn--soft btn--sm" data-act="editMem">' + ic('pen', 15) + 'Sửa thẻ hội viên</button></div>' +
       '<div class="nbsec"><h3>Lịch tập của mình</h3>' + (S.plan ? '<p><b>' + esc(planLine(S.plan)) + '</b></p><p class="goal">' + esc(S.plan.txt) + '</p>' : '<p class="ps-small">Chưa có. Làm ở Sàn tập › Giãn cơ và lịch tập.</p>') + '</div>' +
       '<div class="nbsec"><h3>Kỷ lục cá nhân</h3>' + (rec.length ? '<ul class="kv">' + rec.join('') + '</ul>' : '<p class="ps-small">Chưa có. Tập thử ở các bài của Sàn tập nhé.</p>') + '</div>' +
-      nbFood() + nbNghe() +
+      nbS10() + nbRadio() + nbFood() + nbNghe() + nbYte() + nbTest() + nbFt() +
       (notes.length ? '<div class="nbsec"><h3>Ghi chú của bạn</h3><ul class="notes">' + notes.join('') + '</ul></div>' : '');
   }
   function nbNghe() {
@@ -1269,8 +1974,8 @@
   function drawNb() {
     var el = $('#nb'); if (!el) return;
     el.innerHTML = '<div class="nb__in"><div class="nb__top"><h2>Sổ tay</h2><button type="button" class="nb__x" data-act="nbClose" aria-label="Đóng sổ tay">' + PS.icon('close', 20) + '</button></div>' +
-      '<div class="tabs" role="tablist">' + [['tq', 'Tổng quan'], ['the', 'Thẻ hội viên'], ['cd', 'Cài đặt']].map(function (t) { return '<button type="button" role="tab" aria-selected="' + (TAB === t[0]) + '" class="' + (TAB === t[0] ? 'on' : '') + '" data-act="tab" data-t="' + t[0] + '">' + t[1] + '</button>'; }).join('') + '</div>' +
-      '<div id="nbBody">' + (TAB === 'tq' ? nbOverview() : (TAB === 'the' ? nbCard() : nbSettings())) + '</div></div>';
+      '<div class="tabs tabs--4" role="tablist">' + [['tq', 'Tổng quan'], ['the', 'Thẻ hội viên'], ['kc', 'Khẩn cấp'], ['cd', 'Cài đặt']].map(function (t) { return '<button type="button" role="tab" aria-selected="' + (TAB === t[0]) + '" class="' + (TAB === t[0] ? 'on' : '') + '" data-act="tab" data-t="' + t[0] + '">' + t[1] + '</button>'; }).join('') + '</div>' +
+      '<div id="nbBody">' + (TAB === 'tq' ? nbOverview() : (TAB === 'the' ? nbCard() : (TAB === 'kc' ? nbKc() : nbSettings()))) + '</div></div>';
     if (TAB === 'cd') PS.wireSettings($('#nbBody'), { ctx: 'module', mod: ID, onChange: function () { render(); } });
   }
   function openNb() { if (nbOpen) return; nbOpen = true; var el = D.createElement('div'); el.id = 'nb'; el.className = 'nb'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', 'Sổ tay'); D.body.appendChild(el); D.body.classList.add('ps-lock'); drawNb(); }
@@ -1284,6 +1989,10 @@
     var b = e.target && e.target.getAttribute && e.target.getAttribute('data-act') === 'flipCard' ? e.target : null; if (!b) return;
     e.preventDefault(); flipCard(b);
   });
+  (function () {
+    var onTap = function (e) { var b = PS.closest(e.target, '[data-act="btTap"]'); if (!b) return; if (e.cancelable) e.preventDefault(); btTap(); };
+    if (W.PointerEvent) D.addEventListener('pointerdown', onTap); else { D.addEventListener('touchstart', onTap, { passive: false }); D.addEventListener('mousedown', onTap); }
+  })();
   D.addEventListener('click', function (e) {
     var b = PS.closest(e.target, '[data-act]'); if (!b) return;
     var a = b.getAttribute('data-act'), id = b.getAttribute('data-id');
@@ -1316,12 +2025,30 @@
     if (a === 'finish') {
       syncWrite();
       var fa = actById(V.a);
+      if (fa && fa.k === 'rself' && (T.rs.c[0] < 0 || T.rs.c[1] < 0 || T.rs.c[2] < 0)) { PS.toast('Chọn đủ 3 tiêu chí nhé.'); return; }
+      if (fa && fa.k === 'sang7' && (T.s7.slot < 0 || words(T.txt) < 3)) { PS.toast('Chọn lúc tập và viết lời hẹn nhé.'); return; }
       if (fa && fa.k === 'calc') { syncCalc(); if (!calcRes(T.c)) { PS.toast('Nhập đủ chiều cao, cân nặng, tuổi, giới tính và mức vận động nhé.'); return; } }
       if (fa && fa.k === 'commit' && T.hab >= HABITS.length && words(T.own) < 2) { PS.toast('Viết tên thói quen của bạn nhé.'); return; }
       if (fa && fa.k === 'habit' && T.hb >= habList().length && words(T.hown) < 2) { PS.toast('Viết tên thói quen của bạn nhé.'); return; }
       finishAct(); return;
     }
     if (a === 'pickNext') { T.round++; T.pick = -1; render(true); return; }
+    if (a === 'smGo') { T.sm.i = 0; sfx('whistle'); render(true); return; }
+    if (a === 'smPick') { smPick(+b.getAttribute('data-i')); return; }
+    if (a === 'smBack') { T.sm.pick = -1; render(); return; }
+    if (a === 'smNext') { T.sm.i++; T.sm.pick = -1; render(true); return; }
+    /* Phòng test */
+    if (a === 'qzGo' || a === 'qzAgain') { T.qz = { st: 1, L: qDraw(actById(V.a)), i: 0, ans: {}, sc: 0, pr: false, miss: false }; sfx('whistle'); render(true); return; }
+    if (a === 'qzPick') { T.qz.ans[T.qz.i] = +b.getAttribute('data-i'); sfx('pop'); render(); return; }
+    if (a === 'qzMove') { T.qz.i = Math.max(0, Math.min(T.qz.L.length - 1, T.qz.i + +b.getAttribute('data-d'))); render(true); return; }
+    if (a === 'qzJump') { T.qz.i = +b.getAttribute('data-i'); render(true); return; }
+    if (a === 'qzSubmit') { quizSubmit(); return; }
+    if (a === 'tfPick') { var tq = T.tq, tv = +b.getAttribute('data-v'); tq.pick = tv; if (tv === TFY[tq.L[tq.i]].v) { tq.ok++; sfx('ting'); } else sfx('pop'); render(); return; }
+    if (a === 'tfNext') { T.tq.i++; T.tq.pick = -1; if (T.tq.i >= T.tq.L.length) tfEnd(actById(V.a)); render(true); return; }
+    if (a === 'tfAgain') { T.tq = null; render(true); return; }
+    if (a === 'rdGo') { var rw = b.getAttribute('data-m') === 'w' ? shuf(wrongIds()).map(function (x) { return QBY[x]; }) : shuf(QB.dd.concat(QB.sk)); T.rd = { st: 1, L: rw.slice(0, 10).map(qItem), i: 0, pick: -1, tried: {}, first: 0, n: 0 }; sfx('whistle'); render(true); return; }
+    if (a === 'rdPick') { rdPick(+b.getAttribute('data-i')); return; }
+    if (a === 'rdNext') { T.rd.i++; T.rd.pick = -1; render(true); return; }
     if (a === 'plFood') { T.sel = +b.getAttribute('data-i'); T.wrong = ''; render(); return; }
     if (a === 'plZone') {
       var pa = actById(V.a); if (T.sel < 0) { PS.toast('Chạm một món trước, rồi chạm nhóm nhé.', 1800); return; }
@@ -1347,6 +2074,31 @@
     if (a === 'bdSee') { T.bres = true; render(); return; }
     if (a === 'ladP') { T.lad[b.getAttribute('data-k')] = +b.getAttribute('data-v'); T.lres = false; render(); return; }
     if (a === 'ladSee') { T.lres = true; render(); return; }
+    /* Radio Taiso Deck + buổi 10 phút (TC01.1.5) */
+    if (a === 'btGo') { btStart(); return; }
+    if (a === 'rqPick') { var qi = +b.getAttribute('data-i'), qa = actById(V.a), qo = rtqOpts(qa, T.rq.i), qr = rtqRounds(qa)[T.rq.i]; T.rq.pick = qi; if (qo[qi] === rtName(qr.m)) { var tn = 0; for (var tk in T.rq.tried) if (T.rq.tried.hasOwnProperty(tk)) tn++; if (!tn) T.rq.first++; } else T.rq.tried[qi] = 1; render(); return; }
+    if (a === 'rqNext') { T.rq.i++; T.rq.pick = -1; T.rq.tried = {}; render(true); return; }
+    if (a === 'rfTp') { T.rf.tp = +b.getAttribute('data-i'); render(); return; }
+    if (a === 'rfStart') { T.rf = { st: 1, tp: T.rf.tp, mi: 0, g: 0, run: true, feel: -1 }; render(true); rfRun(0); return; }
+    if (a === 'rfPause') { if (T.rf.run) rfPause(); else rfRun(T.rf.g); render(); return; }
+    if (a === 'rfSkip') { var fa2 = actById(V.a), PL2 = rfPlan(fa2), nx = T.rf.mi + 1 < fa2.mv.length ? PL2.st[T.rf.mi + 1] : PL2.tot, wr = T.rf.run; mtStop(); T.rf.run = false;
+      if (nx >= PL2.tot) { T.rf.st = 2; tick(); render(true); } else { T.rf.mi++; T.rf.g = nx; T.rf.run = wr; render(); if (wr) rfRun(nx); } return; }
+    if (a === 'rfAgain') { T.rf = { st: 0, tp: T.rf.tp, mi: 0, g: 0, run: false, feel: -1 }; render(true); return; }
+    if (a === 'rfFeel') { T.rf.feel = +b.getAttribute('data-i'); render(); return; }
+    if (a === 'rsC') { T.rs.c[+b.getAttribute('data-c')] = +b.getAttribute('data-i'); render(); return; }
+    if (a === 'rsNeed') { var rn = +b.getAttribute('data-i'); T.rs.need[rn] = T.rs.need[rn] ? 0 : 1; render(); return; }
+    if (a === 's7Slot') { syncWrite(); T.s7.slot = +b.getAttribute('data-i'); render(); return; }
+    if (a === 's7Tick') { var X7 = S.radio.s7; if (X7) { X7.days[today()] = 1; markDay(); save(true); tick(); PS.toast(RT_TXT.s7Toast); } if (nbOpen) drawNb(); else render(); return; }
+    if (a === 's10') { if (!QS || QS.st !== 2) qNew(); go({ v: 's10' }); return; }
+    if (a === 'qMenu') { QS.m = id; QS.st = 1; sfx('slide'); render(true); return; }
+    if (a === 'qBack') { QS.st = 0; render(true); return; }
+    if (a === 'qStart') { QS.segs = qSegs(QS.m); QS.i = 0; QS.st = 2; QS.act = 0; QS.rem = -1; beep(true); qRun(); render(true); return; }
+    if (a === 'qPause') { if (QS.run) qPause(); else qRun(); render(); return; }
+    if (a === 'qSkip') { if (QS.run) QS.act += Date.now() - QS.last; qStop(); qNext(); return; }
+    if (a === 'qEnd') { qEnd(); return; }
+    if (a === 'qPain') { qEnd(); QS.feel = 3; render(); return; }
+    if (a === 'qFeel') { QS.feel = +b.getAttribute('data-i'); render(); return; }
+    if (a === 'qSave') { if (QS.feel >= 0) qSave(); return; }
     if (a === 'flStart') { T.fl = { i: 0, run: false, rem: -1, end: 0, feel: -1 }; flRun(); render(true); return; }
     if (a === 'flPause') { if (T.fl.run) flPause(); else flRun(); render(); return; }
     if (a === 'flSkip') { flStop(); flNext(); return; }
@@ -1377,6 +2129,25 @@
     if (a === 'hsMiss') { T.miss++; PS.toast('Chưa phải chỗ này. Thử lại nhé.', 1600); render(); return; }
     if (a === 'spotNext') { T.round++; T.miss = 0; render(true); return; }
     if (a === 'spotShow') { T.miss = 4; render(); return; }
+    if (a === 'ftGo' || a === 'ftAgain') { stopTimer(); T.ft = { st: 1, i: 0, r: {}, rs: 0, feel: -1, rec: -1 }; T.n = 0; T.el = 0; T.run = false; T.tryEx = ftEx(actById(V.a).items[0]) || null; sfx('whistle'); render(true); return; }
+    if (a === 'ftDone' || a === 'ftSkip') {
+      stopTimer(); var fa = actById(V.a), fk = fa.items[T.ft.i], fv = -1, fin = $('#cNin');
+      if (a === 'ftDone') {
+        if (fin && fin.value) T.n = Math.max(0, Math.min(999, parseInt(fin.value, 10) || 0));
+        fv = FT[fk].u === 's' ? Math.round(T.el / 1000) : T.n;
+        if (fv <= 0) { PS.toast(FT[fk].u === 's' ? 'Bấm Bắt đầu và giữ nhịp trước đã nhé. Không làm được thì chọn Bỏ qua.' : 'Bạn chưa đếm cái nào. Chạm nút tròn mỗi lần làm xong nhé.'); return; }
+      }
+      T.ft.r[fk] = fv; T.ft.st = 2; T.ft.rs = Date.now();
+      if (T.ft.i >= fa.items.length - 1) { var anyR = false; fa.items.forEach(function (x) { if (T.ft.r[x] > 0) anyR = true; }); if (!anyR) { T.ft.st = 1; PS.toast(FT_TXT.noData, 3000); render(); return; } }
+      sfx(fv > 0 ? 'ting' : 'pop'); render(true); return;
+    }
+    if (a === 'ftNext') {
+      stopTimer(); var na = actById(V.a);
+      if (T.ft.i >= na.items.length - 1) { T.ft.st = 3; ftRecord(na); }
+      else { T.ft.i++; T.ft.st = 1; T.n = 0; T.el = 0; T.run = false; T.tryEx = ftEx(na.items[T.ft.i]) || null; }
+      render(true); return;
+    }
+    if (a === 'ftFeel') { T.ft.feel = +b.getAttribute('data-i'); var fh = FTS().h; if (T.ft.rec >= 0 && fh[T.ft.rec]) fh[T.ft.rec].f = T.ft.feel; save(); render(); return; }
     if (a === 'tryEx') { T.tryEx = b.getAttribute('data-x'); render(); return; }
     if (a === 'tryGo') { T.n = 0; T.el = 0; T.run = false; V.step = 1; render(); return; }
     if (a === 'tap') { T.n++; tick(); var cn = $('#cN'); if (cn) { cn.textContent = T.n; cn.parentNode.classList.remove('bump'); void cn.offsetWidth; cn.parentNode.classList.add('bump'); } var ni = $('#cNin'); if (ni) ni.value = ''; return; }
@@ -1409,6 +2180,8 @@
     if (t.id === 'cH' || t.id === 'cW' || t.id === 'cA') syncCalc();
     if (t.id === 'cOwn') T.own = t.value;
     if (t.id === 'hbOwn') T.hown = t.value;
+    var kc = t.getAttribute && t.getAttribute('data-kc');
+    if (kc && !IS_DEMO) { S.kc[kc] = t.value; save(); var km = $('#kcMsg'); if (km) km.textContent = KC.saved; }
   });
   function syncJoin() {
     var g = $('#jGoal'), h = $('#jH'), w = $('#jW');

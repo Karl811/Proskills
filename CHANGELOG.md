@@ -5,6 +5,68 @@ Quy ước số phiên bản: **PS a.b.c**
 - b: giai đoạn / thêm module hoặc tính năng lớn
 - c: sửa nhỏ trong giai đoạn đó
 
+## PS1.3.33 · 18/11/2026 · TC01.1.5: mở Radio Taiso Deck (6 bài) + Buổi tập 10 phút cùng Shin
+Thầy chốt: Radio Taiso PA1 (học theo cụm, ráp dần), Buổi 10 phút PA A (3 bài cố định), đồng ý cả 8 đề xuất. Không đổi trang chủ, CD01, TK, Shin Routine, các khu khác.
+- **Radio Taiso Deck mở** (`KHU.radio.ready`), 6 bài, 18 hoạt động: **r1 Radio Taiso là gì?** (3 câu: bài là gì, gặp ở đâu, vì sao nên thuộc · ghép 6 từ tiếng Nhật · mini-game Bắt nhịp 1–8) · **r2–r5 bốn cụm** 1–3, 4–7, 8–10, 11–13 (xem cách làm 2 khung/động tác + 3 điểm chính · thẻ nhanh "hình này là động tác nào / sau X là gì" · tập theo nhịp; r5 thay thẻ nhanh bằng xếp đủ 13 động tác) · **r6 Trọn bài** (tập 13 động tác theo nhịp · mở video có nhạc + tự chấm 3 tiêu chí Bảng 3.3 · hẹn 7 buổi Radio Taiso, có thẻ đóng dấu mỗi ngày ở khu và Sổ tay).
+- Tên 13 động tác (tiếng Việt + tiếng Nhật nhỏ) theo Viện Khoa học Tuổi thọ Nhật Bản. 21 tư thế mới, nhìn thẳng, **lật như soi gương** (có ghi chú). Trong app chỉ có tiếng đếm nhịp (いち…はち), nhạc thật mở video YouTube (không nhúng nhạc vì bản quyền). Học viên có chấn thương: động tác 11 gợi ý nhún gối tại chỗ.
+- **Buổi tập 10 phút cùng Shin** (nút dưới "Gợi ý hôm nay"): chọn 1 trong 3 bài (Tỉnh táo buổi sáng · Sức mạnh · Chống mỏi nghề) → khởi động 2 phút → 6 động tác × (làm 40 giây, nghỉ 20 giây) → giãn 2 phút → cảm nhận (Nhẹ nhàng / Vừa sức / Mệt / Có chỗ bị đau). Có Tạm dừng, Bỏ qua, Dừng buổi tập, "Thấy đau? Dừng ngay". Không đục lỗ thẻ; mặt sau thẻ ghi số buổi. Nữ: chống đẩy tự đổi sang khuỵu gối.
+- Thẻ hội viên thêm dòng đục lỗ **DECK** (đủ 36 lỗ = CHAMPION). Gợi ý hôm nay có Radio Taiso. Sổ tay: ô "Dấu Radio Taiso", "Buổi tập 10 phút"; mục "Buổi tập 10 phút", "Radio Taiso của mình". Báo trang chủ `extra.radio`, `extra.s10`. Demo GV có dữ liệu mẫu cho cả hai. config.js: TC01 `total` 103, `ver` TC01.1.5.
+- Kiểm 390 (Nhà xưởng nam, Dịch vụ nữ có chấn thương) + 1280 (Dây chuyền nam): làm trọn 18 hoạt động, buổi 10 phút (xong trọn và dừng vì đau), Sổ tay, thẻ hội viên, demo GV; hồi quy Góc nghề n2c, Sàn tập b2c, Phòng test t4b; độ dài đáp án (r1a + 10 vòng thẻ nhanh: 0 lỗi); ES5; không lỗi console.
+
+Tệp đổi: tc01/content.js, tc01/engine.js, tc01/art.js, tc01/tc01.css, tc01/index.html, config.js, sw.js, index.html, cd01/index.html, tk/index.html, mau/index.html, routine/index.html (số phiên bản), CHANGELOG.md, AGENTS.md.
+File cần xóa trên GitHub: không có.
+
+## PS1.3.32 · 18/11/2026 · TC01.1.4: Phòng test đợt 2 · t4 Tự test sức mạnh, t5 Tự test sức bền, t6 Bảng thành tích
+Theo kế hoạch 302 đã chốt (PA 1). Không đổi trang chủ, CD01, TK, Shin Routine, các khu khác, bài t1–t3.
+- **t4 Tự test sức mạnh**: Tự test sao cho đúng (3 câu: khởi động trước, chỉ đếm cái đúng tư thế, đau thì dừng) · Test Cơ bản (hít đất, plank, squat) · Test Nâng cao (hít đất, gập bụng nâng cao, squat 1 chân, squat bình nước). Mốc Đạt theo Chương trình TTS 30 tiết, Bảng 3.1, dòng "Đạt" (bảng gốc ghi "<=", app hiểu "từ … trở lên"). Nữ: Cơ bản dùng hít đất khuỵu gối (khớp mốc 30 của Sổ quản lý v10.1), Nâng cao dùng hít đất thường. Gập bụng nâng cao = gập bụng nâng chân (`legraise`). Squat 1 chân, squat bình nước chưa có hình: ghi "làm theo cách thầy cô GDTC dạy".
+- **t5 Tự test sức bền**: Test nâng cao đùi + jumping jack (bấm giờ, thang Yếu · Trung bình · Tốt của Sổ quản lý v10.1) · Tăng sức bền an toàn (3 câu: tăng dần, hạ nhịp bằng đi chậm, choáng/tức ngực thì dừng và báo).
+- **t6 Bảng thành tích**: Thẻ thành tích (tên, lớp, ngày, mỗi bài: lần này, lần trước, mốc, ▲▼, Đạt; mục tiêu lần tới; chữ ký Shin) để chụp màn hình gửi GV · Mục tiêu lần test tới (viết, gợi ý theo bài chưa đạt mốc).
+- Dạng mới **ft**: giới thiệu (danh sách bài, mốc, kỷ lục) → từng bài (hình + 3 điểm chính, đếm chạm/nhập số hoặc bấm giờ; "Bỏ qua bài này") → kết quả bài (mốc, so lần trước) + đồng hồ nghỉ 2 phút → tổng kết (bảng, ± so lần trước, cảm nhận bắt buộc). Không cho lưu buổi test bỏ qua hết. Dạng **board**.
+- Lưu `S.ft.h`; số test cũng vào Kỷ lục cá nhân (ô "Lần tập thử" không tính test). Báo trang chủ `extra.test.ft`. Sổ tay › Thẻ hội viên: mục "Thể lực tự test". Demo GV có 3 buổi test mẫu. config.js: TC01 `total` 85, `ver` TC01.1.4.
+- Kiểm 390 (Nhà xưởng nam, Dịch vụ nữ, Ngoài trời nữ) + 1280 (Văn phòng nam): làm trọn 7 hoạt động mới, test lại để thấy ± và ▲▼, bỏ qua bài, Sổ tay, demo GV, trang chủ; hồi quy Tập thử Sàn tập và t1b; độ dài đáp án (t4a, t5b: 0 lỗi); ES5; không lỗi console.
+
+Tệp đổi: tc01/content.js, tc01/engine.js, tc01/tc01.css, tc01/index.html, config.js, sw.js, index.html, cd01/index.html, tk/index.html, mau/index.html, routine/index.html (số phiên bản), CHANGELOG.md, AGENTS.md.
+File cần xóa trên GitHub: không có.
+
+## PS1.3.31 · 18/11/2026 · TC01.1.3: mở Phòng test (302 Test Lab) đợt 1 · t1–t3 · ngân hàng câu
+Theo PA 1 đã chốt (bảng đánh giá lớp GDTC, Chương trình TTS 30 tiết, Bảng 3.2). Không đổi trang chủ, CD01, TK, Shin Routine, các khu khác.
+- **Phòng test mở** (`KHU.test.ready`), 6 bài (`BAI_TEST`); đợt 1 xong 3 bài, 6 hoạt động; t4 Tự test sức mạnh, t5 Tự test sức bền, t6 Bảng thành tích hiện "Sắp mở".
+- **t1 Test thử Dinh dưỡng**: Đúng hay sai 10 câu (khởi động) · Test thử 20 câu, mốc Đạt từ 15/20. **t2 Sức khỏe & Bệnh lý**: tương tự. **t3 Test tổng**: 30 câu (15 + 15), mốc Đạt từ 25/30 · Ôn lại câu đã sai (tối đa 10 câu/lượt; chưa có câu sai thì ôn nhanh 10 câu ngẫu nhiên).
+- **Ngân hàng câu** (content.js): `QB.dd` 36 câu, `QB.sk` 38 câu (3 đáp án, `o[0]` đúng, máy xáo), `QTF` 16 + 16 câu Đúng/Sai. Mỗi câu có `s` = bài để ôn; kết quả hiện nút "Ôn: Khu › Bài". Soạn từ bài TC01 + Sổ tay sức khỏe 2.0 (Ch.1, 2, 3, 7, 9). Kiểm độ dài đáp án: 0 lỗi.
+- Dạng mới: **quiz** (làm như đề thật: chọn đáp án trung tính, đi lại giữa các câu, lưới số câu, nộp khi đủ; kết quả: điểm, Đạt/Chưa đạt mốc lớp, thanh mốc, Kỷ lục, câu cần xem lại + giải thích) · **tf** (Đúng/Sai, phản hồi ngay) · **redo** (ôn câu sai, chọn lại đến khi đúng; đúng ngay lần đầu thì câu rời danh sách).
+- Lưu `S.test` {q: tốt nhất/lần cuối/số lần, w: câu cần ôn, tf}; báo trang chủ `extra.test`. Sổ tay: ô "Dấu Phòng test", "Câu cần ôn", mục "Phòng test của mình". Thẻ hội viên thêm dòng đục lỗ **TEST**. config.js: TC01 `total` 78, `ver` TC01.1.3.
+- Không dùng từ Sổ tay: lịch "thải độc" theo giờ, tỷ lệ 50/25/25, "tập trước bữa sáng đốt mỡ hơn 20%". Bảng 3.2 gốc ghi ngược dấu (Đạt "<15/20"), app dùng "từ 15/20".
+- Kiểm 390 (Nhà xưởng nam, Ngoài trời nữ) + 1280 (Dịch vụ nữ): làm trọn t1a, t1b (thử nộp thiếu câu), t2a, t2b, t3a, t3b; Sổ tay; demo GV; trang chủ phòng tập; ES5; không lỗi console.
+
+Tệp đổi: tc01/content.js, tc01/engine.js, tc01/tc01.css, tc01/index.html, config.js, sw.js, index.html, cd01/index.html, tk/index.html, mau/index.html, routine/index.html (số phiên bản), CHANGELOG.md, AGENTS.md.
+File cần xóa trên GitHub: không có.
+
+## PS1.3.30 · 18/11/2026 · TC01.1.2: Phòng y tế đợt 2 (y4–y6) · Thang 5 mức khi không khỏe
+Làm theo dàn bài đã duyệt. Không đổi trang chủ, CD01, TK, Shin Routine, các bài y1–y3.
+- **y4 Bong gân, trầy xước**: ca trực "Trận bóng chiều chủ nhật" (dừng, chườm lạnh 15–20 phút, băng ép vừa chặt, kê cao; rửa vết trầy bằng nước sạch; đỏ lan, sưng nóng, mủ, sốt → đi khám) · xếp 4 việc Nghỉ – Lạnh – Ép – Kê cao · chuyện bạn Q. té xe trước ngày bay (hỏi dồn 3 "vì sao" + viết "Trước ngày bay, mình sẽ…").
+- **y5 Đau lưng, cổ, vai**: ca trực "Sau ca bê hàng" (mỏi thường / đau nhiều thì báo, xin việc nhẹ / đang đau không tự tập mạnh / tê, yếu chân → đi khám / phòng lại) · xem cách làm 3 động tác nhẹ (EX `backcare`: nghiêng cổ, xoay vai, chống tay ưỡn lưng) · chọn 1 thói quen giữ lưng, cổ, vai (`YHABITS`, 3 chung + 1 theo nhóm, lưu `S.yte.habit`, không đè thói quen Góc nghề).
+- **y6 Không khỏe thì báo thế nào**: ca trực "Báo ốm bằng tiếng Nhật" (báo trước giờ vào ca, câu 体調が悪いので、今日は休ませてください, nói rõ dấu hiệu, tự đi khám + nhờ dịch qua điện thoại, khám xong báo lại) · Thang 5 mức: mức nào, làm gì? (5 câu, xong hiện thẻ thang) · viết tin nhắn báo ốm (gợi ý mẫu tiếng Nhật và tiếng Việt).
+- **Thang 5 mức** (`THANG`, lược từ bảng Kokateam: bỏ ý uống thuốc mang từ Việt Nam, bỏ ý mang thai) hiện ở cuối y6b và trong Sổ tay › Khẩn cấp.
+- Dạng mở rộng: habit nhận `hl` (dùng `YHABITS`) · pick nhận `scale: 1` · write nhận `dyn: 'yte'` (không chèn gợi ý bữa ăn). `words()` đếm cả chữ Nhật (3 ký tự ≈ 1 chữ) để tin nhắn tiếng Nhật lưu được. Báo cáo `extra.yte` thêm `habit`. Sổ tay › Tổng quan hiện thói quen giữ lưng đã chọn.
+- Kiểm 390 + 1280: làm trọn 9 hoạt động mới, Sổ tay › Khẩn cấp, y1a, y3c, Góc nghề n4c (thói quen cũ không đổi), trang chủ; độ dài đáp án (BAI_YTE: 0 lỗi); ES5; không lỗi console.
+
+Tệp đổi: tc01/content.js, tc01/engine.js, tc01/tc01.css, tc01/index.html, config.js, sw.js, index.html, cd01/index.html, tk/index.html, mau/index.html, routine/index.html (số phiên bản), CHANGELOG.md, AGENTS.md.
+File cần xóa trên GitHub: không có.
+
+## PS1.3.29 · 18/11/2026 · TC01.1.1: mở Phòng y tế (301 First Aid) đợt 1 · dạng Ca trực · Thẻ khẩn cấp
+Thầy chốt: 301 theo PA C "Ca trực của Shin"; 302 Test Lab theo PA 1 (làm sau); thêm Thẻ khẩn cấp vào Sổ tay. Không đổi trang chủ, CD01, TK, Shin Routine.
+- **Phòng y tế mở** (`KHU.yte.ready`), 6 bài (y1–y6); đợt 1 làm xong 3 bài, 9 hoạt động: **y1 Choáng, sắp ngất** (ca trực bạn H. ở sân tập · xếp 4 việc khi chính mình sắp ngất · gọi 119 hay theo dõi, 4 câu) · **y2 Say nắng (熱中症)** (ca trực anh K. ở công trường · ghép 6 từ tiếng Nhật · ngày nắng của nhóm mình, câu cuối theo 5 nhóm) · **y3 Cảm lạnh, cúm, sốt** (ca trực "sáng thức dậy bị sốt" · nghỉ ở phòng hay đi khám, 4 câu · chuyện bạn M. ở trung tâm đào tạo, hỏi dồn vì sao + viết). y4 Bong gân, trầy xước · y5 Đau lưng, cổ, vai · y6 Không khỏe thì báo thế nào: "Sắp mở".
+- **Dạng mới `sim` (Ca trực)**: màn mở đầu (cảnh, giờ, lời Shin) → 5 tình huống; mỗi lựa chọn có "chuyện xảy ra tiếp" riêng; chọn chưa đúng thì xem hậu quả + lý do rồi "Quay lại, chọn cách khác" (lựa chọn đã thử mờ đi); đồng hồ "An toàn" 3 mức; cuối ca: số tình huống đúng ngay lần đầu + **Phiếu sơ cứu** (5 dòng). Lưu `S.yte.sim[id] = {f, n, at}`, báo GV `extra.yte`.
+- **Thẻ khẩn cấp** (Sổ tay › thẻ mới "Khẩn cấp"): 119, 110, #7119 (ghi rõ chỉ một số nơi có), 4 câu tiếng Nhật khi gọi 119, 3 ô tự ghi (địa chỉ chữ Nhật, người hỗ trợ, công ty) lưu `S.kc`, chỉ trên máy này, không gửi báo cáo.
+- Shin ở Phòng y tế (`SHIN_OUTFIT = 'aid'`): giữ băng đô, bỏ còi, băng tay trắng chữ thập xanh (không dùng chữ thập đỏ). Thẻ hội viên thêm dòng đục lỗ **AID**; Sổ tay › Tổng quan thêm ô "Dấu Phòng y tế", Thẻ hội viên thêm mục "Phòng y tế của mình". Sân khối: mẹo "aid" đổi thành câu từ bài y1.
+- Hoạt động nhận `kl` (nhãn dạng riêng, vd y3c "Chuyện đã xảy ra"); story nhận `w` (câu viết riêng); match tra chữ ở `YTE_TXT` trước rồi `NGHE_TXT`.
+- **Sửa lỗi cũ**: kiểu `.cnt` của cửa phòng tập (TC01.0.7) làm thẻ đếm ở Sàn tập › Tập thử và màn hình "Tập theo Shin" (Góc nghề) bị đặt `position:absolute`. Nay chỉ áp cho `.door .cnt`.
+- Không dùng từ Sổ tay sức khỏe Ch.8: tát má, giật tóc mai, cho ngửi amoniac/giấm, bấm huyệt.
+- Kiểm 390 (nhóm Ngoài trời nữ, Dây chuyền nữ, Dịch vụ, Văn phòng) + 1280 (Nhà xưởng nam): làm trọn 9 hoạt động, đục lỗ, Sổ tay 4 thẻ, nhập Thẻ khẩn cấp, mặt sau thẻ, trang chủ phòng tập, demo GV; độ dài đáp án (34 câu); ES5; không lỗi console. Hồi quy n5b, n5c, d3a, b2b.
+
+Tệp đổi: tc01/content.js, tc01/engine.js, tc01/art.js, tc01/tc01.css, tc01/index.html, config.js, sw.js, index.html, cd01/index.html, tk/index.html, mau/index.html, routine/index.html (số phiên bản), CHANGELOG.md, AGENTS.md.
+File cần xóa trên GitHub: không có.
+
 ## PS1.3.28 · 18/11/2026 · Trang chủ mới: Shin Routine đứng đầu, nút Check-in, khóa học kiểu thẻ Labs
 Thầy chốt PA1. Chỉ đổi trang chủ và cầu nối Shin; không đổi bài học, dữ liệu học viên.
 - **Phong cách** (cảm hứng tabletop.google, labs.google): nền kem #F6F4EE, tiêu đề phông Nunito (lấy từ `routine/assets/fonts`, chạy cả khi mất mạng; trang chủ bỏ phông Google), hình mờ trang trí trôi nhẹ ở mép, thẻ trắng bo tròn.
