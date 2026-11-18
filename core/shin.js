@@ -34,9 +34,12 @@
     ['bow', 'Nơ lịch sự', 1, 'Nơ đỏ cho ngày phỏng vấn'],
     ['sport', 'Thể thao', 2, 'Băng đô, còi như HLV TC01'],
     ['work', 'Đi làm', 2, 'Mũ bảo hộ, áo phản quang'],
-    ['grad', 'Tốt nghiệp', 3, 'Mũ tốt nghiệp ở Ga Ước Mơ']
+    ['grad', 'Tốt nghiệp', 3, 'Mũ tốt nghiệp ở Ga Ước Mơ'],
+    ['captain', 'Thuyền trưởng', 0, 'Mũ thuyền trưởng từ CD02', 'cd02'] /* PS1.3.38: mở khi nhận Bằng Thuyền Trưởng (CD02 › Cảng Khởi Hành) */
   ];
   var FITMAP = {}; FITS.forEach(function (f) { FITMAP[f[0]] = f; });
+  /* trang phục có phần tử thứ 5 = mã khóa: chỉ mặc được khi khóa đó báo extra.fin (học xong). Khóa tự gọi svg(..., {fit}) thì luôn vẽ được. */
+  function earned(f) { if (!f || !f[4]) return true; try { var x = (W.PS.summary(f[4]) || {}).extra || {}; return !!x.fin; } catch (e) { return false; } }
   var ALIAS = { party: 'cheer', touched: 'moved', encourage: 'wink', surprise: 'wow', sad: 'worry', miss: 'hi' };
 
   function P(n) { return Math.round(n * 10) / 10; }
@@ -179,12 +182,19 @@
     var x = s.n[0], y = s.n[1];
     return '<path d="M' + (x - s.n[2] + 4) + ' ' + (y - 4) + 'Q' + x + ' ' + (y + 8) + ' ' + (x + s.n[2] - 4) + ' ' + (y - 4) + '" stroke="#2A714D" stroke-width="1.8" fill="none"/><rect x="' + (x - 4) + '" y="' + (y + 3) + '" width="10" height="6" rx="3" fill="#C9D3E6" stroke="#7A86A3" stroke-width="1"/><circle cx="' + (x - 2) + '" cy="' + (y + 6) + '" r="1.3" fill="#7A86A3"/>';
   }
+  function captainHat(s) { /* mũ thuyền trưởng: thân trắng, vành xanh đậm, lưỡi trai đen, huy hiệu mỏ neo */
+    var x = s.top[0], y = s.top[1], w = s.top[2] + 5;
+    return '<path d="M' + (x - w + 3) + ' ' + (y + 4) + 'Q' + (x - w - 2) + ' ' + (y - 12) + ' ' + x + ' ' + (y - 13) + 'Q' + (x + w + 2) + ' ' + (y - 12) + ' ' + (x + w - 3) + ' ' + (y + 4) + 'Z" fill="#FBFAF6" stroke="#2A2118" stroke-width="1.4" stroke-linejoin="round"/>' +
+      '<rect x="' + (x - w + 2) + '" y="' + (y + 1) + '" width="' + (2 * w - 4) + '" height="6" rx="2" fill="#174A63"/>' +
+      '<path d="M' + (x - w + 4) + ' ' + (y + 7) + 'Q' + x + ' ' + (y + 14) + ' ' + (x + w - 4) + ' ' + (y + 7) + 'Z" fill="#1E2A33"/>' +
+      '<g transform="translate(' + x + ' ' + (y - 5) + ')"><circle r="4.2" fill="#F2C230"/><path d="M0-2.6v5M-2 1.2q2 2.2 4 0M-1.4-1h2.8" stroke="#174A63" stroke-width="1.1" fill="none" stroke-linecap="round"/></g>';
+  }
   function vest(stg) {
     if (stg === 3) return '<path d="M33 64Q50 58 67 64L66 84Q50 92 34 84Z" fill="#FF9A3C" opacity=".95"/><path d="M34 74Q50 79 66 74" stroke="#F4F1EA" stroke-width="3" fill="none"/>';
     if (stg === 2) return '<path d="M30 70Q50 64 70 70L68 84Q50 92 32 84Z" fill="#FF9A3C" opacity=".95"/><path d="M31 78Q50 84 69 78" stroke="#F4F1EA" stroke-width="3" fill="none"/>';
     return '';
   }
-  function hatOf(fit) { return { cap: 1, winter: 1, sport: 1, work: 1, grad: 1 }[fit] ? 1 : 0; }
+  function hatOf(fit) { return { cap: 1, winter: 1, sport: 1, work: 1, grad: 1, captain: 1 }[fit] ? 1 : 0; }
   function outfitBack(fit, s, stg) { return fit === 'work' ? vest(stg) : ''; }
   function outfitNeck(fit, s) {
     if (!s.n) return '';
@@ -192,6 +202,7 @@
     if (fit === 'winter') return scarf(s, '#E8574A', '#B5352B', 1);
     if (fit === 'bow') return bow(s);
     if (fit === 'sport') return whistle(s);
+    if (fit === 'captain') return scarf(s, '#0F9F98', '#0B6F6A', 1);
     return '';
   }
   function outfitHead(fit, s, stg) {
@@ -200,6 +211,7 @@
     if (fit === 'sport') return band(s, '#E8574A', '#B5352B', 1);
     if (fit === 'work') return helmet(s);
     if (fit === 'grad') return grad(s);
+    if (fit === 'captain') return captainHat(s);
     return '';
   }
   /* ---------- đồ vật kèm biểu cảm ---------- */
@@ -245,9 +257,9 @@
     if (W.DEMO) days = 40; /* demo giáo viên ở Shin Routine: Shin đã lớn, trang phục chỉ thử tạm */
     if (W.PS_SHIN_FIT_TMP) fit = W.PS_SHIN_FIT_TMP;
     var stg = stageOf(days);
-    if (!FITMAP[fit] || FITMAP[fit][2] > stg) fit = 'coach';
+    if (!FITMAP[fit] || FITMAP[fit][2] > stg || (!W.DEMO && !earned(FITMAP[fit]))) fit = 'coach';
     return { stg: stg, fit: fit, days: days };
   }
-  W.PSShin = { svg: svg, look: look, stageOf: stageOf, FITS: FITS, STAGE_DAYS: STAGE_DAYS, STAGE_NAME: STAGE_NAME,
+  W.PSShin = { svg: svg, look: look, stageOf: stageOf, earned: earned, FITS: FITS, STAGE_DAYS: STAGE_DAYS, STAGE_NAME: STAGE_NAME,
     now: function (mood, cls) { var l = look(); return svg(mood, { stg: l.stg, fit: l.fit, days: l.days, cls: cls }); } };
 })(window);

@@ -8,7 +8,7 @@
    ========================================================= */
 var PS_CONFIG = {
   APP: 'Proskills',
-  APP_VER: 'PS1.3.36',
+  APP_VER: 'PS1.3.38',
   ORG: 'Khoa Kỹ năng · JPC · Proskills',
 
   /* Mật khẩu bản demo giáo viên, dùng chung cho MỌI module (phân biệt hoa thường).
@@ -49,8 +49,8 @@ var PS_CONFIG = {
       door: 0 /* PS1.3.28: tắt (thầy chốt 18/11). 1 = mở Proskills mà hôm nay chưa đóng dấu thì vào thẳng Shin Routine; 0 = tắt */ },
     { id: 'cd01', code: 'CD01', title: 'Career Design 1', sub: 'Hiểu mình, chọn nghề, kế hoạch JPC và 3 năm đầu ở Nhật',
       icon: 'rail', color: '#2C5BC4', state: 'ready', gateQ: 'Shin thích ăn món gì nhất?', pass: ['oden', 'おでん', 'オデン'], total: 18, ver: 'CD01.1.6' },
-    { id: 'cd02', code: 'CD02', title: 'Career Design 2', sub: 'Sau 3–5 năm ở Nhật: hướng đi 5–10 năm',
-      icon: 'compass', color: '#0F9F98', state: 'soon', gateQ: '', pass: [], total: 0, ver: '0' },
+    { id: 'cd02', code: 'CD02', title: 'Career Design 2', sub: 'Hải Đồ La Bàn: những hướng đi sau 3 năm ở Nhật',
+      icon: 'compass', color: '#0F9F98', state: 'ready', gateQ: 'Thuyền của Shin xuất phát từ cảng nào?', pass: ['cang 3 nam', 'cảng 3 năm', '3 nam', 'ba nam', 'cang ba nam'], total: 18, ver: 'CD02.1.0' },
     { id: 'tk', code: 'HP05', title: 'Nhật Bản Du Ký', sub: 'Kiến thức quy định: luật Nhật, luật cư trú, luật Việt Nam',
       icon: 'scroll', color: '#2F4BD8', state: 'ready', gateQ: 'Ngộ Không thích ăn quả gì nhất?', pass: ['dao'], total: 26, ver: 'TK16' },
     { id: 'tc01', code: 'TC01', title: 'Huấn luyện thể chất', sub: 'Phòng tập HLV Shin: động tác đúng, dinh dưỡng, sức khỏe theo nghề',

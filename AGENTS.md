@@ -54,6 +54,17 @@ Dạng bước có sẵn (khóa `k`): say, pick, multi, video, write (+show, +re
 Chữ có thể chèn `[Tên]`, `[Nghề]` (nghề chính ở a33), `[Diện]` (a44 hoặc hồ sơ). Dữ liệu diện đi Nhật ở `VISA` (content.js) là tóm tắt tham khảo: soát lại với Tikme và nguồn Nhật trước mỗi đợt phát hành.
 Dạng bước có sẵn: say, pick, multi (có groups), video, write, dil (tình huống hai bên), recap, age, tag, venn, ria (RIASEC từng câu), riares, tik (mở link Tikme bắt buộc), inds (chọn ngành), cmp. **CD không chấm đúng/sai; chữ viết cho điện thoại: câu ngắn, một ý một câu** (xem đầu content.js).
 
+### Module cd02 (Career Design 2 · Hải Đồ La Bàn, từ PS1.3.37)
+Nạp theo thứ tự trong `cd02/index.html`: `../core/shin.js` → `art.js` (biểu tượng `CD2_IC`/`cdIc`, cờ `flagSym/flagSVG/flagMast`, thuyền `shipSVG(lv)`, la bàn `compassSVG`, đảo `isleArt`, sương `fogArt`, Shin `shin2()` = PSShin gà lớn + `fit: 'captain'`) → `content.js` (**chữ: sửa ở đây**) → `engine.js`.
+- Dữ liệu: `ISLES` (8 đảo = 8 hướng; x, y trên hải đồ 360×460; who = mã Senpai) · `SENPAI` (người thật: kd/bn/nay khóa tóm tắt, q nguyên văn, url, f điểm chung `CD2_F`) · `BASE5` (5 nền, rt = thẻ Shin Routine) · `HANH` (nhân vật ghép) · `PORT`, `BEN` (r: vòng 1 tùy ý / 2 lần lượt / 3 tùy ý; `ready: 1` = đã mở) · `ACTS`, `ORDER`.
+- Mở khóa ở `benOpen()`: x1 → b1, b2 → b3 → b4 → b5, b6 → (đủ 6 con dấu) Cảng Khởi Hành. Mở bến mới: viết chặng vào `ACTS`, đặt `ready: 1`, nối id vào `ORDER`.
+- Dạng bước (k): say, write (key, min, tips), from, flag, open1, card, flip, flipsum, isles, pickisle, book, common, base, chat, pairs, winds, life, compass. Mỗi dạng có `STEP[k]` và (nếu cần) `CHECK[k]`.
+- Chữ chèn: [Tên], [Nghề], [Đảo] (b13), [Lệch] (la bàn), [Gió], [Gió2] (b32).
+- Trạng thái `S`: d, done, xp, ins, days, seen, cards (thẻ Senpai), isl (đảo đã tan sương), stamp (con dấu bến). Thẻ mới +2 XP (`xp['card.<id>']`).
+- Đọc CD01: `PS.summary('cd01').extra` (jobKey/main, mainName, far, letter). Không học CD01 vẫn vào được (chọn nghề ở x1).
+- Quy tắc chữ: không đúng/sai; không chữ “hải tặc”, không cờ đầu lâu; biển, đảo hư cấu; ý của Thầy nói gián tiếp “thầy của Shin”; Senpai chỉ JLPT N3+ và chuyện đã công khai.
+- **Từ PS1.3.38 (CD02.1.0) đủ khóa:** Bến 4 (b41–b43, `VOY`, `MS_TIPS`, `JL_OPTS`, `METERS`), Bến 5 (b51–b53, `WEIGHT`, `FEEL3`, `BLOCKS`, `WHY3`, `TRIALS`, `TRY_ISLE`), Bến 6 (b61–b62, `RING_P`, `RING_L`, `MSG_Q`, `WORKS`, `LEARN_H`), Cảng Khởi Hành `GOAL_PORT` (acts f1, f2; `FIN_ORDER`, không tính vào `CD2_TOTAL` = 18). Dạng bước mới: voy, tline, meters, trio, weigh, leanpick, block, why3, ways, real, trial, ring, msg, work, habit, open2, sheet, send, cert. Khóa dữ liệu hải trình: `<b41|b42|b43>.isl/.islo/.name/.m1/.m3/.m5/.jl/.g`; cân `b51.w`, nghiêng `b51.lean`; thử nhỏ `b53.try/.when/.with/.start/.tk`. Chữ chèn thêm [Nghiêng]. Xong f2 → `S.fin` (không đóng dấu, có Bằng Thuyền Trưởng `certHTML()`), `extra.fin` mở trang phục Thuyền trưởng (`PSShin.FITS` phần tử thứ 5 = mã khóa, `PSShin.earned`).
+
 ### Module tc01 (Huấn luyện thể chất, TC01)
 Nạp theo thứ tự trong `tc01/index.html`: `art.js` (HLV Shin `shin()`, người tập `fig(tênTưThế,{marks})` từ `POSES`, `figGuide/figArrow/figArc`, biểu tượng `TC_ICONS`) → `content.js` (**chữ: sửa ở đây**: `GROUPS`, `JOBS`, `KHU`, `TXT`, `EX` động tác, `MOC` mốc lớp, `BAI` bài và hoạt động, `PLANS`, `DEMO`) → `engine.js`.
 **Không tuần tự:** mọi khu, bài, hoạt động mở tự do. Khu chưa làm: `KHU[].ready` không có → "Sắp mở". Thêm khu mới: thêm dữ liệu bài như `BAI` và bật `ready: 1`.

@@ -5,6 +5,40 @@ Quy ước số phiên bản: **PS a.b.c**
 - b: giai đoạn / thêm module hoặc tính năng lớn
 - c: sửa nhỏ trong giai đoạn đó
 
+## PS1.3.38 · 18/11/2026 · CD02.1.0 Hải Đồ La Bàn: Bến 4–6 + Cảng Khởi Hành (đủ khóa)
+Làm tiếp theo khung thầy đã chốt (PA A, Hải Đồ La Bàn, không Excel duyệt chữ). Không đổi nội dung CD01, TK, TC01, Shin Routine; Xuất phát và Bến 1–3 giữ nguyên.
+- **CD02 đủ 18 chặng** (Xuất phát 1 + Bến 1–5 × 3 + Bến 6 × 2) + Cảng Khởi Hành 2 chặng (không tính vào tổng, như Ga Ước Mơ CD01). config.js: total 18, ver CD02.1.0.
+- **Bến 4 Phòng Hải Đồ** (Vòng Thiết kế, mở sau Xưởng La Bàn): b41 Hải trình A · Đường đang đi (gợi lại hướng 5 năm CD01 và câu viết lúc nhận thuyền) · b42 Hải trình B · Nếu đường A đóng lại (dùng cơn gió khó ở b32) · b43 Hải trình C · Nếu không lo tiền, không lo ai nghĩ gì + đặt 3 hải trình cạnh nhau (vuốt ngang) + viết điều nhận ra. Mỗi hải trình: chọn đảo (hoặc đảo riêng), đặt tên, dòng thời gian 5 năm sau 3 năm ở Nhật (năm 1, 3, 5 kèm tuổi; gợi ý mốc theo đảo), tiếng Nhật cần đạt, 4 đồng hồ tự chấm Thích · Tự tin · Hợp la bàn · Khả thi.
+- **Bến 5 Vịnh Ngã Rẽ**: b51 Bàn cân nhắc (học viên tự đặt nặng/nhẹ cho 4 đồng hồ → điểm 3 hải trình; chọn hải trình đang nghiêng; kết quả cân giống/khác cảm giác) · b52 Khi đường bị chặn (4 tình huống từ chuyện thật đã công khai: trượt N2, công ty chưa có chi nhánh ở VN, dịch bệnh, gia đình cần → hỏi vì sao 3 tầng → chọn 2–3 cách gỡ + bước nhỏ đầu tiên → xem Senpai thật đã làm gì: anh Huân, anh Dũng, anh Hợi, anh Hoài, anh Sỹ, chị Cẩm Vinh, chị Hưng) · b53 Thử nhỏ 2 tuần (gợi ý theo đảo của hải trình nghiêng; thẻ 14 ngày đánh dấu ở Hải đồ và Sổ tay).
+- **Bến 6 Ngọn Hải Đăng**: b61 Ngọn hải đăng của bạn (8 nhóm người xếp vào 3 vòng Đã gần · Có quen · Cần tìm, vẽ thành vòng tròn; chọn người giúp nhiều nhất; chuyện thật anh Hợi, chị Ngát, chị Linh) + soạn tin nhắn xin lời khuyên (mẫu tự điền, sửa được, chép) · b62 Học từ công việc (3 tình huống ở chỗ làm, mỗi cách có cái được và lưu ý, không đúng/sai; chọn cách học + gợi ý thẻ Shin Routine; viết cách tập ở JPC).
+- **Cảng Khởi Hành** (mở khi đủ 6 con dấu bến): f1 Nhìn lại hải trình (đo độ mở lần 2, so với lúc nhận thuyền) · f2 Hải trình của tôi (bản 1 trang: la bàn, 3 hải trình, nền, khi đường bị chặn, thử nhỏ, người soi đường, độ mở; Lưu ảnh canvas + In/PDF) → báo cáo thầy cô (chép / mở Teams) → Bằng Thuyền Trưởng. Xong: `S.fin`, nút Xem bằng ở Hải đồ và Sổ tay.
+- **Tủ đồ của Shin** (core/shin.js, routine/proskills.js): thêm trang phục **Thuyền trưởng** vào `FITS` với khóa `cd02`; chỉ mặc được khi `PS.summary('cd02').extra.fin` (học viên nhận Bằng Thuyền Trưởng). `PSShin.earned(f)`. Demo GV Shin Routine vẫn thử được.
+- Sổ tay › Hải trình thêm: 3 hải trình, thẻ thử nhỏ, khi đường bị chặn, ngọn hải đăng, cách học, Bằng Thuyền Trưởng.
+- **Demo giáo viên** `cd02/?demo`: học viên giả định đã xong Xuất phát + Bến 1–3 để thầy cô thử ngay Bến 4–6 và Cảng Khởi Hành.
+- Báo về trang chủ `extra` thêm: voy (3 hải trình: đảo, tên, JLPT, mốc, đồng hồ, điểm), trio, leanVoy, leanFeel, leanWhy5, block, blockRoot, ways, firstStep, trial, trialStart, trialDays, trialLearn, ring, guide, msgTo, work6, learnH, learnHow, open2, change, fin.
+- Kiểm 390 + 1280: đi trọn Bến 4 → Cảng Khởi Hành, ảnh Hải trình của tôi, Sổ tay; Tủ đồ mở Thuyền trưởng sau khi xong; ES5 (acorn) cho cd02/*.js, core/shin.js, routine/proskills.js; không lỗi console; không tràn ngang.
+
+Tệp đổi: cd02/content.js, cd02/engine.js, cd02/cd02.css, cd02/index.html, core/shin.js, routine/proskills.js, config.js, sw.js, index.html và ?v= ở mọi trang module, CHANGELOG.md, AGENTS.md.
+File cần xóa trên GitHub: không có.
+
+## PS1.3.37 · 18/11/2026 · CD02.0.1 Hải Đồ La Bàn: Xuất phát + 3 bến đầu
+Thầy chốt: PA A (6 bến, không tuyến tính), câu chuyện Hải Đồ La Bàn (thủy thủ đoàn, không dùng chữ hải tặc, thế giới riêng của khóa), góc nhìn THT nói gián tiếp “thầy của Shin”, không qua Excel duyệt chữ. Không đổi nội dung CD01, TK, TC01, Shin Routine.
+- **Module mới `cd02/`** (art.js → content.js → engine.js, cd02.css): mở ở trang chủ (`state: 'ready'`, cổng “Thuyền của Shin xuất phát từ cảng nào?” → Cảng 3 Năm), total 16 chặng (bản này mở 10).
+- **Hải đồ** (trang chủ module): Sổ Thuyền Trưởng (cờ, tên, nghề, cảng nhà, 7 con dấu, % sương tan, thẻ Senpai) · bản đồ SVG: Cảng 3 Năm ở giữa, 6 bến, 8 đảo phủ sương (sương tan khi ghé đảo, lật thẻ, gắn nhãn) · thuyền lớn dần theo số bến có dấu · danh sách bến theo 3 vòng · Thư trong chai (câu nguyên văn Senpai, đổi mỗi ngày).
+- **Mở khóa**: Xuất phát → Vòng Khám phá (Bến 1, Bến 2 đi thứ tự tùy ý) → Xưởng La Bàn → (Phòng Hải Đồ, Vịnh Ngã Rẽ, Ngọn Hải Đăng, Cảng Khởi Hành: Sắp mở). Đảo ghé tự do sau khi nhận thuyền.
+- **Xuất phát · Nhận thuyền (x1)**: Shin chào · dữ liệu CD01 (nghề, hướng 5 năm, thư) hoặc chọn nghề nhanh · thiết kế cờ (8 biểu tượng, 6 màu, khẩu hiệu) · đo độ mở lần 1 (số hướng, rõ mấy phần, nghĩ gì) · mục tiêu khóa · Sổ Thuyền Trưởng.
+- **Bến 1 Đài Vọng Biển**: b11 Đoán hải trình (lật 6 thẻ Senpai) · b12 Bản đồ 8 đảo (cần gì, được gì, đánh đổi, ai đã đi; gắn nhãn Tò mò / Chưa từng nghĩ / Chưa hợp) · b13 Đảo làm bạn tò mò.
+- **Bến 2 Bến Senpai**: b21 Mượn 2 cuốn sách người (cùng nghề, khác đường) · b22 Tìm điểm chung (đoán rồi xem Shin đếm từ 25 chuyện) + “Mọi hải trình đều xuất phát từ Cảng 3 Năm” (5 nền, việc nhỏ, gợi ý thẻ Shin Routine) · b23 Hỏi chị Hạnh (nhân vật ghép) + câu hỏi gửi Senpai thật.
+- **Bến 3 Xưởng La Bàn**: b31 Cán cân (6 cặp thanh trượt → la bàn) · b32 Gió ngoài khơi (8 điều có thể đổi kế hoạch) · b33 Shin nhớ thầy dặn (đường đời 18–40, “lấy ngắn nuôi dài”, Senpai đi khác đường) + đi làm là để…, tuổi 30 tốt là….
+- **25 thẻ Senpai** người thật (Tikme, esuhai.vn, JLPT N3 trở lên; anh Hợi, chị Kim Thanh chưa ghi JLPT), câu nguyên văn + link bài gốc. Sổ tay: Tổng quan | Hải trình (sổ, la bàn, nền, câu hỏi, bộ thẻ) | Cài đặt.
+- **core/shin.js**: thêm trang phục riêng `captain` (mũ thuyền trưởng, khăn teal) dùng cho CD02; không nằm trong Tủ đồ.
+- Demo giáo viên `cd02/?demo`: học viên giả định đã nhận thuyền.
+- Báo về trang chủ `extra`: job, flag, goal, open1, fog, cards, curious, isl, books, base, askSenpai, compass, lean, windHard, adapt, work, life30, stamps.
+- Kiểm 390 + 1280: đi trọn Xuất phát → Bến 3, đảo, thẻ Senpai, Sổ tay, demo; ES5 (acorn); không lỗi console.
+
+Tệp đổi: cd02/ (mới: index.html, cd02.css, art.js, content.js, engine.js), core/shin.js, config.js, sw.js, index.html và ?v= ở mọi trang module, CHANGELOG.md, AGENTS.md.
+File cần xóa trên GitHub: không có.
+
 ## PS1.3.36 · 18/11/2026 · (gộp PS1.3.35 + PS1.3.36) Ảnh đại diện · Cỡ chữ Vừa/Lớn · Gà Shin lớn dần thay mèo Shin
 Thầy chốt: ảnh đại diện khoảng 12 hình tự vẽ (không cần duyệt), làm gộp hai bước. Không đổi nội dung CD01, TK, TC01.
 - **Ảnh đại diện** (Cài đặt trang chủ › Ảnh đại diện, tệp mới `hub/avatar.js`): 12 hình vẽ phẳng, nền tròn màu nhạt (Cáo, Gấu trúc, Cá voi, Cú, Ếch, Bạch tuộc, Núi Phú Sĩ, Tên lửa, Xương rồng, Cơm nắm, Âm nhạc, Bóng đá) hoặc chữ cái đầu tên với 8 màu (màu vàng cũ là mặc định). Lưu `PS.prefs().av` ('i:mã' / 'c:số'), có trong tệp sao lưu. Hiện ở góc phải thanh trên.
