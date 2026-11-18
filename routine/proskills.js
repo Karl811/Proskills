@@ -7,6 +7,8 @@
      need (có thẻ cần ghi nhận), cards, active, fire (Lửa), recDays, mastered, habits }.
    - Phút rèn luyện thật (đang mở và có thao tác) theo ngày: ps.mod.routine.min → tính vào chuỗi ngày, phút học chung.
    - Cửa Rèn luyện (?door=1, trang chủ chuyển sang khi hôm nay chưa đóng dấu): đóng dấu xong thì mời vào học.
+   - PS1.3.28: nút Check-in trang chủ mở ?ci=1#checkin; check-in xong hiện thanh "Đã check-in hôm nay · Vào học".
+     extra báo thêm ci (đã check-in hôm nay), ciTime (giờ check-in).
    - Nút "Về trang chủ Proskills" đặt ở đầu Sổ tay › Cài đặt (không thêm nút trên trang Hôm nay);
      nút ⋯ (Sổ tay) mở thẳng thẻ Cài đặt.
    - Demo giáo viên dùng mật khẩu chung: routine/?demo.
@@ -20,7 +22,9 @@
   if (!W.PS || W.PS_STOP) return;
   var PS = W.PS, ID = 'routine';
   var FIRST_KEY = 'ps.mod.routine.first', MIN_KEY = 'ps.mod.routine.min';
-  var DOOR = /[?&]door=1/.test(location.search || '');
+  var DOOR = /[?&](?:door|ci)=1/.test(location.search || '');
+  /* PS1.3.28: ?ci=1 = vào từ nút Check-in trên trang chủ (kèm #checkin) */
+  var DOOR_CI = /[?&]ci=1/.test(location.search || '');
   function qp(n) { var m = new RegExp('[?&]' + n + '=([^&#]*)').exec(location.search || ''); if (!m) return ''; try { return decodeURIComponent(m[1]); } catch (e) { return ''; } }
   var ADD = qp('add'), FROM = qp('from');
   var FROM_MOD = FROM ? PS.mod(FROM) : null; if (FROM_MOD && FROM_MOD.kind === 'routine') FROM_MOD = null;
@@ -46,7 +50,8 @@
   function sync() {
     var S = W.S; if (!S || W.DEMO || W.LOAD_ISSUE32) return;
     var p = PS.profile(), t = PS.teacher();
-    if (!S.name) S.name = PS.given();
+    /* PS1.3.28: tên gọi 2 chữ cuối như trang chủ (Nguyễn Thị Quỳnh Anh → Quỳnh Anh) */
+    if (!S.name) { var w = String(p.name || '').trim().split(/\s+/); S.name = w.length >= 3 ? w.slice(-2).join(' ') : PS.given(); }
     if (p.cls) S.cls = p.cls;
     S.teacher = t ? teacherIndex(t.email) : null;
     if (!S.introSeen) S.introSeen = 1;
@@ -122,7 +127,7 @@
       mine[id] = u.master ? 'master' : (u.status === 'keep' ? 'keep' : (S.slots.indexOf(id) >= 0 ? (u.status === 'pause' ? 'pause' : 'active') : 'stored'));
     });
     (W.HABITS || []).forEach(function (h) { lib[h.id] = W.sname(h.id); });
-    var x = { day: t, rec: !!rec[t], need: now.length > 0 || all.length === 0, cards: cards, active: now.length,
+    var x = { day: t, rec: !!rec[t], ci: !!(S.ci && S.ci[t]), ciTime: S.ciTime || '21:00', need: now.length > 0 || all.length === 0, cards: cards, active: now.length,
       fire: W.streak(), recDays: Object.keys(rec).length, mastered: mastered, habits: all.length, mine: mine, lib: lib };
     PS.report(ID, { xp: 0, ins: 0, done: x.recDays, total: 0, days: minutes(), extra: x, ver: W.APP_VER });
     door(x);
@@ -145,9 +150,10 @@
 
   /* ---------- cửa Rèn luyện: đóng dấu xong thì mời vào học ---------- */
   function door(x) {
-    if (wasRec === null) { wasRec = x.rec; return; }
-    if (DOOR && x.rec && !wasRec) whenFree(goCard, 0);
-    wasRec = x.rec;
+    var on = DOOR_CI ? x.ci : x.rec;
+    if (wasRec === null) { wasRec = on; return; }
+    if (DOOR && on && !wasRec) whenFree(goCard, 0);
+    wasRec = on;
   }
   function whenFree(fn, n) {
     if (n > 900) return;
@@ -158,7 +164,7 @@
   function goCard() {
     if (D.getElementById('psGo')) return;
     var el = D.createElement('div'); el.id = 'psGo'; el.className = 'psgo'; el.setAttribute('role', 'status');
-    el.innerHTML = '<span class="psgo__t"><b>Đã đóng dấu hôm nay</b><small>Vào Proskills học tiếp nhé.</small></span>' +
+    el.innerHTML = '<span class="psgo__t"><b>' + (DOOR_CI ? 'Đã check-in hôm nay' : 'Đã đóng dấu hôm nay') + '</b><small>Vào Proskills học tiếp nhé.</small></span>' +
       '<a class="psgo__go" href="../index.html" data-ps-home>Vào học</a>' +
       '<button type="button" class="psgo__x" aria-label="Để sau">×</button>';
     el.querySelector('.psgo__x').addEventListener('click', function () { if (el.parentNode) el.parentNode.removeChild(el); });
@@ -217,7 +223,7 @@
     } else if (FROM_MOD) whenFree(backCard, 0);
     else if (FIRST && !Object.keys(S.habits || {}).length && typeof W.openFirstChoice32 === 'function') {
       whenFree(function () { if (!W.OV) W.openFirstChoice32(); }, 0);
-    } else if (DOOR && !wasRec && W.r2TrainingNow().length) {
+    } else if (DOOR && !DOOR_CI && !wasRec && W.r2TrainingNow().length) {
       setTimeout(function () { try { W.toast('Ghi nhận thói quen hôm nay, rồi vào học tiếp nhé.', 3200); } catch (e) {} }, 700);
     }
     queue();
