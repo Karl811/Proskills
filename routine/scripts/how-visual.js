@@ -692,7 +692,7 @@ var HV={vandong:VD,ngu:NG,chitieu:CT,horenso:HR,anuong:AU,camxuc:CX,giup:GD,'5ph
 
 /* ---------- Ghép vào "Cách làm" ---------- */
 function stepsHTML(id,x,V){return '<div class="hw__k">Ba bước</div><div class="hwsteps hv-steps">'+x.steps.map(function(s,i){var art=V.steps&&V.steps[i]?V.steps[i]():'';return '<div class="hws hv-step">'+(art?'<figure class="hv-fig">'+art+'</figure>':'')+'<div class="hv-step-t"><i>'+(i+1)+'</i><div><b>'+esc(s[0])+'</b><span>'+esc(s[1])+'</span></div></div></div>';}).join('')+'</div>'+(x.ill?oldIll(x.ill[1]):'')+(V.key?V.key():'')+tipHTML(V);}
-function tipHTML(V){if(!V.tip)return '';return '<div class="hv-tip"><span class="hv-tip-shin" aria-hidden="true">'+shin(V.tip[0]).replace(/^\s*<svg /,'<svg class="hv-shin" ')+'</span><p><b>Shin mách nhỏ</b>'+esc(V.tip[1])+'</p></div>';}
+function tipHTML(V){if(!V.tip)return '';return '<div class="hv-tip"><span class="hv-tip-shin" aria-hidden="true">'+shin(V.tip[0]).replace('<svg class="','<svg class="hv-shin ')+'</span><p><b>Shin mách nhỏ</b>'+esc(V.tip[1])+'</p></div>';}
 function oldIll(n){return n&&ILL_CAP[n]!=null?'<figure class="ill">'+illSVG(n)+'<figcaption>'+esc(ILL_CAP[n]||'')+'</figcaption></figure>':'';}
 function whyHTML(x,V){var h='<div class="hw__k">Vì sao nên làm?</div><figure class="ill hv-duo">'+V.duo()+'</figure>'+(x.ill?oldIll(x.ill[0]):'');
  if(x.why)h+='<div class="hw__why"><small>VỚI BẠN</small>'+esc(x.why.now)+'</div><div class="hw__why"><small>Ở NHẬT</small>'+esc(x.why.jp)+'</div>';

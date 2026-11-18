@@ -93,7 +93,7 @@ function treeLettersSVG37(stage,stems,sx,order,interactive){
    KAIZEN MỖI NGÀY · TQ02
    Một file HTML, dữ liệu lưu trong trình duyệt của từng máy.
    ========================================================= */
-var APP_VER = 'M.Claude.3.3.41';
+var APP_VER = 'M.Claude.3.4.0';
 var APP_NAME = 'Shin routine';
 /* PS1.3.25: Shin Routine nằm trong Proskills (thư mục routine/), lưu theo quy ước ps.* để đi cùng bản sao lưu chung */
 var KEY = 'ps.mod.routine', KEY_DEMO = 'ps.demo.routine', KEY_MODE = 'ps.demo.routine.mode';
@@ -671,82 +671,13 @@ var GCOL={1:'#2A74DB',2:'#22A05E',3:'#0F9F98',4:'#E0567F',5:'#7B5BD0',6:'#D9731A
 function hico(id,size){ var g=HMAP[id].g; return '<span class="hi g'+g+(size?' hi--'+size:'')+'">'+glyph(id,GCOL[g])+'</span>'; }
 function gico(g,size){ return '<span class="hi g'+g+(size?' hi--'+size:'')+'">'+glyph('g'+g,GCOL[g])+'</span>'; }
 function uico(n,g){ return '<span class="hi g'+(g||1)+'" style="color:#fff">'+ic(n)+'</span>'; }
-/* ---- Shin: mèo huấn luyện viên · hi · cheer · think · wow · worry · sleep ---- */
+/* ---- Shin: gà lớn dần cùng học viên (PS1.3.36 · M.Claude.3.4.0) ----
+   Hình vẽ ở ../core/shin.js (PSShin, dùng chung với trang chủ Proskills). Giai đoạn theo số ngày đã ghi nhận
+   (Trứng → Gà con 3 ngày → Gà choai 14 ngày → Gà lớn 30 ngày), trang phục chọn ở Sổ tay › Cài đặt › Tủ đồ của Shin.
+   Biểu cảm: hi · still · cheer · think · curious · wow · worry · sleep · yawn · moved · comfort · proud · focused · determined · waiting · pout · wink · welcome. */
 function shin(mood){
-  mood = mood || 'hi';
-  var K='#3A2A1C', O='#F29A3C', W='#FFF9F0', S='#2A74DB';
-  var eyes, mouth='<path d="M54 70q3 3.5 6 0q3 3.5 6 0" stroke="'+K+'" stroke-width="2.6" fill="none" stroke-linecap="round"/>';
-  var extra='', armL='<ellipse cx="44" cy="100" rx="8" ry="6" fill="'+W+'" stroke="'+K+'" stroke-width="2.4"/>', armR='<ellipse cx="76" cy="100" rx="8" ry="6" fill="'+W+'" stroke="'+K+'" stroke-width="2.4"/>';
-  if(mood==='cheer'){
-    eyes='<path d="M42 58q6-7 12 0M66 58q6-7 12 0" stroke="'+K+'" stroke-width="3.4" fill="none" stroke-linecap="round"/>';
-    mouth='<path d="M53 68q7 9 14 0z" fill="#E86A5C" stroke="'+K+'" stroke-width="2.4" stroke-linejoin="round"/>';
-    armL='<ellipse cx="30" cy="70" rx="7.5" ry="9" fill="'+W+'" stroke="'+K+'" stroke-width="2.4" transform="rotate(-25 30 70)"/>';
-    armR='<ellipse cx="90" cy="70" rx="7.5" ry="9" fill="'+W+'" stroke="'+K+'" stroke-width="2.4" transform="rotate(25 90 70)"/>';
-    extra='<g fill="#F4B63B"><path d="M18 40l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/><path d="M100 34l1.6 4 4 1.6-4 1.6-1.6 4-1.6-4-4-1.6 4-1.6z"/></g>';
-  } else if(mood==='think'){
-    eyes='<g class="blink"><circle cx="49" cy="56" r="4.6" fill="'+K+'"/><circle cx="71" cy="56" r="4.6" fill="'+K+'"/><circle cx="50.5" cy="54" r="1.5" fill="#fff"/><circle cx="72.5" cy="54" r="1.5" fill="#fff"/></g>';
-    mouth='<path d="M55 71h10" stroke="'+K+'" stroke-width="2.6" stroke-linecap="round"/>';
-    armR='<ellipse cx="74" cy="80" rx="7.5" ry="6.5" fill="'+W+'" stroke="'+K+'" stroke-width="2.4"/>';
-    extra='<text x="94" y="36" style="'+FONT_SVG+';font-weight:800" font-size="22" fill="'+S+'">?</text>';
-  } else if(mood==='wow'){
-    eyes='<g class="blink"><circle cx="48" cy="58" r="7" fill="'+K+'"/><circle cx="72" cy="58" r="7" fill="'+K+'"/><circle cx="50.5" cy="55" r="2.6" fill="#fff"/><circle cx="74.5" cy="55" r="2.6" fill="#fff"/></g>';
-    mouth='<ellipse cx="60" cy="72" rx="4.5" ry="5.5" fill="#E86A5C" stroke="'+K+'" stroke-width="2.2"/>';
-    extra='<g stroke="#F4B63B" stroke-width="3" stroke-linecap="round"><path d="M18 46l-7-3M20 56h-8M100 46l7-3M100 56h8"/></g>';
-  } else if(mood==='worry'){
-    eyes='<g class="blink"><circle cx="48" cy="59" r="3.8" fill="'+K+'"/><circle cx="72" cy="59" r="3.8" fill="'+K+'"/></g><path d="M41 49l12 3M79 49l-12 3" stroke="'+K+'" stroke-width="2.4" stroke-linecap="round"/>';
-    mouth='<path d="M54 73q6-5 12 0" stroke="'+K+'" stroke-width="2.6" fill="none" stroke-linecap="round"/>';
-    extra='<path d="M88 40q4 7 0 10q-4-3 0-10z" fill="#8FD0E8" stroke="#4A9BBE" stroke-width="1.4"/>';
-  } else if(mood==='sleep'){
-    eyes='<path d="M42 58q6 5 12 0M66 58q6 5 12 0" stroke="'+K+'" stroke-width="3" fill="none" stroke-linecap="round"/>';
-    mouth='<path d="M56 71q4 2 8 0" stroke="'+K+'" stroke-width="2.4" fill="none" stroke-linecap="round"/>';
-    extra='<text x="88" y="34" style="'+FONT_SVG+';font-weight:800" font-size="15" fill="'+S+'">z</text><text x="98" y="24" style="'+FONT_SVG+';font-weight:800" font-size="11" fill="'+S+'">z</text>';
-  } else if(mood==='moved'){
-    eyes='<g class="blink"><ellipse cx="48" cy="58" rx="6" ry="6.6" fill="'+K+'"/><ellipse cx="72" cy="58" rx="6" ry="6.6" fill="'+K+'"/><circle cx="50.4" cy="55.6" r="2.4" fill="#fff"/><circle cx="74.4" cy="55.6" r="2.4" fill="#fff"/><circle cx="46" cy="60.6" r="1.2" fill="#fff"/><circle cx="70" cy="60.6" r="1.2" fill="#fff"/></g><path d="M43 66q-2 3.4 0 5.4q2-2 0-5.4z" fill="#8FD0E8"/>';
-    mouth='<path d="M54 70q6 6 12 0" stroke="'+K+'" stroke-width="2.6" fill="none" stroke-linecap="round"/>';
-    armL='<ellipse cx="50" cy="97" rx="8" ry="6" fill="'+W+'" stroke="'+K+'" stroke-width="2.4"/>';
-    armR='<ellipse cx="70" cy="97" rx="8" ry="6" fill="'+W+'" stroke="'+K+'" stroke-width="2.4"/>';
-    extra='<path d="M100 40l-7-7c-4-5 3-10 7-4 4-6 11-1 7 4z" fill="#E0567F"/>';
-  } else if(mood==='comfort'){
-    eyes='<g class="blink"><circle cx="48" cy="58" r="4.4" fill="'+K+'"/><circle cx="72" cy="58" r="4.4" fill="'+K+'"/><circle cx="49.6" cy="56.4" r="1.5" fill="#fff"/><circle cx="73.6" cy="56.4" r="1.5" fill="#fff"/></g><path d="M41 52l12-4M79 52l-12-4" stroke="'+K+'" stroke-width="2.4" stroke-linecap="round"/>';
-    mouth='<path d="M55 71q5 3 10 0" stroke="'+K+'" stroke-width="2.6" fill="none" stroke-linecap="round"/>';
-    armR='<ellipse cx="90" cy="86" rx="8" ry="6.4" fill="'+W+'" stroke="'+K+'" stroke-width="2.4" transform="rotate(-20 90 86)"/>';
-    extra='<path d="M100 78l-6-6c-3-4 2-8 6-3 4-5 9-1 6 3z" fill="#F29A9A" stroke="#D96C6C" stroke-width="1"/>';
-  } else if(mood==='proud'){
-    eyes='<g class="blink"><circle cx="48" cy="57" r="5" fill="'+K+'"/><circle cx="72" cy="57" r="5" fill="'+K+'"/><path d="M50 53.6l.9 1.9 2 .3-1.5 1.4.4 2-1.8-1-1.8 1 .4-2-1.5-1.4 2-.3z" fill="#fff"/><path d="M74 53.6l.9 1.9 2 .3-1.5 1.4.4 2-1.8-1-1.8 1 .4-2-1.5-1.4 2-.3z" fill="#fff"/></g><path d="M42 49q6-4 12-1M66 48q6-3 12 1" stroke="'+K+'" stroke-width="2.4" fill="none" stroke-linecap="round"/>';
-    mouth='<path d="M52 69q9 8 17-2" stroke="'+K+'" stroke-width="2.6" fill="none" stroke-linecap="round"/>';
-    armL='<ellipse cx="34" cy="98" rx="8" ry="6" fill="'+W+'" stroke="'+K+'" stroke-width="2.4"/>';
-    armR='<ellipse cx="86" cy="98" rx="8" ry="6" fill="'+W+'" stroke="'+K+'" stroke-width="2.4"/>';
-    extra='<path d="M54 92l6 8 6-8" stroke="#C8372D" stroke-width="3" fill="none"/><circle cx="60" cy="105" r="5.2" fill="#F4B63B" stroke="'+K+'" stroke-width="1.8"/><g fill="#F4B63B"><path d="M18 40l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/><path d="M101 36l1.6 4 4 1.6-4 1.6-1.6 4-1.6-4-4-1.6 4-1.6z"/></g>';
-  } else if(mood==='yawn'){
-    eyes='<path d="M42 55l10 4-10 4M78 55l-10 4 10 4" stroke="'+K+'" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>';
-    mouth='<ellipse cx="60" cy="73" rx="6.5" ry="8.4" fill="#E86A5C" stroke="'+K+'" stroke-width="2.4"/>';
-    armR='<ellipse cx="80" cy="78" rx="7.5" ry="6.6" fill="'+W+'" stroke="'+K+'" stroke-width="2.4"/>';
-    extra='<path d="M40 66q-2 3.4 0 5.4q2-2 0-5.4z" fill="#8FD0E8"/><text x="92" y="34" style="'+FONT_SVG+';font-weight:800" font-size="16" fill="'+S+'">z</text>';
-  } else if(mood==='curious'){
-    eyes='<g class="blink"><circle cx="48" cy="57" r="5.6" fill="'+K+'"/><circle cx="72" cy="57" r="5.6" fill="'+K+'"/><circle cx="50.4" cy="54.8" r="1.9" fill="#fff"/><circle cx="74.4" cy="54.8" r="1.9" fill="#fff"/></g><path d="M41 47q6-5 12-1M66 50h12" stroke="'+K+'" stroke-width="2.4" fill="none" stroke-linecap="round"/>';
-    mouth='<path d="M57 71q3-3.4 6 0q-3 3.4-6 0z" fill="#E86A5C" stroke="'+K+'" stroke-width="1.6" stroke-linejoin="round"/>';
-    armR='<ellipse cx="86" cy="84" rx="7.5" ry="6.4" fill="'+W+'" stroke="'+K+'" stroke-width="2.4"/>';
-    extra='<circle cx="101" cy="70" r="9" fill="#DDF1FA" fill-opacity=".75" stroke="#5A4A3A" stroke-width="3"/><path d="M94.4 77l-8 8.4" stroke="#5A4A3A" stroke-width="4" stroke-linecap="round"/>';
-  } else {
-    eyes='<g class="blink"><circle cx="48" cy="58" r="5" fill="'+K+'"/><circle cx="72" cy="58" r="5" fill="'+K+'"/><circle cx="49.8" cy="56" r="1.7" fill="#fff"/><circle cx="73.8" cy="56" r="1.7" fill="#fff"/></g>';
-    if(mood!=='still') armR='<g class="wave"><ellipse cx="92" cy="66" rx="7.5" ry="9" fill="'+W+'" stroke="'+K+'" stroke-width="2.4" transform="rotate(20 92 66)"/><path d="M89 61v6M93 60v6" stroke="'+K+'" stroke-width="1.4" stroke-linecap="round"/></g>';
-  }
-  return '<svg viewBox="0 0 120 124" aria-hidden="true"><g'+(mood==='still'?'':' class="bob"')+'>'+
-    '<path class="tail" d="M86 108q22 2 20-20q-1-8-7-6" stroke="'+K+'" stroke-width="2.6" fill="'+O+'" stroke-linejoin="round"/>'+
-    '<ellipse cx="60" cy="102" rx="27" ry="18" fill="'+W+'" stroke="'+K+'" stroke-width="2.6"/>'+
-    '<path d="M44 92q16 8 32 0" stroke="none" fill="'+O+'" opacity=".55"/>'+
-    '<path d="M28 36L26 10l20 14z" fill="'+O+'" stroke="'+K+'" stroke-width="2.6" stroke-linejoin="round"/>'+
-    '<path d="M92 36L94 10 74 24z" fill="'+W+'" stroke="'+K+'" stroke-width="2.6" stroke-linejoin="round"/>'+
-    '<path d="M31 30l-1-13 9 7z" fill="#F7B9B0"/><path d="M89 30l1-13-9 7z" fill="#F7B9B0"/>'+
-    '<ellipse cx="60" cy="58" rx="34" ry="30" fill="'+W+'" stroke="'+K+'" stroke-width="2.6"/>'+
-    '<path d="M32 46q6-18 24-18q-6 8-8 20q-10-4-16-2z" fill="'+O+'"/>'+
-    '<path d="M70 30q10 2 16 10q-6 0-10 4z" fill="'+O+'" opacity=".8"/>'+
-    '<ellipse cx="40" cy="68" rx="5.5" ry="3.4" fill="#F7B9B0" opacity=".85"/><ellipse cx="80" cy="68" rx="5.5" ry="3.4" fill="#F7B9B0" opacity=".85"/>'+
-    eyes+'<path d="M57.5 64.5h5l-2.5 3z" fill="#E86A5C" stroke="'+K+'" stroke-width="1.4" stroke-linejoin="round"/>'+mouth+
-    '<path d="M34 84q26 10 52 0l-2 7q-24 8-48 0z" fill="'+S+'" stroke="'+K+'" stroke-width="2.2" stroke-linejoin="round"/>'+
-    '<path d="M70 90l8 12-9-2z" fill="'+S+'" stroke="'+K+'" stroke-width="2" stroke-linejoin="round"/>'+
-    '<circle cx="60" cy="92" r="4" fill="#F4B63B" stroke="'+K+'" stroke-width="1.6"/>'+
-    armL+armR+extra+'</g></svg>';
+  if(window.PSShin) return PSShin.now(mood||'hi');
+  return '<svg viewBox="0 0 120 124" aria-hidden="true"></svg>';
 }
 
 /* ---- Senpai: 6 anh chị khóa trước (hư cấu), mỗi người một ngành · 0 Minh nhà máy · 1 Hạnh chế biến thực phẩm · 2 Vy điều dưỡng · 3 Tuấn xây dựng · 4 Linh nhà hàng khách sạn · 5 Phong gara ô tô ---- */

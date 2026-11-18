@@ -16,6 +16,8 @@
    - PS1.3.26: chỉ dùng sao lưu chung (backup → PS.backup, psRestore → PS.restorePick).
      Khóa gợi ý thẻ: routine/?add=<mã thẻ>&from=<id khóa> → mở thẻ (đang có) hoặc màn đặt công thức; thanh "Quay lại <khóa>".
      extra báo thêm mine {mã: active|pause|keep|master|stored} và lib {mã: tên}.
+   - PS1.3.36: Shin là gà lớn dần (../core/shin.js). Tủ đồ của Shin ở Sổ tay › Cài đặt › nhóm Proskills
+     (PS.prefs().shinFit; demo chỉ thử tạm). Qua mốc ngày ghi nhận thì hiện màn "Shin đã lớn".
    ========================================================= */
 (function (W, D) {
   'use strict';
@@ -72,10 +74,10 @@
     PS.setProfile({ teacher: t ? t[1] : '' });
   });
 
-  /* ---------- màn chào: chỉ lần đầu ---------- */
+  /* ---------- màn chào: PS1.3.34 bỏ hẳn (kể cả lần đầu), vào thẳng app cho nhanh ---------- */
   var baseSplash = W.splashBoot;
   W.splashBoot = function () {
-    if (!lsGet(FIRST_KEY)) { FIRST = true; lsSet(FIRST_KEY, today()); return baseSplash.apply(this, arguments); }
+    if (!lsGet(FIRST_KEY)) { FIRST = true; lsSet(FIRST_KEY, today()); }
     D.documentElement.classList.remove('growth-starting');
     var meta = D.querySelector('meta[name="theme-color"]'); if (meta) meta.content = '#F9F9FF';
   };
@@ -85,8 +87,48 @@
   W.nbSet = function () {
     var h = baseNbSet.apply(this, arguments);
     var row = W.setRow('psHome', 'phone', 2, 'Trang chủ Proskills', '', '', '<a class="btn btn--soft btn--sm" href="../index.html" data-ps-home>Về trang chủ</a>');
-    return W.setGroup('Proskills', [row]) + h;
+    return W.setGroup('Proskills', [row, fitRow()]) + h;
   };
+
+  /* ---------- PS1.3.36 · Tủ đồ của Shin (gà lớn dần, trang phục mở theo giai đoạn) ---------- */
+  function fitRow() {
+    if (!W.PSShin) return '';
+    var Z = W.PSShin, l = Z.look(), F = {}; Z.FITS.forEach(function (f) { F[f[0]] = f; });
+    var nx = l.stg < 3 ? Z.STAGE_DAYS[l.stg + 1] : 0, pct = nx ? Math.min(100, Math.round(l.days / nx * 100)) : 100;
+    var body = '<div class="psfit__now">' + Z.svg('proud', { stg: l.stg, fit: l.fit, days: l.days }) +
+      '<div><b>Shin đang là ' + Z.STAGE_NAME[l.stg] + '</b><small>' + (W.DEMO ? 'Bản demo: Shin đã lớn.' : 'Bạn đã ghi nhận ' + l.days + ' ngày.') +
+      (nx && !W.DEMO ? ' Thêm ' + (nx - l.days) + ' ngày nữa, Shin thành ' + Z.STAGE_NAME[l.stg + 1] + '.' : (l.stg === 3 ? ' Shin đã trưởng thành cùng bạn!' : '')) + '</small>' +
+      '<span class="psfit__bar"><i style="width:' + pct + '%"></i></span></div></div>' +
+      '<div class="psfit__g">' + Z.FITS.map(function (f) {
+        var lock = f[2] > l.stg, on = f[0] === l.fit;
+        return '<button type="button" class="psfit__b' + (on ? ' on' : '') + (lock ? ' lock' : '') + '" data-ps-fit="' + f[0] + '"' + (lock ? ' aria-disabled="true"' : '') + ' aria-pressed="' + on + '">' +
+          Z.svg('still', { stg: Math.max(l.stg, f[2]), fit: f[0], days: l.days }) + '<b>' + PS.esc(f[1]) + '</b><small>' + (lock ? 'Mở khi Shin là ' + Z.STAGE_NAME[f[2]] : PS.esc(f[3])) + '</small></button>';
+      }).join('') + '</div><p class="psfit__ft">Shin lớn dần theo số ngày bạn ghi nhận: Gà con ' + Z.STAGE_DAYS[1] + ' ngày · Gà choai ' + Z.STAGE_DAYS[2] + ' ngày · Gà lớn ' + Z.STAGE_DAYS[3] + ' ngày.</p>';
+    return W.setRow('psFit', 'smile', 4, 'Tủ đồ của Shin', PS.esc(F[l.fit][1]) + ' · ' + Z.STAGE_NAME[l.stg], body);
+  }
+  D.addEventListener('click', function (e) {
+    var b = e.target && e.target.closest ? e.target.closest('[data-ps-fit]') : null; if (!b || !W.PSShin) return;
+    e.preventDefault(); e.stopPropagation();
+    var k = b.getAttribute('data-ps-fit'), l = W.PSShin.look(), f = null;
+    W.PSShin.FITS.forEach(function (x) { if (x[0] === k) f = x; });
+    if (!f) return;
+    if (f[2] > l.stg) { W.toast('Trang phục này mở khi Shin thành ' + W.PSShin.STAGE_NAME[f[2]] + '. Ghi nhận đều mỗi ngày nhé!'); return; }
+    if (W.DEMO) W.PS_SHIN_FIT_TMP = k; else PS.setPref('shinFit', k);
+    try { W.refreshAll(); } catch (er) {}
+    W.toast('Shin đã thay: ' + f[1] + '.');
+  }, true);
+  /* Shin lớn lên: mừng một lần khi vừa qua mốc */
+  function grewUp(from, to, days) {
+    var Z = W.PSShin, news = Z.FITS.filter(function (f) { return f[2] === to; }).map(function (f) { return f[1]; });
+    whenFree(function () {
+      if (W.OV || typeof W.openMini !== 'function') return;
+      W.openMini('<div class="center psgrow"><div class="psgrow__art">' + Z.svg('cheer', { stg: to, fit: Z.look().fit, days: days }) + '</div>' +
+        '<small>SHIN ĐÃ LỚN</small><h2>' + (to === 1 ? 'Shin nở rồi! Chào Gà con!' : 'Shin thành ' + Z.STAGE_NAME[to] + '!') + '</h2>' +
+        '<p class="muted">Bạn đã ghi nhận <b>' + days + ' ngày</b>. Shin lớn lên nhờ từng ngày bạn giữ nhịp.</p>' +
+        (news.length ? '<p class="psgrow__new">Tủ đồ có thêm: <b>' + news.map(PS.esc).join(', ') + '</b></p>' : '') +
+        '<button class="btn btn--wide" data-act="close">Tuyệt quá!</button></div>');
+    }, 0);
+  }
   D.addEventListener('click', function (e) {
     var t = e.target && e.target.closest ? e.target : null; if (!t) return;
     if (t.closest('[data-ps-home]')) { try { W.save(true); } catch (er) {} }
@@ -129,7 +171,10 @@
     (W.HABITS || []).forEach(function (h) { lib[h.id] = W.sname(h.id); });
     var x = { day: t, rec: !!rec[t], ci: !!(S.ci && S.ci[t]), ciTime: S.ciTime || '21:00', need: now.length > 0 || all.length === 0, cards: cards, active: now.length,
       fire: W.streak(), recDays: Object.keys(rec).length, mastered: mastered, habits: all.length, mine: mine, lib: lib };
+    var prev = PS.summary(ID), pd = prev && prev.extra ? +prev.extra.recDays || 0 : -1;
     PS.report(ID, { xp: 0, ins: 0, done: x.recDays, total: 0, days: minutes(), extra: x, ver: W.APP_VER });
+    /* PS1.3.36: Shin lớn lên khi số ngày ghi nhận qua mốc (không mừng lần báo đầu tiên trên máy) */
+    if (W.PSShin && pd >= 0 && W.PSShin.stageOf(x.recDays) > W.PSShin.stageOf(pd)) { grewUp(W.PSShin.stageOf(pd), W.PSShin.stageOf(x.recDays), x.recDays); try { W.render(); } catch (er) {} }
     door(x);
   }
   var baseSave = W.save;
@@ -179,7 +224,19 @@
     '.psgo__x{flex:none;width:36px;height:36px;border:0;border-radius:50%;background:rgba(255,255,255,.14);color:#fff;font-size:20px;line-height:1;cursor:pointer}' +
     '@keyframes psgoIn{from{transform:translateY(16px);opacity:0}to{transform:none;opacity:1}}' +
     '@media (prefers-reduced-motion:reduce){.psgo{animation:none}}' +
-    '@media (min-width:900px){.psgo{bottom:24px}}';
+    '@media (min-width:900px){.psgo{bottom:24px}}' +
+    /* PS1.3.36 · Tủ đồ của Shin, màn mừng Shin lớn */
+    '.psfit__now{display:flex;align-items:center;gap:12px;background:#F4F6FC;border-radius:18px;padding:8px 12px 8px 4px}.psfit__now svg{width:78px;height:80px;flex:none}' +
+    '.psfit__now b{display:block;font-size:15px}.psfit__now small{display:block;font-size:12.5px;color:#5D6478;line-height:1.4;margin-top:2px}' +
+    '.psfit__bar{display:block;height:7px;border-radius:9px;background:#DFE5F2;margin-top:8px;overflow:hidden}.psfit__bar i{display:block;height:100%;border-radius:9px;background:#F2B21B}' +
+    '.psfit__g{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}' +
+    '.psfit__b{display:flex;flex-direction:column;align-items:center;gap:1px;border:1.5px solid #E2E6F0;background:#fff;border-radius:16px;padding:6px 6px 9px;cursor:pointer;font:inherit;color:inherit;-webkit-tap-highlight-color:transparent}' +
+    '.psfit__b svg{width:70px;height:72px}.psfit__b b{font-size:13.5px}.psfit__b small{font-size:11.5px;color:#6B7183;line-height:1.3;text-align:center}' +
+    '.psfit__b.on{border-color:#2265C5;box-shadow:0 0 0 2px #2265C5 inset;background:#F3F7FF}.psfit__b.lock{opacity:.55}.psfit__b.lock svg{filter:grayscale(1)}' +
+    '.psfit__b:active{transform:scale(.97)}.psfit__ft{font-size:12px;color:#6B7183;margin:10px 2px 2px;line-height:1.45}' +
+    '.psgrow__art{width:150px;margin:0 auto}.psgrow__art svg{width:100%;height:auto}.psgrow small{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;color:#2265C5;margin-top:4px}' +
+    '.psgrow h2{margin:4px 0 6px}.psgrow__new{background:#FFF6DA;border-radius:14px;padding:8px 12px;font-size:14px;margin:10px 0 14px}' +
+    '@media (min-width:600px){.psfit__g{grid-template-columns:repeat(4,1fr)}}';
   D.head.appendChild(css);
 
   /* ---------- khóa gợi ý thẻ: mở thẻ, đặt công thức, rồi mời quay lại khóa ---------- */
