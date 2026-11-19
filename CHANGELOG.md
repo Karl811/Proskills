@@ -5,6 +5,23 @@ Quy ước số phiên bản: **PS a.b.c**
 - b: giai đoạn / thêm module hoặc tính năng lớn
 - c: sửa nhỏ trong giai đoạn đó
 
+## PS1.3.39 · 19/11/2026 · CD02.1.1 Giao diện sổ tay cho Hải Đồ La Bàn
+Thầy chốt (19/11): 4 tông nhạt theo vòng, tiêu đề chữ có chân như bản phác, hải đồ PA B (biển tô xanh xám), Sổ Thuyền Trưởng PA A nhưng bỏ lò xo, banner PA A (tranh trên, chữ dưới), cờ học viên chọn tông dịu, chỉ sửa CD02. Không đổi nội dung chữ, chặng, cách chấm của CD02; không đổi CD01, TK, TC01, Shin Routine, trang chủ.
+- **Hệ màu mới** (kiểu trang claude.ai): nền ngà, chữ mực đen, cam đất chỉ ở nút, tiêu đề, banner, dây đánh dấu; bỏ teal và vàng. Thẻ viền mảnh thay bóng đổ; nút cam đất nổi khối nhẹ; ô chọn đang chọn viền đen nền cam nhạt.
+- **Chữ tiêu đề Lora** (có chân, đủ dấu tiếng Việt), kèm tệp phông trong `cd02/fonts/` để chạy cả khi mất mạng; nội dung giữ Be Vietnam Pro.
+- **Hải đồ mới**: giấy biển xanh xám, viền đôi có vạch tọa độ, sóng và hoa gió nét mực, đảo tô theo phía (Ở Nhật rêu · Về VN đào · Cả hai oải hương), đảo còn sương là mây tô chấm (không lộ màu đảo), mỗi bến là hình vẽ nhỏ của nơi chốn + nhãn; tuyến đang đi nét cam, bến đã có dấu có dấu tích đen, bến chưa mở mờ + khóa. Đảo Quê Nhà, Gió Hai Chiều, Cầu Nối, Tự Lập dời vào trong khung.
+- **Sổ Thuyền Trưởng mới**: sổ bìa da bò, giấy kẻ dòng có lề đỏ, đường may thay lò xo, dây đánh dấu cam đất, ảnh polaroid lá cờ dán băng keo, chữ điền kiểu viết tay, khẩu hiệu gạch chân lượn sóng, 7 con dấu kiểu hộ chiếu (tròn, vuông, bát giác; mực cam đất hoặc xanh than; có ngày đóng) + ô Cảng Khởi Hành, thanh sương tan, thẻ Senpai, Streak · XP · Insight.
+- **Banner 8 nơi chốn** (tranh nét mực, tô chấm, nền tông vòng): Cảng 3 Năm, Đài Vọng Biển, Bến Senpai, Xưởng La Bàn, Phòng Hải Đồ, Vịnh Ngã Rẽ, Ngọn Hải Đăng, Cảng Khởi Hành; trang đảo có cảnh đảo riêng.
+- **Danh sách bến**: thẻ hàng ngang, ô tranh nơi chốn theo tông vòng, số chặng · phút, trạng thái (Có dấu / số chặng / Chưa mở).
+- **Sổ tay**: bìa da bò, 4 tab giấy (Tổng quan · Hải trình · **Thẻ Senpai** (mới, tách khỏi Hải trình) · Cài đặt); mỗi đầu ra là một tờ ghi chú dán băng keo. Vẫn mở tab Cài đặt trước.
+- **Cờ học viên**: 6 tông dịu (Cam đất, Xanh ngọc, Xanh biển, Vàng nắng, Tím oải hương, Than chì). Cờ đã chọn màu cũ tự đổi sang tông dịu gần nhất, không mất bài làm.
+- Shin thuyền trưởng trong CD02 quàng khăn cam đất (core/shin.js không đổi nên Tủ đồ Shin Routine vẫn khăn teal).
+- La bàn, đồng hồ tự chấm, vòng tròn ngọn hải đăng, Hải trình của tôi (cả ảnh xuất), Bằng Thuyền Trưởng, con dấu: đổi sang hệ màu mới. Thẻ CD02 ở trang chủ đổi màu cam đất (config.js).
+- Kiểm 390 + 1280: demo đi trọn Bến 4 → Cảng Khởi Hành (tự điền), hải đồ, trang đảo, Sổ tay 4 tab, bằng; ES5 (acorn) cho cd02/*.js; không lỗi console; không tràn ngang.
+
+Tệp đổi: cd02/art.js, cd02/engine.js, cd02/content.js, cd02/cd02.css, cd02/index.html, **cd02/fonts/ (mới: Lora-Variable.ttf, Lora-Italic-Variable.ttf, LORA-OFL.txt)**, config.js, sw.js, index.html và ?v= ở mọi trang module (cd01, tc01, tk, mau, routine/index.html), CHANGELOG.md, AGENTS.md.
+File cần xóa trên GitHub: không có.
+
 ## PS1.3.38 · 18/11/2026 · CD02.1.0 Hải Đồ La Bàn: Bến 4–6 + Cảng Khởi Hành (đủ khóa)
 Làm tiếp theo khung thầy đã chốt (PA A, Hải Đồ La Bàn, không Excel duyệt chữ). Không đổi nội dung CD01, TK, TC01, Shin Routine; Xuất phát và Bến 1–3 giữ nguyên.
 - **CD02 đủ 18 chặng** (Xuất phát 1 + Bến 1–5 × 3 + Bến 6 × 2) + Cảng Khởi Hành 2 chặng (không tính vào tổng, như Ga Ước Mơ CD01). config.js: total 18, ver CD02.1.0.

@@ -13,7 +13,7 @@
    - Ý của thầy Lê Long Sơn nói gián tiếp: “thầy của Shin”. Không ghi tên Thầy trên giao diện CD02.
    - Không dùng từ “đơn hàng”. ES5. */
 var CD2_ID = 'cd02';
-var CD2_VER = 'CD02.1.0';
+var CD2_VER = 'CD02.1.1';
 var CD2_XP_ACT = 30, CD2_INS_WORDS = 15, CD2_INS_FIELD = 5, CD2_XP_CARD = 2;
 var CD2_TOTAL = 18; /* Xuất phát 1 + Bến 1–5 × 3 chặng + Bến 6 × 2 chặng. Cảng Khởi Hành (f1, f2) không tính. */
 
@@ -41,7 +41,7 @@ var ISLES = [
     gain: 'Bằng cấp, nghề mới, mở thêm nhiều cửa.',
     cost: 'Mất thời gian. Thu nhập giảm trong lúc học.',
     who: ['tait', 'tan'] },
-  { id: 'gio', n: 'Đảo Gió Hai Chiều', ic: 'wind', side: 'both', x: 330, y: 214,
+  { id: 'gio', n: 'Đảo Gió Hai Chiều', ic: 'wind', side: 'both', x: 312, y: 214,
     sub: 'Đi rồi về, rồi lại đi',
     what: 'Về nước một thời gian, rồi quay lại Nhật bằng diện khác, công việc khác.',
     need: ['Hồ sơ đẹp, giữ chữ tín với công ty', 'Tiếp tục học tiếng Nhật khi ở nhà', 'Tìm hiểu kỹ điều kiện của diện mới'],
@@ -55,21 +55,21 @@ var ISLES = [
     gain: 'Một nghề dùng chính tiếng Nhật. Giúp được nhiều người.',
     cost: 'Phải học rất bền. Thu nhập lúc đầu có thể chưa cao.',
     who: ['mai', 'xuan', 'son', 'quy', 'lich'] },
-  { id: 'lap', n: 'Đảo Tự Lập', ic: 'shop', side: 'vn', x: 182, y: 428,
+  { id: 'lap', n: 'Đảo Tự Lập', ic: 'shop', side: 'vn', x: 182, y: 416,
     sub: 'Về Việt Nam tự làm chủ',
     what: 'Mang tay nghề, cách làm việc kiểu Nhật về mở cửa hàng, xưởng, công ty riêng.',
     need: ['Tay nghề và quy trình học được ở Nhật', 'Vốn tích lũy và kế hoạch rõ ràng', 'Mối quan hệ, khách hàng đầu tiên'],
     gain: 'Tự quyết. Tạo việc làm cho người khác.',
     cost: 'Rủi ro cao. Có lúc thất bại phải làm lại.',
     who: ['hoi', 'thao', 'vinh'] },
-  { id: 'cau', n: 'Đảo Cầu Nối', ic: 'bridge', side: 'vn', x: 44, y: 382,
+  { id: 'cau', n: 'Đảo Cầu Nối', ic: 'bridge', side: 'vn', x: 50, y: 382,
     sub: 'Về Việt Nam làm cho công ty Nhật',
     what: 'Làm ở công ty Nhật tại Việt Nam, hoặc chi nhánh của chính công ty mình từng làm.',
     need: ['Tiếng Nhật N2 là lợi thế lớn', 'Hiểu cách làm việc kiểu Nhật', 'Giữ liên lạc tốt với công ty cũ'],
     gain: 'Vị trí tốt, có thể lên quản lý. Gần gia đình.',
     cost: 'Thu nhập lúc đầu có thể thấp hơn ở Nhật. Phải học thêm cách quản lý.',
     who: ['thuy', 'hoai', 'hien', 'hang', 'kthanh'] },
-  { id: 'que', n: 'Đảo Quê Nhà', ic: 'home', side: 'vn', x: 30, y: 214,
+  { id: 'que', n: 'Đảo Quê Nhà', ic: 'home', side: 'vn', x: 48, y: 214,
     sub: 'Gia đình là ưu tiên',
     what: 'Chọn việc, chọn nơi sống theo điều gia đình cần nhất, ngay bây giờ hoặc sau vài năm.',
     need: ['Kế hoạch tiết kiệm rõ ràng', 'Một nghề, một kỹ năng mang về dùng được', 'Tìm hiểu việc gần nhà trước khi về'],
@@ -303,7 +303,8 @@ var FLAG_SYM = [
   ['compass', 'La bàn'], ['star', 'Ngôi sao'], ['sun', 'Mặt trời'], ['whale', 'Cá voi'],
   ['wing', 'Cánh chim'], ['flame', 'Ngọn lửa'], ['sakura', 'Hoa anh đào'], ['leaf', 'Lá non']
 ];
-var FLAG_COL = [['#0F9F98', 'Xanh biển'], ['#2C5BC4', 'Xanh dương'], ['#E8574A', 'Đỏ san hô'], ['#F2B21B', 'Vàng nắng'], ['#7A55D3', 'Tím'], ['#2A2118', 'Đen gỗ']];
+/* PS1.3.39: 6 tông dịu hợp giao diện mới (màu cũ tự đổi, xem FLAG_OLD trong art.js) */
+var FLAG_COL = [['#D97757', 'Cam đất'], ['#6E9E94', 'Xanh ngọc'], ['#5E7FA8', 'Xanh biển'], ['#D9A84E', 'Vàng nắng'], ['#8C82B4', 'Tím oải hương'], ['#3D3D3A', 'Than chì']];
 var MOTTO_TIPS = ['Đi chậm mà chắc', 'Học mỗi ngày một chút', 'Dám thử, dám sửa', 'Vì gia đình, vì mình', 'Không bỏ cuộc giữa biển'];
 var OPEN_N = [['1', '1 hướng'], ['2', '2 hướng'], ['3', '3 hướng'], ['4', '4 hướng'], ['5', '5 hướng'], ['6', '6 hướng trở lên']];
 var GOAL_TIPS = ['Biết thêm các hướng đi sau 3 năm', 'Hiểu mình hợp với hướng nào', 'Chuẩn bị từ bây giờ cho hướng mình chọn', 'Có thêm động lực học tiếng Nhật'];
