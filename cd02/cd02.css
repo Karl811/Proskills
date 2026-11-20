@@ -789,3 +789,195 @@ html,body{background:var(--bg)}
 .nb .nbbox--plain::before{display:none}
 .nbsub{margin:0 0 6px;color:var(--muted);font-size:13.5px}
 .nb .lbk{margin-top:4px}
+
+/* =========================================================
+   PS1.3.40 · CD02.1.2 · hải đồ 2 mặt, vòng gấp, sổ gọn, thuyền buồm kiểu Nhật
+   ========================================================= */
+.maphd{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:26px}
+.maphd .sec-h{margin:0}
+.seg{display:inline-flex;padding:3px;border:1px solid var(--rule);border-radius:12px;background:var(--bg-2);gap:2px}
+.seg__b{display:inline-flex;align-items:center;gap:5px;border:0;background:transparent;font:600 13px var(--f);color:var(--ink-2);padding:7px 12px;border-radius:9px;cursor:pointer;min-height:36px;transition:background .2s var(--ease),color .2s var(--ease)}
+.seg__b small{font-weight:500;color:var(--muted);font-size:11.5px}
+.seg__b.on{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(20,20,19,.1),0 0 0 1px var(--rule)}
+.seg__b.on svg{color:var(--c)}
+.maphd+.sec-sub{margin-top:6px}
+/* mặt Bến: ẩn đảo · mặt Đảo: bến mờ, mất nhãn */
+.chart .mp-isles{opacity:0;pointer-events:none;transition:opacity .35s var(--ease)}
+.chart .mp-ben,.chart .mp-rt,.chart .mp-lab{transition:opacity .3s var(--ease)}
+.isl-on .chart .mp-isles{opacity:1;pointer-events:auto}
+.isl-on .chart .mp-ben{opacity:.28;pointer-events:none}
+.isl-on .chart .mp-rt{opacity:.22}
+.isl-on .chart .mp-lab{opacity:0}
+.chartbox .fogbar{display:none}
+.chartbox.isl-on .fogbar{display:flex}
+/* các vòng: hàng gấp, mặc định đóng */
+.rgrp{border:1px solid var(--rule);border-radius:16px;background:#fff;margin:8px 0;overflow:hidden}
+.rgrp__h{display:flex;align-items:center;gap:10px;width:100%;border:0;background:transparent;padding:12px 14px;text-align:left;font:inherit;color:var(--ink);cursor:pointer;min-height:56px}
+.rgrp__h:active{background:var(--bg-2)}
+.rgrp__h>i{flex:none;width:12px;height:12px;border-radius:4px;border:1px solid rgba(20,20,19,.25)}
+.rgrp__t{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.rgrp__t b{font-family:var(--serif);font-size:16.5px;font-weight:600;line-height:1.25}
+.rgrp__t small{font-size:12px;color:var(--muted)}
+.rgrp__h em{font-style:normal;font-size:11px;font-weight:600;color:var(--c);border:1px solid var(--c-l);border-radius:99px;padding:2px 8px;white-space:nowrap}
+.rgrp__n{font-size:12.5px;color:var(--ink-2);white-space:nowrap}
+.rgrp__h>svg{flex:none;color:var(--muted);transition:transform .25s var(--ease)}
+.rgrp.on .rgrp__h>svg{transform:rotate(90deg)}
+.rgrp__b{display:none;padding:0 10px 10px}
+.rgrp.on .rgrp__b{display:block;animation:rgIn .25s var(--ease)}
+@keyframes rgIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+/* Sổ Thuyền Trưởng gọn */
+.lbk__ft{justify-content:flex-end;border-top:0;padding-top:4px}
+@media (prefers-reduced-motion:reduce){
+  .chart .mp-isles,.chart .mp-ben,.chart .mp-rt,.chart .mp-lab,.rgrp__h>svg{transition:none}
+  .rgrp.on .rgrp__b{animation:none}
+}
+.mp-z{font:600 9px var(--f);letter-spacing:.14em;fill:#141413;opacity:.7}
+.mp-t tspan{font:inherit}
+.chart .mp-rose,.chart .mp-ship{transition:opacity .3s var(--ease)}
+.isl-on .chart .mp-rose{opacity:0}
+.isl-on .chart .mp-ship{opacity:.25}
+
+/* ---------- PS1.3.41 · CD02.2.0 ---------- */
+/* nhãn “Từ CD01”: thẻ giấy nhỏ, viền trái cam đất */
+.c1{position:relative;display:grid;gap:6px;background:var(--paper);border:1px solid var(--rule);border-left:3px solid var(--c-l);border-radius:12px;padding:24px 12px 10px;margin:0 0 12px}
+.c1__tag{position:absolute;top:6px;left:10px;display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--c-d)}
+.c1 small{display:block;font-size:12px;color:var(--muted)}
+.c1 b{display:block;font-size:14.5px;font-weight:500;line-height:1.4;color:var(--ink)}
+.c1 q{display:block;font-family:var(--serif);font-style:italic;font-size:15px;line-height:1.5;color:var(--ink-2)}
+/* mang CD01 lên thuyền */
+.carry{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:2px 0 12px}
+.cry{position:relative;display:flex;flex-direction:column;justify-content:flex-start;text-align:left;font:inherit;color:var(--ink);background:#fff;border:1.5px solid var(--rule-2);border-radius:14px;padding:10px 10px 10px 34px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:border-color .2s,background .2s}
+.cry small{display:block;font-size:11.5px;color:var(--muted);margin-bottom:2px}
+.cry b{display:block;font-size:13.5px;font-weight:500;line-height:1.35;overflow-wrap:anywhere}
+.cry__ck{position:absolute;left:10px;top:11px;width:18px;height:18px;border-radius:50%;border:1.5px solid var(--rule-2);display:grid;place-items:center;color:#fff}
+.cry.on{border-color:var(--ink);background:var(--c-t)}
+.cry.on .cry__ck{background:var(--c);border-color:var(--c)}
+.c1go{display:grid;gap:10px;margin-top:6px}
+.c1go a.btn{text-decoration:none;display:flex;align-items:center;justify-content:center;gap:6px}
+/* xem và sửa / làm lại */
+.amenu{display:grid;gap:8px;margin:12px 0}
+.sheetbtn{display:flex;align-items:center;gap:12px;width:100%;border:1px solid var(--rule);background:#fff;border-radius:14px;padding:11px 12px;font:inherit;color:var(--ink);cursor:pointer;text-align:left;-webkit-tap-highlight-color:transparent}
+.sheetbtn svg{flex:none;color:var(--c-d)}
+.sheetbtn b{display:block;font-size:15px}
+.sheetbtn small{display:block;font-size:12.5px;color:var(--muted)}
+.restore{margin:-4px 0 6px;text-align:right;font-size:13px}
+.redo--new{background:var(--c-t);color:var(--c-dd)}
+.insline:empty{display:none}
+
+/* Sổ Thuyền Trưởng: lò xo mảnh, xám nhạt (thầy chốt 20/11) */
+.lbk__page::before{display:none}
+.lbk__ring{position:absolute;left:-7px;top:16px;bottom:16px;width:16px;display:flex;flex-direction:column;justify-content:space-between;pointer-events:none;z-index:2}
+.lbk__ring i{display:block;width:16px;height:7px;border:1.6px solid #B9B6AC;border-radius:5px;background:linear-gradient(180deg,#F4F2EC,#D9D6CC);opacity:.85}
+.lbk__page{padding-left:26px}
+
+/* ===== PS1.3.42 · CD02.2.1: Bến 6 Phòng Tuyển Dụng, phỏng vấn anh chị đi trước, Các bước thường gặp ===== */
+.seg3--ic button{display:flex;flex-direction:column;align-items:center;gap:3px;line-height:1.2;padding-top:9px;padding-bottom:9px}
+.adlist{display:grid;gap:8px;margin-top:10px}
+.adi{display:flex;align-items:center;gap:10px;width:100%;border:1.5px solid var(--rule);background:#fff;border-radius:14px;padding:11px 12px;font:inherit;color:var(--ink);text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.adi.on{border-color:var(--c);background:var(--c-t)}
+.adi__ic{flex:none;width:36px;height:36px;border-radius:10px;background:var(--paper);border:1px solid var(--paper-d);display:grid;place-items:center;color:var(--c-d)}
+.adi b{display:block;font-size:14.5px;line-height:1.3}.adi small{display:block;font-size:12.5px;color:var(--muted)}
+.adi em{display:inline-block;margin-top:4px;font-style:normal;font-size:11.5px;font-weight:700;color:var(--c-dd);background:var(--c-t);border-radius:99px;padding:1px 8px}
+.adi__ok{margin-left:auto;flex:none;width:22px;height:22px;border-radius:50%;background:var(--c);color:#fff;display:grid;place-items:center}
+.ad{background:#fff;border:1px solid var(--rule);border-radius:18px;padding:14px;margin-bottom:12px}
+.ad__h small{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--c-d);font-weight:700}
+.ad__h b{display:block;font-family:var(--serif,Georgia,serif);font-size:19px;line-height:1.25;margin:3px 0 2px}
+.ad__h span{display:block;font-size:13px;color:var(--muted)}
+.ad__job{margin:10px 0;font-size:14.5px;border-left:3px solid var(--c-t2);padding-left:10px}
+.ad__leg{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:12px;color:var(--ink-2);margin:8px 0 2px}
+.ad__leg span{display:flex;align-items:center;gap:5px}
+.ad__hint{font-size:12.5px;color:var(--muted);margin:6px 0}
+.ad__req{list-style:none;margin:0;padding:0;display:grid;gap:7px}
+.adr{display:flex;align-items:center;gap:9px;width:100%;border:1.5px dashed var(--rule-2);background:#FAF9F5;border-radius:12px;padding:10px 11px;font:inherit;color:var(--ink);text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.adr span{flex:1;font-size:14.5px;line-height:1.35}
+.adr small{flex:none;font-size:11px;color:var(--muted);max-width:84px;text-align:right;line-height:1.2}
+.adr.c-g{border-style:solid;border-color:#9DBFB5;background:#EEF5F2}
+.adr.c-y{border-style:solid;border-color:#E2C27E;background:#FBF3E1}
+.adr.c-x{border-style:solid;border-color:#C9C5BA;background:#F1F0EC}
+.adr.c-x span{color:var(--ink-2)}
+.ad__leg i,.adr i{flex:none;width:12px;height:12px;border-radius:50%;display:inline-block;border:1.5px solid var(--ink)}
+.dot-n{background:#fff;border-style:dashed!important;border-color:#B9B6AC!important}
+.dot-g{background:#6E9E94}.dot-y{background:#D9A84E}.dot-x{background:#A8A49A}
+.ad__src{margin:10px 0 0;font-size:11.5px;color:var(--muted)}
+.admore{background:var(--paper);border:1px solid var(--paper-d);border-radius:16px;padding:12px 14px;margin:10px 0}
+.admore b{display:flex;align-items:center;gap:6px;font-size:14.5px;color:var(--c-dd)}
+.admore ul{margin:6px 0 4px;padding-left:20px;font-size:14px}
+.admore small{font-size:11.5px;color:var(--muted)}
+.pl{display:grid;gap:10px}
+.pl__r{border-top:1px solid var(--rule);padding-top:9px}
+.pl__r:first-child{border-top:0;padding-top:0}
+.pl__r small{display:block;font-size:11.5px;font-weight:700;color:var(--c-d);text-transform:uppercase;letter-spacing:.04em}
+.pl__r p{margin:2px 0 7px;font-size:14.5px}
+.opt__tag{display:inline-block;font-style:normal;font-size:11px;font-weight:700;color:var(--c-dd);background:var(--c-t);border-radius:99px;padding:1px 7px;vertical-align:1px}
+.opt__sub{display:block;font-size:12.5px;color:var(--muted);line-height:1.35;margin-top:2px}
+.opt b{font-weight:700}
+.ivq{background:#fff;border:1px solid var(--rule);border-radius:18px;padding:14px;margin-bottom:12px}
+.ivq__h{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.ivq__h b{font-size:14px}.ivq__h small{margin-left:auto;font-size:12px;color:var(--muted)}
+.ivq__jp{margin:0;font-size:19px;line-height:1.5;font-family:"Noto Sans JP","Hiragino Sans","Yu Gothic",sans-serif}
+.ivq__vi{margin:4px 0 10px;font-size:15px;font-weight:600}
+.ivq .btn svg{margin-right:4px}
+.ivbox{display:grid;gap:9px;margin-bottom:6px}
+.ivbox label small{display:block;font-size:12.5px;font-weight:700;color:var(--ink-2);margin-bottom:3px}
+.chat--iv{margin-top:12px}
+.chat--iv .msg__b small{display:block;font-size:11px;color:var(--muted);margin-bottom:2px}
+.ivev{display:block;font-size:13.5px;background:var(--c-t);color:var(--c-dd);border-radius:12px;padding:8px 10px}
+.ivev svg{vertical-align:-3px;margin-right:4px}
+.evc{background:#fff;border:1.5px solid var(--ink);border-radius:16px;padding:12px 14px;margin:10px 0;box-shadow:3px 3px 0 var(--c-t2)}
+.evc__h{display:flex;align-items:center;gap:7px;margin-bottom:6px;color:var(--c-dd)}
+.evc__h b{font-family:var(--serif,Georgia,serif);font-size:17px;color:var(--ink)}
+.evc__h span{margin-left:auto;font-weight:800;font-size:13px;background:var(--c);color:#fff;border-radius:99px;padding:1px 8px}
+.evc ul{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.evc li{display:flex;justify-content:space-between;gap:8px;border-top:1px dashed var(--rule-2);padding-top:6px;font-size:14px}
+.evc li:first-child{border-top:0;padding-top:0}
+.evc li small{flex:none;font-size:11px;color:var(--muted);text-align:right}
+.p3l{display:grid;gap:8px;margin-bottom:10px}
+.p3l__r{background:#fff;border:1.5px solid var(--rule);border-radius:14px;padding:10px 11px}
+.p3l__r.set{border-color:var(--c-t2)}
+.p3l__r b{display:block;font-size:14.5px;line-height:1.35}.p3l__r small{display:block;font-size:11.5px;color:var(--muted);margin-bottom:6px}
+.p3add{display:flex;gap:8px;align-items:center;margin-bottom:12px}
+.p3add .inp{flex:1;min-width:0}
+.p3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.p3__c{background:var(--paper);border:1px solid var(--paper-d);border-radius:12px;padding:8px;min-height:70px}
+.p3__c>b{display:block;font-family:var(--serif,Georgia,serif);font-size:14px;color:var(--c-dd);margin-bottom:4px}
+.p3__c ul{margin:0;padding-left:15px;font-size:12.5px;line-height:1.35}
+.p3__c small{font-size:12px;color:var(--muted)}
+.peers{display:grid;gap:8px;margin:8px 0 10px}
+.peer{display:flex;align-items:center;gap:10px;width:100%;border:1.5px solid var(--rule);background:#fff;border-radius:14px;padding:11px 12px;font:inherit;color:var(--ink);text-align:left;cursor:pointer}
+.peer>span:nth-child(2){flex:1}.peer b{display:block;font-size:15px}.peer small{display:block;font-size:13px;color:var(--muted)}
+.peer>svg{color:var(--muted)}
+.peerhd{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.peerhd b{display:block;font-size:15px}.peerhd small{display:block;font-size:12.5px;color:var(--muted)}
+.peerhd .link{margin-left:auto;font-size:13px}
+.path{background:#fff;border:1px solid var(--rule);border-radius:16px;padding:0 14px;margin:8px 0}
+.path summary{display:flex;align-items:center;gap:7px;padding:12px 0;font-weight:700;font-size:14.5px;color:var(--c-dd);cursor:pointer;list-style:none}
+.path summary::-webkit-details-marker{display:none}
+.path summary::after{content:'+';margin-left:auto;font-size:18px;font-weight:600;color:var(--muted)}
+.path[open] summary::after{content:'–'}
+.path ol{margin:0 0 8px;padding:0;list-style:none;counter-reset:st}
+.path li{position:relative;padding:0 0 10px 30px;counter-increment:st}
+.path li::before{content:counter(st);position:absolute;left:0;top:0;width:20px;height:20px;border-radius:50%;background:var(--ink);color:#fff;font-size:11.5px;font-weight:800;display:grid;place-items:center}
+.path li::after{content:'';position:absolute;left:9.5px;top:22px;bottom:2px;border-left:1.5px dotted var(--rule-2)}
+.path li:last-child::after{display:none}
+.path li b{display:block;font-size:14.5px}.path li span{display:block;font-size:13.5px;color:var(--ink-2);line-height:1.4}
+.path__ik{font-size:13px;background:var(--paper);border-radius:10px;padding:8px 10px;margin:0 0 8px}
+.path__ft{font-size:11.5px;color:var(--muted);margin:0 0 6px}
+.path .srclink{margin-bottom:10px}
+
+/* ===== PS1.3.43 (CD02.2.2, phiên 3): cửa trượt khi vào phòng, người phỏng vấn, phòng phỏng vấn ===== */
+.bnr__art{position:relative;overflow:hidden}
+.bnr__dr{position:absolute;inset:0;display:flex;pointer-events:none}
+.bnr__dr b{flex:1;background-color:#FFFDF8;background-image:linear-gradient(rgba(20,20,19,.16) 1.2px,transparent 1.2px),linear-gradient(90deg,rgba(20,20,19,.16) 1.2px,transparent 1.2px);background-size:22px 26px;background-position:-1px -1px;border:2px solid #141413;animation:cd2drL .75s cubic-bezier(.5,0,.2,1) .12s forwards}
+.bnr__dr b:last-child{animation-name:cd2drR}
+.bnr__dr b:first-child::after,.bnr__dr b:last-child::before{content:"";display:block;position:relative;top:calc(50% - 9px);width:5px;height:18px;border-radius:3px;background:#D4A27F;border:1.5px solid #141413}
+.bnr__dr b:first-child::after{margin-left:auto;right:8px}
+.bnr__dr b:last-child::before{left:8px}
+@keyframes cd2drL{to{transform:translateX(-101%)}}
+@keyframes cd2drR{to{transform:translateX(101%)}}
+@media (prefers-reduced-motion:reduce){.bnr__dr{display:none}}
+.ivav{display:block;flex:none}
+.opt--iv{gap:9px}
+.opt--iv .ivav{width:46px;height:46px}
+.msg__av--iv{background:none!important;border:0!important;width:34px;height:34px}
+.ivq__room{margin:-14px -14px 10px;border-radius:18px 18px 0 0;overflow:hidden;line-height:0;border-bottom:1px solid var(--rule)}
+.ivq__room .ivroom{display:block;width:100%;height:auto}

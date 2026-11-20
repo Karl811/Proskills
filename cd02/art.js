@@ -26,6 +26,7 @@ var CD2_IC = {
   card: '<rect x="4" y="3" width="16" height="18" rx="3"/><circle cx="12" cy="10" r="3"/><path d="M8 17c.7-1.7 2.2-2.6 4-2.6s3.3.9 4 2.6"/>',
   bottle: '<path d="M10 3h4v3.5l2 3V20a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V9.5l2-3z"/><path d="M8 13h8"/>',
   arrowL: '<path d="M15 5 8 12l7 7"/>',
+  doc: '<path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4"/><path d="M9 12h7M9 16h5"/>',
   link: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>'
 };
 function cdIc(k, sz, sw) {
@@ -45,14 +46,13 @@ function roundBg(r) { return r === 1 ? CD2_COL.peach : (r === 2 ? CD2_COL.lav : 
 /* tông đảo theo phía: Ở Nhật · Về Việt Nam · Cả hai */
 function sideBg(side) { return side === 'jp' ? CD2_COL.sage : (side === 'vn' ? CD2_COL.peach : CD2_COL.lav); }
 
-/* Mẫu tô chấm + nét run tay: chèn một lần vào trang (dùng chung cho mọi hình) */
+/* Mẫu tô chấm: chèn một lần vào trang (dùng chung cho mọi hình) */
 (function () {
   try {
     var d = document.createElement('div');
     d.innerHTML = '<svg width="0" height="0" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true" focusable="false"><defs>' +
       '<pattern id="cd2dots" width="4" height="4" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r=".75" fill="#141413"/><circle cx="3" cy="3" r=".75" fill="#141413"/></pattern>' +
       '<pattern id="cd2dotsL" width="5" height="5" patternUnits="userSpaceOnUse"><circle cx="1.2" cy="1.2" r=".7" fill="#141413" opacity=".55"/><circle cx="3.7" cy="3.7" r=".7" fill="#141413" opacity=".55"/></pattern>' +
-      '<filter id="cd2rough" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="2" seed="4"/><feDisplacementMap in="SourceGraphic" scale="1.8"/></filter>' +
       '</defs></svg>';
     document.body.appendChild(d.firstChild);
   } catch (e) {}
@@ -65,6 +65,66 @@ function aR(x, y, w, h, f, sw, rx) { return '<rect x="' + x + '" y="' + y + '" w
 function aWave(x, y, n, s, o) { var d = 'M' + x + ' ' + y; for (var i = 0; i < n; i++) d += 'q' + s / 2 + ' ' + (-s / 3) + ' ' + s + ' 0'; return '<path d="' + d + '" fill="none" stroke="#141413" stroke-width="1.6" stroke-linecap="round" opacity="' + (o || 1) + '"/>'; }
 function aGull(x, y, k) { k = k || 1; return '<path d="M' + x + ' ' + y + 'q' + 4 * k + ' ' + (-5 * k) + ' ' + 8 * k + ' 0q' + 4 * k + ' ' + (-5 * k) + ' ' + 8 * k + ' 0" fill="none" stroke="#141413" stroke-width="1.6" stroke-linecap="round"/>'; }
 function aDots(d, o, light) { return '<path d="' + d + '" fill="url(#' + (light ? 'cd2dotsL' : 'cd2dots') + ')" opacity="' + (o == null ? 1 : o) + '"/>'; }
+
+/* ---------- nét bút sổ tay (PS1.3.40, bổ sung 19/11) ----------
+   Thay bộ lọc cd2rough (làm nét gãy bậc thang, nặng máy yếu). hand(svg) uốn mỗi đoạn thẳng của path/rect/line
+   thành đường cong rất nhẹ như tay kéo bút; điểm đầu cuối giữ nguyên nên các hình vẫn khép kín.
+   Tính một lần khi vẽ (có bộ nhớ đệm), không tốn gì khi cuộn. Không dùng cho flagSVG, compassSVG, Shin, chữ. */
+var HAND_C = {}, HAND_N = 0;
+function hF(v) { return Math.round(v * 100) / 100; }
+function hRand(a, b, c, d) { var x = Math.sin(a * 12.9898 + b * 78.233 + c * 37.719 + d * 4.581) * 43758.5453; return x - Math.floor(x); }
+function hSeg(x0, y0, x1, y1) {
+  var dx = x1 - x0, dy = y1 - y0, L = Math.sqrt(dx * dx + dy * dy);
+  if (L < 5) return 'L' + hF(x1) + ' ' + hF(y1);
+  var sw = x0 > x1 || (x0 === x1 && y0 > y1), ax = sw ? x1 : x0, ay = sw ? y1 : y0, bx = sw ? x0 : x1, by = sw ? y0 : y1;
+  var r = hRand(ax, ay, bx, by), r2 = hRand(by, bx, ay, ax);
+  var amp = Math.min(Math.max(L * .02, .3), 1.4) * (r < .5 ? -1 : 1) * (.55 + .45 * r2);
+  var nx = -(by - ay) / L, ny = (bx - ax) / L, t = .4 + .2 * r2;
+  return 'Q' + hF(ax + (bx - ax) * t + nx * amp * 2) + ' ' + hF(ay + (by - ay) * t + ny * amp * 2) + ' ' + hF(x1) + ' ' + hF(y1);
+}
+function handD(d) {
+  var tk = String(d).match(/[A-Za-z]|-?(?:\d*\.\d+|\d+\.?\d*)(?:[eE][-+]?\d+)?/g); if (!tk) return d;
+  var i = 0, o = '', cmd = '', x = 0, y = 0, sx = 0, sy = 0, qx = null, qy = 0, cx = null, cy = 0;
+  function need(k) { if (i + k > tk.length) throw 1; for (var j = i; j < i + k; j++) if (/[A-Za-z]/.test(tk[j])) throw 1; }
+  function n() { return +tk[i++]; }
+  try {
+    while (i < tk.length) {
+      if (/[A-Za-z]/.test(tk[i])) cmd = tk[i++]; else if (!cmd) return d;
+      var rel = cmd >= 'a', C = cmd.toUpperCase(), ox = rel ? x : 0, oy = rel ? y : 0, nq = null, nc = null, a, b, c1, c2, e, f;
+      if (C === 'Z') { if (Math.abs(x - sx) + Math.abs(y - sy) > .01) o += hSeg(x, y, sx, sy); o += 'Z'; x = sx; y = sy; qx = cx = null; continue; }
+      if (C === 'M') { need(2); x = ox + n(); y = oy + n(); sx = x; sy = y; o += 'M' + hF(x) + ' ' + hF(y); cmd = rel ? 'l' : 'L'; }
+      else if (C === 'L') { need(2); a = ox + n(); b = oy + n(); o += hSeg(x, y, a, b); x = a; y = b; }
+      else if (C === 'H') { need(1); a = ox + n(); o += hSeg(x, y, a, y); x = a; }
+      else if (C === 'V') { need(1); b = oy + n(); o += hSeg(x, y, x, b); y = b; }
+      else if (C === 'C') { need(6); c1 = ox + n(); c2 = oy + n(); a = ox + n(); b = oy + n(); e = ox + n(); f = oy + n(); o += 'C' + [c1, c2, a, b, e, f].map(hF).join(' '); nc = [a, b]; x = e; y = f; }
+      else if (C === 'S') { need(4); c1 = cx != null ? 2 * x - cx : x; c2 = cx != null ? 2 * y - cy : y; a = ox + n(); b = oy + n(); e = ox + n(); f = oy + n(); o += 'C' + [c1, c2, a, b, e, f].map(hF).join(' '); nc = [a, b]; x = e; y = f; }
+      else if (C === 'Q') { need(4); a = ox + n(); b = oy + n(); e = ox + n(); f = oy + n(); o += 'Q' + [a, b, e, f].map(hF).join(' '); nq = [a, b]; x = e; y = f; }
+      else if (C === 'T') { need(2); a = qx != null ? 2 * x - qx : x; b = qx != null ? 2 * y - qy : y; e = ox + n(); f = oy + n(); o += 'Q' + [a, b, e, f].map(hF).join(' '); nq = [a, b]; x = e; y = f; }
+      else if (C === 'A') { need(7); a = n(); b = n(); c1 = n(); c2 = n(); var fs = n(); e = ox + n(); f = oy + n(); o += 'A' + [a, b, c1, c2, fs, hF(e), hF(f)].join(' '); x = e; y = f; }
+      else return d;
+      if (nc) { cx = nc[0]; cy = nc[1]; } else cx = null;
+      if (nq) { qx = nq[0]; qy = nq[1]; } else qx = null;
+    }
+  } catch (er) { return d; }
+  return o;
+}
+function hAttr(t, k) { var m = new RegExp('\\s' + k + '="([^"]*)"').exec(t); return m ? m[1] : null; }
+function hStrip(t, ks) { ks.forEach(function (k) { t = t.replace(new RegExp('\\s' + k + '="[^"]*"'), ''); }); return t; }
+function hand(svg) {
+  svg = String(svg || ''); if (HAND_C[svg]) return HAND_C[svg];
+  var out = svg.replace(/<rect\b([^>]*?)\/>/g, function (m, at) {
+    var st = hAttr(at, 'stroke'); if (!st || st === 'none') return m;
+    var x = +(hAttr(at, 'x') || 0), y = +(hAttr(at, 'y') || 0), w = +hAttr(at, 'width'), h = +hAttr(at, 'height'), r = +(hAttr(at, 'rx') || 0);
+    if (!(w > 0 && h > 0)) return m; r = Math.min(r, w / 2, h / 2);
+    var d = r > 0 ? 'M' + (x + r) + ' ' + y + 'H' + (x + w - r) + 'A' + r + ' ' + r + ' 0 0 1 ' + (x + w) + ' ' + (y + r) + 'V' + (y + h - r) + 'A' + r + ' ' + r + ' 0 0 1 ' + (x + w - r) + ' ' + (y + h) + 'H' + (x + r) + 'A' + r + ' ' + r + ' 0 0 1 ' + x + ' ' + (y + h - r) + 'V' + (y + r) + 'A' + r + ' ' + r + ' 0 0 1 ' + (x + r) + ' ' + y + 'Z'
+      : 'M' + x + ' ' + y + 'H' + (x + w) + 'V' + (y + h) + 'H' + x + 'Z';
+    return '<path d="' + d + '"' + hStrip(at, ['x', 'y', 'width', 'height', 'rx', 'ry']) + '/>';
+  }).replace(/<line\b([^>]*?)\/>/g, function (m, at) {
+    return '<path d="M' + hAttr(at, 'x1') + ' ' + hAttr(at, 'y1') + 'L' + hAttr(at, 'x2') + ' ' + hAttr(at, 'y2') + '"' + hStrip(at, ['x1', 'y1', 'x2', 'y2']) + '/>';
+  }).replace(/(<path\b[^>]*?\sd=")([^"]*)"/g, function (m, a, d) { return a + handD(d) + '"'; });
+  if (++HAND_N > 400) { HAND_C = {}; HAND_N = 0; }
+  HAND_C[svg] = out; return out;
+}
 
 /* Shin thuyền trưởng: gà lớn (core/shin.js), mũ thuyền trưởng + khăn cam đất */
 function shinRecolor(s) { return String(s || '').replace(/#0F9F98/g, '#D97757').replace(/#0B6F6A/g, '#B5532F'); }
@@ -109,21 +169,34 @@ function flagMast(sym, col) {
     '<path d="M6 140h60" stroke="#141413" stroke-width="2.4" stroke-linecap="round"/><path d="M10 146q6-4 12 0t12 0 12 0" fill="none" stroke="#141413" stroke-width="1.4" stroke-linecap="round" opacity=".5"/></svg>';
 }
 
-/* ---------- con thuyền: lớn dần theo số bến đã ghé (0–6) ----------
-   0 thuyền nhỏ một buồm · 2 thêm buồm phụ · 4 thêm bánh lái · 6 đèn, cờ đuôi */
+/* ---------- con thuyền (PS1.3.40): thuyền buồm kiểu Nhật, vẽ vector tô màu cùng kiểu Shin (viền nâu đậm, màu phẳng ấm).
+   Một kiểu xuyên suốt; huy hiệu giữa buồm = biểu tượng cờ, cờ đuôi nheo = màu cờ. lv giữ để tương thích. Không dùng hand(). ---------- */
 function shipSVG(lv, sym, col, w) {
-  lv = lv || 0; col = flagCol(col);
-  var big = lv >= 2, h = '';
-  h += '<path d="M14 70h92l-12 20H26z" fill="#fff" stroke="#141413" stroke-width="2.2" stroke-linejoin="round"/>' +
-    '<path d="M22 76h78l-8 12H30z" fill="url(#cd2dots)" opacity=".4"/><path d="M20 78h80" stroke="#141413" stroke-width="1.4"/>' +
-    '<g transform="translate(96 54) scale(.22)">' + (W_PSShin() ? W_PSShin().svg('still', { stg: 3, fit: 'none' }).replace(/^<svg[^>]*>|<\/svg>$/g, '') : '') + '</g>';
-  h += '<path d="M56 70V14" stroke="#141413" stroke-width="2.6" stroke-linecap="round"/>' +
-    '<path d="M58 18Q86 36 58 64Z" fill="#FFFDF8" stroke="#141413" stroke-width="2" stroke-linejoin="round"/>' +
-    '<g transform="translate(60 30) scale(.5)">' + flagSym(sym || 'compass', col) + '</g>';
-  if (big) h += '<path d="M54 24Q32 42 54 62Z" fill="#fff" stroke="#141413" stroke-width="2" stroke-linejoin="round"/><path d="M52 34Q40 44 52 58Z" fill="url(#cd2dotsL)"/>';
-  if (lv >= 4) h += '<circle cx="24" cy="66" r="6" fill="none" stroke="#141413" stroke-width="2"/><path d="M24 58v16M16 66h16" stroke="#141413" stroke-width="1.4"/>';
-  if (lv >= 6) h += '<path d="M30 70V54" stroke="#141413" stroke-width="1.8"/><rect x="26" y="48" width="8" height="8" rx="2" fill="#F6E6DD" stroke="#141413" stroke-width="1.5"/><circle cx="30" cy="52" r="1.8" fill="#D97757"/>';
-  h += '<path d="M56 14h18l-3 4 3 4H56" fill="' + col + '" stroke="#141413" stroke-width="1.6" stroke-linejoin="round"/>';
+  col = flagCol(col);
+  var o = '#4A2C17', wood = '#C98A4B', dk = '#7A4B2A', h = '', i;
+  var hull = 'M5 47Q14 56 21 67H96L101 56H112L110 64Q106 82 92 87H33Q17 83 5 47Z';
+  h += '<path d="M0 86q7-4 14 0t14 0 14 0 14 0 14 0 14 0 14 0 14 0 8 0V96H0Z" fill="#CFE3EC"/>';
+  h += '<path d="M56 6L9 50M56 6L104 55" stroke="' + o + '" stroke-width="1" opacity=".55"/>';
+  h += '<rect x="54.4" y="3" width="3.2" height="66" rx="1.2" fill="' + dk + '" stroke="' + o + '" stroke-width="1.4"/>';
+  h += '<path d="M31 15H81Q84.5 37 81 59H31Q34.5 37 31 15Z" fill="#FFF8EC"/><path d="M75 15H81Q84.5 37 81 59H75Q78.5 37 75 15Z" fill="#EFE1C6"/>';
+  var sl = ''; for (i = 0; i < 6; i++) { var x = 38.2 + i * 7.15; sl += 'M' + x.toFixed(1) + ' 16Q' + (x + 1.6).toFixed(1) + ' 37 ' + x.toFixed(1) + ' 58'; }
+  h += '<path d="' + sl + '" fill="none" stroke="#DCC9A6" stroke-width="1.3"/>';
+  h += '<path d="M31 15H81Q84.5 37 81 59H31Q34.5 37 31 15Z" fill="none" stroke="' + o + '" stroke-width="2" stroke-linejoin="round"/>';
+  h += '<rect x="25" y="12" width="62" height="4" rx="2" fill="' + dk + '" stroke="' + o + '" stroke-width="1.4"/><rect x="29" y="57.5" width="54" height="3.2" rx="1.6" fill="' + dk + '" stroke="' + o + '" stroke-width="1.3"/>';
+  h += '<path d="M32 60L24 67M80 60L92 64" stroke="' + o + '" stroke-width="1" opacity=".7"/>';
+  h += '<circle cx="56" cy="36" r="12" fill="#fff" stroke="' + o + '" stroke-width="1.6"/><circle cx="56" cy="36" r="9.6" fill="none" stroke="' + col + '" stroke-width="1.3"/><g transform="translate(46.5 26.5) scale(.475)">' + flagSym(sym || 'compass', col) + '</g>';
+  h += '<path d="M57.6 3h15l-3.5 3.5L72.6 10H57.6" fill="' + col + '" stroke="' + o + '" stroke-width="1.4" stroke-linejoin="round"/>';
+  h += '<path d="' + hull + '" fill="' + wood + '"/>';
+  h += '<path d="M22 77H105Q103 83 92 87H33Q26 84 22 77Z" fill="#A86A35"/>';
+  h += '<path d="M8 51Q15 59 21 67H96L101 56H112L111 61H103L98 72H18Q12 62 8 51Z" fill="' + dk + '"/>';
+  h += '<path d="M19 77H105M26 82.5H100" stroke="#8A5530" stroke-width="1.2" stroke-linecap="round"/>';
+  h += '<path d="' + hull + '" fill="none" stroke="' + o + '" stroke-width="2.2" stroke-linejoin="round"/>';
+  h += '<path d="M5 47L1.5 39" stroke="' + o + '" stroke-width="2.6" stroke-linecap="round"/>';
+  h += '<path d="M86 67V60H98V67" fill="#F3D9A0" stroke="' + o + '" stroke-width="1.5" stroke-linejoin="round"/><rect x="89.5" y="61.5" width="5" height="3.6" rx=".6" fill="#7FB3CC" stroke="' + o + '" stroke-width="1"/>' +
+    '<path d="M83.5 61L92 56 100.5 61Z" fill="#E8574A" stroke="' + o + '" stroke-width="1.5" stroke-linejoin="round"/>';
+  h += '<path d="M110 64L115 66 113 80 106 83" fill="' + dk + '" stroke="' + o + '" stroke-width="1.4" stroke-linejoin="round"/>';
+  h += '<path d="M20 90q6-3 12 0t12 0M72 91q6-3 12 0t12 0" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>';
+  h += '<g transform="translate(16 46) scale(.2)">' + (W_PSShin() ? W_PSShin().svg('still', { stg: 3, fit: 'none' }).replace(/^<svg[^>]*>|<\/svg>$/g, '') : '') + '</g>';
   return '<svg class="ship" viewBox="0 0 120 96" width="' + (w || 120) + '" aria-hidden="true">' + h + '</svg>';
 }
 
@@ -146,13 +219,49 @@ function compassSVG(vals, w) {
 }
 
 /* ---------- đảo (vẽ quanh 0,0): nền theo phía, bờ nét đứt, núi, cây ---------- */
-function isleShape(side, k) {
-  var L = 'M-27 6q-3-11 9-14 5-10 17-7 12-5 21 3 9 5 6 14-3 8-15 8h-27q-12 0-11-4z', ns = k && k > 1.5 ? ' vector-effect="non-scaling-stroke"' : '';
-  return '<g transform="scale(' + (k || 1.1) + ')"><path d="' + L + '" transform="scale(1.22 1.3)" fill="none" stroke="#141413" stroke-width=".9" stroke-dasharray="2 3" opacity=".55"' + ns + '/>' + aP(L, sideBg(side), 1.8, ns) +
-    '<path d="M-20 10q22 4 40-2l3 5q-20 6-42 2z" fill="url(#cd2dots)" opacity=".55"/>' + aP('M-16 4l7-12 7 12', '#fff', 1.5, ns) + aP('M-6 4l6-9 6 9', '#fff', 1.5, ns) +
-    aP('M13 6q1-7-1-13', 'none', 1.5, ns) + aP('M12-7q-6-3-9 1M12-7q6-4 9 0M12-7q-1-6 4-8', 'none', 1.4, ns) + '</g>';
+/* PS1.3.40: mỗi đảo một công trình riêng theo con đường + dấu hiệu phía (Nhật: núi đỉnh tuyết · Việt Nam: cây dừa).
+   Vẽ quanh 0,0; k = tỉ lệ (hải đồ 1.1, trang đảo 2.6). Nét cong nhẹ nhờ hand() ở mapSVG / sceneSVG. */
+function isleDraw(is, k) {
+  k = k || 1.1; var s = k > 1.5 ? .58 : 1, id = is && is.id, side = is && is.side;
+  function P(d, f, w) { return aP(d, f, (w || 1.6) * s); }
+  function R(x, y, w, h, f, sw) { return aR(x, y, w, h, f || '#fff', (sw || 1.5) * s, .6); }
+  function T(x, y, t) { return '<text x="' + x + '" y="' + y + '" text-anchor="middle" font-size="8" font-weight="700" fill="#141413" font-family="sans-serif">' + t + '</text>'; }
+  var G = 'M-31 7q-2-9 8-12 7-6 22-5 16-2 25 4 9 4 5 12-2 5-12 5h-38q-9 0-10-4z';
+  var h = '<path d="' + G + '" transform="scale(1.14 1.3)" fill="none" stroke="#141413" stroke-width="' + (.9 * s) + '" stroke-dasharray="2 3" opacity=".5"/>' + P(G, sideBg(side), 1.8) +
+    '<path d="M-22 9q22 4 42-2l3 4q-21 6-44 2z" fill="url(#cd2dots)" opacity=".5"/>';
+  var side0 = { len: -1, re: -1, cau: -1, lap: 1, que: -1 }[id];
+  if (side === 'jp') { var mx = side0 < 0 ? -30 : 10; h += P('M' + mx + ' -2l10-17 10 17', '#fff', 1.4) + '<path d="M' + (mx + 6) + ' -12.2l4-6.8 4 6.8-2-1.2-2 1.6-2-1.6z" fill="#141413" opacity=".8"/>'; }
+  if (side === 'vn') { var px = side0 < 0 ? -25 : 25; h += P('M' + px + ' -1q1-10-2-18', 'none', 1.5) + P('M' + (px - 2) + ' -19q-7-3-10 2M' + (px - 2) + ' -19q7-4 10 1M' + (px - 2) + ' -19q-1-7 5-9M' + (px - 2) + ' -19q-5-6-9-5', 'none', 1.3); }
+  if (id === 'len') { /* xưởng + bậc thang đi lên */
+    h += R(-14, -15, 17, 13) + P('M-14 -15l4.2-5v5l4.2-5v5l4.2-5v5l4.2-5v5', '#fff', 1.4) + R(-8, -8, 5, 6, '#F6E6DD', 1.2) +
+      P('M5 -2h5v-5h5v-5h5v-5', 'none', 1.6) + P('M14 -22l3.5-4 3.5 4M17.5 -26v7', 'none', 1.5);
+  } else if (id === 're') { /* biển chỉ đường hai nhánh, hai mái nhà khác nhau */
+    h += P('M0 -1V-27', 'none', 1.7) + P('M-1 -26h-12l-3.5 3 3.5 3h12z', '#fff', 1.4) + P('M1 -19h12l3.5 3-3.5 3H1z', '#F6E6DD', 1.4) +
+      P('M0 0q-7 2-15 2M0 0q7 2 15 2', 'none', 1.1) + P('M-22 -2v-5l3-3 3 3v5z', '#fff', 1.2) + P('M17 -2v-5h6v5z', '#fff', 1.2) + P('M16 -7l4-3 4 3', 'none', 1.2);
+  } else if (id === 'hoc') { /* trường có tháp chuông, chồng sách */
+    h += R(-14, -13, 26, 11) + P('M-16 -13L-1 -21 14 -13', '#fff', 1.5) + R(-4, -29, 6, 7) + P('M-5 -29l4-4 4 4', '#fff', 1.3) + '<circle cx="-1" cy="-25.5" r="1.3" fill="#141413"/>' +
+      R(-3, -8, 4, 6, '#F6E6DD', 1.1) + R(-11, -10, 4, 3.5, '#fff', 1) + R(5, -10, 4, 3.5, '#fff', 1) + R(15, -4, 9, 2.6, '#F6E6DD', 1.1) + R(16, -6.6, 8, 2.6, '#fff', 1.1) + R(15.5, -9.2, 8, 2.6, '#F6E6DD', 1.1);
+  } else if (id === 'gio') { /* bến nhỏ + mũi tên đi rồi về */
+    h += P('M-22 -3h18M-19 -3v4M-11 -3v4M-5 -3v4', 'none', 1.5) + P('M-20 -6h12l-2 3h-8z', '#fff', 1.2) + P('M-14 -6v-10', 'none', 1.2) + P('M-13 -15l5 3.5-5 1.5z', '#F6E6DD', 1) +
+      P('M2.5 -25A8.5 8.5 0 0 1 18.5 -25', 'none', 1.7) + P('M15.2 -26.6L18.5 -25 19.6 -28.6', 'none', 1.6) + P('M18.5 -18A8.5 8.5 0 0 1 2.5 -18', 'none', 1.7) + P('M5.8 -16.4L2.5 -18 1.4 -14.4', 'none', 1.6);
+  } else if (id === 'chu') { /* bảng chữ あ + bong bóng lời Ă */
+    h += R(-19, -24, 19, 14) + P('M-17 -10l-2 8M-2 -10l2 8', 'none', 1.3) + T(-9.5, -14, 'あ') +
+      P('M4 -27h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-4 4v-4h-2a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2z', '#F6E6DD', 1.4) + T(11, -18, 'Ă');
+  } else if (id === 'cau') { /* văn phòng nhiều tầng nối cầu */
+    h += R(-12, -29, 14, 27) + P('M-9 -25h3M-3 -25h3M-9 -20h3M-3 -20h3M-9 -15h3M-3 -15h3M-9 -10h3M-3 -10h3', 'none', 1.5) + R(-7, -6, 4, 4, '#F6E6DD', 1) +
+      P('M2 -8q9-9 19 0', 'none', 1.5) + P('M2 -6h20', 'none', 1.6) + P('M8 -6v4M15 -6v4', 'none', 1.3);
+  } else if (id === 'lap') { /* cửa hàng mái hiên sọc, biển hiệu */
+    h += R(-15, -12, 26, 10) + P('M-17 -12l2.4-6h26l2.4 6z', '#F6E6DD', 1.4) + P('M-10 -18l-1 6M-3.5 -18v6M3 -18v6M9 -18l1 6', 'none', 1.2) +
+      R(-9, -27, 14, 6) + P('M-7 -21v3M3 -21v3', 'none', 1.1) + R(-4, -9, 5, 7, '#fff', 1.2) + R(4, -9, 5, 4, '#fff', 1);
+  } else if (id === 'que') { /* nhà có khói bếp, ruộng lúa, hàng rào */
+    h += R(-12, -12, 17, 10) + P('M-14.5 -12L-3.5 -21 7.5 -12', '#fff', 1.5) + P('M2 -17.5v-6h3v3.5', '#fff', 1.2) + P('M3.5 -26q-2-2 0-4t0-4', 'none', 1) + R(-6, -8, 4, 6, '#F6E6DD', 1.1) +
+      P('M10 -3l1.5-5M14 -3l1.5-5M18 -3l1.5-5', 'none', 1.2) + P('M11.5 -8l-1.6-2M11.5 -8l1.6-2M15.5 -8l-1.6-2M15.5 -8l1.6-2M19.5 -8l-1.6-2M19.5 -8l1.6-2', 'none', .9) +
+      P('M-21 -2v-6M-18 -2v-6M-22 -6h7', 'none', 1.1);
+  }
+  return '<g transform="scale(' + k + ')">' + h + '</g>';
 }
-function isleArt(is) { return '<g transform="translate(' + is.x + ' ' + is.y + ')">' + isleShape(is.side) + '</g>'; }
+function isleShape(side, k) { return isleDraw({ side: side }, k); }
+function isleArt(is) { return '<g transform="translate(' + is.x + ' ' + is.y + ')">' + isleDraw(is) + '</g>'; }
 /* mây sương tô chấm che đảo chưa mở */
 function fogArt(x, y) {
   var d = 'M-34 10c-8-10 4-20 14-14 2-12 20-16 26-4 10-8 26-2 22 10 10 0 12 12 0 14h-56c-10 0-12-4-6-6z';
@@ -186,11 +295,75 @@ var CD2_MINI = {
   map: function () { return aR(10, 16, 40, 30, '#fff', 1.8, 3) + aP('M10 16l20-10 20 10', '#fff', 1.8) + aP('M16 40q8-14 16-6t14-10', 'none', 1.6) + '<path d="M16 40q10-2 22 2" fill="none" stroke="#D97757" stroke-width="1.8" stroke-dasharray="3 3"/>'; },
   wave: function () { return aP('M30 52V20', 'none', 1.8) + aP('M18 20h16l4 4-4 4H18z', '#fff', 1.5) + aP('M42 32H26l-4 4 4 4h16z', '#fff', 1.5) + aP('M32 12h12l3 3-3 3H32z', '#D97757', 1.4) + aP('M6 50q4-4 8 0t8 0M38 50q4-4 8 0t8 0', 'none', 1.5) + aP('M22 52q8-8 16 0', '#fff', 1.6); },
   light: function () { return '<path d="M34 14L58 6v16z" fill="#FFF3D9"/>' + aP('M22 52l3-34h10l3 34z', '#fff', 1.8) + '<path d="M23.6 40h12.8l.8 6H22.8z" fill="#D97757"/>' + aP('M23 40h14M22.6 46h14.8', 'none', 1.3) + aR(23, 10, 14, 8, '#FDEFE7', 1.6) + aP('M22 10q8-9 16 0z', '#fff', 1.6) + aC(30, 14, 1.8, '#D97757', 1); },
+  office: function () { /* PS1.3.42: Phòng Tuyển Dụng · nhà cảng 2 tầng, bảng tin dán giấy (hình nhỏ ở hải đồ, thẻ bến; banner vẽ lại ở PS1.3.43) */ return aP('M8 24L28 10l20 14', '#fff', 1.8) + aR(12, 23, 32, 28, '#fff', 1.8) + aR(17, 28, 8, 7, '#FDEFE7', 1.3) + aR(31, 28, 8, 7, '#FDEFE7', 1.3) + aR(24, 39, 8, 12, '#fff', 1.4) +
+    aP('M48 51V34M58 51V34', 'none', 1.6) + aR(45, 26, 16, 12, '#fff', 1.6, 1) + aR(47.5, 28.5, 5, 4, '#D97757', 1) + aP('M54 29h5M54 32h4M48 35h10', 'none', 1); },
   flag: function () { return aP('M8 44h40l-6 7H14z', '#fff', 1.8) + aP('M22 44V8M36 44V12', 'none', 1.6) + aP('M14 38q8 2 16 0l-1-12q-7 2-14 0z', '#fff', 1.5) + aP('M28 40q8 2 16 0l-1-14q-7 2-14 0z', '#fff', 1.5) + aP('M36 12l9 3-9 3', '#D97757', 1.3); }
 };
 /* mã nơi chốn theo bến */
-var CD2_PLACE = { p0: 'port', b1: 'scope', b2: 'people', b3: 'compass', b4: 'map', b5: 'wave', b6: 'light', fin: 'flag' };
-function miniArt(k, w) { return '<svg class="mini" viewBox="0 0 60 56" width="' + (w || 60) + '" aria-hidden="true"><g filter="url(#cd2rough)">' + (CD2_MINI[k] ? CD2_MINI[k]() : '') + '</g></svg>'; }
+var CD2_PLACE = { p0: 'port', b1: 'scope', b2: 'people', b3: 'compass', b4: 'map', b5: 'wave', b6: 'office', b7: 'light', fin: 'flag' }; /* PS1.3.42: b6 Phòng Tuyển Dụng, b7 Ngọn Hải Đăng */
+function miniArt(k, w) { return '<svg class="mini" viewBox="0 0 60 56" width="' + (w || 60) + '" aria-hidden="true"><g>' + hand(CD2_MINI[k] ? CD2_MINI[k]() : '') + '</g></svg>'; }
+
+/* ---------- người phỏng vấn (PS1.3.43): tượng bán thân nét mực, khung 80×80, vai chạm đáy khung ----------
+   ivPerson(mã) với mã trong IV_WHO (xuong, hr, vn, gv, kh) · ivAv(mã, w) ảnh tròn · ivRoom(mã) phòng phỏng vấn (360×132).
+   Nhân vật vẽ chung, không phải người thật. Nét thẳng nhỏ nên không qua hand() (trừ khi nằm trong banner). */
+var IV_SKIN = '#FCE6D8', IV_BG = { xuong: '#DCE6EC', hr: '#EBCBB9', vn: '#BCD3CB', gv: '#CBCAD9', kh: '#DDDAD0' };
+function ivFace(cx, cy, gl) {
+  var s = '<circle cx="' + (cx - 5) + '" cy="' + cy + '" r="1.5" fill="#141413"/><circle cx="' + (cx + 5) + '" cy="' + cy + '" r="1.5" fill="#141413"/>' +
+    '<circle cx="' + (cx - 8.5) + '" cy="' + (cy + 4.5) + '" r="2.2" fill="#F2B9A0" opacity=".75"/><circle cx="' + (cx + 8.5) + '" cy="' + (cy + 4.5) + '" r="2.2" fill="#F2B9A0" opacity=".75"/>' +
+    aP('M' + (cx - 3.5) + ' ' + (cy + 6) + 'q3.5 2.8 7 0', 'none', 1.5);
+  if (gl === 'r') s += aC(cx - 5, cy, 3.8, 'none', 1.3) + aC(cx + 5, cy, 3.8, 'none', 1.3) + aP('M' + (cx - 1.2) + ' ' + cy + 'h2.4', 'none', 1.3);
+  if (gl === 's') s += aR(cx - 9, cy - 3, 7.6, 6, 'none', 1.3, 1.5) + aR(cx + 1.4, cy - 3, 7.6, 6, 'none', 1.3, 1.5) + aP('M' + (cx - 1.4) + ' ' + cy + 'h2.8', 'none', 1.3);
+  return s;
+}
+function ivHead(hairBack, hairFront, gl, extra) { /* tai, cổ, mặt, tóc */
+  return (hairBack || '') + aC(27, 39, 2.8, IV_SKIN, 1.6) + aC(53, 39, 2.8, IV_SKIN, 1.6) + aR(35, 48, 10, 11, IV_SKIN, 1.8, 2) +
+    aC(40, 37, 13, IV_SKIN, 2) + ivFace(40, 38, gl) + (hairFront || '') + (extra || '');
+}
+function ivBody(fill, inner) { return aP('M6 82q2-22 34-24q32 2 34 24z', fill, 2) + (inner || ''); }
+var IV_ART = {
+  xuong: function () { /* trưởng xưởng: áo đồng phục xanh xám, mũ công nhân */
+    return ivBody('#DCE6EC', aP('M31 59l9 9 9-9', '#fff', 1.6) + aP('M40 68v14', 'none', 1.4) + aR(48, 66, 10, 6, '#D97757', 1.2, 1) + aP('M22 70v12M58 70v12', 'none', 1.2, ' opacity=".5"')) +
+      ivHead('', aP('M26.5 33q1-15 13.5-15t13.5 15z', '#2B3A55', 2) + aP('M25 33h30q-2 3.5-6 3.5H31q-4 0-6-3.5z', '#2B3A55', 1.8) + aC(40, 25.5, 2.2, '#D97757', 1.1), '');
+  },
+  hr: function () { /* nhân sự công ty ở Nhật: tóc ngắn ngang vai, vest xanh than, thẻ tên */
+    return aP('M24 44q-3-23 16-24q19 1 16 24q0 7-4 9H28q-4-2-4-9z', '#141413', 2) +
+      ivBody('#2B3A55', aP('M33 59l7 12 7-12z', '#fff', 1.6) + aP('M33 59l-4 11 6 5M47 59l4 11-6 5', 'none', 1.4, ' stroke="#fff" opacity=".7"') +
+        '<path d="M33.5 60q6.5 16 13 0" fill="none" stroke="#D97757" stroke-width="1.4"/>' + aR(36.5, 71, 7, 9, '#fff', 1.3, 1)) +
+      ivHead('', aP('M27 37q2-13 13-13t13 13q-6-6-13-6.5Q33 31 27 37z', '#141413', 1.6), '');
+  },
+  vn: function () { /* giám đốc người Nhật (trước) và chị nhân sự (sau) */
+    var hrw = aP('M25 47q-3-25 15-26q18 1 15 26l1 12H24z', '#141413', 2) +
+      ivBody('#EBCBB9', aP('M33 59l7 11 7-11z', '#fff', 1.6)) + ivHead('', aP('M27 37q1-13 13-13t13 13q-9-8-20-3z', '#141413', 1.6), '');
+    var dir = ivBody('#2B3A55', aP('M33 59l7 12 7-12z', '#fff', 1.6) + aP('M38.5 61h3l1 3-2.5 11-2.5-11z', '#D97757', 1.2)) +
+      ivHead('', aP('M27 36q-1-13 13-13q14 0 13 13q-3-7-9-8q-7 5-17 8z', '#BDBAB0', 1.8), 's');
+    return '<g transform="translate(24 6) scale(.78)">' + hrw + '</g><g transform="translate(-10 8) scale(.92)">' + dir + '</g>';
+  },
+  gv: function () { /* thầy cô tuyển sinh: tóc búi, kính tròn, áo len */
+    return ivBody('#CBCAD9', aP('M33 59l7 9 7-9', '#fff', 1.6) + aP('M40 68v14', 'none', 1.3) + aC(37, 73, 1.2, '#141413', 1) + aC(43, 73, 1.2, '#141413', 1) + aC(52, 66, 2.2, '#D97757', 1.1)) +
+      aC(40, 21, 6.5, '#6B564B', 1.8) + ivHead('', aP('M27 38q-1-14 13-14t13 14q-4-8-13-8t-13 8z', '#6B564B', 1.6), 'r');
+  },
+  kh: function () { /* giám đốc xưởng Nhật (khách): áo khoác xanh rêu, tóc ngắn, ria */
+    return ivBody('#BCD3CB', aP('M31 59l9 8 9-8', '#fff', 1.6) + aP('M40 67v15', 'none', 1.6) + aR(23, 66, 10, 7, '#fff', 1.2, 1) + aP('M25 69.5h6', 'none', 1)) +
+      ivHead('', aP('M27 35q0-14 13-14t13 14q-2-4-5-5l-2 3-3-3.5-3 3.5-3-3.5-2 3q-5 1-8 5.5z', '#141413', 1.8) + aP('M33 33.5l4-1M43 32.5l4 1', 'none', 1.8) + aP('M36 42.4q4-2.2 8 0', 'none', 2), '');
+  }
+};
+function ivPerson(id) { return (IV_ART[id] || IV_ART.hr)(); }
+var IV_N = 0;
+function ivAv(id, w) {
+  var k = 'cd2iv' + (++IV_N);
+  return '<svg class="ivav" viewBox="0 0 80 80" width="' + (w || 40) + '" height="' + (w || 40) + '" aria-hidden="true"><defs><clipPath id="' + k + '"><circle cx="40" cy="40" r="38.5"/></clipPath></defs>' +
+    '<circle cx="40" cy="40" r="38.5" fill="' + (IV_BG[id] || '#EBCBB9') + '"/><g clip-path="url(#' + k + ')">' + ivPerson(id) + '</g><circle cx="40" cy="40" r="38.5" fill="none" stroke="#141413" stroke-width="2"/></svg>';
+}
+function ivRoom(id) { /* phòng phỏng vấn nhỏ ở đầu mỗi câu hỏi: cửa sổ nhìn biển, lịch +3 năm, người phỏng vấn sau bàn */
+  var env = aR(16, 14, 92, 64, '#DCE6EC', 2, 3) + aP('M62 14v64M16 50h92', 'none', 1.6) + aC(36, 30, 6, '#D97757', 1.4) + aWave(20, 62, 3, 12, .8) + aWave(66, 66, 3, 12, .8) +
+    aR(124, 18, 30, 34, '#fff', 1.8, 2) + aR(124, 18, 30, 9, '#D97757', 1.8, 2) + '<text x="139" y="44" text-anchor="middle" font-family="Lora,Georgia,serif" font-size="12" font-weight="700" fill="#141413">+3</text>' +
+    aR(196, 22, 68, 80, '#D4A27F', 2, 8);
+  var desk = aP('M150 98h200v7H150z', '#fff', 2) + aR(158, 105, 184, 27, '#FFFDF8', 2) + aDots('M160 107h180v6H160z', .35, 1) +
+    aP('M268 98l3-9h30l3 9z', '#fff', 1.6) + '<text x="286" y="96" text-anchor="middle" font-family="Be Vietnam Pro,system-ui,sans-serif" font-size="7" font-weight="700" fill="#141413">面接</text>' +
+    aR(170, 92, 26, 6, '#fff', 1.4, 1) + aR(174, 88, 22, 4, '#fff', 1.2, 1) + aP('M322 98v-10h10v10M332 90q5 0 5 4t-5 4', '#fff', 1.6);
+  return '<svg class="ivroom" viewBox="0 0 360 132" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="360" height="132" fill="#F3EFE6"/>' +
+    hand(env) + '<g transform="translate(180 4) scale(1.25)">' + ivPerson(id) + '</g>' + hand(desk) + '</svg>';
+}
 
 /* ---------- 8 cảnh banner (360×150, nền tông vòng) ---------- */
 function aSea(y0, o) { return aWave(14, y0, 6, 16, o) + aWave(150, y0 + 10, 7, 16, o) + aWave(40, y0 + 20, 8, 14, o) + aWave(230, y0 + 24, 6, 14, o); }
@@ -265,6 +438,22 @@ var CD2_SCN = {
       aR(208, 30, 28, 6, '#fff', 2) + aR(212, 16, 20, 14, '#FDEFE7', 2) + aP('M222 16v14', 'none', 1.4) + aC(222, 23, 3.4, '#D97757', 1.4) + aP('M210 16q12-14 24 0z', '#fff', 2) + aP('M222 4v-4', 'none', 1.6) +
       aR(218, 96, 8, 12, '#fff', 1.6, 3) + aBoat(70, 116, .7) + aSea(122, .9) + aGull(120, 60) + aGull(300, 80, .8);
   },
+  office: function (who) { /* PS1.3.43 · Phòng Tuyển Dụng vẽ lại: bên trong phòng, cửa sổ nhìn biển, bảng tin tuyển dụng tô 3 màu, lịch +3 năm, người phỏng vấn sau bàn, ghế ứng viên */
+    var note = function (x, y, w, h, hl, f) { return aR(x, y, w, h, f || '#fff', 1.5, 1) + '<path d="M' + (x + 4) + ' ' + (y + 7) + 'h' + (w - 10) + '" stroke="' + hl + '" stroke-width="4" stroke-linecap="round" opacity=".9"/>' + aP('M' + (x + 4) + ' ' + (y + 7) + 'h' + (w - 10) + 'M' + (x + 4) + ' ' + (y + 12) + 'h' + (w - 8) + 'M' + (x + 4) + ' ' + (y + 17) + 'h' + (w - 12), 'none', 1) + aC(x + w / 2, y + 1, 1.8, '#D97757', 1); };
+    return aP('M0 128h360', 'none', 1.6) + aDots('M0 130h360v20H0z', .3, 1) +
+      aR(14, 16, 90, 68, '#DCE6EC', 2.2, 3) + aP('M59 16v68M14 52h90', 'none', 1.8) + aC(32, 32, 7, '#D97757', 1.5) + aWave(18, 70, 3, 12, .85) + aWave(64, 74, 3, 12, .85) +
+      '<g transform="translate(84 66) scale(.32)">' + aBoat(0, 0, 1) + '</g>' + aGull(70, 28, .7) +
+      aR(116, 12, 92, 70, '#fff', 2.2, 3) + aR(140, 6, 44, 11, '#D97757', 1.6, 2) + '<text x="162" y="14.6" text-anchor="middle" font-family="Be Vietnam Pro,system-ui,sans-serif" font-size="7.5" font-weight="700" fill="#fff">求人</text>' +
+      note(122, 24, 26, 22, '#BCD8CF') + note(152, 22, 26, 24, '#F3DFAE', '#FFFDF8') + note(182, 26, 22, 20, '#DEDBD3') + note(130, 52, 30, 22, '#F3DFAE') + note(166, 52, 32, 22, '#BCD8CF', '#FFFDF8') +
+      aR(220, 16, 30, 34, '#fff', 1.8, 2) + aR(220, 16, 30, 9, '#D97757', 1.8, 2) + aP('M227 13v6M243 13v6', 'none', 1.6) + '<text x="235" y="42" text-anchor="middle" font-family="Lora,Georgia,serif" font-size="12" font-weight="700" fill="#141413">+3</text>' +
+      aP('M114 128l3-17h18l3 17z', '#EBCBB9', 1.8) + aP('M126 111q-12-14-4-28M126 111q10-12 18-22M126 111q-2-16 6-30', 'none', 1.8) + aP('M122 83q-6 2-6 8 6 0 6-8zM144 89q2 6-4 9 -2-6 4-9zM132 81q6 2 4 8-5-2-4-8z', '#BCD3CB', 1.4) +
+      aR(262, 34, 54, 64, '#D4A27F', 2, 8) +
+      '<g transform="translate(251 19) scale(.95)">' + ivPerson(who || 'hr') + '</g>' +
+      aP('M226 96h128v7H226z', '#fff', 2.2) + aR(232, 103, 116, 25, '#FFFDF8', 2) + aDots('M234 105h112v6H234z', .35, 1) +
+      aP('M296 96l3-9h28l3 9z', '#fff', 1.6) + '<text x="313" y="94" text-anchor="middle" font-family="Be Vietnam Pro,system-ui,sans-serif" font-size="7" font-weight="700" fill="#141413">面接</text>' +
+      aR(240, 90, 24, 6, '#fff', 1.4, 1) + aR(244, 86, 20, 4, '#fff', 1.2, 1) + aP('M336 96v-9h9v9M345 89q5 0 5 3.5t-5 3.5', '#fff', 1.6) +
+      aP('M178 104h30v5h-30zM180 104V74q0-4 4-4h3q3 0 3 4v30M182 109l-2 19M204 109l2 19M190 109v19', '#fff', 2) + aDots('M182 76h6v26h-6z', .4, 1);
+  },
   flag: function () { /* Cảng Khởi Hành: thuyền buồm lớn, cờ dây, mặt trời mọc */
     var bunt = '', i; for (i = 0; i < 7; i++) { var x = 8 + i * 18; bunt += aP('M' + x + ' ' + (14 + i * 2.2) + 'l9 14 9-12', i % 2 ? '#fff' : '#D97757', 1.4); }
     return '<path d="M200 112a64 64 0 0 1 128 0z" fill="#D97757" opacity=".22"/>' + aP('M200 112a64 64 0 0 1 128 0', 'none', 1.6) +
@@ -278,14 +467,13 @@ var CD2_SCN = {
   },
   isle: function (is) { /* trang đảo: đảo lớn giữa biển, bảng tên có biểu tượng đảo */
     return aSea(120, .8) + aWave(30, 92, 3, 14, .6) + aWave(270, 88, 3, 14, .6) + aGull(80, 34) + aGull(270, 28, .8) +
-      '<g transform="translate(170 100)">' + isleShape(is && is.side, 2.6) + '</g>' +
-      aP('M246 104V58', 'none', 2) + aC(246, 44, 15, '#fff', 2) + '<g transform="translate(236 34) scale(.84)" color="#141413"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">' + (CD2_IC[is && is.ic] || '') + '</g></g>' +
+      '<g transform="translate(180 104)">' + isleDraw(is, 2.6) + '</g>' +
       aBoat(300, 132, .5, '#D97757');
   }
 };
 function sceneSVG(k, bg, h, arg) {
   h = h || 150;
-  return '<svg class="scene" viewBox="0 0 360 ' + h + '" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="360" height="' + h + '" fill="' + bg + '"/><g filter="url(#cd2rough)">' + (CD2_SCN[k] ? CD2_SCN[k](arg) : '') + '</g></svg>';
+  return '<svg class="scene" viewBox="0 0 360 ' + h + '" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="360" height="' + h + '" fill="' + bg + '"/><g>' + hand(CD2_SCN[k] ? CD2_SCN[k](arg) : '') + '</g></svg>';
 }
 
 /* ---------- con dấu kiểu hộ chiếu: 3 hình, mực cam đất hoặc xanh than, xoay nhẹ, có ngày ---------- */

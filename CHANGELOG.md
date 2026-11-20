@@ -5,6 +5,64 @@ Quy ước số phiên bản: **PS a.b.c**
 - b: giai đoạn / thêm module hoặc tính năng lớn
 - c: sửa nhỏ trong giai đoạn đó
 
+## PS1.3.43 · 20/11/2026 · CD02.2.2 (phiên 3) Âm thanh ra/vào bến, banner Phòng Tuyển Dụng, người phỏng vấn
+Theo “Việc tiếp theo · Phiên 3” trong cd02-tiep-tuc.md (bản 2 thầy chốt 20/11). Chỉ sửa CD02. Không đổi chữ, chặng, cách chấm, bài làm.
+- **Âm thanh nhẹ khi ra/vào** (tự soạn bằng Web Audio, không tải tệp, theo công tắc âm thanh chung, không tiếng sóng): vào cảng, bến ngoài trời (Cảng 3 Năm, Đài Vọng Biển, Bến Senpai, Vịnh Ngã Rẽ, Ngọn Hải Đăng, Cảng Khởi Hành) nghe chuông thuyền 2 tiếng; vào nơi trong nhà (Xưởng La Bàn, Phòng Hải Đồ, Phòng Tuyển Dụng) nghe tiếng cửa + chuông “pin-pon”; về Hải đồ (cả nút Back điện thoại) nghe 2 nốt nhẹ đi xuống, ra khỏi phòng nghe tiếng cửa khép. Quay từ chặng về trang bến thì im lặng.
+- **Cửa trượt khi vào phòng**: banner của 3 nơi trong nhà mở bằng 2 cánh cửa giấy kiểu Nhật trượt sang hai bên (0,75 giây). Giảm chuyển động: không có cửa.
+- **Banner Phòng Tuyển Dụng vẽ lại**: bên trong phòng, cửa sổ nhìn biển, bảng tin 求人 có tin tô 3 màu như ở b61, lịch “+3” (3 năm sau), cây xanh, ghế ứng viên, bàn phỏng vấn có bảng 面接; người ngồi sau bàn là người phỏng vấn hợp hướng bạn nghiêng (hoặc người bạn đã chọn ở b62).
+- **5 nhân vật người phỏng vấn** (vẽ chung, không phải người thật): Trưởng xưởng (mũ, đồng phục) · Nhân sự công ty ở Nhật (vest, thẻ tên) · Giám đốc người Nhật và chị nhân sự (2 người) · Thầy cô tuyển sinh (tóc búi, kính tròn) · Giám đốc xưởng Nhật (áo khoác xưởng). Hiện ở bước chọn người phỏng vấn, đầu mỗi câu hỏi (phòng phỏng vấn nhỏ: cửa sổ, lịch +3, người sau bàn) và ở “Người phỏng vấn hay hỏi thêm”.
+- Đo chữ nhìn thấy khi đi trọn 20 chặng ở demo (390px, chữ trên màn đầu của mỗi bước, tính cả tiêu đề và thanh nút): 7.064 chữ, bằng PS1.3.42 (phiên 3 không thêm chữ). Nhiều nhất: f2 Hướng đi của tôi 1.383 chữ, b62 Phỏng vấn 471 chữ.
+- Kiểm 390 + 1280: đi trọn 20 chặng ở demo không kẹt, không lỗi JS; âm thanh đúng từng loại nơi; Back điện thoại; giảm chuyển động; trang chủ, 1 service worker; ES5 (acorn) cho config.js, core/*.js, hub/*.js, cd02/*.js.
+
+Tệp đổi: cd02/art.js, cd02/engine.js, cd02/content.js (room: 1, số phiên bản), cd02/cd02.css (khối cuối PS1.3.43), cd02/index.html, config.js, sw.js, ?v= ở mọi trang (index.html, cd01, cd02, tk, tc01, mau, routine/index.html), CHANGELOG.md, AGENTS.md, cd02-tiep-tuc.md.
+File cần xóa trên GitHub: không có.
+
+## PS1.3.42 · 20/11/2026 · CD02.2.1 (phiên 2) Bến Phòng Tuyển Dụng, phỏng vấn anh chị đi trước, Các bước thường gặp
+Theo bản 2 thầy chốt (PA A, 20/11). Chỉ sửa CD02. Vẫn 18 chặng, 7 bến.
+- **Gộp chặng**: “Hướng làm bạn tò mò” vào “8 hướng đi sau 3 năm” (b12) · Kế hoạch B và C chung một chặng (b42; C gọn: chỉ mốc năm 5, chấm B và C trên một màn, rồi đặt 3 kế hoạch cạnh nhau) · “Thử nhỏ 2 tuần” vào “Kế hoạch 3 năm ở Nhật” (b63). Vịnh Ngã Rẽ còn 2 chặng.
+- **Bến 6 mới · Phòng Tuyển Dụng** (b61–b63, Vòng Ra khơi, giữa đáy hải đồ):
+  - b61 Đọc tin tuyển dụng 3 năm sau: chọn Tin ở Việt Nam · Tin ở Nhật · Kế hoạch kinh doanh (Shin chọn sẵn theo hướng bạn nghiêng, tin gần nghề lên trước). 8 tin mô phỏng từ tin thật 2026 (bỏ tên công ty, không ghi lương); chạm tô màu từng yêu cầu: Chắc có sau 3 năm · Phải cố mới có · Cần đi đường khác; rồi thẻ “Điều nhà tuyển dụng hay để ý thêm” (theo Sổ tay tìm việc của JASSO). Kế hoạch kinh doanh 1 trang của 3 nhân vật ghép: chấm 5 dòng Rõ · Mơ hồ · Thiếu, “Nếu là người góp vốn, bạn có góp không?”, chọn điều cần chuẩn bị, xem anh Hợi, chị Thu Thảo, chị Cẩm Vinh đã bắt đầu thế nào.
+  - b62 Phỏng vấn 3 năm sau: nhãn “Từ CD01” hiện câu trả lời phỏng vấn 60 giây. Chọn người phỏng vấn (5 người theo hướng đi) và 3 câu (8 câu, có tiếng Nhật, nút Nghe đọc giọng máy ja-JP theo công tắc âm thanh). Mỗi câu 3 ô ngắn Việc · Kết quả · Học được gì, tự soát “Có bằng chứng thật chưa?” và “Nói được bằng tiếng Nhật chưa?”, người phỏng vấn hỏi thêm 1 câu. Kết thúc: Thẻ bằng chứng còn thiếu.
+  - b63 Kế hoạch 3 năm ở Nhật: xếp từng bằng chứng còn thiếu (từ tin tuyển dụng, kế hoạch kinh doanh, phỏng vấn, hoặc tự thêm) vào Năm 1 · 2 · 3, rồi chọn việc thử nhỏ 2 tuần (giữ cơ chế cũ). Vào bản Hướng đi của tôi, Sổ tay, báo cáo GV.
+- **Ngọn Hải Đăng thành Bến 7** (b71–b72). Bài làm cũ tự chuyển (`migrate()`: b61/b62 → b71/b72, dấu b6 → b7, bỏ dấu xong riêng của b13, b43, b53).
+- **b23 Phỏng vấn anh chị đi trước**: học viên là phóng viên nhỏ của lớp, chọn chị Hạnh (về làm công ty Nhật) · anh Phúc (về làm chủ) · chị Ngân (ở lại, lên Kỹ năng đặc định 2), hỏi ít nhất 3 câu, rồi đọc chuyện thật cùng hướng. Ba người là nhân vật ghép, có ghi chú.
+- **Các bước thường gặp** trên 8 đảo (trang đảo mở sẵn, ở b12 gấp lại): 3–4 bậc, điều kiện chung, ghi chú Ikusei Shuro từ 1/4/2027 ở 2 đảo ở Nhật, link trang chính thức ISA (Kỹ năng đặc định; visa Kỹ thuật – Nhân văn – Quốc tế).
+- Hình: biểu tượng `doc`, nơi chốn `office` (hình nhỏ và banner Phòng Tuyển Dụng). Sổ Thuyền Trưởng 8 ô dấu; chữ “6 bến” → 7 bến; con cá trên hải đồ dời sang trái.
+- Kiểm 390 + 1280: đi trọn 20 chặng ở demo (cả nhánh tin tuyển dụng và kế hoạch kinh doanh), không lỗi JS, ES5 đạt; thử chuyển bài cũ.
+
+Tệp đổi: cd02/content.js, cd02/engine.js, cd02/art.js, cd02/cd02.css (khối cuối PS1.3.42), cd02/index.html, config.js, sw.js, ?v= ở mọi trang, CHANGELOG.md, AGENTS.md.
+File cần xóa trên GitHub: không có.
+
+## PS1.3.41 · 20/11/2026 · CD02.2.0 (phiên 1) Chữ dễ hiểu hơn, nối CD01, Xem và sửa, lò xo
+Thầy chốt bản đề xuất 2 (20/11, `claude/cd02-ban2-de-xuat.md`). Phiên 1: chữ, nối CD01, Xem và sửa, lò xo. Chỉ sửa CD02.
+- **Chữ nói thẳng, ít ẩn dụ**: thế giới biển chỉ còn ở tên nơi chốn và hình. “Hải trình A/B/C” → “Kế hoạch A/B/C”; “Đoán hải trình” → “Họ đi đâu sau 3 năm?”; “Mượn 2 cuốn sách người” → “Đọc chuyện 2 anh chị”; “Cán cân” → “Điều bạn coi trọng”; “Gió ngoài khơi” → “Điều có thể làm đổi kế hoạch”; “Ngọn hải đăng của bạn” → “Người giúp bạn”; “Hải trình của tôi” → “Hướng đi của tôi”; tab Sổ tay “Hải trình” → “Bài làm”. “TTS” viết đủ “thực tập sinh”. Shin nói 1 câu mỗi lần (bỏ câu thứ hai), bỏ phần lớn dòng chữ mờ dưới câu hỏi, rút gọn chuyện Senpai, tình huống ở chỗ làm, tình huống bị chặn đường.
+- **Ẩn hết chip gợi ý** (`tipsHTML` trả rỗng, bật lại bằng `window.CD2_TIPS_ON = 1` nếu cần); giữ ví dụ mờ trong ô ở các câu khó: điều nghĩ sau 3 năm, câu hỏi Senpai, nếu điều khó xảy ra, đi làm là để, tuổi 30, 3 kế hoạch cạnh nhau, khác đi điều gì.
+- **Dòng Insight dưới ô viết** chỉ hiện khi đã được điểm (“+5 Insight”).
+- **Nối CD01**: nhãn “Từ CD01” tự hiện ở đầu bước có `c1: [...]` (b13 hướng 5 năm · b21 anh chị muốn học theo, điều muốn học · b22 điều muốn làm được ở Nhật · b23 câu từng muốn hỏi · b31 điều quan trọng nhất · b32 điều lo nhất · b33 5 năm sau muốn là người · b41 hướng 5 năm, kế hoạch ở Nhật · b42 nghề phương án 2 · b43 việc làm thấy vui · b53 việc nhỏ hứa thử · b61 người dẫn đường · b62 thói quen). Xuất phát: xong CD01 thì chọn 3 thẻ “mang lên thuyền” (`x1.carry`); chưa xong (hoặc đang dở) thì Shin khuyên học CD01 trước, có nút “Sang học CD01” và “Vẫn vào CD02”; vẫn vào thì trả lời nhanh nghề, 5 năm sau muốn là người thế nào, điều quan trọng nhất, điểm mạnh (`x1.me`, `x1.val`, `x1.good`, tối đa 2). Cảng Khởi Hành f1 thêm bước **tái bút cho thư CD01** (`f1.ps`). Bản 1 trang có mục “Từ CD01”; báo cáo thêm cd1, carry, quick, ps.
+- **Xem và sửa / Làm lại từ đầu** như CD01: chặng đã xong mở bảng chọn; làm lại giữ bài cũ trong `S.bak` đến khi đóng dấu lại, có “Khôi phục bài cũ”.
+- **Lò xo mảnh xám nhạt** bên trái Sổ Thuyền Trưởng (thay đường may).
+- Đo chữ nhìn thấy khi đi trọn 20 chặng (390px): 8.334 → 7.109 chữ (−15%; riêng phần nội dung khoảng −18%) (tính cả thanh nút, tiêu đề cố định); phiên 2 gộp b13, b42–b43, b53 sẽ giảm thêm.
+- Kiểm 390 + 1280: đi trọn 20 chặng qua “Xem và sửa”, Xuất phát ở 3 trạng thái CD01 (chưa học · dở · xong), không lỗi JS.
+
+Tệp đổi: cd02/content.js, cd02/engine.js, cd02/cd02.css (khối cuối PS1.3.41), cd02/index.html, config.js, sw.js, ?v= ở mọi trang module, CHANGELOG.md, AGENTS.md.
+File cần xóa trên GitHub: không có.
+
+## PS1.3.40 · 19/11/2026 · CD02.1.2 Hải đồ 2 mặt, vòng gấp, sổ gọn, thuyền buồm kiểu Nhật
+Theo góp ý của thầy (19/11). Chỉ sửa CD02; nội dung, bài làm giữ nguyên.
+- **Hải đồ 2 mặt**: nút gạt Bến | Đảo cạnh tiêu đề. Mặc định mặt Bến (ẩn 8 đảo). Bật mặt Đảo: đảo hiện ra, các bến và tuyến mờ đi, nhãn tên bến và Cảng 3 Năm ẩn hết; thanh “Sương đã tan” chỉ hiện ở mặt Đảo. Đổi mặt không vẽ lại trang (giữ vị trí cuộn).
+- **Các vòng dưới hải đồ mặc định đóng**: mỗi vòng (Khám phá · Thiết kế · Ra khơi · Đích) là một hàng gấp, có số bến đã có dấu và nhãn “Đang đi” ở vòng có chặng kế tiếp; chạm để mở các bến. Vòng đã mở giữ nguyên khi quay lại trang chủ trong cùng lần học.
+- **Thuyền một kiểu xuyên suốt**: thuyền buồm kiểu Nhật (thân cong, mũi vút, đuôi cao có lầu lái, buồm vuông ghép dải dọc). Biểu tượng cờ của học viên là huy hiệu tròn giữa buồm, màu cờ ở cờ đuôi nheo; Shin đứng ở mũi. Không còn lớn dần theo bến (tham số lv giữ để tương thích). Sửa câu ở bước nhận thuyền.
+- **Sổ Thuyền Trưởng gọn**: bỏ chuỗi ngày, XP, Insight và % sương tan; còn tên, nghề, cảng nhà, khẩu hiệu, con dấu, số Thẻ Senpai. Các số điểm vẫn ở Sổ tay (tab Tổng quan) và thông báo điểm.
+- **Nét bút sổ tay mượt** (bổ sung cùng ngày, thầy chọn PA B): bỏ bộ lọc `cd2rough` (xô lệch điểm ảnh nên nét gãy thành bậc thang, nặng trên máy yếu). Thay bằng `hand()` trong art.js: mỗi đoạn thẳng của hình (path, rect, line) uốn thành đường cong rất nhẹ, độ cong theo độ dài đoạn, điểm đầu cuối giữ nguyên; tính một lần khi vẽ, có bộ nhớ đệm (khoảng 10 ms cho cả 9 cảnh và 8 hình nhỏ), không tốn gì khi cuộn. Áp cho banner, hình nhỏ ở bến, hải đồ (cả khung và nhãn). Không áp cho thuyền (vector tô màu), cờ, la bàn (còn xuất ảnh), Shin, chữ.
+- **Tên đảo gọi thẳng con đường** (thầy chốt PA A): Ở lại, lên bậc nghề · Rẽ nghề khác (Nhật Bản) · Học tiếp · Về rồi lại sang Nhật · Làm nghề tiếng Nhật (Cả hai nơi) · Về gần gia đình · Về làm chủ · Về làm công ty Nhật (Việt Nam). Bỏ chữ “Đảo” trước tên; nhãn phía “Cả hai nơi”. Mã đảo giữ nguyên nên bài làm cũ không mất.
+- **Hải đồ mặt Đảo chia 3 vùng**: Việt Nam (trái, tông đào) · Cả hai nơi (giữa, oải hương) · Nhật Bản (phải, rêu), có tên vùng và vạch chia; tên đảo dài xuống 2 dòng; hoa gió, cá, thuyền mờ/ẩn ở mặt Đảo cho thoáng.
+- **Mỗi đảo một hình riêng** (`isleDraw`): xưởng + bậc thang đi lên · biển chỉ đường hai nhánh · trường có tháp chuông và chồng sách · bến nhỏ + mũi tên đi về · bảng chữ あ và bong bóng Ă · tòa văn phòng nối cầu · cửa hàng mái hiên sọc · nhà có khói bếp, ruộng lúa. Dấu hiệu phía: đảo Nhật có núi đỉnh tuyết, đảo Việt Nam có cây dừa. Trang đảo dùng cùng hình, bỏ cột biển biểu tượng.
+- **Thuyền vẽ vector tô màu cùng kiểu Shin** (viền nâu đậm, gỗ ấm, buồm kem, mái lầu lái đỏ, nước xanh nhạt), không qua nét phác; trên hải đồ to hơn (58px) cho nổi bật.
+- Kiểm 390 + 1280 (demo): hải đồ 2 mặt, so trước/sau banner Xưởng La Bàn, mở/đóng vòng, thuyền ở hải đồ và cỡ lớn; ES5 (acorn) cho cd02/*.js; không tràn ngang.
+
+Tệp đổi: cd02/art.js, cd02/engine.js, cd02/cd02.css (khối cuối PS1.3.40), cd02/content.js (số phiên bản), cd02/index.html, config.js, sw.js, ?v= ở mọi trang module, CHANGELOG.md, AGENTS.md.
+File cần xóa trên GitHub: không có.
+
 ## PS1.3.39 · 19/11/2026 · CD02.1.1 Giao diện sổ tay cho Hải Đồ La Bàn
 Thầy chốt (19/11): 4 tông nhạt theo vòng, tiêu đề chữ có chân như bản phác, hải đồ PA B (biển tô xanh xám), Sổ Thuyền Trưởng PA A nhưng bỏ lò xo, banner PA A (tranh trên, chữ dưới), cờ học viên chọn tông dịu, chỉ sửa CD02. Không đổi nội dung chữ, chặng, cách chấm của CD02; không đổi CD01, TK, TC01, Shin Routine, trang chủ.
 - **Hệ màu mới** (kiểu trang claude.ai): nền ngà, chữ mực đen, cam đất chỉ ở nút, tiêu đề, banner, dây đánh dấu; bỏ teal và vàng. Thẻ viền mảnh thay bóng đổ; nút cam đất nổi khối nhẹ; ô chọn đang chọn viền đen nền cam nhạt.
