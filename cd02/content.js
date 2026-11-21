@@ -13,7 +13,7 @@
    - Ý của thầy Lê Long Sơn nói gián tiếp: “thầy của Shin”. Không ghi tên Thầy trên giao diện CD02.
    - Không dùng từ “đơn hàng”. ES5. */
 var CD2_ID = 'cd02';
-var CD2_VER = 'CD02.2.2';
+var CD2_VER = 'CD02.3.4';
 var CD2_XP_ACT = 30, CD2_INS_WORDS = 15, CD2_INS_FIELD = 5, CD2_XP_CARD = 2;
 var CD2_TOTAL = 18; /* PS1.3.42 (bản 2, PA A): Xuất phát 1 + 7 bến (2·3·3·2·2·3·2 chặng) = 18. Cảng Khởi Hành (f1, f2) không tính. */
 
@@ -41,7 +41,7 @@ var ISLES = [
     gain: 'Bằng cấp, nghề mới, mở thêm nhiều cửa.',
     cost: 'Mất thời gian. Thu nhập giảm trong lúc học.',
     who: ['tait', 'tan'] },
-  { id: 'gio', n: 'Về rồi lại sang Nhật', ic: 'wind', side: 'both', x: 180, y: 300,
+  { id: 'gio', n: 'Về rồi lại sang Nhật', ic: 'wind', side: 'both', x: 180, y: 318,
     sub: 'Đi rồi về, rồi lại đi',
     what: 'Về nước một thời gian, rồi quay lại Nhật bằng diện khác, công việc khác.',
     need: ['Hồ sơ đẹp, giữ chữ tín với công ty', 'Tiếp tục học tiếng Nhật khi ở nhà', 'Tìm hiểu kỹ điều kiện của diện mới'],
@@ -61,7 +61,7 @@ var ISLES = [
     need: ['Tay nghề và quy trình học được ở Nhật', 'Vốn tích lũy và kế hoạch rõ ràng', 'Mối quan hệ, khách hàng đầu tiên'],
     gain: 'Tự quyết. Tạo việc làm cho người khác.',
     cost: 'Rủi ro cao. Có lúc thất bại phải làm lại.',
-    who: ['hoi', 'thao', 'vinh'] },
+    who: ['hoi', 'thao', 'vinh', 'ngoc3'] },
   { id: 'cau', n: 'Về làm công ty Nhật', ic: 'bridge', side: 'vn', x: 62, y: 404,
     sub: 'Về Việt Nam làm cho công ty Nhật',
     what: 'Làm ở công ty Nhật tại Việt Nam, hoặc chi nhánh của chính công ty mình từng làm.',
@@ -240,6 +240,13 @@ var SENPAI = [
     nay: 'Chị kiên trì gần 8 năm, nay là Giám đốc Công ty DORIANNA.',
     q: 'Khi sang Nhật, đừng nghĩ mình chỉ đến đó để kiếm tiền, mà hãy nhớ mình đang đại diện cho hình ảnh của người trẻ Việt Nam.',
     url: TIK + 'nguyen-thi-cam-vinh', src: 'Tikme', f: ['jp', 'retry', 'change'] },
+  { id: 'ngoc3', n: 'Ba anh em Nguyễn Ngọc Trung, Dũng, Hiếu', a: 'Ba anh em Trung, Dũng, Hiếu', jl: 'N1', job: 'Cơ khí', ind: 'co-khi', from: 'TP.HCM', jp: 'Nhật Bản', isl: 'lap',
+    tag: 'Ba người, ba diện đi Nhật → ba công ty cơ khí ở Việt Nam',
+    kd: 'Ba anh em cùng học kỹ thuật ở Trường ĐH Sư phạm Kỹ thuật TP.HCM, rồi sang Nhật theo ba diện: tu nghiệp sinh, kỹ sư, thực tập sinh.',
+    bn: 'Công ty Nhật tin anh Trung, giao anh quản lý nhà máy ở Việt Nam. Đối tác Nhật giúp anh Hiếu về nước lập công ty.',
+    nay: 'Anh Trung có O.N Precision (linh kiện chính xác), anh Dũng là Giám đốc Cơ khí Công nghiệp VNP, anh Hiếu có V.N.T Việt Nam.',
+    q: 'Thành công chỉ mỉm cười với ai nhìn thấy cơ hội ẩn sau rủi ro.', qBy: 'Anh Nguyễn Ngọc Dũng',
+    url: TIK + 'nguyen-ngoc-trung-nguyen-ngoc-dung-nguyen-ngoc-hieu', src: 'Tikme', f: ['rel', 'learn'] },
   { id: 'thuy', n: 'Trần Thị Thúy', a: 'Chị Thúy', jl: 'N2', job: 'Thủy sản', ind: 'thuy-san', from: 'Lâm Đồng', jp: 'Hokkaido', isl: 'cau',
     tag: 'Sư phạm Vật lý → thực tập sinh thủy sản → giám đốc đại diện công ty Nhật',
     kd: 'Tốt nghiệp Sư phạm Vật lý, định theo nghề giáo, chị chọn một hướng khác: sang Nhật làm việc.',
@@ -291,6 +298,16 @@ var SENPAI = [
     url: TIK + 'tiet-quy-hung', src: 'Tikme', f: ['jp', 'change'] }
 ];
 
+/* PS1.3.48 (bản 3 · đợt 5) hình thẻ Senpai: [cảnh nơi làm việc hôm nay, đồ vật lúc khởi đầu / điểm riêng] (vẽ ở art.js: CD2_SPSC, CD2_PROP).
+   Không vẽ mặt người thật. Nền tranh theo phía của đảo: Ở Nhật xanh lá nhạt · Về Việt Nam hồng đất · Cả hai tím nhạt. */
+var SP_ART = {
+  sy: ['pack', 'cal8'], taih: ['weld', 'medal'], ngat: ['office', 'noodle'], linh: ['talk', 'fish'], long: ['cross', 'box'], ploan: ['resto', 'basket'],
+  tait: ['uni', 'brush'], tan: ['uni', 'fish'], dung: ['plane', 'torch'], hoa: ['care', 'helmet'],
+  mai: ['class', 'chip'], xuan: ['class', 'fish'], son: ['class', 'heart'], quy: ['online', 'print'], lich: ['code', 'mold'],
+  hoi: ['company', 'gear'], thao: ['bakery', 'cart'], vinh: ['resto', 'cap'], ngoc3: ['cnc', 'gear3'],
+  thuy: ['company', 'fish'], hoai: ['cnc', 'clip'], hien: ['office', 'leaf'], hang: ['farm', 'calc'], kthanh: ['chart', 'fish'],
+  huan: ['home', 'helmet'], hung: ['home', 'basket']
+};
 /* điểm chung khóa học tìm thấy trong các chuyện (Bến Senpai, chặng 2). rich: không ai có, để so sánh. */
 var CD2_F = [
   ['jp', 'Tiếng Nhật từ N2 trở lên'],
@@ -299,9 +316,8 @@ var CD2_F = [
   ['goal', 'Có mục tiêu riêng ngay từ đầu'],
   ['rel', 'Được công ty, cấp trên tin và giúp'],
   ['fam', 'Gia đình là động lực'],
-  ['retry', 'Từng thất bại, thi lại nhiều lần'],
-  ['rich', 'Có sẵn nhiều tiền trước khi đi']
-];
+  ['retry', 'Từng thất bại, thi lại nhiều lần']
+]; /* PS1.3.45: bỏ thẻ “có sẵn nhiều tiền”, bỏ đếm (bài không kể ≠ không có) */
 
 /* nền chung: “Mọi hải trình đều xuất phát từ Cảng 3 Năm”. rt: thẻ Shin Routine gợi ý (PS_CONFIG.ROUTINE_LIB). */
 var BASE5 = [
@@ -353,7 +369,7 @@ var PEERS = [
    Mọi chỗ dùng lại bài CD01 có nhãn “Từ CD01”. Bước có c1: [mã] tự hiện nhãn ở đầu bước (engine c1HTML).
    Chưa xong CD01: khuyên học CD01 trước; vẫn vào thì trả lời nhanh nghề, 5 năm sau, điều quan trọng, điểm mạnh. */
 var C1_LAB = { main: 'Nghề chính', me: '5 năm sau, bạn muốn là người', value: 'Điều quan trọng nhất', good: 'Điểm mạnh', like: 'Việc làm bạn thấy vui',
-  far: 'Hướng 5 năm bạn tò mò', p2: 'Kế hoạch ở Nhật', jp2: 'Tiếng Nhật ở Nhật', work: 'Điều bạn muốn làm được ở Nhật', senpai: 'Anh chị bạn muốn học theo',
+  far: 'Hướng 5 năm bạn quan tâm', p2: 'Kế hoạch ở Nhật', jp2: 'Tiếng Nhật ở Nhật', work: 'Điều bạn muốn làm được ở Nhật', senpai: 'Anh chị bạn muốn học theo',
   learn: 'Điều bạn muốn học theo', qs: 'Câu bạn từng muốn hỏi anh chị', worry: 'Điều bạn lo nhất', b: 'Nghề phương án 2', first: 'Việc nhỏ bạn hứa thử',
   guide: 'Người dẫn đường bạn nghĩ tới', habits: 'Thói quen bạn đặt ra', motto: 'Lời hứa của bạn', letter: 'Thư gửi mình 5 năm sau',
   iv: 'Câu bạn trả lời phỏng vấn 60 giây ở CD01' };
@@ -378,6 +394,10 @@ var FLIP_OPTS = { /* 4 đảo để đoán (đảo thật luôn có trong danh s
   thuy: ['cau', 'chu', 'que', 'lap'], lich: ['chu', 'len', 'cau', 'lap'], linh: ['re', 'cau', 'chu', 'que'],
   hoi: ['lap', 'cau', 'len', 'gio'], sy: ['len', 'gio', 'cau', 'que'], mai: ['chu', 'cau', 'len', 're']
 };
+/* PS1.3.45: nhóm sở thích RIASEC (từ CD01) → đảo hợp, và Senpai “đi đường khác” gợi ý ở b21. Chỉ là gợi ý tham khảo. */
+var RIA_N = { R: 'Kỹ thuật', I: 'Nghiên cứu', A: 'Sáng tạo', S: 'Xã hội', E: 'Quản lý, kinh doanh', C: 'Nghiệp vụ' };
+var RIA_ISLE = { R: ['len', 'gio'], I: ['hoc', 're'], A: ['lap', 're'], S: ['chu', 'que'], E: ['lap', 'cau'], C: ['cau', 'len'] };
+var RIA_SP = { S: ['mai', 'xuan', 'son', 'quy'], E: ['vinh', 'thuy', 'hoi'], I: ['lich', 'tait'], A: ['thao', 'ploan'], C: ['hoai', 'hang', 'ngat'], R: ['sy', 'taih', 'dung'] };
 var TAG3 = [['cur', 'Tò mò', 'spark'], ['new', 'Chưa từng nghĩ', 'bulb'], ['no', 'Chưa hợp lúc này', 'clock']];
 
 /* ---------- BẾN 3 · XƯỞNG LA BÀN ---------- */
@@ -398,7 +418,7 @@ var LIFE = [ /* đường đời thầy của Shin hay vẽ lên bảng (ý củ
   [18, 22, 'Rèn sức khỏe, tinh thần'], [22, 30, 'Chọn một nghề, làm liên tục ít nhất 5 năm'], [30, 35, 'Tạo dựng sự nghiệp'], [35, 40, 'Gánh thêm trách nhiệm']
 ];
 var WORK_TIPS = ['Với mình, đi làm là để lo cho gia đình', 'Với mình, đi làm là để giỏi một nghề', 'Với mình, đi làm là để được tôn trọng', 'Với mình, đi làm là để giúp được người khác'];
-var LIFE_TIPS = ['Ở tuổi 30, một cuộc sống tốt với mình là có nghề vững', 'Ở tuổi 30, một cuộc sống tốt với mình là gần ba mẹ', 'Ở tuổi 30, một cuộc sống tốt với mình là có nhà riêng', 'Ở tuổi 30, một cuộc sống tốt với mình là được làm việc mình thích'];
+var LIFE_TIPS = ['10 năm nữa, một cuộc sống tốt với mình là có nghề vững', '10 năm nữa, một cuộc sống tốt với mình là gần ba mẹ', '10 năm nữa, một cuộc sống tốt với mình là có nhà riêng', '10 năm nữa, một cuộc sống tốt với mình là được làm việc mình thích'];
 
 /* ---------- BẾN 4 · PHÒNG HẢI ĐỒ: 3 hải trình 5 năm ----------
    Ý tưởng tham khảo: “Odyssey Plan” trong sách Designing Your Life (Burnett, Evans · Stanford). Khóa học viết lại cho học viên JPC. */
@@ -438,21 +458,25 @@ var BLOCKS = [
     w1: ['Phần nghe còn yếu', 'Học dồn sát ngày thi', 'Đi làm về mệt, học không đều', 'Chưa biết mình hổng phần nào'],
     w2: ['Chưa có giờ học cố định mỗi ngày', 'Học một mình, không ai nhắc', 'Chưa xem lại bài thi cũ', 'Ngại hỏi người đã đậu'],
     ways: ['Học 20 phút mỗi sáng trước giờ làm', 'Rủ một bạn cùng học, nhắc nhau mỗi tối', 'Nghe tiếng Nhật trên đường đi làm', 'Hỏi anh chị đã đậu cách ôn', 'Đăng ký kỳ thi sau ngay, đặt mốc rõ', 'Mỗi ngày nói chuyện với đồng nghiệp người Nhật'],
+    rt: ['5phut', 'camxuc'], rtf: 'Khi đứng chờ xe hay giờ nghỉ, tôi sẽ ôn 5 từ mới, để trở thành người đậu N2.',
     sp: ['huan', 'dung'] },
   { id: 'chi', ic: 'bridge', t: 'Về nước, công ty cũ chưa có chi nhánh ở Việt Nam', ctx: 'Bạn định về làm cho chính công ty mình, nhưng công ty chưa có chi nhánh ở Việt Nam.',
     w1: ['Mình chỉ tính một đường là công ty cũ', 'Chưa tìm hiểu công ty Nhật nào ở Việt Nam', 'Chưa hỏi cấp trên có quen ai không', 'Chưa ghi lại mình làm được gì'],
     w2: ['Chưa có kế hoạch B', 'Ít quen biết ngoài công ty', 'Ngại nhờ người khác', 'Chưa biết cách giới thiệu bản thân'],
     ways: ['Xin cấp trên lời giới thiệu trước khi về', 'Lập danh sách công ty Nhật cùng ngành ở Việt Nam', 'Ghi lại các việc mình làm giỏi ở Nhật', 'Hỏi thầy cô JPC, Senpai đã về nước', 'Giữ liên lạc với công ty cũ sau khi về', 'Học lên N2 để có thêm lựa chọn'],
+    rt: ['memo', 'chao'], rtf: 'Khi gặp anh chị đi trước, tôi sẽ hỏi một câu và ghi lại, để trở thành người có nhiều đường đi.',
     sp: ['hoi', 'hoai'] },
   { id: 'dich', ic: 'wave', t: 'Hết hạn đúng lúc có dịch bệnh', ctx: 'Chuyện lớn ngoài ý muốn. Kế hoạch về nước, thi cử, công việc đều đảo lộn.',
     w1: ['Không về nước được như dự định', 'Công ty ít việc hơn', 'Kỳ thi bị hoãn', 'Gia đình ở nhà lo lắng'],
     w2: ['Chuyện lớn, ngoài sức mình', 'Chưa có kế hoạch dự phòng', 'Chưa có khoản tiền phòng thân', 'Chưa biết hỏi ai về giấy tờ'],
     ways: ['Hỏi công ty có cách nào để làm tiếp', 'Dùng thời gian này học tiếng Nhật, thi tay nghề', 'Để dành một khoản phòng thân', 'Gọi về nhà đều để gia đình yên tâm', 'Hỏi tổ chức hỗ trợ về giấy tờ', 'Lùi mốc, không bỏ mục tiêu'],
+    rt: ['chitieu', 'camxuc'], rtf: 'Khi nhận lương, tôi sẽ để riêng một khoản phòng thân trước, để trở thành người vững vàng khi có chuyện.',
     sp: ['sy', 'vinh'] },
   { id: 'nha', ic: 'home', t: 'Gia đình cần bạn ở gần', ctx: 'Gia đình cần bạn về gần hơn, sớm hơn bạn tính.',
     w1: ['Ba mẹ lớn tuổi, cần người bên cạnh', 'Có con nhỏ cần chăm', 'Nhà cần người phụ việc', 'Ba mẹ nhớ, muốn mình về'],
     w2: ['Chưa nói rõ kế hoạch với gia đình', 'Chưa biết việc gần nhà dùng được tay nghề', 'Chưa có nghề mang về dùng được', 'Chưa tính chuyện tiền lúc mới về'],
     ways: ['Nói rõ với gia đình về mốc thời gian', 'Tìm việc gần nhà dùng tiếng Nhật, tay nghề', 'Học thêm một kỹ năng mang về dùng được', 'Để dành một khoản cho lúc mới về', 'Gọi video về nhà mỗi tuần', 'Hỏi anh chị đã về quê làm gì'],
+    rt: ['chitieu', '5phut'], rtf: 'Khi gọi về nhà mỗi tuần, tôi sẽ kể một việc mình đã làm cho kế hoạch, để trở thành người con gia đình yên tâm.',
     sp: ['huan', 'hung'] }
 ];
 var TRIALS = ['Hỏi 1 anh chị đi trước về hướng này', 'Đọc 2 chuyện trên Tikme về hướng này', 'Học thêm 15 phút tiếng Nhật mỗi tối', 'Ghi chi tiêu mỗi ngày', 'Nói chuyện với gia đình về kế hoạch mình nghiêng', 'Hỏi thầy cô JPC: hướng này cần chuẩn bị gì'];
@@ -465,11 +489,12 @@ var LEARN_TIPS = ['Hướng này có hợp với mình không', 'Mình có giữ
 
 /* ---------- BẾN 7 · NGỌN HẢI ĐĂNG (PS1.3.42: trước là Bến 6) ---------- */
 var RING_P = [['fam', 'Gia đình', 'home'], ['ban', 'Bạn cùng lớp', 'people'], ['gv', 'Thầy cô JPC', 'cap'], ['sp', 'Senpai đi trước', 'card'],
-  ['boss', 'Cấp trên người Nhật', 'shield'], ['dn', 'Đồng nghiệp ở Nhật', 'tool'], ['cd', 'Bạn bè người Việt ở Nhật', 'speech'], ['tc', 'Nghiệp đoàn, tổ chức hỗ trợ', 'anchor']];
-var RING_L = [['1', 'Đã gần'], ['2', 'Có quen'], ['3', 'Cần tìm']];
-var RING_STORY = [['hoi', 'Tổng Giám đốc giới thiệu anh Hợi sang công ty của một người bạn.'], ['ngat', 'Công ty mời chị Ngát ở lại, chuyển lên văn phòng.'], ['linh', 'Nghiệp đoàn nhận chị Linh làm thông dịch viên.']];
+  ['boss', 'Cấp trên người Nhật', 'shield'], ['dn', 'Đồng nghiệp ở Nhật', 'tool'], ['cd', 'Bạn cùng công ty trúng tuyển', 'speech'], ['tc', 'Anh chị Nghiệp đoàn, tổ chức hỗ trợ', 'anchor']];
+var RING_L = [['1', 'Thân thiết'], ['2', 'Quen sơ'], ['3', 'Chưa quen']]; /* PS1.3.45 (thầy góp ý 29b) */
+var RING_STORY = [['hoi', 'Tổng Giám đốc giới thiệu anh Hợi sang công ty của một người bạn.'], ['ngat', 'Công ty mời chị Ngát ở lại, chuyển lên văn phòng.'], ['linh', 'Nghiệp đoàn nhận chị Linh làm thông dịch viên.'], ['ngoc3', 'Công ty Nhật giao anh Trung quản lý nhà máy; đối tác Nhật giúp anh Hiếu lập công ty.']];
 var MSG_TO = ['Anh chị Senpai', 'Thầy cô chủ nhiệm', 'Một người quen đã đi Nhật'];
-var MSG_Q = ['Anh chị chuẩn bị gì từ năm đầu để sau 3 năm có nhiều lựa chọn?', 'Lúc muốn bỏ cuộc, anh chị làm gì?', 'Hướng này cần tiếng Nhật tới đâu ạ?'];
+var MSG_Q = ['Mình nên chuẩn bị gì từ bây giờ cho hướng này?', 'Năm đầu ở Nhật, điều gì khó nhất?', 'Lúc muốn bỏ cuộc, mình nên làm gì?', 'Hướng này cần tiếng Nhật tới đâu?', 'Làm sao để công ty tin và giao việc mới?'];
+var ASK_TIP = 'Câu hỏi đã sẵn sàng. Giờ cất điện thoại, gặp trực tiếp người đó và hỏi nhé. Gặp xong, quay lại đây ghi lời khuyên.';
 var WORKS = [ /* 3 tình huống ở chỗ làm. Không có đáp án sai: mỗi cách có cái được và một lưu ý. (PS1.3.41: rút gọn chữ) */
   { t: 'Cấp trên chỉ việc rất nhanh. Bạn chưa hiểu hết.', ic: 'speech', opts: [
     ['Hỏi lại ngay, nhắc lại để xác nhận', 'Hiểu đúng từ đầu.', 'Hỏi ngắn, đúng chỗ chưa rõ.'],
@@ -495,42 +520,219 @@ var HOW_TIPS = ['Mỗi buổi học kỹ năng, mình ghi 3 điều mới vào s
 var CHANGE_TIPS = ['Mình biết thêm nhiều hướng mình chưa từng nghĩ', 'Mình chắc hơn về hướng mình đang đi', 'Mình bớt chắc, nhưng mình biết phải tìm hiểu gì', 'Mình thấy 3 năm sắp tới quan trọng hơn'];
 var TIKME_HOME = 'https://tikme.com/cau-chuyen-thanh-cong/danh-sach';
 
-/* ---------- BẾN 6 · PHÒNG TUYỂN DỤNG (PS1.3.42, bản 2) ----------
-   Tin tuyển dụng: MÔ PHỎNG từ tin thật đăng năm 2026 (JobsGO và trang tuyển dụng khác), bỏ tên công ty, không ghi lương.
-   g: mã nghề (INDS2) để xếp tin hợp nghề lên trước; 'all' = mọi nghề. req: yêu cầu, học viên tô màu (AD_COL). */
+/* ---------- PS1.3.47 (bản 3 · đợt 4) CLIP MYROAD · loạt phim 20 năm Esuhai trên YouTube ----------
+   Ý chính viết lại bằng lời khóa học; KHÔNG dán transcript tự động (máy nghe sai nhiều). Câu trích chỉ thêm khi thầy đã nghe xác nhận.
+   yt: mã video · at: giây bắt đầu “đoạn đáng xem” · seg: nhãn đoạn · len: độ dài cả clip · sp: mã thẻ Senpai (nếu có).
+   CLIP_AT[chặng] = {kt: nhóm Kỹ thuật, sản xuất, xây dựng · dv: nhóm Thực phẩm, dịch vụ, chăm sóc}. Nhóm lấy theo nhóm ngành ở b61 (adGrp). */
+var CLIP_SRC = 'MyRoad · loạt phim 20 năm Esuhai (YouTube)';
+var CLIPS = {
+  hoai: { sp: 'hoai', n: 'Anh Phạm Ngọc Hoài', role: 'Thực tập sinh cơ khí → quản lý sản xuất ở công ty Nhật', yt: 'hVNR8dOspI8', at: 519, seg: '8:39–11:06', len: '11 phút',
+    ideas: ['Chọn nghề không vì việc nhẹ, mà vì thấy quý sản phẩm mình làm ra.', 'Ở Nhật, anh học tiếng từ các anh, các bác ở chỗ làm, học nghề qua từng việc.', 'Ba năm ấy là hành trang. Đừng vội, bước cho vững rồi mới đi xa.'] },
+  thao: { sp: 'thao', n: 'Chị Trần Thị Thu Thảo', role: 'Thực tập sinh làm bánh → chủ tiệm bánh, trà', yt: 'TKB6IDsjQCc', at: 245, seg: '4:05–5:40', len: '7 phút',
+    ideas: ['Chị chia 3 năm thành 3 chặng học: nướng bánh, làm bột, rồi bánh mì.', 'Về nước 6 tháng, thấy chưa ổn, chị quay lại Nhật làm nhà hàng để học quản lý, vận hành.', 'Chị dám mở tiệm, dù nhiều người khuyên để tiền mua nhà, mua xe.'] },
+  hoi: { sp: 'hoi', n: 'Anh Nguyễn Bá Hợi', role: 'Thực tập sinh cơ khí → giám đốc công ty cơ khí', yt: '3jJjO-Fxi90', at: 216, seg: '3:36–5:26', len: '7 phút',
+    ideas: ['Anh đặt mục tiêu cho từng năm: năm 1 học gia công, năm 2 xin học thêm máy chấn, máy cắt laser.', 'Công ty cũ chưa có chi nhánh ở Việt Nam, sếp người Nhật giới thiệu anh sang công ty bạn.', 'Chỗ làm sau đó phá sản. Anh lập công ty riêng thì gặp dịch, gần 1 năm mới vượt qua.'] },
+  vinh: { sp: 'vinh', n: 'Chị Nguyễn Thị Cẩm Vinh', role: 'Thực tập sinh thực phẩm → giám đốc công ty nhà hàng', yt: 'SOpqDIkgcI0', at: 384, seg: '6:24–9:07', len: '12 phút',
+    ideas: ['Năm thứ hai, chị muốn bỏ về. Chị nhắn cho thầy ở trường cũ, được động viên, và ở lại.', 'Về nước, nhà hàng đầu tiên chị mở cùng đối tác Nhật phải dừng vì dịch.', 'Chị làm quản lý, tư vấn nhà hàng Nhật gần 8 năm, rồi mở lại nhà hàng của riêng mình.'] },
+  thieu: { sp: '', n: 'Anh Hoàng Văn Thiệu', role: 'Kỹ sư cơ khí → Phó Giám đốc một công ty cơ khí', yt: 'pkCX1Z-8Oxs', at: 50, seg: '0:50–2:06', len: '9 phút',
+    ideas: ['Ra trường điểm cao, anh đòi lương cao và trượt hầu hết các buổi phỏng vấn.', 'Anh viết lại CV, nhìn lại mình, rồi vào được một công ty Nhật.', 'Lúc khó nhất, bạn cùng lớp góp tiền giúp anh. Phỏng vấn đi Nhật, anh giữ tâm thế thoải mái và đậu.'] },
+  son: { sp: 'son', n: 'Chị Nguyễn Thị Son', role: 'Thực tập sinh thực phẩm → giáo viên tiếng Nhật', yt: 'SBOEknkExd8', at: 553, seg: '9:13–11:50', len: '19 phút',
+    ideas: ['Mới sang, nghiệp đoàn lo cho chị chu đáo; cô ở nghiệp đoàn chỉ dẫn rất nhiều.', 'Chưa quen tiếng địa phương, chị chủ động chào các cụ ở công viên, nói chuyện nhiều hơn.', 'Trước khi đi, thầy cô cho chị chuyển lớp để vừa làm thêm vừa học.'] }
+};
+var CLIP_AT = { b22: { kt: 'hoai', dv: 'thao' }, b52: { kt: 'hoi', dv: 'vinh' }, b62: { kt: 'thieu', dv: 'thieu' }, b71: { kt: 'son', dv: 'son' } };
+var CLIP_SAY = {
+  b22: 'Nghe một anh chị kể khoảng 2 phút nhé. Không xem được thì đọc 3 ý bên dưới.',
+  b52: 'Anh chị này cũng từng bị chặn đường. Nghe cách họ gỡ.',
+  b62: 'Phỏng vấn trượt cũng là chuyện thường. Nghe anh Thiệu kể nhé.',
+  b71: 'Nhiều anh chị có bước ngoặt nhờ một người giúp. Nghe chị Son kể, rồi mình xem ai đang ở gần bạn.'
+};
+
+/* ---------- PS1.3.47 · nối Shin routine ----------
+   BLOCKS[].rt: thẻ gợi ý khi đường bị chặn (b52), rtf: công thức gợi ý “Khi…, tôi sẽ…, để trở thành…”.
+   TRIAL_RT: việc thử nhỏ 2 tuần (b63) → 1 thẻ Shin routine; việc tự viết hoặc theo đảo → TRIAL_RT_DEF. */
+var TRIAL_RT = { 'Hỏi 1 anh chị đi trước về hướng này': 'memo', 'Đọc 2 chuyện trên Tikme về hướng này': '5phut', 'Học thêm 15 phút tiếng Nhật mỗi tối': '5phut',
+  'Ghi chi tiêu mỗi ngày': 'chitieu', 'Nói chuyện với gia đình về kế hoạch mình nghiêng': 'horenso', 'Hỏi thầy cô JPC: hướng này cần chuẩn bị gì': 'memo' };
+var TRIAL_RT_DEF = 'viecko';
+
+/* ---------- BẾN 6 · PHÒNG TUYỂN DỤNG (PS1.3.46, bản 3 đợt 3) ----------
+   Tin GIẢ ĐỊNH, ghép từ tin tuyển dụng thật năm 2026 (JobsGO, CareerLink, 123job, Joboko, Indeed Nhật, en-gage) và thống kê lương 2025 của Bộ Y tế, Lao động và Phúc lợi Nhật Bản.
+   Tên công ty là tên giả định. Lương = tham khảo. gr: nhóm ngành (AD_GRP) hoặc 'all'. iv: mã người phỏng vấn (IV_WHO).
+   req: [nhóm yêu cầu (AD_RG), yêu cầu, vì sao nhà tuyển dụng cần]. Mỗi tin đủ 5 nhóm, mỗi nhóm 1 yêu cầu. */
 var AD_KIND = [['vn', 'Tin ở Việt Nam', 'bridge'], ['jp', 'Tin ở Nhật', 'stairs'], ['plan', 'Kế hoạch kinh doanh', 'shop']];
-var AD_MFG = ['co-khi', 'dien-tu', 'han', 'son', 'duc-nhua', 'dong-goi-cong-nghiep', 'in-an', 'may-mac', 'o-to', 'thuc-pham', 'thuy-san'];
-var ADS = [
-  { id: 'qc', k: 'vn', n: 'Nhân viên QC, tiếng Nhật N3', at: 'Công ty Nhật · Khu công nghiệp ở Đồng Nai', g: AD_MFG,
-    job: 'Kiểm tra hàng, dịch hướng dẫn công việc, báo lỗi cho công ty mẹ ở Nhật.',
-    req: ['Tiếng Nhật N3', 'Tốt nghiệp cao đẳng trở lên', '1 năm kinh nghiệm kiểm tra chất lượng', 'Dịch được hướng dẫn Việt ↔ Nhật', 'Dùng được Excel'] },
-  { id: 'lead', k: 'vn', n: 'Trưởng nhóm chuyền sản xuất, N3', at: 'Công ty Nhật · Khu công nghiệp ở Long An', g: AD_MFG,
-    job: 'Quản lý 8–10 công nhân, kiểm tra hàng trong chuyền.',
-    req: ['Tiếng Nhật N3, nói được với chuyên gia Nhật', 'Trung cấp trở lên', 'Biết 5S, cải tiến (kaizen)', 'Kèm và chia việc cho 8–10 người', 'Từng làm việc ở Nhật là lợi thế'] },
-  { id: 'qlsx', k: 'vn', n: 'Nhân viên quản lý sản xuất, N3', at: 'Công ty 100% vốn Nhật · Đồng Nai', g: AD_MFG,
-    job: 'Theo dõi tiến độ chuyền mỗi ngày, quản lý nguyên liệu, báo cáo cấp trên.',
-    req: ['Tiếng Nhật N3', 'Cao đẳng hoặc đại học', 'Báo cáo bằng tiếng Nhật', 'Dùng Word, Excel', 'Chưa có kinh nghiệm được đào tạo'] },
-  { id: 'tv', k: 'vn', n: 'Phiên dịch tiếng Nhật tại xưởng, N2', at: 'Công ty Nhật · TP.HCM', g: ['all'],
-    job: 'Dịch cho chuyên gia Nhật trong họp, đào tạo, xử lý lỗi.',
-    req: ['Tiếng Nhật N2', 'Hiểu từ chuyên ngành kỹ thuật', 'Từng làm việc ở Nhật là lợi thế', 'Giao tiếp tốt, bình tĩnh khi gấp'] },
-  { id: 'gv', k: 'vn', n: 'Giáo viên tiếng Nhật, N2', at: 'Trung tâm đào tạo · TP.HCM', g: ['all'],
-    job: 'Dạy tiếng Nhật cho học viên chuẩn bị sang Nhật.',
-    req: ['Tiếng Nhật N2 (N1 được ưu tiên)', 'Phát âm rõ, kiên nhẫn', 'Chứng chỉ nghiệp vụ sư phạm, hoặc sẵn sàng học', 'Từng sống, làm việc ở Nhật là lợi thế'] },
-  { id: 'kumi', k: 'jp', n: 'Tổ trưởng chuyền · diện Kỹ năng đặc định 2', at: 'Chính công ty bạn · Nhật Bản', g: ['all'],
-    job: 'Chia việc cho tổ, kèm người mới, báo cáo trưởng xưởng.',
-    req: ['Đậu kỳ thi Kỹ năng đặc định 2 của ngành', 'Có kinh nghiệm làm tổ trưởng, chỉ dẫn người khác', 'Tiếng Nhật đủ để kèm người mới', 'Đi làm đều, được công ty tin'] },
-  { id: 'hotel', k: 'jp', n: 'Nhân viên khách sạn · Kỹ năng đặc định 1 ngành Lưu trú', at: 'Khách sạn · Nhật Bản', g: ['all'],
-    job: 'Đón khách, dọn phòng, phục vụ bữa ăn. Làm theo ca.',
-    req: ['Đậu kỳ thi tay nghề ngành Lưu trú', 'Đậu kỳ thi tiếng Nhật theo quy định', 'Nói chuyện với khách bằng tiếng Nhật', 'Làm theo ca, cả ngày lễ'] },
-  { id: 'kanri', k: 'jp', n: 'Thông dịch, hỗ trợ thực tập sinh', at: 'Tổ chức hỗ trợ · Nhật Bản', g: ['all'],
-    job: 'Đi thăm các công ty, giúp thực tập sinh người Việt, dịch giấy tờ.',
-    req: ['Tiếng Nhật N2 trở lên (N1 được ưu tiên)', 'Bằng cao đẳng, đại học (điều kiện của visa Kỹ sư)', 'Từng là thực tập sinh là lợi thế', 'Có bằng lái xe ở Nhật'] }
+var AD_GRP = [
+  ['sx', 'Sản xuất, kỹ thuật', ['co-khi', 'dien-tu', 'han', 'son', 'duc-nhua', 'dong-goi-cong-nghiep', 'in-an', 'may-mac', 'o-to', 'ky-su']],
+  ['xd', 'Xây dựng', ['xay-dung']],
+  ['tp', 'Thực phẩm, nông nghiệp', ['thuc-pham', 'nong-nghiep', 'thuy-san']],
+  ['kg', 'Kaigo', ['dieu-duong']],
+  ['dv', 'Nhà hàng, khách sạn', ['nha-hang', 've-sinh-toa-nha']]
 ];
-var AD_SRC = 'Tin mô phỏng, dựa trên tin tuyển dụng thật năm 2026. Đã bỏ tên công ty và lương.';
-var AD_COL = [['g', 'Chắc có sau 3 năm'], ['y', 'Phải cố mới có'], ['x', 'Cần đi đường khác']];
-/* Điều nhà tuyển dụng hay để ý thêm · theo khảo sát doanh nghiệp in trong Sổ tay tìm việc ở Nhật của JASSO (tham khảo, khảo sát về du học sinh) */
-var AD_MORE = { t: 'Điều nhà tuyển dụng hay để ý thêm', src: 'Theo Sổ tay tìm việc ở Nhật của JASSO (tham khảo)',
-  L: ['Giao tiếp: nói rõ, hỏi lại khi chưa hiểu', 'Tiếng Nhật dùng được trong việc', 'Làm việc nhóm, giúp người khác', 'Báo cáo, liên lạc, bàn bạc', 'Định làm ở đây bao lâu'] };
+var AD_RG = [['jp', 'Tiếng Nhật'], ['cm', 'Chuyên môn'], ['kn', 'Kỹ năng'], ['kg', 'Kinh nghiệm'], ['td', 'Thái độ']];
+var ADS = [
+  /* Sản xuất, kỹ thuật */
+  { id: 'qc', k: 'vn', gr: 'sx', co: 'Công ty TNHH Hải Âu Denshi', ng: 'Linh kiện điện tử', vt: 'Nhân viên QC, tiếng Nhật N3', at: 'KCN Long Đức, Đồng Nai', lu: '11–15 triệu đồng/tháng', iv: 'vn',
+    job: 'Kiểm tra hàng trên chuyền, ghi lỗi, báo cáo quản lý người Nhật.',
+    req: [['jp', 'JLPT N3 trở lên', 'Để đọc hướng dẫn, báo lỗi với quản lý người Nhật mà không cần người dịch.'],
+      ['cm', 'Đọc được bản vẽ, dùng dụng cụ đo', 'QC phải đo đúng mới biết hàng đạt hay lỗi.'],
+      ['kn', 'Ghi số liệu bằng Excel', 'Số liệu lỗi rõ ràng giúp cả xưởng tìm ra chỗ cần sửa.'],
+      ['kg', '1–2 năm làm ở nhà máy', 'Người từng đứng chuyền hiểu lỗi sinh ra từ đâu.'],
+      ['td', 'Cẩn thận, thấy lỗi là báo ngay', 'Một lỗi bị giấu có thể làm cả lô hàng bị trả về.']] },
+  { id: 'baotri', k: 'vn', gr: 'sx', co: 'Công ty TNHH Mỏ Neo Kikai', ng: 'Cơ khí chế tạo', vt: 'Nhân viên bảo trì máy, N3', at: 'KCN Long Thành, Đồng Nai', lu: '12–15 triệu đồng/tháng', iv: 'vn',
+    job: 'Bảo trì máy theo lịch, sửa khi máy dừng, ghi sổ bảo trì.',
+    req: [['jp', 'JLPT N3', 'Tài liệu máy và quản lý đều dùng tiếng Nhật.'],
+      ['cm', 'Đọc được sơ đồ điện, cơ khí', 'Hiểu máy chạy thế nào mới tìm ra chỗ hỏng nhanh.'],
+      ['kn', 'Tìm nguyên nhân khi máy hỏng', 'Sửa đúng gốc thì máy không hỏng lại.'],
+      ['kg', '1–2 năm bảo trì hoặc đứng máy', 'Công ty cần người đã quen tay với máy thật.'],
+      ['td', 'Giữ 5S, sẵn sàng làm ca đêm', 'Máy dừng lúc nào cũng phải có người xử lý.']] },
+  { id: 'kumi', k: 'jp', gr: 'sx', co: 'Umikaze Seisakusho', ng: 'Linh kiện ô tô', vt: 'Tổ trưởng chuyền · Kỹ năng đặc định 2', at: 'Tỉnh Aichi, Nhật Bản', lu: '250.000–320.000 yên/tháng', iv: 'xuong',
+    job: 'Chia việc cho tổ, kèm người mới, báo cáo trưởng xưởng.',
+    req: [['jp', 'Đủ tiếng Nhật để kèm người mới (khoảng N3)', 'Tổ trưởng phải giải thích việc cho người mới và báo cáo cấp trên.'],
+      ['cm', 'Đậu kỳ thi Kỹ năng đặc định 2 ngành sản xuất', 'Có diện số 2, bạn được ở lâu dài và đưa vợ hoặc chồng, con sang.'],
+      ['kn', 'Chia việc theo kế hoạch sản xuất trong ngày', 'Tổ chạy đều thì cả chuyền mới kịp tiến độ.'],
+      ['kg', 'Nhiều năm ở xưởng, từng chỉ dẫn người khác', 'Diện số 2 cần kinh nghiệm thật, không chỉ điểm thi.'],
+      ['td', 'Đi làm đều, giữ an toàn cho cả tổ', 'Tổ trưởng là người cả tổ nhìn vào để làm theo.']] },
+  { id: 'kikai', k: 'jp', gr: 'sx', co: 'Minato Kogyo', ng: 'Gia công kim loại', vt: 'Nhân viên đứng máy · Kỹ năng đặc định 1', at: 'Tỉnh Gifu, Nhật Bản', lu: '200.000–240.000 yên/tháng', iv: 'hr',
+    job: 'Đứng máy gia công, kiểm tra hàng, giữ khu làm việc sạch.',
+    req: [['jp', 'JLPT N4 trở lên (hoặc JFT-Basic)', 'Đây là mức tối thiểu của diện số 1. Giỏi hơn thì làm việc dễ hơn.'],
+      ['cm', 'Đậu thi tay nghề, hoặc xong thực tập kỹ năng số 2 đúng nghề', 'Công ty cần biết bạn làm được việc ngay.'],
+      ['kn', 'Đọc bảng chỉ thị công việc', 'Làm sai một bước trên bảng là sai cả lô hàng.'],
+      ['kg', 'Từng làm ở xưởng Nhật là lợi thế', 'Bạn đã quen quy trình, công ty tốn ít thời gian dạy.'],
+      ['td', 'Làm đúng quy trình, không tự bỏ bước', 'Ở xưởng Nhật, an toàn và chất lượng đến từ làm đúng từng bước.']] },
+  /* Xây dựng */
+  { id: 'ct', k: 'vn', gr: 'xd', co: 'Công ty Cánh Buồm Kensetsu', ng: 'Xây dựng nhà xưởng', vt: 'Kỹ thuật viên hỗ trợ công trường, N3', at: 'Hà Nội', lu: 'Đến 20 triệu đồng/tháng', iv: 'vn',
+    job: 'Theo dõi công trường, báo cáo tiến độ cho kỹ sư người Nhật.',
+    req: [['jp', 'JLPT N3, có chứng chỉ', 'Bạn trao đổi với kỹ sư Nhật mỗi ngày.'],
+      ['cm', 'Đọc bản vẽ, dùng AutoCAD cơ bản', 'Bản vẽ là ngôn ngữ chung của công trường.'],
+      ['kn', 'Báo cáo tiến độ mỗi ngày', 'Công trình trễ một ngày là tốn tiền của cả dự án.'],
+      ['kg', 'Ít nhất 1 năm ở công trường Nhật', 'Công ty muốn người đã quen an toàn và nhịp làm kiểu Nhật.'],
+      ['td', 'Giữ an toàn tuyệt đối, họp đầu ca đầy đủ', 'Ở công trường, một lần chủ quan có thể gây tai nạn.']] },
+  { id: 'ksxd', k: 'vn', gr: 'xd', co: 'Công ty TNHH Hải Đăng Sekkei', ng: 'Thiết kế, thi công', vt: 'Kỹ sư hỗ trợ thiết kế, quản lý thi công, N3', at: 'TP.HCM, Hà Nội, Đà Nẵng', lu: '28–35 triệu đồng/tháng', iv: 'vn',
+    job: 'Vẽ, sửa bản vẽ, theo dõi thi công cho dự án của khách Nhật.',
+    req: [['jp', 'JLPT N3 trở lên', 'Bạn họp với khách Nhật, đọc tài liệu kỹ thuật.'],
+      ['cm', 'Bằng cao đẳng, đại học ngành xây dựng', 'Vị trí kỹ sư cần nền kiến thức học bài bản.'],
+      ['kn', 'Dùng thành thạo AutoCAD', 'Bản vẽ đúng giúp thợ làm đúng ngay từ đầu.'],
+      ['kg', 'Từng làm ở công trường Nhật', 'Bạn hiểu tiêu chuẩn của khách Nhật.'],
+      ['td', 'Đúng hẹn, báo trước khi có vấn đề', 'Khách Nhật rất coi trọng lời hứa về thời gian.']] },
+  { id: 'xd1', k: 'jp', gr: 'xd', co: 'Kaigan Kensetsu', ng: 'Xây dựng', vt: 'Thợ xây dựng · Kỹ năng đặc định 1', at: 'Tỉnh Saitama, Nhật Bản', lu: 'Từ 220.000 yên/tháng', iv: 'hr',
+    job: 'Làm ở nhiều công trình theo tổ: lắp dựng, hoàn thiện.',
+    req: [['jp', 'JLPT N4 trở lên (hoặc JFT-Basic)', 'Nghe hiểu chỉ dẫn an toàn trên công trường.'],
+      ['cm', 'Đậu thi tay nghề, hoặc xong thực tập kỹ năng số 2', 'Công ty cần biết bạn làm được việc ngay.'],
+      ['kn', 'Dùng đúng dụng cụ, đồ bảo hộ', 'Dùng sai một dụng cụ có thể gây tai nạn.'],
+      ['kg', 'Từng làm ở công trường Nhật là lợi thế', 'Bạn đã quen họp sáng, kiểm tra an toàn đầu ca.'],
+      ['td', 'Đúng giờ, làm ăn ý với cả tổ', 'Công trình chạy được nhờ cả tổ cùng nhịp.']] },
+  { id: 'xd2', k: 'jp', gr: 'xd', co: 'Kaigan Kensetsu', ng: 'Xây dựng', vt: 'Trưởng nhóm thợ · Kỹ năng đặc định 2', at: 'Tỉnh Saitama, Nhật Bản', lu: '250.000–320.000 yên/tháng', iv: 'xuong',
+    job: 'Dẫn một nhóm thợ, chia việc, giữ tiến độ và an toàn.',
+    req: [['jp', 'Đủ tiếng Nhật để họp, chỉ dẫn thợ (khoảng N3)', 'Trưởng nhóm là cầu nối giữa quản lý và thợ.'],
+      ['cm', 'Đậu thi Kỹ năng đặc định 2 hoặc tay nghề bậc 1', 'Đây là điều kiện để lên diện số 2.'],
+      ['kn', 'Lập lịch làm việc cho nhóm', 'Nhóm làm đúng lịch thì công trình không trễ.'],
+      ['kg', 'Từng làm trưởng nhóm (班長) ở công trường', 'Diện số 2 ngành xây dựng yêu cầu kinh nghiệm này.'],
+      ['td', 'Nhắc an toàn, quan tâm người mới', 'Người mới là người dễ gặp tai nạn nhất.']] },
+  /* Thực phẩm, nông nghiệp */
+  { id: 'qatp', k: 'vn', gr: 'tp', co: 'Công ty Sao Biển Foods', ng: 'Chế biến thực phẩm', vt: 'Nhân viên QA/QC thực phẩm, N3', at: 'KCN Nhơn Trạch, Đồng Nai', lu: 'Khoảng 12 triệu đồng/tháng', iv: 'vn',
+    job: 'Kiểm tra nguyên liệu, vệ sinh xưởng, ghi kết quả kiểm tra.',
+    req: [['jp', 'JLPT N3 đến N2', 'Quy trình và khách hàng đều dùng tiếng Nhật.'],
+      ['cm', 'Hiểu vệ sinh an toàn thực phẩm (HACCP)', 'Một sai sót vệ sinh có thể làm cả lô hàng bị hủy.'],
+      ['kn', 'Ghi chép, kiểm tra theo bảng', 'Ghi đủ, đúng thì khi có lỗi mới truy lại được.'],
+      ['kg', 'Từng làm ở nhà máy thực phẩm', 'Bạn đã quen quy định ra vào khu sạch.'],
+      ['td', 'Trung thực khi ghi kết quả', 'Người mua tin vào con số bạn ghi.']] },
+  { id: 'nn', k: 'vn', gr: 'tp', co: 'Nông trại Sóng Xanh (vốn Nhật)', ng: 'Nông nghiệp', vt: 'Kỹ thuật viên nông trại', at: 'Đồng Nai', lu: '11–13 triệu đồng/tháng', iv: 'vn',
+    job: 'Lên lịch trồng, chăm cây, theo dõi nước, phân, ghi nhật ký vườn.',
+    req: [['jp', 'Tiếng Nhật N3 là lợi thế', 'Bạn làm việc cùng chuyên gia nông nghiệp người Nhật.'],
+      ['cm', 'Hiểu cách chăm cây, đất, nước', 'Mỗi loại cây cần cách chăm khác nhau.'],
+      ['kn', 'Ghi nhật ký vườn, lập kế hoạch trồng', 'Ghi lại giúp mùa sau trồng tốt hơn.'],
+      ['kg', 'Từng làm nông trại ở Nhật hoặc 1 năm ở trang trại', 'Bạn biết trồng sạch, đều, đúng lịch.'],
+      ['td', 'Chịu nắng mưa, làm đều mỗi ngày', 'Cây không chờ người, ngày nào cũng cần chăm.']] },
+  { id: 'tp1', k: 'jp', gr: 'tp', co: 'Hamakaze Foods', ng: 'Chế biến thực phẩm', vt: 'Nhân viên xưởng cơm hộp · Kỹ năng đặc định 1', at: 'Tỉnh Saitama, Nhật Bản', lu: '200.000–240.000 yên/tháng', iv: 'hr',
+    job: 'Chế biến, xếp cơm hộp theo ca, giữ vệ sinh khu làm.',
+    req: [['jp', 'JLPT N4 trở lên (hoặc JFT-Basic)', 'Đọc biển báo, quy định vệ sinh trong xưởng.'],
+      ['cm', 'Đậu thi tay nghề ngành Thực phẩm, hoặc xong thực tập kỹ năng số 2', 'Công ty cần biết bạn làm được việc ngay.'],
+      ['kn', 'Làm nhanh mà vẫn đúng định lượng', 'Mỗi hộp phải giống nhau, giao đúng giờ.'],
+      ['kg', 'Từng làm xưởng thực phẩm là lợi thế', 'Bạn đã quen rửa tay, mặc đồ sạch đúng cách.'],
+      ['td', 'Giữ vệ sinh tuyệt đối', 'Một sơ suất có thể làm nhiều người bị ngộ độc.']] },
+  { id: 'nn1', k: 'jp', gr: 'tp', co: 'Nông trại Midori', ng: 'Trồng rau', vt: 'Nhân viên nông trại · Kỹ năng đặc định 1', at: 'Tỉnh Kumamoto, Nhật Bản', lu: '190.000–230.000 yên/tháng', iv: 'hr',
+    job: 'Trồng, thu hoạch, đóng gói rau. Việc nhiều ít theo mùa.',
+    req: [['jp', 'JLPT N4 trở lên (hoặc JFT-Basic)', 'Hiểu chỉ dẫn của chủ nông trại.'],
+      ['cm', 'Đậu thi tay nghề ngành Nông nghiệp, hoặc xong thực tập kỹ năng số 2', 'Công ty cần biết bạn làm được việc ngay.'],
+      ['kn', 'Dùng máy nông nghiệp nhỏ', 'Nông trại Nhật dùng máy để làm nhanh, ít người.'],
+      ['kg', 'Từng làm nông trại', 'Bạn biết việc theo mùa: lúc rất bận, lúc rảnh hơn.'],
+      ['td', 'Dậy sớm, chịu nắng mưa', 'Việc nông trại bắt đầu từ sáng sớm.']] },
+  /* Kaigo */
+  { id: 'gvkg', k: 'vn', gr: 'kg', co: 'Học viện Kaigo Hải Đăng', ng: 'Đào tạo', vt: 'Giáo viên Kaigo', at: 'TP.HCM', lu: 'Khoảng 20 triệu đồng/tháng', iv: 'gv',
+    job: 'Dạy kỹ năng chăm sóc và tiếng Nhật cho học viên sắp sang Nhật.',
+    req: [['jp', 'JLPT N3 trở lên', 'Bạn dạy cả từ ngữ chăm sóc bằng tiếng Nhật.'],
+      ['cm', 'Nắm quy trình chăm sóc kiểu Nhật', 'Học viên cần học đúng ngay từ đầu.'],
+      ['kn', 'Soạn bài, đứng lớp, chấm bài', 'Dạy dễ hiểu thì học viên mới tự tin sang Nhật.'],
+      ['kg', 'Đã làm Kaigo ở Nhật', 'Chuyện thật của bạn giúp học viên hiểu việc hơn sách.'],
+      ['td', 'Kiên nhẫn, làm gương cho học viên', 'Học viên học cả cách bạn làm việc.']] },
+  { id: 'pk', k: 'vn', gr: 'kg', co: 'Phòng khám Bến Cảng (vốn Nhật)', ng: 'Y tế', vt: 'Nhân viên hỗ trợ khách Nhật', at: 'Hà Nội', lu: '10–15 triệu đồng/tháng', iv: 'vn',
+    job: 'Đón khách Nhật, đặt lịch, đi cùng và dịch khi khám.',
+    req: [['jp', 'Tiếng Nhật giao tiếp (khoảng N3)', 'Khách Nhật lo lắng khi bệnh, cần người nói được tiếng mình.'],
+      ['cm', 'Biết từ ngữ y tế, chăm sóc cơ bản', 'Dịch sai một triệu chứng có thể ảnh hưởng tới việc khám.'],
+      ['kn', 'Hướng dẫn, đặt lịch, ghi hồ sơ', 'Khách đi đúng chỗ, đúng giờ thì đỡ mệt.'],
+      ['kg', 'Từng chăm sóc người già, người bệnh', 'Bạn biết cách nói nhẹ nhàng, kiên nhẫn.'],
+      ['td', 'Ân cần, giữ bí mật thông tin của khách', 'Thông tin sức khỏe là chuyện riêng của khách.']] },
+  { id: 'kg1', k: 'jp', gr: 'kg', co: 'Viện dưỡng lão Hidamari', ng: 'Chăm sóc người cao tuổi', vt: 'Nhân viên Kaigo · Kỹ năng đặc định 1', at: 'Tỉnh Osaka, Nhật Bản', lu: '200.000–240.000 yên/tháng', iv: 'hr',
+    job: 'Giúp người già ăn, tắm, đi lại. Làm theo ca, có ca đêm.',
+    req: [['jp', 'Đậu thi tiếng Nhật ngành Kaigo và N4 (hoặc JFT-Basic)', 'Bạn nói chuyện với người già mỗi ngày.'],
+      ['cm', 'Đậu thi kỹ năng Kaigo, hoặc xong thực tập kỹ năng số 2 ngành Kaigo', 'Chăm sóc sai cách có thể làm người già bị đau, bị ngã.'],
+      ['kn', 'Ghi sổ theo dõi sau mỗi ca', 'Ca sau biết hôm nay người già ra sao.'],
+      ['kg', 'Từng chăm sóc người già, người bệnh', 'Bạn đã quen việc vừa nặng vừa cần nhẹ tay.'],
+      ['td', 'Tôn trọng, giữ thể diện cho người già', 'Người già cần được đối xử như người lớn, không như trẻ con.']] },
+  { id: 'kg2', k: 'jp', gr: 'kg', co: 'Viện dưỡng lão Hidamari', ng: 'Chăm sóc người cao tuổi', vt: 'Hộ lý có bằng quốc gia · visa Kaigo', at: 'Tỉnh Osaka, Nhật Bản', lu: '240.000–300.000 yên/tháng', iv: 'hr',
+    job: 'Chăm sóc, lập kế hoạch chăm sóc, kèm nhân viên mới.',
+    req: [['jp', 'JLPT N2 trở lên', 'Bạn đọc, viết hồ sơ chăm sóc, nói chuyện với gia đình người già.'],
+      ['cm', 'Đậu kỳ thi quốc gia Hộ lý (介護福祉士)', 'Có bằng này, bạn được visa Kaigo, ở lâu dài, đưa gia đình sang.'],
+      ['kn', 'Lập kế hoạch chăm sóc, kèm người mới', 'Bạn là người giữ chất lượng cho cả nhóm.'],
+      ['kg', 'Ít nhất 3 năm làm Kaigo, học thêm khóa thực hành', 'Đây là điều kiện để được dự thi quốc gia.'],
+      ['td', 'Lắng nghe người già và gia đình họ', 'Chăm sóc tốt bắt đầu từ hiểu người mình chăm.']] },
+  /* Nhà hàng, khách sạn, vệ sinh tòa nhà */
+  { id: 'nh', k: 'vn', gr: 'dv', co: 'Nhà hàng Washoku La Bàn', ng: 'Nhà hàng Nhật', vt: 'Quản lý nhà hàng, N3', at: 'TP.HCM', lu: '18–20 triệu đồng/tháng', iv: 'vn',
+    job: 'Quản lý ca, nhân viên phục vụ, chăm sóc khách Nhật.',
+    req: [['jp', 'JLPT N3, giao tiếp tốt', 'Nhiều khách và chủ nhà hàng là người Nhật.'],
+      ['cm', 'Hiểu món ăn, cách phục vụ kiểu Nhật', 'Khách Nhật để ý từng chi tiết nhỏ.'],
+      ['kn', 'Xếp ca, kèm nhân viên mới', 'Nhà hàng đông khách cần đủ người đúng giờ.'],
+      ['kg', 'Từng làm nhà hàng Nhật', 'Bạn đã quen nhịp làm và yêu cầu của khách Nhật.'],
+      ['td', 'Đón khách chu đáo (omotenashi)', 'Khách hài lòng sẽ quay lại và giới thiệu thêm.']] },
+  { id: 'ks', k: 'vn', gr: 'dv', co: 'Khách sạn Sakura Bến Cảng', ng: 'Khách sạn', vt: 'Lễ tân tiếng Nhật', at: 'Đà Nẵng', lu: '8–12 triệu đồng/tháng', iv: 'vn',
+    job: 'Đón khách, nhận, trả phòng, giải đáp thắc mắc của khách Nhật.',
+    req: [['jp', 'Nói chuyện với khách Nhật (khoảng N3)', 'Khách Nhật yên tâm hơn khi được nói tiếng mình.'],
+      ['cm', 'Biết đặt phòng, thanh toán', 'Sai một đặt phòng là khách mất chỗ ngủ.'],
+      ['kn', 'Tiếng Anh giao tiếp cơ bản', 'Khách sạn có khách nhiều nước.'],
+      ['kg', 'Từng làm khách sạn, nhà hàng ở Nhật là lợi thế', 'Bạn hiểu cách người Nhật phục vụ khách.'],
+      ['td', 'Mỉm cười, bình tĩnh khi khách phàn nàn', 'Cách bạn xử lý phàn nàn quyết định khách có quay lại không.']] },
+  { id: 'hotel', k: 'jp', gr: 'dv', co: 'Khách sạn suối nóng Yamabiko', ng: 'Khách sạn', vt: 'Nhân viên khách sạn · Kỹ năng đặc định 1 ngành Lưu trú', at: 'Tỉnh Nagano, Nhật Bản', lu: '200.000–240.000 yên/tháng', iv: 'hr',
+    job: 'Đón khách, phục vụ bữa ăn, dọn phòng. Làm theo ca.',
+    req: [['jp', 'JLPT N4 trở lên (hoặc JFT-Basic)', 'Bạn nói chuyện với khách mỗi ngày.'],
+      ['cm', 'Đậu thi tay nghề ngành Lưu trú', 'Đây là điều kiện của diện này.'],
+      ['kn', 'Phục vụ bàn, dọn phòng đúng chuẩn', 'Khách Nhật để ý từng chi tiết nhỏ.'],
+      ['kg', 'Từng làm nhà hàng, khách sạn', 'Bạn đã quen làm theo ca, cả ngày lễ.'],
+      ['td', 'Lễ phép, chu đáo với khách', 'Khách sạn sống nhờ khách quay lại.']] },
+  { id: 'clean', k: 'jp', gr: 'dv', co: 'Kirei Building Service', ng: 'Vệ sinh tòa nhà', vt: 'Nhân viên vệ sinh tòa nhà · Kỹ năng đặc định 1', at: 'Tokyo, Nhật Bản', lu: '190.000–230.000 yên/tháng', iv: 'hr',
+    job: 'Làm sạch văn phòng, khách sạn, bệnh viện bằng máy và hóa chất đúng cách.',
+    req: [['jp', 'JLPT N4 trở lên (hoặc JFT-Basic)', 'Hiểu cách dùng hóa chất, biển báo an toàn.'],
+      ['cm', 'Đậu thi tay nghề, hoặc xong thực tập kỹ năng số 2 ngành này', 'Công ty cần biết bạn làm được việc ngay.'],
+      ['kn', 'Dùng máy, hóa chất đúng loại', 'Dùng sai hóa chất có thể làm hỏng sàn, hại sức khỏe.'],
+      ['kg', 'Từng làm vệ sinh tòa nhà là lợi thế', 'Bạn đã quen quy trình của từng loại phòng.'],
+      ['td', 'Kỹ lưỡng cả ở chỗ khuất', 'Khách đánh giá công ty qua những góc nhỏ.']] },
+  /* Mọi ngành */
+  { id: 'tv', k: 'vn', gr: 'all', co: 'Công ty TNHH Hải Âu Denshi', ng: 'Sản xuất', vt: 'Phiên dịch tiếng Nhật tại xưởng, N2', at: 'Bình Dương', lu: '13–22 triệu đồng/tháng', iv: 'vn',
+    job: 'Dịch cho quản lý người Nhật trong họp, đào tạo, xử lý lỗi.',
+    req: [['jp', 'JLPT N2 trở lên', 'Bạn phải nghe kịp người Nhật nói nhanh, dịch đúng ý.'],
+      ['cm', 'Hiểu từ chuyên ngành của xưởng', 'Dịch sai một từ kỹ thuật có thể làm hỏng cả lô hàng.'],
+      ['kn', 'Dịch giấy tờ, dùng Word, Excel', 'Ngoài nói, bạn còn dịch quy trình, báo cáo.'],
+      ['kg', 'Từng làm việc ở Nhật là lợi thế', 'Bạn hiểu cách người Nhật nghĩ, nên dịch được cả ý.'],
+      ['td', 'Bình tĩnh, giữ trung lập', 'Khi hai bên bất đồng, bạn là cầu nối.']] },
+  { id: 'kanri', k: 'jp', gr: 'all', co: 'Hiệp hội hỗ trợ Asahi', ng: 'Hỗ trợ người lao động nước ngoài', vt: 'Thông dịch, hỗ trợ thực tập sinh', at: 'Tokyo, Nhật Bản', lu: '230.000–300.000 yên/tháng', iv: 'hr',
+    job: 'Đi thăm các công ty, giúp người lao động Việt, dịch giấy tờ.',
+    req: [['jp', 'JLPT N2 trở lên', 'Bạn dịch giấy tờ, họp với công ty và cơ quan nhà nước.'],
+      ['cm', 'Thường cần bằng đại học', 'Đây là điều kiện thường gặp của visa Kỹ thuật, Tri thức nhân văn, Nghiệp vụ quốc tế.'],
+      ['kn', 'Lái xe ở Nhật, dùng máy tính', 'Bạn đi thăm nhiều công ty ở xa ga tàu.'],
+      ['kg', 'Từng là thực tập sinh là lợi thế', 'Bạn hiểu nỗi lo của người mới sang.'],
+      ['td', 'Công bằng, giữ bí mật cho cả hai bên', 'Người lao động và công ty đều phải tin bạn.']] }
+];
+var AD_SRC = 'Tin giả định, ghép từ tin tuyển dụng thật năm 2026. Tên công ty là tên giả định. Lương chỉ để tham khảo, mỗi nơi mỗi khác.';
+var AD_SRC_JP = 'Lương ở Nhật tính trước thuế, bảo hiểm. Năm 2025, người diện Kỹ năng đặc định nhận trung bình khoảng 221.000 yên/tháng (Bộ Y tế, Lao động và Phúc lợi Nhật Bản).';
+/* ghi chú theo nhóm ngành, chỉ hiện với Tin ở Nhật (nguồn: Cục Quản lý Xuất nhập cảnh Nhật Bản, 27/3/2026) */
+var AD_NOTE = { dv: 'Lưu ý: từ 13/4/2026, Nhật tạm dừng cấp mới diện Kỹ năng đặc định 1 ngành Nhà hàng cho người ở nước ngoài, vì đã gần đủ số người. Hãy theo dõi tin mới.' };
 /* Kế hoạch kinh doanh 1 trang của một người về nước · NHÂN VẬT GHÉP (không phải người thật). Không ghi số tiền. */
 var PLANS = [
   { id: 'baotri', n: 'Dịch vụ bảo trì máy cho nhà xưởng', who: 'Anh Phúc · 3 năm làm cơ khí ở Nhật', g: ['co-khi', 'dien-tu', 'o-to', 'han', 'duc-nhua', 'dong-goi-cong-nghiep', 'in-an', 'son'],
@@ -563,12 +765,22 @@ var IV_Q = [
   { id: 'hard', jp: '仕事で一番大変だったことは何ですか。', vi: 'Ở chỗ làm, việc khó nhất là gì? Bạn vượt qua thế nào?', ev: 'Một lần vượt khó, có người biết', more: 'Ai đã giúp bạn lúc đó?' },
   { id: 'kohai', jp: '後輩に仕事を教えたことはありますか。', vi: 'Bạn đã từng kèm người mới chưa?', ev: 'Kinh nghiệm kèm người mới', more: 'Người mới hay sai ở đâu?' },
   { id: 'school', jp: 'どうしてこの学校で勉強したいのですか。', vi: 'Vì sao bạn muốn học ở trường này?', ev: 'Đủ tiền học, biết rõ học để làm gì', more: 'Học xong bạn sẽ làm gì?' },
+  { id: 'whyjob', jp: 'どうしてこの仕事を希望しましたか。', vi: 'Vì sao bạn muốn làm công việc này?', ev: 'Lý do rõ ràng, gắn với 3 năm ở Nhật', more: 'Làm việc này, 5 năm sau bạn muốn ở vị trí nào?' },
   { id: 'client', jp: 'どうしてあなたの会社に仕事を頼むといいですか。', vi: 'Vì sao tôi nên chọn dịch vụ của bạn?', ev: 'Khách hàng đầu tiên, dù nhỏ', more: 'Bạn đã làm cho khách nào chưa?' }
 ];
 var IV_BOX = [['do', 'Việc mình đã làm'], ['res', 'Kết quả, con số'], ['learn', 'Mình học được gì']];
 var IV_EV = [['co', 'Có'], ['se', 'Sẽ có nếu cố'], ['chua', 'Chưa']];
 var IV_SAY = [['ok', 'Được'], ['part', 'Một phần'], ['no', 'Chưa']];
-var PLAN3_Y = [['1', 'Năm 1'], ['2', 'Năm 2'], ['3', 'Năm 3']];
+/* PS1.3.46: câu hỏi phỏng vấn bám yêu cầu của tin (theo nhóm AD_RG). {r} = yêu cầu trong tin. */
+var IV_RQ = {
+  jp: { jp: '日本語はどのくらいできますか。資格はありますか。', vi: 'Tin cần “{r}”. Tiếng Nhật của bạn tới đâu? Có chứng chỉ gì?', more: 'Bạn đọc được hướng dẫn công việc bằng tiếng Nhật không?' },
+  cm: { jp: 'この仕事に必要な技能は、どうやって身につけましたか。', vi: 'Tin cần “{r}”. Bạn có được điều này bằng cách nào?', more: 'Bạn có giấy tờ, chứng chỉ nào chứng minh không?' },
+  kn: { jp: 'その技能を使った経験を、具体的に教えてください。', vi: 'Tin cần “{r}”. Kể một lần bạn đã làm việc này.', more: 'Lần đó kết quả thế nào? Có con số không?' },
+  kg: { jp: '日本では、どんな仕事をしてきましたか。', vi: 'Tin cần “{r}”. Ở Nhật, bạn đã làm những việc gì?', more: 'Việc khó nhất ở đó là gì? Bạn vượt qua thế nào?' },
+  td: { jp: '仕事で大切にしていることは何ですか。', vi: 'Tin cần “{r}”. Kể một lần bạn đã làm như vậy.', more: 'Nếu cấp trên không có mặt, bạn sẽ làm gì?' }
+};
+/* timeline dọc ở b63 (PS1.3.46): 0 = bây giờ ở JPC, 4 = sau 3 năm */
+var PLAN3_Y = [['0', 'Bây giờ', 'Ở JPC'], ['1', 'Năm 1', 'Ở Nhật'], ['2', 'Năm 2', 'Ở Nhật'], ['3', 'Năm 3', 'Ở Nhật'], ['4', 'Sau 3 năm', 'Ứng tuyển']];
 
 /* ---------- BẾN, VÒNG, CHẶNG ----------
    r: vòng (1 Khám phá: đi thứ tự tùy ý · 2 Thiết kế: lần lượt · 3 Ra khơi: tùy ý). ready: đã mở trong bản này.
@@ -576,27 +788,36 @@ var PLAN3_Y = [['1', 'Năm 1'], ['2', 'Năm 2'], ['3', 'Năm 3']];
    Khóa dữ liệu cũ giữ nguyên tên (b13.*, b43.*, b53.*), xem ACT_KEYS trong engine. ship: vị trí thuyền so với bến [dx, dy].
    room: 1 = nơi trong nhà (Xưởng, Phòng): vào nghe chuông cửa + cửa trượt mở trên banner; còn lại là cảng, bến ngoài trời: chuông thuyền (PS1.3.43). */
 var PORT = { id: 'p0', n: 'Cảng 3 Năm', ic: 'anchor', x: 180, y: 232, acts: ['x1'],
-  intro: 'Chào [Tên]! Mọi hướng đi đều bắt đầu từ 3 năm ở Nhật.' };
+  intro: 'Chào [Tên]! Mọi hướng đi đều bắt đầu từ 3 năm ở Nhật.',
+  why: ['Lúc này bạn nghĩ gì về 3 năm sau', 'Nhận thuyền, thiết kế cờ, viết mục tiêu', 'Điểm xuất phát của bạn'], aim: 'bạn đã có điểm xuất phát' };
 var BEN = [
   { id: 'b1', n: 'Đài Vọng Biển', ic: 'scope', r: 1, x: 96, y: 150, ready: 1, acts: ['b11', 'b12'],
-    sub: 'Sau 3 năm có những hướng nào?', intro: '[Tên] ơi, mình xem các anh chị đã đi những hướng nào nhé.' },
-  { id: 'b2', n: 'Bến Senpai', ic: 'people', r: 1, x: 266, y: 150, ready: 1, acts: ['b21', 'b22', 'b23'],
-    sub: 'Nghe anh chị đi trước kể chuyện', intro: 'Ở đây là chuyện thật của người thật. Nghe xong, bạn tự rút ra điều cho mình.' },
+    sub: 'Sau 3 năm có những hướng nào?', intro: '[Tên] ơi, mình xem các anh chị đã đi những hướng nào nhé.',
+    why: ['Sau 3 năm, người ta đi những hướng nào', 'Lật thẻ đoán, xem 8 hướng đi', 'Hướng bạn quan tâm nhất'], aim: 'bạn biết sau 3 năm có 8 hướng đi' },
+  { id: 'b2', n: 'Bến Gặp Gỡ', ic: 'people', r: 1, x: 266, y: 150, ready: 1, acts: ['b21', 'b22', 'b23'],
+    sub: 'Đọc · Xem · Hỏi anh chị đi trước', intro: 'Ở đây là chuyện thật của người thật. Nghe xong, bạn tự rút ra điều cho mình.',
+    why: ['Các anh chị đi trước đã làm gì', 'Đọc chuyện, xem điểm chung, hỏi anh chị', 'Điều bạn muốn học theo, câu bạn muốn hỏi'], aim: 'bạn biết các anh chị đi trước đã xây nền thế nào' },
   { id: 'b3', n: 'Xưởng La Bàn', ic: 'compass', r: 2, room: 1, x: 104, y: 312, ready: 1, acts: ['b31', 'b32', 'b33'],
-    sub: 'Điều gì quan trọng với mình?', intro: 'Trước khi vẽ kế hoạch, mình xem điều gì quan trọng nhất với bạn.' },
+    sub: 'Điều gì quan trọng với mình?', intro: 'Trước khi vẽ kế hoạch, mình xem điều gì quan trọng nhất với bạn.',
+    why: ['Điều gì quan trọng nhất với bạn', 'Kéo 6 cặp giá trị, xếp điều có thể làm đổi kế hoạch', 'La bàn của bạn'], aim: 'bạn biết điều mình coi trọng' },
   { id: 'b4', n: 'Phòng Hải Đồ', ic: 'map', r: 2, room: 1, x: 256, y: 312, ready: 1, acts: ['b41', 'b42'], sub: 'Vẽ 3 kế hoạch 5 năm',
-    intro: 'Ở đây bạn vẽ 3 kế hoạch 5 năm. Chưa cần chọn, cứ vẽ cả ba.' },
+    intro: 'Ở đây bạn vẽ 3 kế hoạch 5 năm. Chưa cần chọn, cứ vẽ cả ba.',
+    why: ['5 năm sau khi xong 3 năm ở Nhật', 'Vẽ kế hoạch A, B, C và tự chấm', '3 kế hoạch 5 năm của bạn'], aim: 'bạn có 3 kế hoạch 5 năm' },
   { id: 'b5', n: 'Vịnh Ngã Rẽ', ic: 'wave', r: 3, x: 96, y: 392, ready: 1, acts: ['b51', 'b52'], sub: 'Cân nhắc và gỡ khó',
-    intro: 'Ở đây bạn tập cân nhắc giữa các kế hoạch, và tập gỡ khi gặp khó.' },
+    intro: 'Ở đây bạn tập cân nhắc giữa các kế hoạch, và tập gỡ khi gặp khó.',
+    why: ['Kế hoạch nào hợp với bạn hơn', 'Cân 3 kế hoạch, tập gỡ một chuyện khó', 'Kế hoạch bạn nghiêng về, bước gỡ đầu tiên'], aim: 'bạn biết cân nhắc và gỡ khó' },
   { id: 'b6', n: 'Phòng Tuyển Dụng', ic: 'doc', r: 3, room: 1, x: 180, y: 430, ship: [0, -62], ready: 1, acts: ['b61', 'b62', 'b63'], sub: 'Tin tuyển dụng, phỏng vấn 3 năm sau',
-    intro: 'Giờ là 3 năm sau. Bạn đọc tin tuyển dụng, tập trả lời phỏng vấn, rồi lên kế hoạch 3 năm ở Nhật.' },
+    intro: 'Giờ là 3 năm sau. Bạn đọc tin tuyển dụng, tập trả lời phỏng vấn, rồi lên kế hoạch 3 năm ở Nhật.',
+    why: ['3 năm sau, nhà tuyển dụng cần gì ở bạn, và vì sao', 'Đọc 1 tin, tập phỏng vấn đúng tin đó, xếp dòng thời gian', 'Dòng thời gian từ JPC tới lúc ứng tuyển, việc thử 2 tuần'], aim: 'bạn biết 3 năm ở Nhật cần chuẩn bị gì' },
   { id: 'b7', n: 'Ngọn Hải Đăng', ic: 'light', r: 3, x: 264, y: 392, ready: 1, acts: ['b71', 'b72'], sub: 'Người giúp bạn, học từ công việc',
-    intro: 'Không ai đi một mình. Ở đây mình tìm người giúp được bạn, và học từ chính công việc.' }
+    intro: 'Không ai đi một mình. Ở đây mình tìm người giúp được bạn, và học từ chính công việc.',
+    why: ['Ai giúp được bạn, học từ công việc thế nào', 'Vẽ vòng người giúp, chuẩn bị câu hỏi, xử lý 3 tình huống', 'Người bạn sẽ gặp hỏi, cách học từ chỗ làm'], aim: 'bạn biết ai giúp được mình' }
 ];
 /* Cảng Khởi Hành: mở khi đủ 7 con dấu bến. Không tính vào CD2_TOTAL (giống Ga Ước Mơ của CD01). */
-var GOAL_PORT = { id: 'fin', n: 'Cảng Khởi Hành', ic: 'flag', ready: 1, acts: ['f1', 'f2'], sub: 'Nhận Bằng Thuyền Trưởng',
-  intro: 'Bạn đã ghé đủ 7 bến! Mình nhìn lại cả chặng đường rồi nhận Bằng Thuyền Trưởng nhé.' };
-var ROUNDS = { 1: 'Vòng Khám phá · đi bến nào trước cũng được', 2: 'Vòng Thiết kế · đi lần lượt', 3: 'Vòng Ra khơi · đi bến nào trước cũng được' };
+var GOAL_PORT = { id: 'fin', n: 'Đảo Kho Báu', ic: 'flag', ready: 1, acts: ['f1', 'f2'], sub: 'Nhận Bằng Thuyền Trưởng Vững Vàng',
+  intro: 'Bạn đã ghé đủ 7 bến! Kho báu ở đây chính là hướng đi bạn tự vẽ. Mình nhìn lại rồi nhận bằng nhé.',
+  why: ['So với lúc đầu, bạn đã khác gì, 10 năm nữa bạn mong có gì', 'Nhìn lại, dán Bảng ước mơ, xem bản Hướng đi của tôi, gửi thầy cô', 'Bảng ước mơ, Hướng đi của tôi, Bằng Thuyền Trưởng Vững Vàng'], aim: 'bạn đã có hướng đi của riêng mình' };
+var ROUNDS = { 1: 'Khám phá bản đồ · đi bến nào trước cũng được', 2: 'Thiết kế hải trình · đi lần lượt', 3: 'Dong buồm ra khơi · đi bến nào trước cũng được', 4: 'Vững tay về đích · nhận Bằng Thuyền Trưởng Vững Vàng' }; /* PS1.3.44: bỏ chữ “Vòng” (thầy chốt 21/11) */
 
 /* Chặng: k = dạng bước (xem engine.js). Mỗi chặng 3–6 phút. */
 var ACTS = {
@@ -615,27 +836,27 @@ var ACTS = {
       { k: 'flip' },
       { k: 'flipsum' }
     ] },
-  b12: { st: 'b1', t: '8 hướng đi sau 3 năm', d: 'Xem từng hướng, chọn hướng bạn tò mò nhất', mins: 6,
+  b12: { st: 'b1', t: '8 hướng đi sau 3 năm', d: 'Xem từng hướng, chọn hướng bạn quan tâm nhất', mins: 6,
     steps: [
       { k: 'say', mood: 'think', t: 'Mỗi đảo là một hướng đi các anh chị đã chọn sau 3 năm. Chạm xem từng hướng rồi gắn nhãn theo cảm nhận của bạn.' },
       { k: 'isles' },
-      { k: 'pickisle', key: 'b13.isl', q: 'Hướng nào làm bạn tò mò nhất lúc này?', c1: ['far'] },
-      { k: 'write', key: 'b13.why', q: 'Vì sao hướng [Đảo] làm bạn tò mò?' }
+      { k: 'pickisle', key: 'b13.isl', q: 'Hướng nào làm bạn quan tâm nhất lúc này?', c1: ['far'] },
+      { k: 'write', key: 'b13.why', q: 'Vì sao bạn quan tâm hướng [Đảo]?' }
     ] },
-  b21: { st: 'b2', t: 'Đọc chuyện 2 anh chị', d: '1 người cùng nghề, 1 người đi đường khác', mins: 5,
+  b21: { st: 'b2', t: 'Đọc · chuyện 2 anh chị', d: '1 người cùng nghề, 1 người đi đường khác', mins: 5,
     steps: [
       { k: 'say', mood: 'hi', t: 'Bạn đọc chuyện 2 anh chị: 1 người cùng nghề với bạn, 1 người đi đường khác hẳn.' },
       { k: 'book', n: 1, same: 1, q: 'Người 1 · Cùng nghề [Nghề]', c1: ['senpai'] },
       { k: 'book', n: 2, same: 0, q: 'Người 2 · Đi đường khác' },
       { k: 'write', key: 'b21.take', q: 'Từ 2 câu chuyện này, bạn muốn mang theo điều gì?', c1: ['learn'] }
     ] },
-  b22: { st: 'b2', t: 'Tìm điểm chung', d: 'Điều gì lặp lại ở nhiều người?', mins: 4,
+  b22: { st: 'b2', t: 'Xem · điểm chung của anh chị', d: 'Chọn điều bạn thấy, xem ai đã kể', mins: 4,
     steps: [
-      { k: 'say', mood: 'think', t: 'Các anh chị đi 8 hướng khác nhau. Họ có gì giống nhau? Bạn đoán trước, rồi xem Shin đếm.' },
+      { k: 'clip', w: 'b22', mood: 'think' },
       { k: 'common' },
       { k: 'base', c1: ['work'] }
     ] },
-  b23: { st: 'b2', t: 'Phỏng vấn anh chị đi trước', d: 'Chọn 1 anh chị, hỏi 3 câu bạn tò mò', mins: 5,
+  b23: { st: 'b2', t: 'Hỏi · phỏng vấn anh chị đi trước', d: 'Chọn 1 anh chị, hỏi 3 câu bạn tò mò', mins: 5,
     steps: [
       { k: 'chat', c1: ['qs'] },
       { k: 'write', key: 'b23.q', min: 8, q: 'Nếu được gặp một anh chị đi trước thật, bạn sẽ hỏi câu gì?', sub: 'Thầy cô sẽ gom câu hỏi của lớp cho buổi giao lưu.', ph: 'Ví dụ: Anh chị học tiếng Nhật thế nào sau giờ làm mệt?' }
@@ -646,24 +867,24 @@ var ACTS = {
       { k: 'pairs' },
       { k: 'write', key: 'b31.why', q: 'Bạn nghiêng rõ nhất về “[Lệch]”. Vì sao?', c1: ['value'] }
     ] },
-  b32: { st: 'b3', t: 'Điều có thể làm đổi kế hoạch', d: 'Cái nào mình thay đổi được, cái nào khó', mins: 4,
+  b32: { st: 'b3', t: 'Điều có thể làm đổi kế hoạch', d: 'Tự viết, rồi đặt vào 2 vòng tròn', mins: 4,
     steps: [
-      { k: 'say', mood: 'worry', t: 'Kế hoạch 5 năm có thể đổi vì nhiều chuyện. Xếp từng điều: mình thay đổi được, hay khó thay đổi.' },
+      { k: 'say', mood: 'worry', t: 'Kế hoạch có thể đổi vì nhiều chuyện. Bạn tự viết 2–3 điều bạn lo, rồi xem điều nào mình tác động được.' },
       { k: 'winds', c1: ['worry'] },
-      { k: 'write', key: 'b32.hard', q: 'Nếu “[Gió]” xảy ra, bạn sẽ làm gì?', ph: 'Ví dụ: nói chuyện với gia đình, hỏi anh chị đã gặp chuyện này.' },
-      { k: 'write', key: 'b32.can', q: 'Với “[Gió2]”, từ bây giờ bạn làm được gì?' }
+      { k: 'winds2' }
     ] },
-  b33: { st: 'b3', t: 'Lời thầy của Shin', d: 'Một đường đời, nhiều cách đi', mins: 4,
+  b33: { st: 'b3', t: 'Lời thầy của Shin', d: 'Đường đời thầy vẽ, anh chị vận dụng', mins: 4,
     steps: [
       { k: 'life' },
       { k: 'write', key: 'b33.work', q: 'Với bạn, đi làm là để…', ph: 'Ví dụ: lo cho gia đình, giỏi một nghề.' },
-      { k: 'write', key: 'b33.life', q: 'Ở tuổi 30, một cuộc sống tốt với bạn là…', ph: 'Ví dụ: có nghề vững, ở gần ba mẹ.', c1: ['me'] },
+      { k: 'write', key: 'b33.life', q: '10 năm nữa, một cuộc sống tốt với bạn là…', ph: 'Ví dụ: có nghề vững, ở gần ba mẹ.', c1: ['me'] },
       { k: 'compass' }
     ] },
   b41: { st: 'b4', t: 'Kế hoạch A · Hướng đang nghĩ tới', d: 'Chưa chắc cũng được, cứ vẽ ra', mins: 4,
     steps: [
       { k: 'say', mood: 'think', t: 'Kế hoạch A là hướng bạn đang nghĩ tới. Mỗi kế hoạch dài 5 năm, tính từ lúc xong 3 năm ở Nhật.' },
       { k: 'voy', v: 'b41', c1: ['far', 'p2'] },
+      { k: 'need', v: 'b41' },
       { k: 'tline', v: 'b41' },
       { k: 'meters', v: 'b41' }
     ] },
@@ -672,9 +893,10 @@ var ACTS = {
       { k: 'say', mood: 'worry', t: 'Giả sử kế hoạch A không đi được nữa, ví dụ: “[Gió]”. Bạn sẽ đi đâu? B không phải đường kém hơn, chỉ là đường khác.' },
       { k: 'voy', v: 'b42', c1: ['b'] },
       { k: 'tline', v: 'b42' },
+      { k: 'meters', v: 'b42' },
       { k: 'voy', v: 'b43', c1: ['like'], say: 'Giờ tưởng tượng: không phải lo tiền, không ai chê cười. Cứ mơ thoải mái.' },
       { k: 'tline', v: 'b43', short: 1 },
-      { k: 'meters', vs: ['b42', 'b43'], trio: 1 }
+      { k: 'meters', v: 'b43', trio: 1 }
     ] },
   b51: { st: 'b5', t: 'Chọn kế hoạch nghiêng về', d: 'Cân 3 kế hoạch theo điều bạn coi trọng', mins: 4,
     steps: [
@@ -690,14 +912,14 @@ var ACTS = {
       { k: 'ways' },
       { k: 'real' }
     ] },
-  b61: { st: 'b6', t: 'Đọc tin tuyển dụng 3 năm sau', d: 'Hoặc xem kế hoạch kinh doanh của một anh chị về nước', mins: 5,
+  b61: { st: 'b6', t: 'Đọc tin tuyển dụng 3 năm sau', d: 'Chọn 1 trong 3 tin hợp nghề, xem họ cần gì', mins: 5,
     steps: [
       { k: 'say', mood: 'curious', t: 'Giả sử bạn vừa xong 3 năm. Mình đọc một tin tuyển dụng, xem họ cần gì nhé.' },
       { k: 'adpick' },
       { k: 'adread' },
       { k: 'write', key: 'b61.why', q: 'Đọc xong, bạn thấy mình cần chuẩn bị gì nhất?' }
     ] },
-  b62: { st: 'b6', t: 'Phỏng vấn 3 năm sau', d: '3 câu hỏi, trả lời trong vai bạn của 3 năm sau', mins: 6,
+  b62: { st: 'b6', t: 'Phỏng vấn 3 năm sau', d: 'Đúng công việc bạn vừa chọn: 1 câu chung, 2 câu theo yêu cầu', mins: 6,
     steps: [
       { k: 'ivset', c1: ['iv'] },
       { k: 'iva', n: 0 },
@@ -705,16 +927,16 @@ var ACTS = {
       { k: 'iva', n: 2 },
       { k: 'ivend' }
     ] },
-  b63: { st: 'b6', t: 'Kế hoạch 3 năm ở Nhật', d: 'Xếp điều còn thiếu vào từng năm, rồi thử nhỏ 2 tuần', mins: 5,
+  b63: { st: 'b6', t: 'Kế hoạch 3 năm ở Nhật', d: 'Xếp từng điều cần có lên dòng thời gian, rồi thử nhỏ 2 tuần', mins: 5,
     steps: [
       { k: 'plan3', c1: ['habits'] },
       { k: 'trial', c1: ['first'] }
     ] },
-  b71: { st: 'b7', t: 'Người giúp bạn', d: 'Ai giúp được bạn? Soạn một tin xin lời khuyên', mins: 5,
+  b71: { st: 'b7', t: 'Người giúp bạn', d: 'Ai giúp được bạn? Chuẩn bị câu hỏi, gặp trực tiếp', mins: 5,
     steps: [
-      { k: 'say', mood: 'hi', t: 'Nhiều anh chị có bước ngoặt nhờ một người giúp: cấp trên, đồng nghiệp, anh chị đi trước, thầy cô. Mình xem ai đang ở gần bạn, ai cần tìm thêm.' },
+      { k: 'clip', w: 'b71', mood: 'hi' },
       { k: 'ring', c1: ['guide'] },
-      { k: 'msg' }
+      { k: 'askprep' }
     ] },
   b72: { st: 'b7', t: 'Học từ công việc', d: '3 tình huống ở chỗ làm', mins: 4,
     steps: [
@@ -730,8 +952,9 @@ var ACTS = {
       { k: 'write', key: 'f1.change', q: 'So với lúc bắt đầu, bạn thấy mình khác đi điều gì?', ph: 'Ví dụ: mình biết thêm 3 hướng chưa từng nghe.' },
       { k: 'ps' }
     ] },
-  f2: { st: 'fin', t: 'Hướng đi của tôi', d: 'Bản 1 trang, gửi thầy cô, nhận Bằng Thuyền Trưởng', mins: 4, btn: 'Nhận Bằng Thuyền Trưởng',
+  f2: { st: 'fin', t: 'Hướng đi của tôi', d: 'Bảng ước mơ, bản 1 trang, gửi thầy cô, nhận bằng', mins: 5, btn: 'Nhận Bằng Thuyền Trưởng Vững Vàng',
     steps: [
+      { k: 'dream' }, /* PS1.3.48 */
       { k: 'sheet' },
       { k: 'send' },
       { k: 'cert' }
@@ -739,24 +962,39 @@ var ACTS = {
 };
 var ORDER = ['x1', 'b11', 'b12', 'b21', 'b22', 'b23', 'b31', 'b32', 'b33', 'b41', 'b42', 'b51', 'b52', 'b61', 'b62', 'b63', 'b71', 'b72'];
 var FIN_ORDER = ['f1', 'f2'];
+/* PS1.3.48 · Bảng ước mơ 10 năm nữa (Đảo Kho Báu, f2 bước 1). Lưới 3×3, ô giữa là cờ của bạn. Sticker vẽ ở art.js (CD2_PROP). */
+var DREAM_T = 'Bảng ước mơ · 10 năm nữa';
+var DREAM_GRP = [
+  ['Công việc', [['gear', 'Tay nghề vững'], ['helmet', 'Công trình'], ['noodle', 'Nghề thực phẩm'], ['care', 'Chăm sóc người khác'], ['leaf', 'Nông nghiệp'], ['laptop', 'Văn phòng, IT'],
+    ['board', 'Dạy tiếng Nhật'], ['talk', 'Phiên dịch, cầu nối'], ['shop', 'Cửa hàng của mình'], ['office', 'Công ty Nhật'], ['clip', 'Quản lý, kèm người mới']]],
+  ['Học', [['jl', 'Tiếng Nhật'], ['cap', 'Học tiếp'], ['cert', 'Chứng chỉ nghề'], ['book', 'Đọc sách mỗi ngày']]],
+  ['Nơi sống', [['fuji', 'Sống ở Nhật'], ['homevn', 'Nhà ở quê'], ['city', 'Sống ở thành phố'], ['plane', 'Qua lại hai nước']]],
+  ['Cuộc sống', [['family', 'Gia đình bên nhau'], ['heart', 'Người thương'], ['friends', 'Bạn bè tốt'], ['piggy', 'Có tích lũy'], ['car', 'Xe riêng'], ['shoe', 'Khỏe mạnh'], ['suitcase', 'Đi du lịch'], ['sun', 'Bình yên']]]
+];
+/* Shin gợi ý sẵn tối đa 4 ô từ bài đã làm: hướng của kế hoạch A, phía (Nhật / Việt Nam), nhóm ngành, điều coi trọng ở CD01, mức tiếng Nhật */
+var DREAM_ISLE = { len: 'gear', re: 'cert', hoc: 'cap', gio: 'plane', chu: 'talk', lap: 'shop', cau: 'office', que: 'family' };
+var DREAM_SIDE = { jp: 'fuji', vn: 'homevn' };
+var DREAM_GRPJOB = { sx: 'gear', xd: 'helmet', tp: 'noodle', kg: 'care', dv: 'noodle' };
+var DREAM_VAL = [['Gia đình', 'family'], ['Thu nhập', 'piggy'], ['Học hỏi', 'book'], ['Ổn định', 'homevn'], ['Sức khỏe', 'shoe'], ['Giúp', 'care'], ['Tự do', 'sun'], ['Khám phá', 'suitcase'], ['Làm chủ', 'shop'], ['tôn trọng', 'cert']];
+var DREAM_MIN = 6; /* dán ít nhất 6/8 ô */
 
 /* ---------- CHỮ CHUNG ---------- */
 var SHIN_TALK = {
   home: ['Biển hôm nay lặng. Đi tiếp một chặng nhé [Tên]!', 'Mỗi bến ghé qua, hải đồ của bạn rõ thêm một chút.', 'Đi chậm mà chắc. Shin ở đây với bạn.'],
   homeNew: 'Chào [Tên]! Shin là thuyền trưởng dẫn đường. Nhận thuyền ở Cảng 3 Năm rồi mình ra khơi nhé!',
   homeWait: 'Bạn đã đi hết các bến đang mở. Các bến sau đang được dựng, sắp mở rồi!',
-  homeFin: 'Bạn đã nhận Bằng Thuyền Trưởng! Hải đồ vẫn ở đây, ghé lại đảo và Senpai lúc nào cũng được.',
-  lockFin6: 'Ghé đủ 7 bến (có đủ 7 con dấu) để tới Cảng Khởi Hành.',
+  homeFin: 'Bạn đã nhận Bằng Thuyền Trưởng Vững Vàng! Hải đồ vẫn ở đây, ghé lại đảo và Senpai lúc nào cũng được.',
+  lockFin6: 'Ghé đủ 7 bến (có đủ 7 con dấu) để tới Đảo Kho Báu.',
   bottle: 'Thư trong chai hôm nay',
   bottleSub: 'Một câu của anh chị đi trước trôi vào bờ',
   fogT: 'Đảo mới hiện ra',
   stampT: 'Con dấu bến',
   doneAct: 'Xong chặng!',
   soon: 'Bến này đang được dựng. Sắp mở!',
-  lockR2: 'Ghé đủ 2 bến của Vòng Khám phá để mở bến này.',
+  lockR2: 'Ghé xong Đài Vọng Biển và Bến Gặp Gỡ để mở bến này.',
   lockR2b: 'Xong Xưởng La Bàn để mở bến này.',
-  lockR3: 'Xong Vòng Thiết kế để mở bến này.',
-  lockFin: 'Ghé đủ 7 bến để tới Cảng Khởi Hành.',
+  lockR3: 'Xong Xưởng La Bàn và Phòng Hải Đồ để mở bến này.',
+  lockFin: 'Ghé đủ 7 bến để tới Đảo Kho Báu.',
   lockP: 'Nhận thuyền ở Cảng 3 Năm trước nhé.',
   redo: 'Bạn đang xem lại chặng đã xong. Sửa chỗ nào cũng được, bài tự lưu.',
   redoNew: 'Bạn đang làm lại chặng này. Bài cũ vẫn giữ tạm cho đến khi đóng dấu lại.',

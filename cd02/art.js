@@ -201,21 +201,36 @@ function shipSVG(lv, sym, col, w) {
 }
 
 /* ---------- la bàn của học viên: 6 trục, chấm theo giá trị 0–10 (không dùng mẫu chung: còn xuất ảnh) ---------- */
+/* PS1.3.44: la bàn to hơn, mỗi đầu trục có tên; đầu bạn nghiêng về in đậm cam đất + chấm mức (1–5). */
 function compassSVG(vals, w) {
-  var cx = 110, cy = 110, R = 84, h = '', pts = [], n = PAIRS.length;
-  h += '<circle cx="110" cy="110" r="96" fill="#FFFDF8" stroke="#141413" stroke-width="2"/><circle cx="110" cy="110" r="84" fill="none" stroke="#C9C2AF" stroke-dasharray="3 4"/>' +
-    '<circle cx="110" cy="110" r="42" fill="none" stroke="#E3DCCB"/>';
+  var cx = 200, cy = 165, R = 76, h = '', pts = [], n = PAIRS.length, labs = '', LH = 16;
+  function esc2(t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+  function lines(t) { var w = t.split(' '); if (t.length <= 11 || w.length < 2) return [t]; var best = 99, a = t, b = ''; for (var k = 1; k < w.length; k++) { var l1 = w.slice(0, k).join(' '), d = Math.abs(l1.length - (t.length - l1.length - 1)); if (d < best) { best = d; a = l1; b = w.slice(k).join(' '); } } return [a, b]; }
+  function lab(t, ang, on, lv) {
+    var dx = Math.cos(ang), dy = Math.sin(ang), x = cx + dx * (R + 12), y = cy + dy * (R + 12), L = lines(t), rows = L.length + (on ? 1 : 0), hh = (rows - 1) * LH, anc, y0;
+    if (Math.abs(dx) < .2) anc = 'middle'; else { anc = dx > 0 ? 'start' : 'end'; if (Math.abs(dy) > .8) x += dx * 8; }
+    if (dy > .8) y0 = y + 14;                 /* dưới: chữ chạy xuống */
+    else if (dy < -.8) y0 = y - hh - 5;       /* trên: chữ chạy lên */
+    else y0 = y + (dy > .3 ? 6 : (dy < -.3 ? -6 : 0)) - hh / 2 + 5; /* ngang, chếch: canh giữa, đẩy nhẹ ra xa trục ngang */
+    var s = '<text x="' + x.toFixed(1) + '" y="' + y0.toFixed(1) + '" text-anchor="' + anc + '" font-family="Be Vietnam Pro, Arial, sans-serif" font-size="14" font-weight="' + (on ? 600 : 400) + '" fill="' + (on ? '#9E4A2C' : '#6F6E69') + '">';
+    L.forEach(function (l, i) { s += '<tspan x="' + x.toFixed(1) + '"' + (i ? ' dy="' + LH + '"' : '') + '>' + esc2(l) + '</tspan>'; });
+    if (on) { var d = ''; for (var k = 1; k <= 5; k++) d += k <= lv ? '●' : '○'; s += '<tspan x="' + x.toFixed(1) + '" dy="' + LH + '" font-size="10.5" letter-spacing="1.5" fill="#C15F3C">' + d + '</tspan>'; }
+    return s + '</text>';
+  }
+  h += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (R + 4) + '" fill="#FFFDF8" stroke="#2B2A27" stroke-width="1.6"/><circle cx="' + cx + '" cy="' + cy + '" r="' + R + '" fill="none" stroke="#C9C2AF" stroke-dasharray="3 4"/>' +
+    '<circle cx="' + cx + '" cy="' + cy + '" r="' + (R / 2) + '" fill="none" stroke="#E3DCCB"/>';
   for (var i = 0; i < n; i++) {
     var ang = (i / n) * Math.PI - Math.PI / 2, dx = Math.cos(ang), dy = Math.sin(ang);
-    h += '<path d="M' + (cx - dx * R).toFixed(1) + ' ' + (cy - dy * R).toFixed(1) + 'L' + (cx + dx * R).toFixed(1) + ' ' + (cy + dy * R).toFixed(1) + '" stroke="#C9C2AF" stroke-width="1.2"/>';
-    var v = vals && vals[i] != null ? +vals[i] : 5, t = (v - 5) / 5;
+    h += '<path d="M' + (cx - dx * R).toFixed(1) + ' ' + (cy - dy * R).toFixed(1) + 'L' + (cx + dx * R).toFixed(1) + ' ' + (cy + dy * R).toFixed(1) + '" stroke="#C9C2AF" stroke-width="1.1"/>';
+    var v = vals && vals[i] != null ? +vals[i] : 5, t = (v - 5) / 5, lv = Math.round(Math.abs(v - 5));
     pts.push([cx + dx * R * t, cy + dy * R * t, v]);
+    labs += lab(PAIRS[i][1], ang, v > 5, lv) + lab(PAIRS[i][0], ang + Math.PI, v < 5, lv);
   }
   var d = ''; pts.forEach(function (p, i) { d += (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1); });
-  h += '<path d="' + d + 'Z" fill="rgba(217,119,87,.24)" stroke="#B5532F" stroke-width="2" stroke-linejoin="round"/>';
-  pts.forEach(function (p) { h += '<circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="5" fill="#C15F3C" stroke="#fff" stroke-width="2"/>'; });
-  h += '<path d="M110 22l5 14h-10z" fill="#141413"/><circle cx="110" cy="110" r="4" fill="#141413"/>';
-  return '<svg class="cmp" viewBox="0 0 220 220" width="' + (w || 220) + '" aria-hidden="true">' + h + '</svg>';
+  h += '<path d="' + d + 'Z" fill="rgba(217,119,87,.22)" stroke="#B5532F" stroke-width="2" stroke-linejoin="round"/>';
+  pts.forEach(function (p) { h += '<circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="' + (p[2] === 5 ? 3.5 : 5) + '" fill="' + (p[2] === 5 ? '#C9C2AF' : '#C15F3C') + '" stroke="#fff" stroke-width="2"/>'; });
+  h += '<circle cx="' + cx + '" cy="' + cy + '" r="3.5" fill="#2B2A27"/>' + labs;
+  return '<svg class="cmp" viewBox="0 0 400 330" width="' + (w || 340) + '" aria-hidden="true">' + h + '</svg>';
 }
 
 /* ---------- đảo (vẽ quanh 0,0): nền theo phía, bờ nét đứt, núi, cây ---------- */
@@ -459,6 +474,9 @@ var CD2_SCN = {
     return '<path d="M200 112a64 64 0 0 1 128 0z" fill="#D97757" opacity=".22"/>' + aP('M200 112a64 64 0 0 1 128 0', 'none', 1.6) +
       aP('M0 12q70 16 140 14', 'none', 1.6) + bunt + aP('M0 112h360', 'none', 1.4, ' opacity=".5"') +
       aP('M0 96h46v10H0z', '#fff') + aP('M12 106v26M36 106v26', 'none', 2.2) +
+      /* PS1.3.48: rương kho báu trên cầu tàu (kho báu = hướng đi bạn tự vẽ: tấm hải đồ cuộn trong rương) */
+      aP('M10 96V84h28v12z', '#EED3B8', 1.8) + aP('M10 84q0-10 14-10t14 10z', '#D97757', 1.8) + aP('M10 86h28M22 84v6h4v-6', 'none', 1.4) + aP('M16 74q2-6 8-4l6-2q4 0 4 4', '#FFFDF8', 1.4) +
+      '<path d="M44 72l2 4 4 1-4 1-2 4-2-4-4-1 4-1z" fill="#D9A84E"/><path d="M4 70l1.4 2.6 2.6.9-2.6.9L4 77l-1.4-2.6L0 73.5l2.6-.9z" fill="#D9A84E"/>' +
       '<g transform="translate(176 112)">' + aP('M-80 0h150l-18 22H-64z', '#fff', 2.4) + aDots('M-76 6h138l-12 14H-62z', .4) + aP('M-60 8h4M-40 8h4M-20 8h4M0 8h4M20 8h4M40 8h4', 'none', 2) +
       aP('M-30 0V-86M24 0V-96') + aP('M-54-8q24 6 48 0l-2-30q-22 6-44 0z', '#fff', 2) + aP('M-50-46q20 5 40 0l-2-26q-18 5-36 0z', '#fff', 2) +
       aP('M0-8q24 6 50 0l-2-34q-22 6-46 0z', '#fff', 2) + aP('M4-52q20 5 40 0l-2-30q-18 5-36 0z', '#fff', 2) + aDots('M2-40q22 5 44 0v30q-22 6-44 0z', .5, 1) +
@@ -490,4 +508,157 @@ function stampArt(i, ic, lab, date, w) {
 function stampEmpty(n, w) {
   return '<svg class="stamp" viewBox="0 0 66 62" width="' + (w || 66) + '" aria-hidden="true"><circle cx="33" cy="31" r="23" fill="none" stroke="#C9C2AF" stroke-width="1.5" stroke-dasharray="3 4"/>' +
     '<text x="33" y="36" text-anchor="middle" font-family="Lora,Georgia,serif" font-style="italic" font-size="13" fill="#A8A08C">' + n + '</text></svg>';
+}
+
+/* ---------- PS1.3.48 (bản 3 · đợt 5) đồ vật nhỏ · cảnh nơi làm việc của 26 thẻ Senpai · sticker Bảng ước mơ ----------
+   CD2_PROP[k](arg): đồ vật vẽ quanh 0,0 trong khung −16..16 (dùng cho huy hiệu thẻ Senpai, banner thẻ, sticker Bảng ước mơ).
+   CD2_SPSC[k](): cảnh nơi làm việc trong khung 100×100, mặt đất y 84 (vẽ nơi làm việc, đồ vật; không vẽ mặt người thật).
+   spArt(sp, 'thumb' | 'banner'): ghép cảnh + đồ vật theo SP_ART trong content.js; nền theo phía của đảo (sideBg).
+   dreamSticker(k, w, arg): một sticker vuông. Tất cả qua hand() cho nét tay mượt. */
+var A_CL = '#D97757', A_LT = '#FDEFE7', A_KR = '#EED3B8', A_SG = '#CFE0D3', A_SK = '#DCE6EC', A_YL = '#F6DDA4';
+function aK(d, w) { return '<path d="' + d + '" fill="none" stroke="#D97757" stroke-width="' + (w || 1.6) + '" stroke-linecap="round" stroke-linejoin="round"/>'; }
+function aT(x, y, t, sz, col, fam, wt) { return '<text x="' + x + '" y="' + y + '" text-anchor="middle" font-family="' + (fam || 'Lora,Georgia,serif') + '" font-size="' + sz + '" font-weight="' + (wt || 700) + '" fill="' + (col || '#141413') + '">' + t + '</text>'; }
+function aDot(x, y, r, c) { return '<circle cx="' + x + '" cy="' + y + '" r="' + (r || 1.2) + '" fill="' + (c || '#141413') + '"/>'; }
+function aGear(cx, cy, r, n, f, w) {
+  var d = '', i, a0, R = r, ri = r * .78, st = Math.PI * 2 / n;
+  for (i = 0; i < n; i++) {
+    a0 = i * st;
+    var p = [[ri, a0], [R, a0 + st * .18], [R, a0 + st * .48], [ri, a0 + st * .66]];
+    p.forEach(function (q, j) { d += (i === 0 && j === 0 ? 'M' : 'L') + hF(cx + q[0] * Math.cos(q[1])) + ' ' + hF(cy + q[0] * Math.sin(q[1])); });
+  }
+  return aP(d + 'Z', f || '#fff', w || 1.6) + aC(cx, cy, r * .3, A_CL, (w || 1.6) * .85);
+}
+function aPerson(x, y, k, f) { /* người dáng chung, không mặt */ k = k || 1; return '<g transform="translate(' + x + ' ' + y + ') scale(' + k + ')">' + aC(0, -12, 5, '#fff', 1.6) + aP('M-8 8q0-13 8-13t8 13z', f || '#fff', 1.6) + '</g>'; }
+
+var CD2_PROP = {
+  box: function () { return aP('M-13 -6l4-6h18l4 6z', '#F6E3CF', 1.5) + aR(-13, -6, 26, 19, A_KR, 1.6, 1) + aP('M-3 -6v7h6v-7', '#fff', 1.2) + aP('M-9 8h6', 'none', 1.2); },
+  cal8: function () { return aR(-12, -10, 24, 24, '#fff', 1.6, 3) + aR(-12, -10, 24, 7, A_CL, 1.6, 2) + aP('M-6 -14v6M6 -14v6', 'none', 1.8) + aT(0, 11.5, '8', 13, '#141413') ; },
+  medal: function () { return aP('M-10 -16h7l5 9-4 5zM10 -16h-7l-5 9 4 5z', A_CL, 1.3) + aC(0, 5, 9, A_YL, 1.6) + aP('M0 0l1.6 3.4 3.6.4-2.7 2.4.8 3.6L0 8l-3.3 1.8.8-3.6-2.7-2.4 3.6-.4z', '#fff', 1); },
+  noodle: function () { return aP('M3 -16l9 13M7 -17l8 12', 'none', 1.6) + aP('M-14 -2h28q-1 14-14 14t-14-14z', '#fff', 1.6) + aP('M-10 -2q2.5-5 5 0t5 0t5 0t5 0', 'none', 1.2) + aK('M-9 5h18', 1.4); },
+  fish: function () { return aP('M-15 0q8-11 21-4l7-6v20l-7-6q-13 7-21-4z', '#fff', 1.6) + aP('M-3 -6q3-6 7-3', A_CL, 1.3) + aP('M1 -4q2 4 0 8', 'none', 1.1) + aDot(-8, -1.5, 1.3); },
+  torch: function () { return '<g transform="rotate(-38)">' + aR(-15, -3.5, 20, 7, '#fff', 1.6, 2) + aR(5, -2.5, 9, 5, A_CL, 1.3, 1) + aP('M-10 -3.5v7M-6 -3.5v7', 'none', 1) + '</g>' + aK('M13 -12l5-5M15 -8h6M10 -15v-6M17 -12.5l3 1', 1.5); },
+  book: function () { return aP('M-15 -10q7.5-4 15 0q7.5-4 15 0v21q-7.5-4-15 0q-7.5-4-15 0z', '#fff', 1.6) + aP('M0 -10v21', 'none', 1.3) + aP('M-11 -4h7M-11 0h7M-11 4h5M4 -4h7M4 0h7', 'none', 1.1) + aK('M7 -11v7l2-2 2 2v-7', 1.2); },
+  chip: function () { return aP('M-5 -9v-5M0 -9v-5M5 -9v-5M-5 9v5M0 9v5M5 9v5M-9 -5h-5M-9 0h-5M-9 5h-5M9 -5h5M9 0h5M9 5h5', 'none', 1.4) + aR(-9, -9, 18, 18, '#fff', 1.6, 2) + aR(-4, -4, 8, 8, A_CL, 1.2, 1); },
+  brush: function () { return aR(-15, -14, 22, 9, A_CL, 1.6, 3) + aP('M7 -10h5v9H-2v5', 'none', 1.6) + aR(-4.5, 4, 5, 11, '#fff', 1.6, 1.5) + aK('M-12 -1q2 4 0 7', 1.3); },
+  mold: function () { return aP('M-4 -16h8v4l3.5 4v20q0 2-2 2h-11q-2 0-2-2v-20l3.5-4z', '#fff', 1.6) + aR(-7.5, -1, 15, 8, A_CL, 1.2, 1) + aP('M-5 -12h10', 'none', 1.1); },
+  print: function () { return aP('M-6 3h20l-2 12H-6z', '#fff', 1.5) + aC(-6, -4, 8, '#fff', 1.6) + aC(-6, -4, 3, A_CL, 1.2) + aK('M0 8h8M0 11h5', 1.2); },
+  gear: function () { return aGear(0, 0, 14, 8); },
+  gear3: function () { return aGear(-6, -5, 9.5, 7) + aGear(8, 3, 7, 6) + aGear(-3, 10, 5.5, 6); },
+  helmet: function () { return aP('M-14 5q0-16 14-16t14 16z', A_YL, 1.6) + aP('M-17 5h34v5h-34z', '#fff', 1.6) + aP('M-3 -11v7h6v-7', '#fff', 1.2); },
+  leaf: function () { return aP('M-12 14h24', 'none', 1.6) + aP('M0 14V-3', 'none', 1.6) + aP('M0 3q-13-1-13-14q13 0 13 14z', A_SG, 1.4) + aP('M0 -2q11-1 13-13q-13 0-13 13z', A_SG, 1.4) + aK('M-6 -5l4 4', 1.1); },
+  calc: function () { return aR(-10, -15, 20, 30, '#fff', 1.6, 3) + aR(-6.5, -11, 13, 7, A_LT, 1.2, 1) + aDot(-4, 1, 1.5) + aDot(0, 1, 1.5) + aDot(4, 1, 1.5) + aDot(-4, 6, 1.5) + aDot(0, 6, 1.5) + aDot(4, 6, 1.5, A_CL) + aDot(-4, 11, 1.5) + aDot(0, 11, 1.5) + aDot(4, 11, 1.5, A_CL); },
+  bread: function () { return aP('M-15 7q-2-15 15-15t15 15v4h-30z', A_KR, 1.6) + aP('M-7 -4l3 6M-1 -6l3 6M5 -4l3 6', 'none', 1.2); },
+  cup: function () { return aP('M2 -10l7-8', 'none', 1.7) + aP('M-9 -10h18l-2.5 24h-13z', '#fff', 1.6) + aP('M-8.2 -2h16.4l-1 8h-14.4z', A_CL, 1.2) + aP('M-11 -10h22', 'none', 1.8); },
+  cart: function () { return aR(-14, -5, 25, 13, '#fff', 1.6, 2) + aP('M-16 -5l4-9h22l4 9z', A_CL, 1.4) + aP('M-9 -14l-1 9M0 -14v9M9 -14l1 9', 'none', 1) + aC(-7, 11, 3.6, '#fff', 1.5) + aC(6, 11, 3.6, '#fff', 1.5) + aP('M11 1h6', 'none', 1.7); },
+  basket: function () { return aC(-5, -6, 4.5, A_CL, 1.3) + aC(4, -7, 4, A_SG, 1.3) + aP('M-9 -3q9-17 18 0', 'none', 1.6) + aP('M-14 -3h28l-4 17h-20z', '#fff', 1.6) + aP('M-11 3h22M-9 9h18', 'none', 1.1); },
+  cap: function () { return aP('M-9 0v8q9 6 18 0v-8', '#fff', 1.6) + aP('M-17 -4l17-8 17 8-17 8z', '#fff', 1.6) + aP('M13 -2v10', 'none', 1.3) + aC(13, 10, 1.9, A_CL, 1); },
+  heart: function () { return aP('M0 13C-10 6-15 0-13.5-6.5C-12-13-3.5-13.5 0-7C3.5-13.5 12-13 13.5-6.5C15 0 10 6 0 13z', A_CL, 1.6); },
+  clip: function () { return aR(-11, -12, 22, 27, '#fff', 1.6, 2) + aR(-5, -15, 10, 6, A_CL, 1.3, 1) + aK('M-7 -3l2 2 3-4M-7 5l2 2 3-4', 1.4) + aP('M0 -3h6M0 5h6', 'none', 1.2); },
+  fuji: function () { return aC(9, -9, 4.5, A_CL, 1.3) + aP('M-17 12l11-16q6-6 12 0l11 16z', '#fff', 1.6) + aP('M-6 -4q6-6 12 0l-2.5 3-3.5-2-3.5 2z', A_SK, 1.2); },
+  homevn: function () { return aP('M13 13V-4M13 -4q-6-1-8 3M13 -4q5-3 8 1M13 -4q-3-5-8-5M13 -4q4-5 8-4', 'none', 1.3) + aR(-14, -1, 22, 14, '#fff', 1.6) + aP('M-17 -1l6-9h16l6 9z', A_CL, 1.5) + aR(-6, 4, 6, 9, A_LT, 1.2); },
+  plane: function () { return aK('M-15 10q15-12 30 0', 1.2) + aP('M-15 -1q0-4 6-4h17q7 0 8 4q-1 3-8 3h-17q-6 0-6-3z', '#fff', 1.6) + aP('M-1 -1l-7 10h5l8-10z', A_CL, 1.3) + aP('M-13 -4l-3-8h4l5 7', '#fff', 1.3) + aDot(4, -2, 1) + aDot(8, -2, 1) + aDot(0, -2, 1); },
+  city: function () { return aR(-15, -4, 10, 18, '#fff', 1.5) + aR(-5, -14, 11, 28, A_SK, 1.6) + aR(6, 0, 10, 14, '#fff', 1.5) + aDot(-11, 1) + aDot(-11, 6) + aDot(-2, -9) + aDot(3, -9) + aDot(-2, -3) + aDot(3, -3) + aDot(-2, 3) + aDot(3, 3, 1.2, A_CL) + aDot(9, 5) + aDot(13, 5) + aP('M-17 14h34', 'none', 1.5); },
+  family: function () { return aPerson(-9, 2, .85) + aPerson(9, 1, .9, A_LT) + aPerson(0, 8, .6, A_CL); },
+  friends: function () { return aPerson(-7, 4, .95) + aPerson(8, 4, .95, A_SG) + aK('M-1 -16q1-3 3 0', 1.4); },
+  laptop: function () { return aR(-12, -12, 24, 16, '#fff', 1.6, 2) + aP('M-16 4h32l-2.5 6h-27z', '#fff', 1.6) + aK('M-7 -6h8M-7 -2h12', 1.4); },
+  board: function () { return aP('M-10 8l-3 8M10 8l3 8', 'none', 1.5) + aR(-15, -13, 30, 21, '#7E9A8E', 1.6, 2) + aT(-4, 2, 'あ', 11, '#fff', 'Noto Sans JP,sans-serif', 500) + aT(7, 2, 'A', 9, '#fff', 'Lora,Georgia,serif', 700); },
+  shop: function () { return aR(-13, -2, 26, 15, '#fff', 1.6) + aP('M-16 -2l3-10h26l3 10z', '#fff', 1.5) + aP('M-10 -12l-1.5 10M-3.5 -12l-.5 10M3.5 -12l.5 10M10 -12l1.5 10', A_CL, 1.1) + aR(-9, 3, 8, 6, A_LT, 1.1) + aR(3, 3, 6, 10, '#fff', 1.2); },
+  office: function () { return aR(-11, -10, 22, 24, '#fff', 1.6) + aP('M0 -10v-7', 'none', 1.4) + aP('M0 -17h8l-2 2.5 2 2.5H0', A_CL, 1.1) + aDot(-5, -5) + aDot(0, -5) + aDot(5, -5) + aDot(-5, 1) + aDot(0, 1) + aDot(5, 1) + aR(-3, 7, 6, 7, A_LT, 1.1); },
+  talk: function () { return aP('M-16 -12h17v12h-9l-5 4v-4h-3z', '#fff', 1.5) + aT(-7.5, -2.5, 'A', 8.5, '#141413') + aP('M-1 -3h17v12h-3v4l-5-4h-9z', A_CL, 1.5) + aT(7.5, 6.5, 'あ', 8.5, '#fff', 'Noto Sans JP,sans-serif', 500); },
+  jl: function (lv) { return aR(-15, -10, 30, 22, '#fff', 1.6, 4) + aP('M-15 -3h30', 'none', 1.1) + aT(0, -4.5, 'JLPT', 5.5, '#141413', 'Be Vietnam Pro,sans-serif', 700) + aT(0, 9.5, lv || 'N2', 11, '#B5532F'); },
+  cert: function () { return aR(-14, -12, 28, 21, '#fff', 1.6, 1) + aP('M-9 -6h18M-9 -2h12', 'none', 1.1) + aP('M4 9l-2 7 4-2 4 2-2-7', A_CL, 1.1) + aC(6, 6, 5, A_YL, 1.3); },
+  piggy: function () { return aC(1, -14, 3, A_YL, 1.3) + aP('M-14 2q0-11 13-11q10 0 13 7h3v7h-3q-2 4-6 5v4h-4v-3h-6v3h-4v-5q-6-3-6-7z', A_LT, 1.6) + aP('M-4 -8q-1-5 3-6', 'none', 1.3) + aP('M-3 -6h6', 'none', 1.5) + aDot(7, -1, 1.1); },
+  car: function () { return aP('M-16 6v-6q0-2 3-2l4-7h15l5 7q5 0 5 3v5z', '#fff', 1.6) + aP('M-8 -2l3-5h7v5zM5 -2v-5h3l4 5z', A_SK, 1.2) + aC(-9, 7, 3.8, '#fff', 1.5) + aC(9, 7, 3.8, '#fff', 1.5) + aK('M-16 2h4', 1.4); },
+  shoe: function () { return aP('M-15 9v-8q0-3 3-3h5q4 6 12 7l7 1q3 1 3 3v0z', '#fff', 1.6) + aP('M-16 9h32v4h-32z', A_CL, 1.4) + aP('M-4 0l2-2M-1 2l2-2', 'none', 1.1) + aK('M-17 -6h-4M-16 -10h-6', 1.3); },
+  suitcase: function () { return aP('M-5 -10v-4h10v4', 'none', 1.6) + aR(-12, -10, 24, 22, '#fff', 1.6, 3) + aP('M-6 -10v22M6 -10v22', A_CL, 1.4) + aC(-6, 14, 1.6, '#fff', 1.1) + aC(6, 14, 1.6, '#fff', 1.1); },
+  sun: function () { return aK('M0 -16v-3M0 16v3M-16 0h-3M16 0h3M-11 -11l-2-2M11 -11l2-2M-11 11l-2 2M11 11l2 2', 1.6) + aC(0, 0, 10, A_YL, 1.6) + aP('M-4 2q4 4 8 0', 'none', 1.3); },
+  care: function () { return aP('M-6 15V-4q0-7 6-7t6 7', 'none', 1.8) + aP('M-11 15h10', 'none', 1.6) + aP('M8 -2C3-5 1-8 2-11C3-14 6-14 8-11C10-14 13-14 14-11C15-8 13-5 8-2z', A_CL, 1.3); }
+};
+function propArt(k, arg) { return CD2_PROP[k] ? CD2_PROP[k](arg) : ''; }
+
+/* cảnh nơi làm việc 100×100, mặt đất y 84 */
+var CD2_SPSC = {
+  pack: function () { return aP('M10 84V42l12-10v10l12-10v10l12-10v10l12-10v10l12-10v52', '#fff') + aDots('M12 46h56v14H12z', .45, 1) +
+    aR(4, 64, 92, 7, '#fff', 1.8, 3.5) + aC(12, 67.5, 1.8, '#fff', 1.2) + aC(50, 67.5, 1.8, '#fff', 1.2) + aC(88, 67.5, 1.8, '#fff', 1.2) + aP('M14 71v13M50 71v13M86 71v13', 'none', 1.8) +
+    '<g transform="translate(24 55) scale(.7)">' + CD2_PROP.box() + '</g><g transform="translate(52 52) scale(.85)">' + CD2_PROP.box() + '</g><g transform="translate(78 57) scale(.55)">' + CD2_PROP.box() + '</g>'; },
+  weld: function () { return aP('M86 84V18h-32M86 28l-12-10M60 18v20', 'none', 1.8) + aP('M57 38h6l-3 5z', '#fff', 1.4) +
+    aP('M6 56h88l-8 28H14z', '#fff') + aP('M10 64h80', 'none', 1.3) + aC(28, 72, 3, A_SK, 1.4) + aC(44, 72, 3, A_SK, 1.4) + aC(60, 72, 3, A_SK, 1.4) + aDots('M16 76h68l-2 7H18z', .5, 1) +
+    aR(18, 44, 22, 12, '#fff', 1.6) + aP('M24 44v-8h8v8', '#fff', 1.4) + aK('M72 52l5-5M75 56h6M70 49v-6M78 51l3 1', 1.5); },
+  office: function () { return aR(10, 16, 38, 30, A_SK, 1.6, 2) + aP('M29 16v30M10 31h38', 'none', 1.3) + aP('M12 44l8-8 6 5 8-9 12 12', 'none', 1.2) +
+    aP('M4 64h92', 'none', 2) + aP('M10 64v20M90 64v20', 'none', 1.8) + aR(56, 34, 30, 21, '#fff', 1.7, 2) + aP('M71 55v5M64 62h14', 'none', 1.6) + aK('M61 41h14M61 46h9', 1.5) +
+    aR(16, 56, 18, 8, '#fff', 1.4, 1) + aR(18, 52, 15, 4, A_LT, 1.2, 1) + aP('M42 56h7v8h-7z', '#fff', 1.4) + aP('M49 58q3 0 3 2.5t-3 2.5', 'none', 1.2); },
+  talk: function () { return aP('M10 64h80', 'none', 2) + aP('M16 64v20M84 64v20', 'none', 1.8) +
+    aP('M4 84V62q0-4 4-4h0v26M96 84V62q0-4-4-4v26', 'none', 1.6) + aR(42, 56, 16, 8, '#fff', 1.4, 1) + aP('M45 59h10', 'none', 1) +
+    '<g transform="translate(42 32) scale(1.65)">' + CD2_PROP.talk() + '</g>'; },
+  cross: function () { return aP('M0 84q30-14 60-6t40 2', '#fff', 1.6) + aDots('M10 82q20-8 40-6v8H10z', .35, 1) + aP('M44 84V24', 'none', 2.2) + aC(44, 22, 2.5, A_CL, 1.3) +
+    aP('M46 34h30l7 6-7 6H46z', '#fff', 1.6) + aT(62, 43, 'NHẬT', 7.5, '#141413', 'Be Vietnam Pro,sans-serif', 700) +
+    aP('M42 52H8l-7 6 7 6h34z', A_CL, 1.6) + aT(23, 61, 'VIỆT NAM', 7, '#fff', 'Be Vietnam Pro,sans-serif', 700) +
+    '<g transform="translate(72 70) scale(.62)">' + CD2_PROP.suitcase() + '</g>'; },
+  resto: function () { return aP('M6 16h88', 'none', 1.8) + aP('M10 16v20h18V16zM54 16v20h18V16z', '#fff', 1.4) + aP('M32 16v20h18V16zM76 16v20h18V16z', A_CL, 1.4) +
+    aR(4, 62, 92, 8, '#fff', 1.8, 1) + aP('M8 70v14M92 70v14', 'none', 1.8) + aDots('M8 72h84v12H8z', .35, 1) +
+    '<g transform="translate(34 50) scale(.95)">' + CD2_PROP.noodle() + '</g>' + aP('M58 62q0-10 10-10h4q10 0 10 10z', '#fff', 1.6) + aP('M70 52v-3', 'none', 1.6) + aK('M30 38q-3-4 0-8M38 38q-3-4 0-8', 1.3); },
+  uni: function () { return aP('M10 34L50 14l40 20z', '#fff', 1.8) + aR(14, 34, 72, 6, '#fff', 1.6) + aP('M22 40v34M36 40v34M50 40v34M64 40v34M78 40v34', 'none', 2) +
+    aR(12, 74, 76, 5, '#fff', 1.6) + aR(6, 79, 88, 5, '#fff', 1.6) + aC(50, 26, 3.5, A_CL, 1.3) + aDots('M24 42h10v30H24zM52 42h10v30H52z', .3, 1); },
+  class: function () { return aR(8, 12, 60, 38, '#7E9A8E', 1.8, 2) + aR(5, 50, 66, 3, '#fff', 1.4) +
+    '<text x="17" y="32" font-family="Noto Sans JP,sans-serif" font-size="13" fill="#fff">あいう</text>' + '<path d="M18 40h36" stroke="#fff" stroke-width="1.4" stroke-linecap="round" opacity=".8"/>' +
+    aP('M60 62h36v4H60z', '#fff', 1.6) + aP('M64 66v18M92 66v18', 'none', 1.8) + aR(66, 54, 18, 4, A_CL, 1.2, 1) + aR(68, 50, 15, 4, '#fff', 1.2, 1) + aP('M74 30l14 30', 'none', 1.5); },
+  online: function () { return aR(18, 18, 64, 42, '#fff', 1.8, 3) + aP('M8 60h84l-4 10H12z', '#fff', 1.8) + aR(24, 24, 32, 22, '#7E9A8E', 1.4, 1) +
+    '<text x="29" y="39" font-family="Noto Sans JP,sans-serif" font-size="10" fill="#fff">あい</text>' + aR(60, 24, 16, 12, A_LT, 1.2, 1) + aR(60, 39, 16, 12, A_SK, 1.2, 1) + aK('M26 52h20', 1.4) +
+    aP('M84 84v-8q0-4 4-4t4 4v8', 'none', 1.5) + aP('M88 72q-6-6-4-14q6 4 4 14zM88 72q6-4 8-12q-8 2-8 12z', A_SG, 1.3); },
+  code: function () { return aR(14, 16, 52, 36, '#fff', 1.8, 3) + aP('M40 52v8M30 60h20', 'none', 1.7) + aT(40, 39, '&lt;/&gt;', 14, '#B5532F', 'Be Vietnam Pro,sans-serif', 700) +
+    aP('M4 66h92', 'none', 2) + aP('M10 66v18M90 66v18', 'none', 1.8) + aR(20, 61, 40, 5, '#fff', 1.3, 1) + aP('M72 66v-9h9v9', '#fff', 1.4) + aP('M81 59q3 0 3 2.5t-3 2.5', 'none', 1.2) +
+    aP('M84 52v-10M84 46q-6-2-8-8q7 0 8 8zM84 44q4-6 9-6q-1 6-9 6z', A_SG, 1.2); },
+  cnc: function () { return '<g transform="translate(20 26)">' + aGear(0, 0, 11, 8, '#fff', 1.4) + '</g><g transform="translate(38 32)">' + aGear(0, 0, 7, 6, '#fff', 1.3) + '</g>' +
+    aR(8, 40, 66, 44, '#fff', 1.8, 3) + aR(14, 48, 36, 26, A_SK, 1.5, 2) + aC(26, 61, 6, '#fff', 1.4) + aP('M32 61h12', 'none', 2) + aK('M44 58l3-3M44 64l3 3', 1.3) +
+    aR(56, 48, 12, 18, '#fff', 1.3, 1) + aDot(59.5, 52, 1.4, A_CL) + aDot(64.5, 52, 1.4) + aDot(59.5, 57, 1.4) + aDot(64.5, 57, 1.4) + aDot(62, 62, 1.4) + aP('M4 84h92', 'none', 1.6) +
+    '<g transform="translate(86 72) rotate(30) scale(.75)">' + aP('M-3 -14a6 6 0 1 0 6 0v4h-6z', '#fff', 1.6) + aR(-2.5, -5, 5, 18, '#fff', 1.5, 2) + '</g>'; },
+  company: function () { return aR(28, 14, 44, 70, '#fff', 1.8, 1) + aR(34, 6, 32, 8, A_CL, 1.5, 1) + aDots('M30 16h12v66H30z', .35, 1) +
+    aR(36, 22, 8, 7, A_SK, 1.1) + aR(46, 22, 8, 7, A_SK, 1.1) + aR(56, 22, 8, 7, A_SK, 1.1) + aR(36, 34, 8, 7, A_SK, 1.1) + aR(46, 34, 8, 7, A_SK, 1.1) + aR(56, 34, 8, 7, A_SK, 1.1) +
+    aR(36, 46, 8, 7, A_SK, 1.1) + aR(46, 46, 8, 7, A_LT, 1.1) + aR(56, 46, 8, 7, A_SK, 1.1) + aR(43, 66, 14, 18, A_LT, 1.4) + aP('M50 66v18', 'none', 1.1) +
+    aP('M14 84V70M14 72q-8-2-8-10q0-8 8-8t8 8q0 8-8 10z', A_SG, 1.4) + aP('M86 84V68M86 70q-7-2-7-9q0-7 7-7t7 7q0 7-7 9z', A_SG, 1.4) + aP('M2 84h96', 'none', 1.6); },
+  bakery: function () { return aR(12, 34, 76, 50, '#fff', 1.8) + aP('M8 34l4-14h76l4 14z', '#fff', 1.6) + aP('M20 20l-2 14M30 20l-1 14M40 20v14M50 20v14M60 20v14M70 20l1 14M80 20l2 14', 'none', 1.1) +
+    aP('M8 34l4-14h8l-2 14zM28 34l1-14h11v14zM50 34V20h10v14zM70 34l1-14h9l4 14z', A_CL, 1.1) +
+    aR(18, 44, 38, 28, A_SK, 1.5, 1) + aP('M18 62h38', 'none', 1.2) + '<g transform="translate(29 54) scale(.45)">' + CD2_PROP.bread() + '</g>' +
+    aP('M42 62v-6q0-3 3-3h4q3 0 3 3v6z', A_LT, 1.2) + aK('M47 53v-3', 1.2) + aR(64, 48, 18, 36, A_LT, 1.5, 1) + aDot(78, 66, 1.5) + aP('M4 84h92', 'none', 1.6); },
+  build: function () { return aP('M78 84V12M60 12h36M78 20l12-8M66 12v20', 'none', 1.8) + aR(61, 32, 10, 7, '#fff', 1.4) + aP('M74 84l4-8 4 8', 'none', 1.4) +
+    aR(10, 34, 46, 50, '#fff', 1.8) + aP('M10 50h46M10 67h46M25 34v50M41 34v50', 'none', 1.4) + aP('M10 34l15 16M25 50l16-16M41 34l15 16M10 67l15-17M41 67l15-17', 'none', 1, ' opacity=".7"') +
+    aP('M2 84h96', 'none', 1.6) + '<g transform="translate(86 74) scale(.6)">' + CD2_PROP.helmet() + '</g>'; },
+  farm: function () { return aC(84, 18, 7, A_YL, 1.5) + aP('M8 62q0-34 42-34t42 34z', A_SK, 1.8) + aP('M29 62q0-30 21-34M71 62q0-30-21-34M50 28v34M12 48h76', 'none', 1.2) + aP('M8 62h84', 'none', 1.8) +
+    aP('M4 74h92M4 84h92', 'none', 1.3) + [12, 26, 40, 54, 68, 82].map(function (x, i) { return '<g transform="translate(' + x + ' ' + (i % 2 ? 72 : 82) + ') scale(.42)">' + CD2_PROP.leaf() + '</g>'; }).join(''); },
+  care: function () { return aR(6, 16, 34, 28, A_SK, 1.6, 2) + aP('M23 16v28M6 30h34', 'none', 1.2) +
+    aP('M44 84V58q0-8 8-8h20q8 0 8 8v26', '#fff', 1.8) + aR(38, 62, 48, 12, A_LT, 1.6, 4) + aP('M48 74v10M76 74v10', 'none', 1.6) +
+    aP('M12 64h20v4H12z', '#fff', 1.4) + aP('M16 68v16M28 68v16', 'none', 1.5) + aP('M17 64v-5h7v5', '#fff', 1.2) + aK('M25 58q-2-3 0-6', 1.2) +
+    '<g transform="translate(62 32) scale(.9)">' + CD2_PROP.heart() + '</g>' + aP('M2 84h96', 'none', 1.6); },
+  home: function () { return aC(18, 18, 7, A_YL, 1.5) + aR(14, 46, 50, 38, '#fff', 1.8) + aP('M6 46l12-16h42l12 16z', A_CL, 1.7) + aP('M18 30l2 16M30 30v16M42 30v16M54 30l-1 16', 'none', 1, ' opacity=".6"') +
+    aR(34, 60, 12, 24, A_LT, 1.5) + aR(20, 56, 9, 9, A_SK, 1.3) + aR(51, 56, 9, 9, A_SK, 1.3) +
+    aP('M84 84V30M84 30q-10-2-14 6M84 30q9-5 14 1M84 30q-5-9-13-8M84 30q6-9 13-7', 'none', 1.5) + aP('M70 84v-8h28v8M70 79h28', 'none', 1.2) + aP('M2 84h96', 'none', 1.6); },
+  chart: function () { return aR(14, 12, 58, 44, '#fff', 1.8, 2) + aP('M24 48h40', 'none', 1.3) + aR(26, 38, 7, 10, A_SK, 1.2) + aR(37, 32, 7, 16, A_SK, 1.2) + aR(48, 26, 7, 22, A_CL, 1.2) +
+    aK('M24 34l12-8 10 4 16-12M58 18h4v4', 1.6) + aP('M28 56l-6 28M58 56l6 28M43 56v28', 'none', 1.6) +
+    aP('M74 84V66h20v18', '#fff', 1.6) + aR(78, 58, 12, 8, A_LT, 1.2, 1) + aP('M2 84h96', 'none', 1.6); },
+  plane: function () { return aP('M-4 84q4-12 26-12q20 0 26 12z', A_LT, 1.6) + aP('M56 84q6-12 22-12q18 0 26 12z', A_SG, 1.6) +
+    '<path d="M14 66Q50 0 86 66" fill="none" stroke="#141413" stroke-width="1.3" stroke-dasharray="3 4" stroke-linecap="round"/>' +
+    '<g transform="translate(50 30) scale(1.15)">' + CD2_PROP.plane() + '</g>' + aP('M14 72V58M14 58q-6-1-8 3M14 58q5-3 8 0', 'none', 1.3) + aP('M76 72l6-9 6 9', '#fff', 1.3) +
+    aT(16, 96, 'VN', 6.5, '#141413', 'Be Vietnam Pro,sans-serif', 700) + aT(84, 96, 'NHẬT', 6.5, '#141413', 'Be Vietnam Pro,sans-serif', 700); }
+};
+
+/* ảnh thẻ Senpai: thumb = vuông 100×100 + huy hiệu đồ vật; banner = mở rộng 2 bên (khởi đầu → hôm nay) */
+function spArtOf(sp) { var a = (typeof SP_ART !== 'undefined' && SP_ART[sp.id]) || ['office', 'book']; return { sc: a[0], pr: a[1] }; }
+function spArt(sp, mode, w) {
+  var a = spArtOf(sp), is = null, i; for (i = 0; i < ISLES.length; i++) if (ISLES[i].id === sp.isl) is = ISLES[i];
+  var bg = sideBg(is ? is.side : 'both'), core = CD2_SPSC[a.sc] ? CD2_SPSC[a.sc]() : '';
+  if (mode === 'banner') {
+    var side = is && is.side === 'jp' ? '<g transform="translate(176 70) scale(1.5)">' + CD2_PROP.fuji() + '</g>' : (is && is.side === 'vn' ? '<g transform="translate(176 66) scale(1.5)">' + CD2_PROP.homevn() + '</g>' : '<g transform="translate(176 56) scale(1.3)">' + CD2_PROP.plane() + '</g>');
+    var inner = aP('M-130 84H230', 'none', 1.4, ' opacity=".55"') + aGull(-40, 22) + aGull(-24, 32, .8) + aGull(130, 18, .8) +
+      aC(-80, 56, 24, '#fff', 1.6) + '<g transform="translate(-80 56) scale(1.15)">' + propArt(a.pr) + '</g>' +
+      '<path d="M-50 50Q-30 30 -8 44" fill="none" stroke="#D97757" stroke-width="1.8" stroke-dasharray="3 4" stroke-linecap="round"/>' + aK('M-13 38l5 6-7 2', 1.8) +
+      core + side;
+    return '<svg class="spart spart--bn" viewBox="-130 0 360 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect x="-130" width="360" height="100" fill="' + bg + '"/><g>' + hand(inner) + '</g></svg>';
+  }
+  var th = core + aC(82, 16, 14, '#fff', 1.4) + '<g transform="translate(82 16) scale(.62)">' + propArt(a.pr) + '</g>';
+  return '<svg class="spart" viewBox="0 0 100 100" width="' + (w || 56) + '" height="' + (w || 56) + '" aria-hidden="true"><rect width="100" height="100" fill="' + bg + '"/><g>' + hand(th) + '</g></svg>';
+}
+
+/* sticker Bảng ước mơ: nền vuông màu nhạt, đồ vật ở giữa */
+function dreamSticker(k, w, arg, bg) {
+  return '<svg class="dsk" viewBox="-24 -24 48 48" width="' + (w || 48) + '" height="' + (w || 48) + '" aria-hidden="true">' + (bg ? '<rect x="-24" y="-24" width="48" height="48" rx="10" fill="' + bg + '"/>' : '') + '<g>' + hand(propArt(k, arg)) + '</g></svg>';
 }
