@@ -16,6 +16,7 @@
    - PS1.3.26: chỉ dùng sao lưu chung (backup → PS.backup, psRestore → PS.restorePick).
      Khóa gợi ý thẻ: routine/?add=<mã thẻ>&from=<id khóa> → mở thẻ (đang có) hoặc màn đặt công thức; thanh "Quay lại <khóa>".
      extra báo thêm mine {mã: active|pause|keep|master|stored} và lib {mã: tên}.
+     PS1.3.47: extra.dn {mã thẻ: số ngày đã ghi nhận (r2Count)} để CD02 hiện “x/14 ngày” cho thẻ thử nhỏ 2 tuần.
    - PS1.3.36: Shin là gà lớn dần (../core/shin.js). Tủ đồ của Shin ở Sổ tay › Cài đặt › nhóm Proskills
      (PS.prefs().shinFit; demo chỉ thử tạm). Qua mốc ngày ghi nhận thì hiện màn "Shin đã lớn".
    ========================================================= */
@@ -112,7 +113,7 @@
     var k = b.getAttribute('data-ps-fit'), l = W.PSShin.look(), f = null;
     W.PSShin.FITS.forEach(function (x) { if (x[0] === k) f = x; });
     if (!f) return;
-    if (!W.DEMO && W.PSShin.earned && !W.PSShin.earned(f)) { W.toast('Trang phục này mở khi bạn nhận Bằng Thuyền Trưởng ở CD02 · Hải Đồ La Bàn.'); return; }
+    if (!W.DEMO && W.PSShin.earned && !W.PSShin.earned(f)) { W.toast('Trang phục này mở khi bạn nhận Bằng Thuyền Trưởng Vững Vàng ở CD02 · Hải Đồ La Bàn.'); return; }
     if (f[2] > l.stg) { W.toast('Trang phục này mở khi Shin thành ' + W.PSShin.STAGE_NAME[f[2]] + '. Ghi nhận đều mỗi ngày nhé!'); return; }
     if (W.DEMO) W.PS_SHIN_FIT_TMP = k; else PS.setPref('shinFit', k);
     try { W.refreshAll(); } catch (er) {}
@@ -164,14 +165,15 @@
     var t = W.dk(), C = W.r2Calc() || {}, rec = C.rec || {}, now = W.r2TrainingNow(), all = Object.keys(S.habits || {});
     var cards = now.slice(0, 5).map(function (id) { return { id: id, n: W.sname(id), m: W.mark(t, id) }; });
     var mastered = all.filter(function (id) { return S.habits[id] && S.habits[id].master; }).length;
-    var mine = {}, lib = {};
+    var mine = {}, lib = {}, dn = {};
     all.forEach(function (id) {
       var u = S.habits[id]; if (!u || !W.HMAP[id]) return;
+      try { dn[id] = W.r2Count(id); } catch (e) {}
       mine[id] = u.master ? 'master' : (u.status === 'keep' ? 'keep' : (S.slots.indexOf(id) >= 0 ? (u.status === 'pause' ? 'pause' : 'active') : 'stored'));
     });
     (W.HABITS || []).forEach(function (h) { lib[h.id] = W.sname(h.id); });
     var x = { day: t, rec: !!rec[t], ci: !!(S.ci && S.ci[t]), ciTime: S.ciTime || '21:00', need: now.length > 0 || all.length === 0, cards: cards, active: now.length,
-      fire: W.streak(), recDays: Object.keys(rec).length, mastered: mastered, habits: all.length, mine: mine, lib: lib };
+      fire: W.streak(), recDays: Object.keys(rec).length, mastered: mastered, habits: all.length, mine: mine, lib: lib, dn: dn };
     var prev = PS.summary(ID), pd = prev && prev.extra ? +prev.extra.recDays || 0 : -1;
     PS.report(ID, { xp: 0, ins: 0, done: x.recDays, total: 0, days: minutes(), extra: x, ver: W.APP_VER });
     /* PS1.3.36: Shin lớn lên khi số ngày ghi nhận qua mốc (không mừng lần báo đầu tiên trên máy) */
