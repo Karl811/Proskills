@@ -11,6 +11,7 @@ var CD2_IC = {
   light: '<path d="M9 21h6M10 21l.8-11h2.4l.8 11"/><path d="M9.5 10h5l-.6-3h-3.8z"/><path d="M12 4.5V3M7 6 5.5 5M17 6l1.5-1"/>',
   flag: '<path d="M5 21V4"/><path d="M5 4h11l-2 3.5 2 3.5H5"/>',
   stairs: '<path d="M3 20h5v-5h5v-5h5V5h3"/>',
+  cycle: '<path d="M20 11a8 8 0 0 0-14.3-4.6"/><path d="M5 3v4h4"/><path d="M4 13a8 8 0 0 0 14.3 4.6"/><path d="M19 21v-4h-4"/>', /* PS1.3.49: về rồi lại sang Nhật */
   turn: '<path d="M6 20V11a5 5 0 0 1 5-5h7"/><path d="m15 3 3 3-3 3"/>',
   cap: '<path d="M2 9.5 12 5l10 4.5L12 14z"/><path d="M6 11.5V16c1.8 1.6 3.8 2.3 6 2.3s4.2-.7 6-2.3v-4.5"/><path d="M21 10v5"/>',
   wind: '<path d="M3 9h11a3 3 0 1 0-3-3"/><path d="M3 14h15a3 3 0 1 1-3 3"/><path d="M3 19h6"/>',
@@ -29,6 +30,7 @@ var CD2_IC = {
   doc: '<path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4"/><path d="M9 12h7M9 16h5"/>',
   link: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>'
 };
+CD2_IC.key = '<circle cx="7.5" cy="15.5" r="4"/><path d="M10.5 12.5l9-9M15.5 7.5l3 3M18 5l2 2"/>'; /* PS1.3.51 */
 function cdIc(k, sz, sw) {
   sz = sz || 20; sw = sw || 2;
   if (!CD2_IC[k]) return PS.icon(k, sz, sw);
@@ -219,12 +221,14 @@ function compassSVG(vals, w) {
   }
   h += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (R + 4) + '" fill="#FFFDF8" stroke="#2B2A27" stroke-width="1.6"/><circle cx="' + cx + '" cy="' + cy + '" r="' + R + '" fill="none" stroke="#C9C2AF" stroke-dasharray="3 4"/>' +
     '<circle cx="' + cx + '" cy="' + cy + '" r="' + (R / 2) + '" fill="none" stroke="#E3DCCB"/>';
+  var anyOn = false; for (var q = 0; q < n; q++) { if (vals && vals[q] != null && +vals[q] !== 5) anyOn = true; }
   for (var i = 0; i < n; i++) {
     var ang = (i / n) * Math.PI - Math.PI / 2, dx = Math.cos(ang), dy = Math.sin(ang);
     h += '<path d="M' + (cx - dx * R).toFixed(1) + ' ' + (cy - dy * R).toFixed(1) + 'L' + (cx + dx * R).toFixed(1) + ' ' + (cy + dy * R).toFixed(1) + '" stroke="#C9C2AF" stroke-width="1.1"/>';
     var v = vals && vals[i] != null ? +vals[i] : 5, t = (v - 5) / 5, lv = Math.round(Math.abs(v - 5));
     pts.push([cx + dx * R * t, cy + dy * R * t, v]);
-    labs += lab(PAIRS[i][1], ang, v > 5, lv) + lab(PAIRS[i][0], ang + Math.PI, v < 5, lv);
+    if (!anyOn || v > 5) labs += lab(PAIRS[i][1], ang, v > 5, lv); /* PS1.3.49: chỉ hiện ý học viên nghiêng về (thầy góp ý 11) */
+    if (!anyOn || v < 5) labs += lab(PAIRS[i][0], ang + Math.PI, v < 5, lv);
   }
   var d = ''; pts.forEach(function (p, i) { d += (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1); });
   h += '<path d="' + d + 'Z" fill="rgba(217,119,87,.22)" stroke="#B5532F" stroke-width="2" stroke-linejoin="round"/>';
@@ -572,9 +576,72 @@ var CD2_PROP = {
   shoe: function () { return aP('M-15 9v-8q0-3 3-3h5q4 6 12 7l7 1q3 1 3 3v0z', '#fff', 1.6) + aP('M-16 9h32v4h-32z', A_CL, 1.4) + aP('M-4 0l2-2M-1 2l2-2', 'none', 1.1) + aK('M-17 -6h-4M-16 -10h-6', 1.3); },
   suitcase: function () { return aP('M-5 -10v-4h10v4', 'none', 1.6) + aR(-12, -10, 24, 22, '#fff', 1.6, 3) + aP('M-6 -10v22M6 -10v22', A_CL, 1.4) + aC(-6, 14, 1.6, '#fff', 1.1) + aC(6, 14, 1.6, '#fff', 1.1); },
   sun: function () { return aK('M0 -16v-3M0 16v3M-16 0h-3M16 0h3M-11 -11l-2-2M11 -11l2-2M-11 11l-2 2M11 11l2 2', 1.6) + aC(0, 0, 10, A_YL, 1.6) + aP('M-4 2q4 4 8 0', 'none', 1.3); },
-  care: function () { return aP('M-6 15V-4q0-7 6-7t6 7', 'none', 1.8) + aP('M-11 15h10', 'none', 1.6) + aP('M8 -2C3-5 1-8 2-11C3-14 6-14 8-11C10-14 13-14 14-11C15-8 13-5 8-2z', A_CL, 1.3); }
+  care: function () { return aP('M-6 15V-4q0-7 6-7t6 7', 'none', 1.8) + aP('M-11 15h10', 'none', 1.6) + aP('M8 -2C3-5 1-8 2-11C3-14 6-14 8-11C10-14 13-14 14-11C15-8 13-5 8-2z', A_CL, 1.3); },
+  /* PS1.3.50: hình cho dây ảnh “thành công về nghề nghiệp” (b33) */
+  key: function () { return aC(-8, -6, 7.5, A_YL, 1.6) + aC(-8, -6, 2.6, '#fff', 1.2) + aP('M-2.5 -1l15 15M7 9l3-3M10.5 12.5l3-3', 'none', 1.8); },
+  up: function () { return aP('M-15 14h8v-7h8v-7h8v-7h6', 'none', 1.6) + aR(-15, 7, 8, 7, A_LT, 1.2) + aR(-7, 0, 8, 14, A_LT, 1.2) + aR(1, -7, 8, 21, A_LT, 1.2) + aK('M3 -12l7-7M5 -19h5v5', 1.8); },
+  clock: function () { return aC(0, 1, 13, '#fff', 1.6) + aP('M0 -6v7l5 4', 'none', 1.7) + aP('M-10 -14l-4 3M10 -14l4 3', 'none', 1.6) + aDot(0, 1, 1.4) + aK('M-9 1h2M7 1h2M0 9v2', 1.3); }
 };
 function propArt(k, arg) { return CD2_PROP[k] ? CD2_PROP[k](arg) : ''; }
+
+/* ---------- PS1.3.51 (bản 4 · đợt 3) 8 món trong Rương kho báu · sticker mới Bảng ước mơ (Sở thích, niềm vui) ---------- */
+var A_PK = '#F5D3DA', A_GL = '#E6F0EF';
+CD2_PROP.anchor = function () { return aC(0, -12, 3.2, A_YL, 1.6) + aP('M0 -8.8V13', 'none', 1.9) + aP('M-7 -4h14', 'none', 1.9) + aP('M-12 3q1 10 12 10t12-10', 'none', 1.9) + aP('M-15 6l3-3 3 3M9 6l3-3 3 3', 'none', 1.6); };
+CD2_PROP.scope = function () { return '<g transform="rotate(-28)">' + aR(-16, -3.5, 9, 7, '#fff', 1.5, 1.5) + aR(-7, -4.5, 10, 9, A_CL, 1.6, 1.5) + aR(3, -6, 12, 12, '#fff', 1.6, 2) + aP('M7 -6v12', 'none', 1.1) + '</g>' + aP('M-4 6l-5 9M-4 6l3 9', 'none', 1.4) + aK('M13 -15l2-3M16 -11h3', 1.3); };
+CD2_PROP.storybk = function () { return '<g transform="translate(-2 3) scale(.82)">' + CD2_PROP.book() + '</g>' + aP('M3 -17h13v9h-6l-4 3.5V-8h-3z', A_CL, 1.3) + aDot(6.5, -12.5, .9, '#fff') + aDot(9.5, -12.5, .9, '#fff') + aDot(12.5, -12.5, .9, '#fff'); };
+CD2_PROP.compass = function () { return aC(0, 0, 14, '#fff', 1.6) + aC(0, 0, 10.5, 'none', 1) + aP('M0 -9.5l3.6 9.5h-7.2z', A_CL, 1.2) + aP('M0 9.5l3.6-9.5h-7.2z', '#fff', 1.2) + aDot(0, 0, 1.5) + aP('M0 -14v2.5M0 14v-2.5M-14 0h2.5M14 0h-2.5', 'none', 1.2); };
+CD2_PROP.chart = function () { return aP('M-15 -9l9-3 12 3 9-3v21l-9 3-12-3-9 3z', '#fff', 1.6) + aP('M-6 -12v21M6 -9v21', 'none', 1.1) + aP('M-11 6q3-7 8-4t8-5', 'none', 1.2, ' stroke-dasharray="2 2.4"') + aK('M7 -9l4 4M11 -9l-4 4', 1.6); };
+CD2_PROP.vest = function () { return aP('M-5 -14l-9 5v20q0 4 4 4h6V-1zM5 -14l9 5v20q0 4-4 4H4V-1z', A_CL, 1.6) + aP('M-5 -14q5 7 10 0', 'none', 1.4) + aP('M-14 2h10M4 2h10M-14 8h10M4 8h10', 'none', 1.1) + aR(-5, 0, 3, 4, '#fff', 1, .5) + aR(2, 0, 3, 4, '#fff', 1, .5); };
+CD2_PROP.lantern = function () { return aP('M0 -18v-0M-3 -16q3-4 6 0', 'none', 1.5) + aR(-8, -14, 16, 4, '#fff', 1.5, 1.5) + aP('M-7 -10q-3 9 0 18h14q3-9 0-18z', A_YL, 1.6) + aP('M0 -5q-3.5 4.5 0 9q3.5-4.5 0-9z', A_CL, 1.1) + aP('M-3 -10v18M3 -10v18', 'none', .8) + aR(-8, 8, 16, 4, '#fff', 1.5, 1.5) + aK('M-14 -4h-3M14 -4h3M-12 -11l-2-2M12 -11l2-2', 1.3); };
+CD2_PROP.palette = function () { return aP('M2 -14C-10 -14 -15 -6 -15 1C-15 9 -9 14 -2 14C2 14 3 11 1 8C-1 5 2 3 5 3H10C14 3 15 0 15 -3C15 -10 9 -14 2 -14z', '#fff', 1.6) + aC(-9, 0, 2.4, A_CL, 1) + aC(-5, -8, 2.4, A_YL, 1) + aC(3, -9, 2.4, A_SG, 1) + aC(9, -4, 2.4, A_SK, 1); };
+CD2_PROP.ball = function () { return aC(0, 1, 13, '#fff', 1.6) + aP('M0 -4.5l5.2 3.8-2 6.1h-6.4l-2-6.1z', '#2B2A27', 1) + aP('M0 -4.5V-12M5.2 -.7l7.4-2.4M3.2 5.4l4.6 6.3M-3.2 5.4l-4.6 6.3M-5.2 -.7l-7.4-2.4', 'none', 1.1) + aK('M-17 -8h-3M-16 -12h-4', 1.3); };
+CD2_PROP.tent = function () { return aP('M-16 12l16-24 16 24z', A_SG, 1.6) + aP('M0 -12l-6 24h12z', '#fff', 1.3) + aP('M-18 12h36', 'none', 1.6) + aP('M0 -12l-3-4M0 -12l3-4', 'none', 1.3) + aK('M11 -14l1 2 2 .3-1.5 1.4.4 2-1.9-1-1.9 1 .4-2-1.5-1.4 2-.3z', 1); };
+CD2_PROP.pan = function () { return aP('M7 -1l10-6', 'none', 2.4) + aC(-3, 2, 11, '#fff', 1.6) + aP('M-10 1q0-6 6-6q5-1 7 3q3 4-1 7q-3 4-8 2q-5-1-4-6z', '#fff', 1.1) + aC(-3, 1.5, 3, A_YL, 1.1) + aK('M-9 -12q-2-3 0-5M-3 -12q-2-3 0-5', 1.2); };
+CD2_PROP.guitar = function () { return '<g transform="rotate(35)">' + aP('M0 -3C-5 -3 -6 0 -5 3C-9 4 -9 14 0 14C9 14 9 4 5 3C6 0 5 -3 0 -3z', A_KR, 1.6) + aR(-1.6, -17, 3.2, 15, '#fff', 1.3, 1) + aR(-2.6, -21, 5.2, 4.5, A_CL, 1.2, 1) + aC(0, 6, 2.3, '#2B2A27', 1) + aP('M0 -16V12', 'none', .6) + aP('M-3 10h6', 'none', 1.2) + '</g>'; };
+CD2_PROP.camera = function () { return aR(-15, -8, 30, 21, '#fff', 1.6, 3) + aP('M-6 -8l2.5-4.5h7L6 -8', '#fff', 1.5) + aC(0, 2.5, 7, A_SK, 1.6) + aC(0, 2.5, 3.4, '#fff', 1.2) + aDot(10.5, -3.5, 1.5, A_CL) + aP('M-12 -4h4', 'none', 1.2); };
+CD2_PROP.pet = function () { return aP('M-11 -3l-2-12 9 6zM11 -3l2-12-9 6z', A_LT, 1.5) + aC(0, 3, 11.5, '#fff', 1.6) + aDot(-4.5, 1, 1.5) + aDot(4.5, 1, 1.5) + aP('M-1.6 5h3.2L0 7z', A_CL, 1) + aP('M0 7q-1.5 2.5-4 1.5M0 7q1.5 2.5 4 1.5', 'none', 1) + aP('M-7 6h-8M-7 8.5l-7 2.5M7 6h8M7 8.5l7 2.5', 'none', .9); };
+CD2_PROP.coffee = function () { return aP('M-13 -3h20v7q0 9-10 9t-10-9z', '#fff', 1.6) + aP('M7 0q6 0 6 4t-6 4', 'none', 1.5) + aP('M-16 13q12 4 26 0', 'none', 1.5) + aP('M-6 2c-2-2-4 0-2 2l2 2 2-2c2-2 0-4-2-2z', A_CL, .9) + aK('M-8 -8q-2-3 0-6M-2 -8q-2-3 0-6', 1.2); };
+CD2_PROP.moto = function () { return aC(-10, 8, 5.5, '#fff', 1.6) + aC(11, 8, 5.5, '#fff', 1.6) + aP('M-10 8l6-9h9l6 9', 'none', 1.6) + aP('M-4 -1q2-5 7-5h4l2 5z', A_CL, 1.4) + aP('M-12 -3h7', 'none', 2.2) + aP('M11 8L8 -6l4-3h3', 'none', 1.6) + aK('M-18 12h-3M-17 8h-4', 1.2); };
+CD2_PROP.sakura = function () { var h = aP('M-16 15q7-3 11-9', 'none', 1.6), i; for (i = 0; i < 5; i++) h += '<g transform="translate(2 -1) rotate(' + (i * 72) + ')">' + aP('M0 0C-6 -3 -6 -10 -2.4 -12L0 -10L2.4 -12C6 -10 6 -3 0 0z', A_PK, 1.2) + '</g>'; return h + aC(2, -1, 2.2, A_CL, 1) + aK('M-13 -10l1.5 1.5M-9 -14l1 1.8', 1.2); };
+CD2_PROP.firework = function () { var h = '', i, a, x1, y1, x2, y2; for (i = 0; i < 10; i++) { a = i * Math.PI / 5; x1 = hF(-2 + Math.cos(a) * 4); y1 = hF(-3 + Math.sin(a) * 4); x2 = hF(-2 + Math.cos(a) * 12); y2 = hF(-3 + Math.sin(a) * 12);
+  h += i % 2 ? aK('M' + x1 + ' ' + y1 + 'L' + x2 + ' ' + y2, 1.5) : aP('M' + x1 + ' ' + y1 + 'L' + x2 + ' ' + y2, 'none', 1.4); h += aDot(hF(-2 + Math.cos(a) * 14.5), hF(-3 + Math.sin(a) * 14.5), 1, i % 2 ? A_CL : '#141413'); }
+  return h + aK('M12 15v-5M10 12l2-2 2 2', 1.2) + aDot(13, 6, 1.1, A_CL); };
+CD2_PROP.gym = function () { return aP('M-5 0h10', 'none', 2.6) + aR(-16, -6, 5, 12, '#fff', 1.6, 1.5) + aR(-11, -10, 6, 20, A_CL, 1.6, 1.5) + aR(5, -10, 6, 20, A_CL, 1.6, 1.5) + aR(11, -6, 5, 12, '#fff', 1.6, 1.5); };
+CD2_PROP.vlog = function () { return aR(-10, -15, 18, 30, '#fff', 1.6, 3) + aR(-7, -11, 12, 18, A_SK, 1.1, 1) + aP('M-3 -6v8l6-4z', A_CL, 1.1) + aDot(-1, 11, 1.3) + aDot(3, -9, 1.2, A_CL) + aK('M11 -8q3 3 0 6M13.5 -11q6 6 0 12', 1.3); };
+CD2_PROP.concert = function () { return aP('M-1 -3l8 15', 'none', 2.6) + aC(-4, -8, 6, '#fff', 1.6) + aP('M-9 -10h10M-10 -7h12M-9 -4h10', 'none', .9) + aK('M8 -15v8M8 -15l6-1.5v8', 1.4) + aC(6.4, -7, 1.9, A_CL, 1) + aC(12.4, -8.5, 1.9, A_CL, 1) + aK('M-14 6l-3 2M-14 11h-3', 1.2); };
+CD2_PROP.apt = function () { return aR(-14, -15, 28, 29, '#fff', 1.6, 2) + aR(-11, -12, 22, 15, A_SK, 1.2, 1) + aC(5, -7, 2.6, A_YL, 1) + aP('M-11 3l6-7 4 4 3-3 9 6', '#fff', 1.1) + aP('M0 -12v15', 'none', 1) + aP('M-14 7h28M-10 7v7M-4 7v7M2 7v7M8 7v7', 'none', 1.1); };
+CD2_PROP.rings = function () { return aC(-5, 4, 8.5, 'none', 2.2) + aC(6, 4, 8.5, 'none', 2.2) + aP('M-8.5 -8l1.6-3h3.8l1.6 3-3.5 4z', A_SK, 1.2) + aK('M10 -12l1-3M14 -9l3-1M13 -13l2-2', 1.3); };
+CD2_PROP.elearn = function () { return aR(-12, -12, 24, 16, '#fff', 1.6, 2) + aP('M-16 4h32l-2.5 6h-27z', '#fff', 1.6) + aP('M-6 -6l6-3 6 3-6 3z', A_CL, 1.1) + aP('M-3 -4.5v3q3 2 6 0v-3', 'none', 1.1) + aP('M6 -6v4', 'none', 1); };
+CD2_PROP.eshop = function () { return aR(-13, -15, 16, 28, '#fff', 1.6, 3) + aP('M-10 -10h10M-10 -6h7', 'none', 1.1) + aDot(-5, 10, 1.2) + aP('M0 -1h14l-1.5 14H1.5z', A_CL, 1.5) + aP('M4 -1v-3q3-4.5 6 0v3', 'none', 1.4); };
+
+/* Rương kho báu (f1): nắp là nhóm .chest__lid để CSS bật lên; vầng sáng .chest__glow hiện khi mở */
+function chestArt(open) {
+  var h = '<g class="chest__glow">' + aK('M60 30V12M40 34l-8-12M80 34l8-12M26 44l-12-6M94 44l12-6', 2) + '<circle cx="60" cy="46" r="26" fill="#F6DDA4" opacity=".55"/></g>';
+  h += aR(14, 48, 92, 42, A_KR, 2, 4) + aP('M30 48v42M90 48v42', 'none', 2) + aP('M14 66h92', 'none', 1.4) + aR(26, 48, 8, 42, A_CL, 1.6, 1) + aR(86, 48, 8, 42, A_CL, 1.6, 1);
+  h += (open ? '<g transform="translate(46 40) scale(.8)">' + CD2_PROP.compass() + '</g><g transform="translate(74 42) scale(.7)">' + CD2_PROP.key() + '</g>' : '');
+  h += '<g class="chest__lid">' + aP('M14 48V36q0-16 46-16t46 16v12z', '#E7B98F', 2) + aP('M30 22.5V48M90 22.5V48', A_CL, 6.5) + aP('M14 48h92', 'none', 2) + '</g>';
+  h += aR(52, 44, 16, 16, A_YL, 1.8, 3) + aC(60, 51, 2.2, '#141413', 1) + aP('M60 53v3', 'none', 1.6);
+  return '<svg class="chest__art' + (open ? ' on' : '') + '" viewBox="0 0 120 100" width="150" height="125" aria-hidden="true">' + hand(h) + '</svg>';
+}
+/* chai thủy tinh có thư cuộn bên trong; nút bần là nhóm .btl__cork */
+function bottleArt(w, sea) {
+  var h = (sea ? '<path d="M4 86q10-6 20 0t20 0 20 0 20 0 20 0" fill="none" stroke="#9DB7C4" stroke-width="2" stroke-linecap="round"/>' : '') +
+    '<g class="btl__body"><g transform="rotate(-16 50 50)">' + aP('M43 18h14v11l7 9v40q0 5-5 5H41q-5 0-5-5V38l7-9z', A_GL, 2) + aP('M39 46q11 4 22 0', 'none', 1, ' stroke-opacity=".5"') +
+    aR(43, 48, 14, 24, '#FFF7E6', 1.4, 3) + aP('M46 55h8M46 60h8M46 65h5', 'none', 1) + aP('M43 52q7-3 14 0', A_CL, 1.2) +
+    '<g class="btl__cork">' + aR(44, 9, 12, 10, A_KR, 1.8, 2) + aP('M47 12v4M51 11v6', 'none', 1) + '</g></g></g>';
+  return '<svg class="btl" viewBox="0 0 100 100" width="' + (w || 64) + '" height="' + (w || 64) + '" aria-hidden="true">' + hand(h) + '</svg>';
+}
+/* thả chai: thư cuộn vào chai, đóng nút, chai rơi xuống biển rồi trôi về chân trời */
+function dropArt() {
+  var h = '<rect width="320" height="170" fill="#EEF3F5"/><circle cx="252" cy="92" r="20" fill="#F6DDA4"/><rect y="92" width="320" height="78" fill="#DCE6EC"/>' +
+    '<path d="M0 92h320" stroke="#9DB7C4" stroke-width="1.6"/>' +
+    '<path d="M18 122q10-5 20 0t20 0M120 140q10-5 20 0t20 0M230 128q10-5 20 0t20 0M70 156q10-5 20 0t20 0" fill="none" stroke="#9DB7C4" stroke-width="1.6" stroke-linecap="round"/>';
+  h += '<g class="fd__b"><g class="fd__bi">' + '<g transform="translate(104 76) rotate(-90 50 50) scale(.9)">' +
+    aP('M43 18h14v11l7 9v40q0 5-5 5H41q-5 0-5-5V38l7-9z', A_GL, 2) + aR(43, 48, 14, 24, '#FFF7E6', 1.4, 3) + aP('M46 55h8M46 60h8', 'none', 1) +
+    '<g class="fd__cork">' + aR(44, 9, 12, 10, A_KR, 1.8, 2) + '</g></g></g></g>';
+  h += '<g class="fd__let">' + aR(116, 24, 26, 30, '#FFF7E6', 1.6, 3) + aP('M121 32h16M121 38h16M121 44h10', 'none', 1.1) + '</g>';
+  return '<svg class="fdrop" viewBox="0 0 320 170" width="100%" aria-hidden="true">' + hand(h) + '</svg>';
+}
 
 /* cảnh nơi làm việc 100×100, mặt đất y 84 */
 var CD2_SPSC = {
@@ -661,4 +728,166 @@ function spArt(sp, mode, w) {
 /* sticker Bảng ước mơ: nền vuông màu nhạt, đồ vật ở giữa */
 function dreamSticker(k, w, arg, bg) {
   return '<svg class="dsk" viewBox="-24 -24 48 48" width="' + (w || 48) + '" height="' + (w || 48) + '" aria-hidden="true">' + (bg ? '<rect x="-24" y="-24" width="48" height="48" rx="10" fill="' + bg + '"/>' : '') + '<g>' + hand(propArt(k, arg)) + '</g></svg>';
+}
+
+/* =========================================================
+   PS1.3.50 · cảnh “Đi một vòng chỗ làm” (b72), hệ 360×220. Điểm “?” do engine đặt (TOUR trong content.js).
+   ========================================================= */
+function tourArt(k) {
+  var Y = '#F2C94C', h = '';
+  h += '<rect x="0" y="0" width="360" height="152" fill="#F7F1E6"/><rect x="0" y="152" width="360" height="68" fill="#ECE5D8"/>' + aP('M0 152h360', 'none', 1.4);
+  /* bảng đầu ca (chung) */
+  h += aR(262, 14, 78, 64, '#fff', 1.6, 3) + aP('M270 30h62M270 42h40M270 52h50M270 62h30', 'none', 1.1) + aT(301, 25, '朝礼', 9, '#B5532F', 'Noto Sans JP,sans-serif', 700) + aP('M276 78l-6 22M326 78l6 22', 'none', 1.5);
+  if (k === 'dv') {
+    /* tranh rửa tay + bồn rửa */
+    h += aR(30, 26, 48, 62, '#fff', 1.6, 2) + aT(54, 38, '手洗い', 8, '#141413', 'Noto Sans JP,sans-serif', 700);
+    for (var i = 0; i < 4; i++) { var cx = 41 + (i % 2) * 26, cy = 52 + Math.floor(i / 2) * 20; h += aC(cx, cy, 7, A_SK, 1.1) + aT(cx, cy + 3, String(i + 1), 7, '#141413'); }
+    h += aP('M20 104h70v10q0 8-8 8H28q-8 0-8-8z', '#fff', 1.6) + aP('M52 104v-10q0-4 6-4h6', 'none', 1.6);
+    /* kệ hộp có nhãn ngày */
+    h += aP('M112 44h80M112 82h80', 'none', 1.6);
+    [118, 142, 166].forEach(function (x, j) { h += aR(x, 22 + (j % 2) * 2, 20, 22 - (j % 2) * 2, A_LT, 1.3, 2) + aR(x + 3, 30, 14, 7, '#fff', .9) + aP('M' + (x + 5) + ' 33.5h10', 'none', .7); });
+    [122, 152].forEach(function (x) { h += aR(x, 60, 24, 22, A_SG, 1.3, 2) + aR(x + 4, 66, 16, 7, '#fff', .9) + aP('M' + (x + 6) + ' 69.5h12', 'none', .7); });
+    /* xe đẩy */
+    h += aR(262, 120, 70, 8, '#fff', 1.5, 2) + aR(262, 150, 70, 8, '#fff', 1.5, 2) + aP('M266 128v40M328 128v40', 'none', 1.6) + aC(270, 176, 5, '#fff', 1.4) + aC(324, 176, 5, '#fff', 1.4);
+    [268, 284, 300, 316].forEach(function (x, j) { h += aR(x, 110, 12, 10, [A_CL, A_YL, A_SG, A_SK][j], 1.1, 2) + aR(x, 140, 12, 10, [A_CL, A_YL, A_SG, A_SK][j], 1.1, 2); });
+    h += aPerson(196, 168, 1.9, A_SG) + aR(206, 136, 13, 16, '#fff', 1.2, 1) + aP('M209 141h7M209 145h7', 'none', .8);
+    h += aPerson(110, 172, 1.6, '#fff');
+  } else {
+    /* bảng dụng cụ có vẽ bóng: mỗi món có bóng vẽ sẵn, món còn thiếu chỉ còn bóng */
+    var SH = '#E2D5BF';
+    h += aR(26, 16, 78, 86, '#FFF6EA', 1.6, 2);
+    h += '<path d="M32 23h22v9H46v32h-6V32h-8z" fill="' + SH + '"/>' + aP('M34 25h18v6h-6v31h-4V31h-8z', '#7E8C96', 1.3);
+    h += '<path d="M60 22a7 7 0 1 1 10 0v42h-10z" fill="' + SH + '"/>' + aP('M62 24a5 5 0 1 1 6 0v38h-6z', '#9AA8B0', 1.3) + aP('M63 20h4', 'none', 1.2);
+    h += '<path d="M80 22h14v18h-4v24h-6V40h-4z" fill="' + SH + '"/>' + aR(82, 24, 10, 14, '#C9573E', 1.3, 2) + aP('M87 38v24', 'none', 2);
+    h += '<path d="M34 74h62v14H34z" fill="' + SH + '"/>' + '<path d="M36 76h58v10H36z" fill="none" stroke="#B5532F" stroke-width="1.2" stroke-dasharray="3 3"/>';
+    /* máy + mẫu đạt / không đạt */
+    h += aR(196, 72, 60, 80, '#E5ECEF', 1.6, 3) + aR(204, 82, 24, 16, '#fff', 1.2, 2) + aC(242, 90, 5, A_CL, 1.2) + aP('M204 112h44', 'none', 1.2) + aR(212, 118, 30, 22, A_SK, 1.2, 2);
+    h += aR(226, 100, 30, 18, '#fff', 1.2, 2);
+    h += aC(234, 109, 4, A_SG, 1) + aC(248, 109, 4, '#F4C7BC', 1) + aT(234, 124, 'OK', 6, '#2B8A86', 'Be Vietnam Pro,sans-serif', 700) + aT(248, 124, 'NG', 6, '#C9573E', 'Be Vietnam Pro,sans-serif', 700);
+    /* senpai cầm sổ */
+    h += aPerson(128, 168, 1.9, A_SG) + aR(138, 136, 13, 16, '#fff', 1.2, 1) + aP('M141 141h7M141 145h7', 'none', .8) + aP('M124 128l-6-10', 'none', 1.4);
+    h += aPerson(82, 172, 1.6, '#fff');
+  }
+  /* vạch vàng dưới sàn */
+  h += '<path d="M0 182h360v6H0zM0 206h360v6H0z" fill="' + Y + '"/>';
+  for (var x = 6; x < 360; x += 22) h += '<path d="M' + x + ' 182l6 6M' + x + ' 206l6 6" stroke="#141413" stroke-width="1" opacity=".35"/>';
+  return '<svg class="tour__svg" viewBox="0 0 360 220" width="100%" aria-hidden="true">' + hand(h) + '</svg>';
+}
+
+/* ---------- PS1.3.52 (bản 4 · đợt 4): thuyền nâng cấp theo bến đã xong, nét mảnh. Thay shipSVG ở mọi nơi (shipSVG cũ giữ lại, không còn gọi). ---------- */
+/* PS1.3.52 · thuyền nâng cấp theo bến (nét mảnh). P = {b1..b7, fin: 1}. */
+function shipSVG2(P, sym, col, w, ghost) { /* ghost = 1: món chưa có vẽ mờ (Sổ Thuyền Trưởng) */
+  P = P || {}; col = flagCol(col);
+  function on(k) { return P[k] || ghost; }
+  function g0(k) { return P[k] ? '' : '<g class="shg" opacity=".22">'; }
+  function g1(k) { return P[k] ? '' : '</g>'; }
+  var o = '#5A3A22', sw = 1.4, wood = '#DDA66C', wd = '#B98250', sail = '#FFF9EE', sl = '#E6D8BC', h = '';
+  function sk(d, c, wd2, ex) { return '<path d="' + d + '" fill="none" stroke="' + (c || o) + '" stroke-width="' + (wd2 || sw) + '" stroke-linecap="round" stroke-linejoin="round"' + (ex || '') + '/>'; }
+  function fl(d, f, wd2) { return '<path d="' + d + '" fill="' + f + '" stroke="' + o + '" stroke-width="' + (wd2 || sw) + '" stroke-linejoin="round"/>'; }
+  function man(x, y, shirt, band) { /* thủy thủ nhỏ, chân ở (x, y) */
+    return '<g>' + sk('M' + (x - 1.6) + ' ' + y + 'l.6-5M' + (x + 1.6) + ' ' + y + 'l-.6-5', o, 1) +
+      fl('M' + (x - 3.2) + ' ' + (y - 4.6) + 'q0-6 3.2-6.4q3.2 .4 3.2 6.4z', shirt, 1) +
+      '<circle cx="' + x + '" cy="' + (y - 13.6) + '" r="3.1" fill="#F4CFA6" stroke="' + o + '" stroke-width="1"/>' +
+      fl('M' + (x - 3.1) + ' ' + (y - 14.4) + 'q3.1-3.4 6.2 0z', band, .9) + sk('M' + (x + 3) + ' ' + (y - 14.6) + 'l2 1.4', band, 1.1) + '</g>';
+  }
+  /* biển */
+  var mx = 82, mtop = P.b1 ? 4 : 10;
+  /* dây buồm (sau buồm) */
+  h += sk('M' + mx + ' ' + mtop + 'L18 60M' + mx + ' ' + mtop + 'L' + (P.b4 ? 157 : 148) + ' ' + (P.b4 ? 51 : 56), o, .6, ' opacity=".55"');
+  /* cột phụ + buồm phụ (Bến 6) */
+  if (on('b6')) {
+    h += g0('b6');
+    h += fl('M31.4 58V26h1.8v32z', wd, .9);
+    h += fl('M20 30H44Q46 42 44 54H20Q22 42 20 30Z', sail);
+    h += sk('M24 31q1 11.5 0 22M28 31q1 11.5 0 22M32.3 31q1 11.5 0 22M36.6 31q1 11.5 0 22M40.6 31q1 11.5 0 22', sl, .9);
+    h += fl('M20 30H44Q46 42 44 54H20Q22 42 20 30Z', 'none');
+    h += fl('M18 28.6h28v2.2H18z', wd, .9);
+    h += g1('b6');
+  }
+  /* cột chính */
+  h += fl('M' + (mx - 1.1) + ' 72V' + mtop + 'h2.2v' + (72 - mtop) + 'z', wd, 1);
+  /* chòi canh + ống nhòm (Bến 1) */
+  if (on('b1')) {
+    h += g0('b1');
+    h += fl('M74.5 9h15l-1.8 6.6H76.3z', wood, 1) + sk('M75.6 11.8h12.8M79.5 9.4v5.8M84.5 9.4v5.8', o, .6);
+    h += fl('M88.4 8.8l9.6-4.2 1.1 2.4-9.6 4.2z', '#7E8C96', .9) + fl('M97.6 3.6l2.6-1.1 1.5 3.4-2.6 1.1z', '#5E6E78', .8) + '<circle cx="101.4" cy="4" r="1.1" fill="#BFD6E2"/>';
+    h += g1('b1');
+  }
+  /* buồm chính */
+  var sx0 = 58, sx1 = 106, sy0 = 18, sy1 = 66;
+  h += fl('M' + sx0 + ' ' + sy0 + 'H' + sx1 + 'Q' + (sx1 + 4) + ' 42 ' + sx1 + ' ' + sy1 + 'H' + sx0 + 'Q' + (sx0 + 4) + ' 42 ' + sx0 + ' ' + sy0 + 'Z', sail);
+  var st = ''; for (var i = 1; i < 8; i++) { var x = sx0 + i * 6; st += 'M' + x + ' ' + (sy0 + 1) + 'Q' + (x + 3.4) + ' 42 ' + x + ' ' + (sy1 - 1); }
+  h += sk(st, sl, .9);
+  if (on('fin')) h += g0('fin') + sk('M' + (sx0 + 2) + ' ' + (sy0 + 2) + 'H' + (sx1 - 2) + 'M' + (sx0 + 2) + ' ' + (sy1 - 2) + 'H' + (sx1 - 2), '#D9A84E', 1.6) + g1('fin');
+  h += fl('M' + sx0 + ' ' + sy0 + 'H' + sx1 + 'Q' + (sx1 + 4) + ' 42 ' + sx1 + ' ' + sy1 + 'H' + sx0 + 'Q' + (sx0 + 4) + ' 42 ' + sx0 + ' ' + sy0 + 'Z', 'none');
+  h += fl('M54 16.4h56v2.6H54z', wd, 1) + fl('M56 65h52v2.4H56z', wd, 1);
+  h += '<circle cx="84" cy="41" r="10.5" fill="#fff" stroke="' + o + '" stroke-width="1"/><circle cx="84" cy="41" r="8.4" fill="none" stroke="' + col + '" stroke-width="1"/><g transform="translate(75.8 32.8) scale(.41)">' + flagSym(sym || 'compass', col) + '</g>';
+  /* buồm mũi (Bến 4) */
+  if (on('b4')) {
+    h += g0('b4');
+    h += sk('M140 58L158 50.5', o, 1.4);
+    h += fl('M100 15Q118 38 154 51.6Q130 58 112 64Q108 40 100 15Z', sail);
+    h += sk('M107 30Q115 46 133 55M104 22Q113 40 144 53', sl, .9);
+    h += fl('M100 15Q118 38 154 51.6Q130 58 112 64Q108 40 100 15Z', 'none');
+    h += g1('b4');
+  }
+  /* cờ đầu cột */
+  if (P.fin) h += '<path d="M' + (mx + 1) + ' ' + (mtop + 1) + 'q10 1 16 4t18 2l-4 2 4 2q-12 2-18-1t-16-3z" fill="' + col + '" stroke="' + o + '" stroke-width=".9" stroke-linejoin="round"/>';
+  else h += '<path d="M' + (mx + 1) + ' ' + (mtop + 1) + 'h11l-2.6 2.6 2.6 2.6H' + (mx + 1) + 'z" fill="' + col + '" stroke="' + o + '" stroke-width=".9" stroke-linejoin="round"/>';
+  /* xuồng dự phòng (Bến 5): treo ở đuôi */
+  if (on('b5')) {
+    h += g0('b5');
+    h += sk('M18 60Q10 54 6 60', o, 1.1) + sk('M7 60v8M13 59v8', o, .6);
+    h += fl('M1 67.5h17q-1.4 5-4.6 5.6H5.4Q2 72.6 1 67.5z', '#C9D9C2', .9) + sk('M3 69.6h13', o, .5);
+    h += g1('b5');
+  }
+  /* thân thuyền */
+  var hull = 'M16 60Q19 79 33 90H122Q141 80 151 52Q148 51 145 53Q132 66 100 70Q60 74 40 68Q26 64 16 60Z';
+  h += '<path d="' + hull + '" fill="' + wood + '"/>';
+  h += '<path d="M24 80Q62 85 133 78Q129 86 122 90H33Q27 86 24 80Z" fill="' + wd + '"/>';
+  h += sk('M19 69Q62 79 140 69M21.5 75Q64 83 137 74', '#A9733F', .8);
+  h += sk('M17.6 64Q60 77 146 57', o, .8);
+  /* họng pháo bên hông */
+  var G = [[46, 73.4], [72, 73.7], [98, 71.9], [121, 69.1]];
+  for (var g = 0; g < G.length; g++) {
+    var gx = G[g][0], gy = G[g][1];
+    h += '<rect x="' + (gx - 3.6) + '" y="' + (gy - 2.7) + '" width="7.2" height="5.4" rx="1" fill="#3B2414" stroke="' + o + '" stroke-width="1"/>';
+    h += '<rect x="' + (gx - 4.6) + '" y="' + (gy - 3.7) + '" width="9.2" height="1.4" rx=".5" fill="' + wd + '" stroke="' + o + '" stroke-width=".6"/>';
+    h += '<circle cx="' + gx + '" cy="' + (gy + .3) + '" r="2" fill="#4E5A62" stroke="#22292E" stroke-width=".8"/><circle cx="' + gx + '" cy="' + (gy + .3) + '" r=".9" fill="#14181B"/>';
+  }
+  h += '<path d="' + hull + '" fill="none" stroke="' + o + '" stroke-width="1.9" stroke-linejoin="round"/>';
+  h += sk('M151 52l3-5', o, 1.6);
+  /* phao cứu sinh (Bến 5) */
+  if (on('b5')) h += g0('b5') + '<g><circle cx="62" cy="79" r="4.6" fill="#fff" stroke="' + o + '" stroke-width=".9"/><circle cx="62" cy="79" r="2.2" fill="' + wood + '" stroke="' + o + '" stroke-width=".8"/>' +
+    sk('M58 77.2l2 .8M66 77.2l-2 .8M60.4 83.2l.8-1.8M63.6 83.2l-.8-1.8', '#E2574C', 1.6) + '</g>' + g1('b5');
+  /* lầu đuôi */
+  h += fl('M18 61.5V53.5h15v9.2', '#F2DDB2', 1) + fl('M16 54l9.5-5 9.5 5z', '#C9573E', 1) + '<rect x="21.5" y="56" width="4.6" height="3.4" rx=".6" fill="#9CC3D5" stroke="' + o + '" stroke-width=".7"/>';
+  /* bánh lái (Bến 3) */
+  if (on('b3')) {
+    h += g0('b3');
+    var wx = 39, wy = 58.4; h += sk('M' + wx + ' ' + (wy + 2) + 'v7', o, 1);
+    h += '<circle cx="' + wx + '" cy="' + wy + '" r="4.4" fill="none" stroke="' + o + '" stroke-width="1.1"/><circle cx="' + wx + '" cy="' + wy + '" r="1.2" fill="' + wd + '" stroke="' + o + '" stroke-width=".7"/>';
+    h += sk('M' + wx + ' ' + (wy - 6) + 'v12M' + (wx - 6) + ' ' + wy + 'h12M' + (wx - 4.2) + ' ' + (wy - 4.2) + 'l8.4 8.4M' + (wx + 4.2) + ' ' + (wy - 4.2) + 'l-8.4 8.4', o, .8);
+    h += g1('b3');
+  }
+  /* rương hành trang (Bến 6) · rương báu (về đích) */
+  if (on('b6')) h += g0('b6') + fl('M110 61h10v6.4h-10z', '#C08A55', .9) + sk('M110 63.6h10M115 61v6.4', o, .6) + g1('b6');
+  if (on('fin')) h += g0('fin') + fl('M90 62.4h11v6h-11z', '#A0522D', .9) + fl('M90 62.4q5.5-4.6 11 0z', '#C26A3A', .9) + sk('M90 64.4h11', '#D9A84E', 1.2) + '<circle cx="95.5" cy="65.4" r=".9" fill="#D9A84E"/>' + sk('M93 58.6l.6-1.4M96 57.8v-1.6M99 58.6l-.6-1.4', '#D9A84E', .8) + g1('fin');
+  /* thủy thủ */
+  if (on('b2')) h += g0('b2') + man(126, 64.6, '#6E9E94', '#D97757') + g1('b2');
+  if (on('b7')) h += g0('b7') + man(70, 69.4, '#5E7FA8', '#D9A84E') + g1('b7');
+  /* đèn lồng mũi (Bến 7) */
+  if (on('b7')) h += g0('b7') + '<circle cx="149" cy="60" r="6" fill="#FFD98A" opacity=".45"/>' + sk('M150.6 52.6V56', o, .7) + fl('M147.4 56.2h6.4l-.8 6.4h-4.8z', '#F4B44A', .9) + sk('M147.6 58.6h6', o, .5) + g1('b7');
+  h += '<path d="M4 88q6-2.6 12 0t12 0 12 0 12 0 12 0 12 0 12 0 12 0 12 0 12 0 12 0 12 0Q158 88 155 96Q151 104 138 104H22Q9 104 5 96Q2 89 4 88Z" fill="#D7E7EE" opacity=".92"/>'; /* PS1.3.52: vệt nước bo tròn, không lộ khung */
+  h += sk('M8 96q6-2.4 12 0t12 0M86 99q6-2.4 12 0t12 0M128 94q5-2 10 0', '#fff', 1.4);
+  /* Shin ở lầu đuôi */
+  h += '<g transform="translate(44 46.4) scale(.15)">' + (W_PSShin() ? W_PSShin().svg('still', { stg: 3, fit: 'none' }).replace(/^<svg[^>]*>|<\/svg>$/g, '') : '') + '</g>';
+  return '<svg class="ship" viewBox="0 0 160 108" width="' + (w || 160) + '" aria-hidden="true">' + h + '</svg>';
+}
+/* vị trí món mới trên thuyền (toạ độ viewBox 160×120) để đặt lấp lánh */
+var SHIP_AT = { b1: [92, 8], b2: [126, 52], b3: [39, 58], b4: [128, 42], b5: [10, 66], b6: [32, 40], b7: [149, 58], fin: [100, 22] };
+function shipSpk(k) {
+  var p = SHIP_AT[k] || [80, 40], x = p[0] / 1.6, y = p[1] / 1.08, o = [[0, 0, 0], [-9, 7, 1], [8, -6, 2]], h = '';
+  o.forEach(function (d) { h += '<i class="shipup__sp shipup__sp--' + d[2] + '" style="left:' + (x + d[0]).toFixed(1) + '%;top:' + (y + d[1]).toFixed(1) + '%"></i>'; });
+  return h;
 }

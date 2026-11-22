@@ -13,9 +13,9 @@
    - Ý của thầy Lê Long Sơn nói gián tiếp: “thầy của Shin”. Không ghi tên Thầy trên giao diện CD02.
    - Không dùng từ “đơn hàng”. ES5. */
 var CD2_ID = 'cd02';
-var CD2_VER = 'CD02.3.4';
+var CD2_VER = 'CD02.3.9';
 var CD2_XP_ACT = 30, CD2_INS_WORDS = 15, CD2_INS_FIELD = 5, CD2_XP_CARD = 2;
-var CD2_TOTAL = 18; /* PS1.3.42 (bản 2, PA A): Xuất phát 1 + 7 bến (2·3·3·2·2·3·2 chặng) = 18. Cảng Khởi Hành (f1, f2) không tính. */
+var CD2_TOTAL = 20; /* PS1.3.50 (bản 4 đợt 2): thêm b53 Đứng giữa ngã rẽ, b73 Học từ chính mình → 20 chặng. */ var CD2_TOTAL_OLD = 18; /* PS1.3.42 (bản 2, PA A): Xuất phát 1 + 7 bến (2·3·3·2·2·3·2 chặng) = 18. Cảng Khởi Hành (f1, f2) không tính. */
 
 /* ---------- 8 ĐẢO = 8 HƯỚNG ĐI SAU 3 NĂM ----------
    side: 'jp' ở Nhật · 'vn' về Việt Nam · 'both' cả hai. x, y: vị trí trên hải đồ (hệ 360 × 460). */
@@ -41,7 +41,7 @@ var ISLES = [
     gain: 'Bằng cấp, nghề mới, mở thêm nhiều cửa.',
     cost: 'Mất thời gian. Thu nhập giảm trong lúc học.',
     who: ['tait', 'tan'] },
-  { id: 'gio', n: 'Về rồi lại sang Nhật', ic: 'wind', side: 'both', x: 180, y: 318,
+  { id: 'gio', n: 'Về rồi lại sang Nhật', ic: 'cycle', side: 'both', x: 180, y: 318,
     sub: 'Đi rồi về, rồi lại đi',
     what: 'Về nước một thời gian, rồi quay lại Nhật bằng diện khác, công việc khác.',
     need: ['Hồ sơ đẹp, giữ chữ tín với công ty', 'Tiếp tục học tiếng Nhật khi ở nhà', 'Tìm hiểu kỹ điều kiện của diện mới'],
@@ -791,32 +791,32 @@ var PORT = { id: 'p0', n: 'Cảng 3 Năm', ic: 'anchor', x: 180, y: 232, acts: [
   intro: 'Chào [Tên]! Mọi hướng đi đều bắt đầu từ 3 năm ở Nhật.',
   why: ['Lúc này bạn nghĩ gì về 3 năm sau', 'Nhận thuyền, thiết kế cờ, viết mục tiêu', 'Điểm xuất phát của bạn'], aim: 'bạn đã có điểm xuất phát' };
 var BEN = [
-  { id: 'b1', n: 'Đài Vọng Biển', ic: 'scope', r: 1, x: 96, y: 150, ready: 1, acts: ['b11', 'b12'],
+  { id: 'b1', n: 'Đài Vọng Biển', ic: 'scope', r: 1, x: 98, y: 100, ready: 1, acts: ['b11', 'b12'],
     sub: 'Sau 3 năm có những hướng nào?', intro: '[Tên] ơi, mình xem các anh chị đã đi những hướng nào nhé.',
     why: ['Sau 3 năm, người ta đi những hướng nào', 'Lật thẻ đoán, xem 8 hướng đi', 'Hướng bạn quan tâm nhất'], aim: 'bạn biết sau 3 năm có 8 hướng đi' },
-  { id: 'b2', n: 'Bến Gặp Gỡ', ic: 'people', r: 1, x: 266, y: 150, ready: 1, acts: ['b21', 'b22', 'b23'],
+  { id: 'b2', n: 'Bến Gặp Gỡ', ic: 'people', r: 1, x: 262, y: 92, ready: 1, acts: ['b21', 'b22', 'b23'],
     sub: 'Đọc · Xem · Hỏi anh chị đi trước', intro: 'Ở đây là chuyện thật của người thật. Nghe xong, bạn tự rút ra điều cho mình.',
     why: ['Các anh chị đi trước đã làm gì', 'Đọc chuyện, xem điểm chung, hỏi anh chị', 'Điều bạn muốn học theo, câu bạn muốn hỏi'], aim: 'bạn biết các anh chị đi trước đã xây nền thế nào' },
-  { id: 'b3', n: 'Xưởng La Bàn', ic: 'compass', r: 2, room: 1, x: 104, y: 312, ready: 1, acts: ['b31', 'b32', 'b33'],
+  { id: 'b3', n: 'Xưởng La Bàn', ic: 'compass', r: 2, room: 1, x: 286, y: 222, ready: 1, acts: ['b31', 'b32', 'b33'],
     sub: 'Điều gì quan trọng với mình?', intro: 'Trước khi vẽ kế hoạch, mình xem điều gì quan trọng nhất với bạn.',
     why: ['Điều gì quan trọng nhất với bạn', 'Kéo 6 cặp giá trị, xếp điều có thể làm đổi kế hoạch', 'La bàn của bạn'], aim: 'bạn biết điều mình coi trọng' },
-  { id: 'b4', n: 'Phòng Hải Đồ', ic: 'map', r: 2, room: 1, x: 256, y: 312, ready: 1, acts: ['b41', 'b42'], sub: 'Vẽ 3 kế hoạch 5 năm',
+  { id: 'b4', n: 'Phòng Hải Đồ', ic: 'map', r: 2, room: 1, x: 256, y: 340, ready: 1, acts: ['b41', 'b42'], sub: 'Vẽ 3 kế hoạch 5 năm',
     intro: 'Ở đây bạn vẽ 3 kế hoạch 5 năm. Chưa cần chọn, cứ vẽ cả ba.',
     why: ['5 năm sau khi xong 3 năm ở Nhật', 'Vẽ kế hoạch A, B, C và tự chấm', '3 kế hoạch 5 năm của bạn'], aim: 'bạn có 3 kế hoạch 5 năm' },
-  { id: 'b5', n: 'Vịnh Ngã Rẽ', ic: 'wave', r: 3, x: 96, y: 392, ready: 1, acts: ['b51', 'b52'], sub: 'Cân nhắc và gỡ khó',
-    intro: 'Ở đây bạn tập cân nhắc giữa các kế hoạch, và tập gỡ khi gặp khó.',
-    why: ['Kế hoạch nào hợp với bạn hơn', 'Cân 3 kế hoạch, tập gỡ một chuyện khó', 'Kế hoạch bạn nghiêng về, bước gỡ đầu tiên'], aim: 'bạn biết cân nhắc và gỡ khó' },
-  { id: 'b6', n: 'Phòng Tuyển Dụng', ic: 'doc', r: 3, room: 1, x: 180, y: 430, ship: [0, -62], ready: 1, acts: ['b61', 'b62', 'b63'], sub: 'Tin tuyển dụng, phỏng vấn 3 năm sau',
+  { id: 'b5', n: 'Vịnh Ngã Rẽ', ic: 'wave', r: 3, x: 176, y: 408, ready: 1, acts: ['b51', 'b52', 'b53'], sub: 'Cân nhắc, gỡ khó, đứng giữa ngã rẽ',
+    intro: 'Ở đây bạn tập cân nhắc giữa các kế hoạch, tập gỡ khi gặp khó, và thử chọn khi đứng giữa ngã rẽ.',
+    why: ['Khi phải chọn, bạn giữ điều gì, buông điều gì', 'Cân 3 kế hoạch, gỡ một chuyện khó, chọn ở 3 ngã rẽ', 'Kế hoạch bạn nghiêng về, điều bạn nhận ra về mình'], aim: 'bạn biết mình hay giữ điều gì khi phải chọn' },
+  { id: 'b6', n: 'Phòng Tuyển Dụng', ic: 'doc', r: 3, room: 1, x: 90, y: 338, ready: 1, acts: ['b61', 'b62', 'b63'], sub: 'Tin tuyển dụng, phỏng vấn 3 năm sau',
     intro: 'Giờ là 3 năm sau. Bạn đọc tin tuyển dụng, tập trả lời phỏng vấn, rồi lên kế hoạch 3 năm ở Nhật.',
-    why: ['3 năm sau, nhà tuyển dụng cần gì ở bạn, và vì sao', 'Đọc 1 tin, tập phỏng vấn đúng tin đó, xếp dòng thời gian', 'Dòng thời gian từ JPC tới lúc ứng tuyển, việc thử 2 tuần'], aim: 'bạn biết 3 năm ở Nhật cần chuẩn bị gì' },
-  { id: 'b7', n: 'Ngọn Hải Đăng', ic: 'light', r: 3, x: 264, y: 392, ready: 1, acts: ['b71', 'b72'], sub: 'Người giúp bạn, học từ công việc',
-    intro: 'Không ai đi một mình. Ở đây mình tìm người giúp được bạn, và học từ chính công việc.',
-    why: ['Ai giúp được bạn, học từ công việc thế nào', 'Vẽ vòng người giúp, chuẩn bị câu hỏi, xử lý 3 tình huống', 'Người bạn sẽ gặp hỏi, cách học từ chỗ làm'], aim: 'bạn biết ai giúp được mình' }
+    why: ['3 năm sau, nhà tuyển dụng cần gì ở bạn, và vì sao', 'Đọc 1 tin, tập phỏng vấn đúng tin đó, xếp dòng thời gian', 'Dòng thời gian từ JPC tới lúc ứng tuyển'], aim: 'bạn biết 3 năm ở Nhật cần chuẩn bị gì' },
+  { id: 'b7', n: 'Ngọn Hải Đăng', ic: 'light', r: 3, x: 74, y: 218, ready: 1, acts: ['b71', 'b72', 'b73'], sub: 'Học từ người, công việc và chính mình',
+    intro: 'Không ai đi một mình. Ở đây mình học từ người giúp mình, từ công việc, và từ chính mình.',
+    why: ['Học từ người, từ công việc, từ chính mình thế nào', 'Vẽ vòng người giúp, đi một vòng chỗ làm, nhận việc khó, làm mẫu thử', 'Người bạn sẽ gặp, câu “Tại sao?” bạn sẽ hỏi, mẫu thử của bạn'], aim: 'bạn biết học từ người, từ việc và từ chính mình' }
 ];
 /* Cảng Khởi Hành: mở khi đủ 7 con dấu bến. Không tính vào CD2_TOTAL (giống Ga Ước Mơ của CD01). */
 var GOAL_PORT = { id: 'fin', n: 'Đảo Kho Báu', ic: 'flag', ready: 1, acts: ['f1', 'f2'], sub: 'Nhận Bằng Thuyền Trưởng Vững Vàng',
   intro: 'Bạn đã ghé đủ 7 bến! Kho báu ở đây chính là hướng đi bạn tự vẽ. Mình nhìn lại rồi nhận bằng nhé.',
-  why: ['So với lúc đầu, bạn đã khác gì, 10 năm nữa bạn mong có gì', 'Nhìn lại, dán Bảng ước mơ, xem bản Hướng đi của tôi, gửi thầy cô', 'Bảng ước mơ, Hướng đi của tôi, Bằng Thuyền Trưởng Vững Vàng'], aim: 'bạn đã có hướng đi của riêng mình' };
+  why: ['Bạn đã gom được gì qua 7 bến, 10 năm nữa bạn mong có gì', 'Mở rương kho báu, dán Bảng ước mơ, chọn việc trên bờ, xem bản Hướng đi của tôi', 'Món quý nhất trong rương, Bảng ước mơ, Hướng đi của tôi, Bằng Thuyền Trưởng Vững Vàng'], aim: 'bạn đã có hướng đi của riêng mình' };
 var ROUNDS = { 1: 'Khám phá bản đồ · đi bến nào trước cũng được', 2: 'Thiết kế hải trình · đi lần lượt', 3: 'Dong buồm ra khơi · đi bến nào trước cũng được', 4: 'Vững tay về đích · nhận Bằng Thuyền Trưởng Vững Vàng' }; /* PS1.3.44: bỏ chữ “Vòng” (thầy chốt 21/11) */
 
 /* Chặng: k = dạng bước (xem engine.js). Mỗi chặng 3–6 phút. */
@@ -859,7 +859,7 @@ var ACTS = {
   b23: { st: 'b2', t: 'Hỏi · phỏng vấn anh chị đi trước', d: 'Chọn 1 anh chị, hỏi 3 câu bạn tò mò', mins: 5,
     steps: [
       { k: 'chat', c1: ['qs'] },
-      { k: 'write', key: 'b23.q', min: 8, q: 'Nếu được gặp một anh chị đi trước thật, bạn sẽ hỏi câu gì?', sub: 'Thầy cô sẽ gom câu hỏi của lớp cho buổi giao lưu.', ph: 'Ví dụ: Anh chị học tiếng Nhật thế nào sau giờ làm mệt?' }
+      { k: 'write', key: 'b23.q', min: 8, q: 'Nếu được gặp một anh chị đi trước thật, bạn sẽ hỏi câu gì?', sub: 'Thầy cô sẽ gom câu hỏi của lớp cho buổi giao lưu.', ph: 'Ví dụ: Anh chị học tiếng Nhật thế nào sau giờ làm mệt?', shore: 's2' }
     ] },
   b31: { st: 'b3', t: 'Điều bạn coi trọng', d: '6 cặp, bên nào cũng tốt', mins: 4,
     steps: [
@@ -869,16 +869,16 @@ var ACTS = {
     ] },
   b32: { st: 'b3', t: 'Điều có thể làm đổi kế hoạch', d: 'Tự viết, rồi đặt vào 2 vòng tròn', mins: 4,
     steps: [
-      { k: 'say', mood: 'worry', t: 'Kế hoạch có thể đổi vì nhiều chuyện. Bạn tự viết 2–3 điều bạn lo, rồi xem điều nào mình tác động được.' },
+      { k: 'say', mood: 'worry', t: 'Kế hoạch có thể đổi vì nhiều chuyện. Bạn tự viết 2–3 điều bạn lo, rồi xem điều nào mình giải quyết được.' },
       { k: 'winds', c1: ['worry'] },
       { k: 'winds2' }
     ] },
-  b33: { st: 'b3', t: 'Lời thầy của Shin', d: 'Đường đời thầy vẽ, anh chị vận dụng', mins: 4,
+  b33: { st: 'b3', t: 'Lời thầy của Shin', d: 'Đường đời thầy vẽ, thành công với bạn là gì', mins: 5,
     steps: [
       { k: 'life' },
-      { k: 'write', key: 'b33.work', q: 'Với bạn, đi làm là để…', ph: 'Ví dụ: lo cho gia đình, giỏi một nghề.' },
+      { k: 'success' }, /* PS1.3.50: thay ô viết “Với bạn, đi làm là để…” (b33.work) */
       { k: 'write', key: 'b33.life', q: '10 năm nữa, một cuộc sống tốt với bạn là…', ph: 'Ví dụ: có nghề vững, ở gần ba mẹ.', c1: ['me'] },
-      { k: 'compass' }
+      { k: 'compass', shore: 's3' }
     ] },
   b41: { st: 'b4', t: 'Kế hoạch A · Hướng đang nghĩ tới', d: 'Chưa chắc cũng được, cứ vẽ ra', mins: 4,
     steps: [
@@ -912,6 +912,15 @@ var ACTS = {
       { k: 'ways' },
       { k: 'real' }
     ] },
+  b53: { st: 'b5', t: 'Đứng giữa ngã rẽ', d: '3 ngã rẽ, bên nào cũng tốt. Bạn giữ gì, buông gì?', mins: 5,
+    steps: [
+      { k: 'say', mood: 'think', t: 'Ở mỗi ngã rẽ, hai bên đều tốt. Chọn bên nào thì cũng phải buông một thứ. Không có đáp án đúng.' },
+      { k: 'cross', n: 0 },
+      { k: 'cross', n: 1 },
+      { k: 'cross', n: 2 },
+      { k: 'crosssum' },
+      { k: 'write', key: 'b53n.me', q: 'Điều mình nhận ra về bản thân khi phải chọn', ph: 'Ví dụ: mình hay giữ gia đình, kể cả khi lương thấp hơn.', shore: 's5' }
+    ] },
   b61: { st: 'b6', t: 'Đọc tin tuyển dụng 3 năm sau', d: 'Chọn 1 trong 3 tin hợp nghề, xem họ cần gì', mins: 5,
     steps: [
       { k: 'say', mood: 'curious', t: 'Giả sử bạn vừa xong 3 năm. Mình đọc một tin tuyển dụng, xem họ cần gì nhé.' },
@@ -925,51 +934,61 @@ var ACTS = {
       { k: 'iva', n: 0 },
       { k: 'iva', n: 1 },
       { k: 'iva', n: 2 },
-      { k: 'ivend' }
+      { k: 'ivend', shore: 's6' }
     ] },
-  b63: { st: 'b6', t: 'Kế hoạch 3 năm ở Nhật', d: 'Xếp từng điều cần có lên dòng thời gian, rồi thử nhỏ 2 tuần', mins: 5,
+  b63: { st: 'b6', t: 'Kế hoạch 3 năm ở Nhật', d: 'Xếp từng điều cần có lên dòng thời gian', mins: 4,
     steps: [
-      { k: 'plan3', c1: ['habits'] },
-      { k: 'trial', c1: ['first'] }
+      { k: 'plan3', c1: ['habits'] } /* PS1.3.50: bỏ bước Thử nhỏ 2 tuần, chuyển thành “Thử để biết” ở b73 */
     ] },
   b71: { st: 'b7', t: 'Người giúp bạn', d: 'Ai giúp được bạn? Chuẩn bị câu hỏi, gặp trực tiếp', mins: 5,
     steps: [
       { k: 'clip', w: 'b71', mood: 'hi' },
       { k: 'ring', c1: ['guide'] },
-      { k: 'askprep' }
+      { k: 'askprep', shore: 's7a' }
     ] },
-  b72: { st: 'b7', t: 'Học từ công việc', d: '3 tình huống ở chỗ làm', mins: 4,
+  b72: { st: 'b7', t: 'Học từ công việc', d: 'Đi một vòng chỗ làm, nhận việc khó', mins: 6,
     steps: [
-      { k: 'say', mood: 'focused', t: 'Ở Nhật, chỗ làm là lớp học lớn nhất. Mỗi tình huống có nhiều cách, cách nào cũng có cái được và một lưu ý.' },
-      { k: 'work' },
-      { k: 'habit' },
-      { k: 'write', key: 'b72.how', q: 'Tuần này ở JPC, bạn tập cách học đó thế nào?' }
+      { k: 'say', mood: 'focused', t: 'Ở Nhật, chỗ làm là lớp học lớn nhất. Mình đi một vòng xưởng, hỏi “Tại sao?” ở mỗi chỗ nhé.' },
+      { k: 'tour' },
+      { k: 'write', key: 'b72.why', q: 'Câu “Tại sao?” bạn sẽ hỏi ở JPC hoặc KTX tuần này', ph: 'Ví dụ: Tại sao lớp mình xếp dép theo một hàng?' },
+      { k: 'hard', shore: 's7b' }
     ] },
-  f1: { st: 'fin', t: 'Nhìn lại chặng đường', d: 'So với lúc bắt đầu, bạn khác gì', mins: 4,
+  b73: { st: 'b7', t: 'Học từ chính mình', d: 'Bài học xương máu, thử để biết', mins: 5,
+    steps: [
+      { k: 'say', mood: 'think', t: 'Người giỏi không phải người không sai. Họ học được từ chính lần sai của mình, và dám thử trước khi chọn.' },
+      { k: 'lesson' },
+      { k: 'proto' },
+      { k: 'proto2', shore: 's7c' }
+    ] },
+  f1: { st: 'fin', t: 'Nhìn lại chặng đường', d: 'Mở rương kho báu, so với lúc bắt đầu', mins: 5,
     steps: [
       { k: 'say', mood: 'moved', t: '[Tên] đã ghé đủ 7 bến! Shin hỏi lại 2 câu lúc đầu nhé. Rõ hơn hay bớt chắc đều tốt.' },
       { k: 'open2' },
-      { k: 'write', key: 'f1.change', q: 'So với lúc bắt đầu, bạn thấy mình khác đi điều gì?', ph: 'Ví dụ: mình biết thêm 3 hướng chưa từng nghe.' },
+      { k: 'chest' }, /* PS1.3.51: Rương kho báu thay ô viết f1.change (bài cũ vẫn hiện nếu đã viết) */
       { k: 'ps' }
     ] },
-  f2: { st: 'fin', t: 'Hướng đi của tôi', d: 'Bảng ước mơ, bản 1 trang, gửi thầy cô, nhận bằng', mins: 5, btn: 'Nhận Bằng Thuyền Trưởng Vững Vàng',
+  f2: { st: 'fin', t: 'Hướng đi của tôi', d: 'Bảng ước mơ, việc trên bờ, bản 1 trang, gửi thầy cô, nhận bằng', mins: 5, btn: 'Nhận Bằng Thuyền Trưởng Vững Vàng',
     steps: [
       { k: 'dream' }, /* PS1.3.48 */
+      { k: 'shore' }, /* PS1.3.50: Việc trên bờ của tôi */
       { k: 'sheet' },
       { k: 'send' },
       { k: 'cert' }
     ] }
 };
-var ORDER = ['x1', 'b11', 'b12', 'b21', 'b22', 'b23', 'b31', 'b32', 'b33', 'b41', 'b42', 'b51', 'b52', 'b61', 'b62', 'b63', 'b71', 'b72'];
+var ORDER = ['x1', 'b11', 'b12', 'b21', 'b22', 'b23', 'b31', 'b32', 'b33', 'b41', 'b42', 'b51', 'b52', 'b53', 'b61', 'b62', 'b63', 'b71', 'b72', 'b73'];
 var FIN_ORDER = ['f1', 'f2'];
 /* PS1.3.48 · Bảng ước mơ 10 năm nữa (Đảo Kho Báu, f2 bước 1). Lưới 3×3, ô giữa là cờ của bạn. Sticker vẽ ở art.js (CD2_PROP). */
 var DREAM_T = 'Bảng ước mơ · 10 năm nữa';
 var DREAM_GRP = [
   ['Công việc', [['gear', 'Tay nghề vững'], ['helmet', 'Công trình'], ['noodle', 'Nghề thực phẩm'], ['care', 'Chăm sóc người khác'], ['leaf', 'Nông nghiệp'], ['laptop', 'Văn phòng, IT'],
-    ['board', 'Dạy tiếng Nhật'], ['talk', 'Phiên dịch, cầu nối'], ['shop', 'Cửa hàng của mình'], ['office', 'Công ty Nhật'], ['clip', 'Quản lý, kèm người mới']]],
-  ['Học', [['jl', 'Tiếng Nhật'], ['cap', 'Học tiếp'], ['cert', 'Chứng chỉ nghề'], ['book', 'Đọc sách mỗi ngày']]],
+    ['board', 'Dạy tiếng Nhật'], ['talk', 'Phiên dịch, cầu nối'], ['shop', 'Cửa hàng của mình'], ['office', 'Công ty Nhật'], ['clip', 'Quản lý, kèm người mới'], ['eshop', 'Kinh doanh online']]],
+  ['Học', [['jl', 'Tiếng Nhật'], ['cap', 'Học tiếp'], ['cert', 'Chứng chỉ nghề'], ['book', 'Đọc sách mỗi ngày'], ['elearn', 'Học online']]],
   ['Nơi sống', [['fuji', 'Sống ở Nhật'], ['homevn', 'Nhà ở quê'], ['city', 'Sống ở thành phố'], ['plane', 'Qua lại hai nước']]],
-  ['Cuộc sống', [['family', 'Gia đình bên nhau'], ['heart', 'Người thương'], ['friends', 'Bạn bè tốt'], ['piggy', 'Có tích lũy'], ['car', 'Xe riêng'], ['shoe', 'Khỏe mạnh'], ['suitcase', 'Đi du lịch'], ['sun', 'Bình yên']]]
+  ['Cuộc sống', [['family', 'Gia đình bên nhau'], ['heart', 'Người thương'], ['friends', 'Bạn bè tốt'], ['piggy', 'Có tích lũy'], ['car', 'Xe hơi riêng'], ['apt', 'Căn hộ view đẹp'], ['rings', 'Đám cưới'], ['shoe', 'Khỏe mạnh'], ['suitcase', 'Đi du lịch'], ['sun', 'Bình yên']]],
+  /* PS1.3.51 (bản 4 · đợt 3, góp ý 22–23): nhóm Sở thích, niềm vui + hình gần gũi bạn trẻ */
+  ['Sở thích, niềm vui', [['sakura', 'Ngắm hoa anh đào'], ['firework', 'Lễ hội pháo hoa'], ['concert', 'Đi xem concert'], ['gym', 'Tập gym'], ['ball', 'Chơi thể thao'], ['tent', 'Cắm trại thiên nhiên'],
+    ['moto', 'Đi phượt'], ['camera', 'Chụp ảnh'], ['vlog', 'Làm vlog'], ['palette', 'Vẽ'], ['guitar', 'Chơi nhạc'], ['pan', 'Nấu ăn'], ['coffee', 'Cà phê cùng bạn'], ['pet', 'Nuôi thú cưng']]]
 ];
 /* Shin gợi ý sẵn tối đa 4 ô từ bài đã làm: hướng của kế hoạch A, phía (Nhật / Việt Nam), nhóm ngành, điều coi trọng ở CD01, mức tiếng Nhật */
 var DREAM_ISLE = { len: 'gear', re: 'cert', hoc: 'cap', gio: 'plane', chu: 'talk', lap: 'shop', cau: 'office', que: 'family' };
@@ -979,13 +998,132 @@ var DREAM_VAL = [['Gia đình', 'family'], ['Thu nhập', 'piggy'], ['Học hỏ
 var DREAM_MIN = 6; /* dán ít nhất 6/8 ô */
 
 /* ---------- CHỮ CHUNG ---------- */
+/* =========================================================
+   PS1.3.50 · CD02.3.6 · BẢN 4 ĐỢT 2: hoạt động mới (thầy chốt 22/11/2026)
+   ========================================================= */
+/* b33 · Dây ảnh “Với bạn, thành công về nghề nghiệp là gì?” · 3 tấm polaroid. Hình vẽ ở art.js (CD2_PROP), mã 'o' = Ý khác (tự đặt tên). */
+var SUCC_T = 'Thành công về nghề nghiệp, với tôi là';
+var SUCC_GRP = [
+  ['Giỏi nghề', [['gear', 'Tay nghề giỏi'], ['cert', 'Có chứng chỉ nghề'], ['box', 'Làm ra sản phẩm tốt'], ['jl', 'Giỏi tiếng Nhật'], ['cap', 'Học lên cao hơn'], ['heart', 'Làm việc mình thích']]],
+  ['Được ghi nhận', [['key', 'Được tin giao việc lớn'], ['clip', 'Kèm cặp người mới'], ['medal', 'Được khen thưởng'], ['up', 'Lên chức, lên bậc'], ['talk', 'Được hỏi ý kiến'], ['friends', 'Đồng nghiệp quý mến']]],
+  ['Cuộc sống quanh nghề', [['piggy', 'Thu nhập tốt'], ['clock', 'Giờ giấc cân bằng'], ['family', 'Gần gia đình'], ['care', 'Giúp được người khác'], ['shop', 'Làm chủ'], ['sun', 'Vui mỗi ngày đi làm']]]
+];
+var SUCC_MIN = 1, SUCC_N = 3;
+
+/* b53 · Đứng giữa ngã rẽ. 3 ngã rẽ, mỗi ngã 2 lựa chọn đều tốt. g = điều có được (mã CROSS_TAG). lv = “điểm đổi ý” khi bạn chọn bên này: bên kia tăng thêm bao nhiêu thì bạn đổi. */
+var CROSS_TAG = { luong: 'Lương cao hơn', thich: 'Việc mình thích', nha: 'Gần gia đình', hoc: 'Học thêm, lên trình độ', on: 'Ổn định, quen việc', moi: 'Thử thách mới', nhat: 'Sống ở Nhật' };
+/* nối với la bàn b31 (PAIRS): mã cặp + bên (0 trái, 1 phải) */
+var CROSS_CMP = { luong: ['money', 0], nha: ['fam', 0], on: ['stab', 0], moi: ['stab', 1], nhat: ['stay', 0] };
+var CROSS = [
+  { id: 0, real: 1, t: 'Hết 3 năm, bạn có 2 lời mời', a: { n: 'Ở lại công ty, làm tổ trưởng công trình', d: '28 man/tháng · việc quen, đồng nghiệp quen', g: ['luong', 'on'], ic: 'helmet',
+      lv: ['Việc quản lý thực tập sinh trả thêm bao nhiêu thì bạn đổi?', 'man/tháng', 10] },
+    b: { n: 'Sang nghiệp đoàn, làm quản lý thực tập sinh', d: '25 man/tháng · việc bạn thích hơn, phải học lại từ đầu', g: ['thich', 'moi'], ic: 'talk',
+      lv: ['Tổ trưởng được trả thêm bao nhiêu thì bạn ở lại?', 'man/tháng', 10] } },
+  { id: 1, t: 'Bạn chọn ở đâu?', a: { n: 'Về Việt Nam, làm công ty Nhật gần nhà', d: 'Khoảng 15 triệu/tháng · ở với gia đình', g: ['nha', 'on'], ic: 'homevn',
+      lv: ['Lương ở Nhật cao thêm bao nhiêu thì bạn ở lại?', 'man/tháng', 10] },
+    b: { n: 'Ở lại Nhật, diện Kỹ năng đặc định', d: 'Khoảng 22 man/tháng · xa nhà, mỗi năm về một lần', g: ['luong', 'nhat'], ic: 'fuji',
+      lv: ['Công ty gần nhà trả thêm bao nhiêu thì bạn về?', 'triệu/tháng', 10] } },
+  { id: 2, t: 'Học lên hay đi làm ngay?', a: { n: 'Học lên 2 năm trường chuyên môn', d: 'Tốn học phí · 2 năm chưa gửi tiền về được', g: ['hoc', 'moi'], ic: 'cap',
+      lv: ['Đi làm ngay được thêm bao nhiêu thì bạn đổi ý?', 'man/tháng', 10] },
+    b: { n: 'Đi làm ngay', d: 'Gửi tiền về đều mỗi tháng · học thêm thì tự sắp xếp', g: ['luong', 'on'], ic: 'piggy',
+      lv: ['Trường cho học bổng bao nhiêu phần trăm học phí thì bạn đi học?', '% học phí', 10, 10] } }
+];
+var CROSS_NOTE = 'Số liệu minh họa, mỗi nơi mỗi khác.';
+var CROSS_NEVER = 'Không đổi';
+
+/* b72 · Đi một vòng chỗ làm. Cảnh 360×220, điểm “?” [x, y]. o[0] là ý đúng (máy xáo), o[1] là ý chưa đúng (dài bằng hoặc hơn). */
+var TOUR = {
+  kt: { n: 'Xưởng sản xuất', spots: [
+    { x: 98, y: 92, t: 'Bảng dụng cụ có vẽ bóng', q: 'Vì sao bảng treo dụng cụ lại vẽ hình từng món?', o: ['Nhìn là biết món nào đang thiếu, ai cũng trả đúng chỗ', 'Để bảng trông đẹp và gọn hơn mỗi khi khách đến thăm xưởng'],
+      les: '5S: đồ nào có chỗ nấy. Thiếu một món là thấy ngay, không ai mất công đi tìm.', jpc: 'Ở KTX, vẽ chỗ để giày, ly, sạc điện thoại. Dùng xong trả về đúng chỗ.' },
+    { x: 182, y: 196, t: 'Vạch kẻ vàng dưới sàn', q: 'Vì sao sàn xưởng kẻ vạch vàng?', o: ['Chia lối đi an toàn và chỗ để hàng, xe nâng không đụng người', 'Để công nhân biết mình phải đứng yên ở đúng chỗ nào suốt cả ca'],
+      les: 'Vạch kẻ giữ an toàn. Đi đúng lối, để đúng ô, tai nạn giảm hẳn.', jpc: 'Ở lớp, để cặp, dép đúng chỗ, lối đi luôn trống.' },
+    { x: 334, y: 20, t: 'Bảng đầu ca', q: 'Vì sao đầu ca cả nhóm đứng họp 5 phút trước bảng?', o: ['Cả nhóm cùng biết việc hôm nay, ai có vấn đề thì báo sớm', 'Để tổ trưởng điểm danh và nhắc ai hay đi trễ trước mọi người'],
+      les: 'Họp đầu ca (chorei) giúp mọi người cùng hiểu một kế hoạch. Báo sớm thì sửa sớm.', jpc: 'Đầu giờ học, nói 1 câu: hôm nay mình sẽ làm gì.' },
+    { x: 268, y: 108, t: 'Mẫu đạt và không đạt cạnh máy', q: 'Vì sao đặt sẵn mẫu đạt và không đạt ngay cạnh máy?', o: ['Nhìn là so được ngay, không phải dựa vào trí nhớ', 'Để người mới không dám chạm vào máy khi chưa được dạy'],
+      les: 'Người Nhật làm cho việc “nhìn là biết”. Ai cũng kiểm được, ít sai.', jpc: 'Dán mẫu bài làm đẹp lên bàn học, so bài mình với mẫu.' },
+    { x: 160, y: 128, t: 'Senpai cầm sổ ghi', q: 'Vì sao senpai luôn cầm sổ khi được chỉ việc?', o: ['Ghi lại để không hỏi lại lần hai, lần sau tự làm được', 'Vì ở Nhật bắt buộc phải nộp sổ ghi chép cho cấp trên mỗi ngày'],
+      les: 'Ghi chép là tôn trọng người chỉ việc. Hỏi một lần, nhớ mãi.', jpc: 'Mang sổ nhỏ trong giờ thực hành. Mỗi buổi ghi 3 điều mới.' }
+  ] },
+  dv: { n: 'Bếp và khu chăm sóc', spots: [
+    { x: 80, y: 30, t: 'Tranh rửa tay cạnh bồn', q: 'Vì sao cạnh bồn rửa có tranh các bước rửa tay?', o: ['Ai cũng rửa đủ bước như nhau, giữ an toàn cho khách', 'Để người mới tập đọc tiếng Nhật trong lúc đứng rửa tay'],
+      les: 'Vệ sinh là trên hết. Làm đủ bước, không bỏ bước nào, kể cả lúc vội.', jpc: 'Rửa tay đủ bước trước giờ ăn ở KTX.' },
+    { x: 196, y: 60, t: 'Nhãn ngày trên hộp', q: 'Vì sao hộp nào cũng dán nhãn ngày giờ?', o: ['Biết món nào làm trước dùng trước, quá hạn thì bỏ', 'Để cuối tháng quản lý đếm xem nhân viên đã làm bao nhiêu hộp'],
+      les: 'Trước vào trước ra. Nhãn rõ thì ai cũng biết, không phải đoán.', jpc: 'Dán tên, ngày lên đồ ăn để chung trong tủ lạnh KTX.' },
+    { x: 340, y: 132, t: 'Xe đẩy xếp theo thứ tự', q: 'Vì sao đồ trên xe đẩy xếp theo đúng thứ tự?', o: ['Lấy nhanh, không quên món nào, ai thay ca cũng làm được', 'Vì mỗi nhân viên được giao riêng một chiếc xe không ai được đụng'],
+      les: 'Chuẩn hóa: ai làm cũng giống nhau. Đổi người, việc vẫn trôi.', jpc: 'Xếp đồ dùng học tập theo một thứ tự cố định mỗi ngày.' },
+    { x: 334, y: 20, t: 'Bảng đầu ca', q: 'Vì sao đầu ca cả nhóm đứng họp 5 phút trước bảng?', o: ['Cả nhóm cùng biết việc hôm nay, ai có vấn đề thì báo sớm', 'Để tổ trưởng điểm danh và nhắc ai hay đi trễ trước mọi người'],
+      les: 'Họp đầu ca giúp mọi người cùng hiểu một kế hoạch. Báo sớm thì sửa sớm.', jpc: 'Đầu giờ học, nói 1 câu: hôm nay mình sẽ làm gì.' },
+    { x: 228, y: 128, t: 'Senpai cầm sổ ghi', q: 'Vì sao senpai luôn cầm sổ khi được chỉ việc?', o: ['Ghi lại để không hỏi lại lần hai, lần sau tự làm được', 'Vì ở Nhật bắt buộc phải nộp sổ ghi chép cho cấp trên mỗi ngày'],
+      les: 'Ghi chép là tôn trọng người chỉ việc. Hỏi một lần, nhớ mãi.', jpc: 'Mang sổ nhỏ trong giờ thực hành. Mỗi buổi ghi 3 điều mới.' }
+  ] }
+};
+var TOUR_DK = 'Mình chưa biết';
+
+/* b72 · Được giao việc khó: 3 tin nhắn của cấp trên. Không có cách sai: mỗi cách có cái được và cái phải chịu. */
+var HARD_BOSS = 'Tổ trưởng Tanaka';
+var HARD = [
+  { m: 'Thứ Bảy này máy số 3 bảo trì. Em lên phụ anh kỹ thuật được không?', jp: '土曜日、3番の機械のメンテナンスを手伝ってくれる？', gain: 'Học sửa máy, hiểu máy từ bên trong',
+    r: [['Nhận ngay', 'Học được nhiều, cấp trên nhớ bạn là người dám nhận.', 'Mất một ngày nghỉ.'],
+      ['Nhận và hỏi thêm', 'Biết trước giờ giấc, cần mang gì. Cấp trên thấy bạn chu đáo.', 'Phải hỏi bằng tiếng Nhật, hơi ngại lúc đầu.'],
+      ['Xin hẹn lần sau', 'Giữ được ngày nghỉ.', 'Cơ hội học sửa máy có khi chưa quay lại sớm.']] },
+  { m: 'Tuần sau có bạn mới vào. Em kèm bạn ấy 2 tuần nhé.', jp: '来週新人が入るから、2週間教えてあげて。', gain: 'Tập làm trưởng nhóm, chỉ việc cho người khác',
+    r: [['Nhận ngay', 'Tập chỉ việc, hiểu nghề chắc hơn khi phải giải thích.', 'Việc của mình chậm lại vài ngày.'],
+      ['Nhận và hỏi thêm', 'Hỏi rõ cần dạy gì trước, dạy có thứ tự, bạn mới tiến bộ nhanh.', 'Phải chuẩn bị thêm, tốn chút thời gian.'],
+      ['Xin hẹn lần sau', 'Tập trung việc của mình.', 'Cấp trên có thể nghĩ bạn chưa sẵn sàng lên tổ trưởng.']] },
+  { m: 'Đây là tài liệu máy mới. Em đọc rồi hướng dẫn lại cho các bạn mới nhé.', jp: '新しい機械の資料だよ。読んで、新人に説明してね。', gain: 'Học tiếng Nhật chuyên ngành',
+    r: [['Nhận ngay', 'Tiếng Nhật chuyên ngành lên nhanh, được tin hơn.', 'Đọc khó, có thể phải thức khuya tra từ.'],
+      ['Nhận và hỏi thêm', 'Hỏi chỗ chưa hiểu trước khi dạy lại, không truyền sai cho người khác.', 'Phải chịu nói thật: mình chưa hiểu chỗ này.'],
+      ['Xin hẹn lần sau', 'Không lo dạy sai.', 'Bỏ lỡ dịp lên trình độ tiếng Nhật.']] }
+];
+var HARD_NOTE = 'Ở Nhật, việc khó thường là <b>phép thử tinh thần</b> và cũng là <b>cơ hội học</b>. Thấy quá sức thì <b>sodan</b> (相談): nói thật và hỏi cách làm. Đừng im lặng từ chối, cũng đừng nhận rồi bỏ dở.';
+var HARD_SHIN = 'Shin nhớ thầy của Shin hay nói: thử thách là người thầy lớn. Mỗi lần vượt qua, mình vững thêm một bậc.';
+
+/* b73 · Bài học xương máu: thẻ sai lầm hay gặp (ph = ví dụ mờ cho 3 dòng). Mã 'o' = chuyện khác của mình. */
+var MISTAKES = [
+  ['hieu', 'Nói “hiểu rồi” khi chưa hiểu', ['Cô chỉ bài, mình gật đầu cho qua. Lúc làm thì sai.', 'Gật cho qua làm mình mất nhiều thời gian hơn.', 'Chưa hiểu thì nhắc lại để hỏi: “Ý cô là… phải không ạ?”']],
+  ['im', 'Im lặng, không hỏi khi bí', ['Bài khó, mình ngồi im cả buổi, không dám hỏi.', 'Hỏi sớm thì đỡ mất công.', 'Bí quá 10 phút thì hỏi bạn hoặc thầy cô.']],
+  ['bo', 'Bỏ học tiếng Nhật sau giờ mệt', ['Tuần trước mình mệt nên bỏ học từ mới 4 tối.', 'Mỗi ngày một ít dễ giữ hơn học dồn.', 'Mệt thì học 5 phút thôi, không bỏ hẳn.']],
+  ['bao', 'Làm theo ý mình, không báo cáo', ['Mình đổi cách làm mà không báo nhóm trưởng.', 'Không báo thì người khác không biết để giúp.', 'Đổi gì cũng báo trước một câu.']],
+  ['tre', 'Đi trễ vì ngủ quên', ['Mình thức khuya xem điện thoại, sáng đi trễ.', 'Đúng giờ bắt đầu từ tối hôm trước.', 'Tắt điện thoại lúc 23 giờ, để báo thức xa giường.']],
+  ['gian', 'Giận rồi nói lời làm mất lòng', ['Bạn cùng phòng nói mình bừa, mình cãi lại to tiếng.', 'Giận quá thì lời nói làm hỏng việc.', 'Giận thì im 1 phút, nói sau khi bình tĩnh.']]
+];
+var MISTAKE_Q = ['Chuyện gì đã xảy ra?', 'Mình rút ra điều gì?', 'Lần sau mình sẽ…'];
+
+/* b73 · Thử để biết (mẫu thử: nhỏ, rẻ, nhanh ≤ 2 tuần, trả lời 1 câu hỏi rõ) */
+var PROTO_K = [
+  ['hoi', 'Hỏi', 'Trò chuyện 15 phút với người đang làm việc đó', 'speech', ['Muốn làm phiên dịch: hỏi một anh chị đang làm phiên dịch, một ngày họ làm gì, khó nhất là gì', 'Muốn về quê mở xưởng: hỏi chú, bác đang có xưởng nhỏ ở quê']],
+  ['xem', 'Xem', 'Xem một ngày làm việc thật: video thật hoặc đến tận nơi', 'scope', ['Muốn làm Kaigo: xem trọn một video “một ngày làm điều dưỡng ở Nhật”, ghi 3 điều bất ngờ', 'Muốn làm công ty Nhật ở Việt Nam: đến xem một khu công nghiệp gần nhà']],
+  ['lam', 'Làm thử', 'Làm một bản nhỏ của việc đó', 'tool', ['Muốn làm giáo viên: dạy bạn cùng phòng 15 phút tiếng Nhật', 'Muốn mở tiệm: nấu 1 món, mời 3 người ăn thử và góp ý', 'Muốn làm quản lý: kèm 1 bạn học chậm hơn trong 1 tuần']]
+];
+var PROTO_RULE = [['Nhỏ', 'Làm trong 15–60 phút'], ['Rẻ', 'Gần như không tốn tiền'], ['Nhanh', 'Xong trong 2 tuần'], ['Rõ', 'Trả lời được 1 câu hỏi']];
+var PROTO_WHEN = [['7', 'Trong 1 tuần'], ['10', 'Trong 10 ngày'], ['14', 'Trong 2 tuần']];
+var PROTO_RT = { hoi: 'memo', xem: 'memo', lam: 'viecko' };
+var LIKE5 = ['', 'Không thích', 'Hơi ngại', 'Bình thường', 'Thích', 'Rất thích'];
+
+/* Nhiệm vụ lên bờ: việc làm ngoài ứng dụng. b = bến, at = chặng hiện thẻ. Cuối khóa (f2) học viên chọn ít nhất 3 việc, đặt ngày. */
+var SHORE = [
+  { id: 's2', b: 'b2', at: 'b23', ic: 'people', t: 'Hỏi một anh chị đi trước thật câu bạn đã soạn' },
+  { id: 's3', b: 'b3', at: 'b33', ic: 'home', t: 'Hỏi ba mẹ: “10 năm nữa ba mẹ mong con thế nào?”, rồi so với la bàn của bạn' },
+  { id: 's5', b: 'b5', at: 'b53', ic: 'speech', t: 'Kể kế hoạch A và B cho một người bạn tin, nghe họ góp ý' },
+  { id: 's6', b: 'b6', at: 'b62', ic: 'speech', t: 'Nói câu trả lời phỏng vấn trước thầy cô hoặc bạn (hoặc tự ghi âm 60 giây)' },
+  { id: 's7a', b: 'b7', at: 'b71', ic: 'light', t: 'Gặp trực tiếp người bạn chọn ở Ngọn Hải Đăng' },
+  { id: 's7b', b: 'b7', at: 'b72', ic: 'tool', t: 'Xung phong nhận một việc khó ở JPC hoặc KTX tuần này' },
+  { id: 's7c', b: 'b7', at: 'b73', ic: 'compass', t: 'Làm mẫu thử “Thử để biết” của bạn' }
+];
+var SHORE_T = 'Nhiệm vụ lên bờ';
+var SHORE_SAY = 'Thuyền cập bến thì thuyền trưởng lên bờ làm việc thật. Việc này làm ngoài ứng dụng nhé.';
+var SHORE_MIN = 3, SHORE_XP = 5;
+var SHORE_WHEN = [['3', '3 ngày nữa'], ['7', '1 tuần nữa'], ['14', '2 tuần nữa']];
+var SHORE_ST = [['chua', 'Chưa làm'], ['dang', 'Đang làm'], ['da', 'Đã làm']];
+
 var SHIN_TALK = {
   home: ['Biển hôm nay lặng. Đi tiếp một chặng nhé [Tên]!', 'Mỗi bến ghé qua, hải đồ của bạn rõ thêm một chút.', 'Đi chậm mà chắc. Shin ở đây với bạn.'],
   homeNew: 'Chào [Tên]! Shin là thuyền trưởng dẫn đường. Nhận thuyền ở Cảng 3 Năm rồi mình ra khơi nhé!',
   homeWait: 'Bạn đã đi hết các bến đang mở. Các bến sau đang được dựng, sắp mở rồi!',
   homeFin: 'Bạn đã nhận Bằng Thuyền Trưởng Vững Vàng! Hải đồ vẫn ở đây, ghé lại đảo và Senpai lúc nào cũng được.',
   lockFin6: 'Ghé đủ 7 bến (có đủ 7 con dấu) để tới Đảo Kho Báu.',
-  bottle: 'Thư trong chai hôm nay',
+  bottle: 'Lời anh chị hôm nay', /* PS1.3.53: tránh trùng tên Thư trong chai 7 bến */
   bottleSub: 'Một câu của anh chị đi trước trôi vào bờ',
   fogT: 'Đảo mới hiện ra',
   stampT: 'Con dấu bến',
@@ -1001,3 +1139,52 @@ var SHIN_TALK = {
   cardNew: 'Thẻ Senpai mới',
   insT: 'Viết thật, viết đủ ý thì được Insight'
 };
+
+/* =========================================================
+   PS1.3.51 · CD02.3.7 · BẢN 4 ĐỢT 3: Rương kho báu, Thư trong chai, Thư gửi thuyền trưởng tương lai (thầy chốt 22/11/2026)
+   ========================================================= */
+/* Rương kho báu (f1): mỗi bến cho 1 món [mã bến, hình (CD2_PROP), tên, ý nghĩa]. Chạm món → xem lại bài ở bến đó. */
+var CHEST = [
+  ['p0', 'anchor', 'Mỏ neo', '3 năm ở Nhật là nền móng'],
+  ['b1', 'scope', 'Ống nhòm', 'Nhìn xa, thấy nhiều hướng'],
+  ['b2', 'storybk', 'Sổ chuyện anh chị', 'Học từ người đi trước'],
+  ['b3', 'compass', 'La bàn', 'Điều mình coi trọng'],
+  ['b4', 'chart', 'Hải đồ', '3 kế hoạch 5 năm'],
+  ['b5', 'vest', 'Áo phao', 'Phương án dự phòng'],
+  ['b6', 'key', 'Chìa khóa', 'Điều nhà tuyển dụng cần'],
+  ['b7', 'lantern', 'Đèn lồng', 'Người soi đường']
+];
+var CHEST_T = 'Rương kho báu', CHEST_MY = 'Kho báu của tôi', CHEST_MAX = 3;
+var CHEST_Q = 'Món này giúp mình hiểu hơn về…';
+var CHEST_PH = 'Ví dụ: mình coi trọng gia đình hơn mình nghĩ.';
+/* Thư trong chai: sau con dấu mỗi bến, vớt 1 chai có câu nguyên văn của 1 Senpai (N3+, đã có trong khóa) */
+var BOTTLE = { b1: 'tan', b2: 'ngat', b3: 'thuy', b4: 'thao', b5: 'hoai', b6: 'lich', b7: 'mai' };
+var BOTTLE_T = 'Thư trong chai';
+/* Thư gửi thuyền trưởng tương lai (sau khi nhận bằng). Không có máy chủ: thư không tự đến học viên khác, thầy cô nhận qua báo cáo. */
+var FUT = {
+  t: 'Thư gửi thuyền trưởng tương lai',
+  ask: 'Một ngày nào đó, sẽ có một thuyền trưởng mới đi khóa này như bạn. Bạn muốn viết cho họ một lá thư bỏ chai không?',
+  q: 'Bạn muốn nói gì với thuyền trưởng đó?',
+  ph: 'Ví dụ: Đừng sợ chọn sai. Cứ đi hết 7 bến, bạn sẽ thấy nhiều đường hơn bạn nghĩ.',
+  max: 300, anon: 'Một thuyền trưởng',
+  ok: 'Đồng ý cho thầy cô dùng thư này (ẩn tên) cho các khóa sau',
+  end: 'Chai đã trôi về phía chân trời. Chúc thuyền trưởng [Tên] thuận buồm xuôi gió!'
+};
+SHIN_TALK.btlNew = 'Thuyền vừa vớt được một Thư trong chai!';
+SHIN_TALK.btlTap = 'Chạm để mở thư';
+SHIN_TALK.btlAgain = 'Đọc lại Thư trong chai';
+SHIN_TALK.chestHi = 'Mỗi bến bạn ghé đã cho bạn một món. Tất cả nằm trong rương này.';
+SHIN_TALK.futHi = 'Viết ngắn thôi, tối đa 300 ký tự. Điều bạn ước mình biết sớm hơn là quý nhất.';
+
+/* PS1.3.52 · CD02.3.8 · BẢN 4 ĐỢT 4: thuyền nâng cấp theo bến đã xong. [tên món, ý nghĩa ngắn] */
+var SHIP_ITEM = {
+  b1: ['Chòi canh và ống nhòm', 'Bạn nhìn xa hơn, thấy nhiều hướng đi.'],
+  b2: ['Một thủy thủ Senpai', 'Bạn có anh chị đi trước đồng hành.'],
+  b3: ['Bánh lái', 'Bạn cầm lái theo điều mình coi trọng.'],
+  b4: ['Buồm mũi', 'Thêm sức gió: bạn đã có 3 kế hoạch.'],
+  b5: ['Phao và xuồng dự phòng', 'Gặp sóng, bạn có phương án dự phòng.'],
+  b6: ['Cột buồm phụ và rương hành trang', 'Bạn biết nhà tuyển dụng cần gì ở mình.'],
+  b7: ['Đèn lồng và thủy thủ thứ ba', 'Bạn biết học từ người, từ việc và từ chính mình.'],
+  fin: ['Cờ dài, buồm viền vàng, rương báu', 'Thuyền đã sẵn sàng cho hành trình của bạn.']
+};
+var SHIP_PORT = 'Mỗi bến xong, thuyền có thêm một món mới.';

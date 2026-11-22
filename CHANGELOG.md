@@ -5,6 +5,69 @@ Quy ước số phiên bản: **PS a.b.c**
 - b: giai đoạn / thêm module hoặc tính năng lớn
 - c: sửa nhỏ trong giai đoạn đó
 
+## PS1.3.53 · 22/11/2026 · CD02.3.9 Sửa nhỏ theo thầy chốt sau PS1.3.52
+- Thẻ cuối trang chủ khóa đổi tên “Thư trong chai hôm nay” → **“Lời anh chị hôm nay”** (`SHIN_TALK.bottle`), tránh trùng với Thư trong chai 7 bến.
+- Nhận bằng: bỏ thông báo “Bằng Thuyền Trưởng Vững Vàng! +30 XP” (che nút “Để sau” và dòng “Thuyền vừa có thêm…”); điểm hiện ngay trong popup bằng dưới tấm bằng (`certOv(first, pts)`), giống popup con dấu.
+- 8 món thuyền (`SHIP_ITEM`): thầy tạm chốt chữ, sẽ chỉnh sau.
+- Kiểm 390 + 1280 (demo): popup con dấu Bến 3, nhận bằng (f2) → popup bằng có “+30 XP”, không còn thông báo che; thẻ trang chủ đúng tên; ES5 (acorn).
+
+Tệp đổi: cd02/engine.js, cd02/content.js, config.js, sw.js, ?v= ở mọi trang html, CHANGELOG.md, cd02-tiep-tuc.md.
+File cần xóa trên GitHub: không có.
+
+## PS1.3.52 · 22/11/2026 · CD02.3.8 (bản 4 · đợt 4) Thuyền nâng cấp theo bến
+Theo `claude/cd02-ban4-de-xuat.md` mục 5 và bảng 9 mốc thầy duyệt 22/11 (`cd02-ban4-nhap/ship2.js`). Chỉ sửa CD02 (+ số phiên bản).
+- **`shipSVG2(P, sym, col, w, ghost)`** (art.js) thay `shipSVG` ở mọi nơi: màn mở đầu, thẻ nhận thuyền (x1), hải đồ, popup con dấu, bằng (f2), popup bằng. `P` = bến đã có dấu (`shipP()`: b1–b7 + `fin` khi nhận bằng); đi bến nào trước cũng được. `ghost = 1`: món chưa có vẽ mờ. Vùng nước dưới thuyền đổi thành vệt bo tròn, viewBox 160×108 (không lộ khung trong hộp có nền biển). `shipSVG` cũ giữ lại, không còn gọi.
+- **Popup con dấu Bến 1–7 lần đầu** (`shipUpHTML`): thuyền cũ → món mới hiện dần (1 s), 3 tia lấp lánh ở chỗ món mới (`SHIP_AT`, `shipSpk`) + “Thuyền vừa có thêm: **…**” và 1 dòng ý nghĩa. Mở lại popup: “Món của bến này: …”, không hiệu ứng. Cảng 3 Năm: “Mỗi bến xong, thuyền có thêm một món mới.” Popup bằng (lần đầu) cũng có hiệu ứng món của Đảo Kho Báu.
+- **Sổ tay › Bài làm › Sổ Thuyền Trưởng**: mục mới “Thuyền của bạn · cấp x / 8” (`shipSec`): thuyền đủ món, món chưa có vẽ mờ; danh sách 8 món theo bến (✓ đã có, vòng nét đứt chưa có).
+- Chữ ở `SHIP_ITEM`, `SHIP_PORT` (cuối content.js). Hải đồ: thuyền rộng 70 (trước 58).
+- Mọi hiệu ứng tắt khi máy bật “giảm chuyển động” (thuyền mới hiện ngay).
+- Kiểm 390 + 1280 (demo): 194 màn (mọi bước mọi chặng, 9 trang bến), không lỗi JS, không tràn ngang; popup con dấu Bến 3 lần đầu và mở lại; nhận bằng (f2) → popup bằng; Sổ Thuyền Trưởng cấp 3/8 và 8/8; hải đồ; ES5 (acorn) cho cd02/*.js.
+
+Tệp đổi: cd02/art.js, cd02/content.js, cd02/engine.js, cd02/cd02.css (khối cuối PS1.3.52), config.js, sw.js, ?v= ở mọi trang html, CHANGELOG.md, AGENTS.md, cd02-tiep-tuc.md.
+File cần xóa trên GitHub: không có.
+
+## PS1.3.51 · 22/11/2026 · CD02.3.7 (bản 4 · đợt 3) Rương kho báu, Bảng ước mơ thêm hình, Thư trong chai, Thư gửi thuyền trưởng tương lai
+Theo `claude/cd02-ban4-de-xuat.md` mục 4 (thầy chốt 22/11). Chỉ sửa CD02 (+ số phiên bản).
+- **Rương kho báu (góp ý 21)** · f1 bước 3, dạng `chest` (thay ô viết `f1.change`; bài cũ vẫn hiện trong khung “Bài cũ” nếu đã viết). Rương đóng lắc nhẹ → “Mở rương” → nắp bật, vầng sáng, 8 món bay lên (`CHEST` trong content.js: Mỏ neo p0, Ống nhòm b1, Sổ chuyện anh chị b2, La bàn b3, Hải đồ b4, Áo phao b5, Chìa khóa b6, Đèn lồng b7). Chạm món → thẻ “Bạn đã làm ở bến này” (lấy từ `sheetData` theo mã bến). Chọn 1–3 món quý nhất, mỗi món 1 dòng “Món này giúp mình hiểu hơn về…” (bắt buộc). Khóa `f1.tro`, `f1.tr` [mã bến], `f1.trw.<mã bến>`. Insight theo từng dòng. Hiện ở đầu bản Hướng đi (`chestStrip`), ảnh lưu (`trSVG`, nạp ảnh tuần tự bằng `ld()` trong `sheetImg`), Sổ tay › Bài làm, tin nhắn gửi thầy cô, `extra.chest`.
+- **Bảng ước mơ (22, 23)**: nhóm mới **Sở thích, niềm vui** (14 hình: hoa anh đào, pháo hoa, concert, gym, thể thao, cắm trại, đi phượt, chụp ảnh, vlog, vẽ, chơi nhạc, nấu ăn, cà phê cùng bạn, thú cưng) + Kinh doanh online (Công việc), Học online (Học), Căn hộ view đẹp, Đám cưới (Cuộc sống). “Xe riêng” đổi tên “Xe hơi riêng”. Hình mới trong `CD2_PROP` cùng nét tay.
+- **Thư trong chai 7 bến (24)**: popup con dấu Bến 1–7 có thẻ “Thuyền vừa vớt được một Thư trong chai!” (`btlCard`) → `btlOv`: chai dập dềnh, nút bần bật ra, lá thư mở ra, câu **nguyên văn** của Senpai theo `BOTTLE` (b1 Tân, b2 Ngát, b3 Thúy, b4 Thu Thảo, b5 Hoài, b6 Lịch, b7 Mai) + “Đọc chuyện của anh/chị” + Tiếp theo. Lưu `S.btl[mã bến]` (trường trạng thái mới). Sổ Thuyền Trưởng thêm hàng “Thư trong chai x/7” (`btlRow`): chai của bến đã có dấu chạm mở được, chai chưa đọc có chấm cam. Học viên cũ đã có dấu vẫn vớt được. `extra.btl`.
+- **Thư gửi thuyền trưởng tương lai (25)**: popup bằng lần đầu hỏi “Có, mình viết thư / Để sau” (`futAsk`); trang Đảo Kho Báu có thẻ `futCard`; Sổ tay › Bài làm có hộp thư. `futOv`: ≤ 300 ký tự, ký tên (tên gọi / “Một thuyền trưởng”), ô đồng ý cho thầy cô dùng ẩn tên. `futSend`: hiệu ứng thư cuộn vào chai, đóng nút, chai trôi về chân trời (`dropArt`). Khóa `fut.t`, `fut.sig` (me/anon), `fut.ok`, `fut.at`. Thầy cô nhận qua `extra.fut` và dòng cuối tin nhắn gửi thầy cô (nếu học viên gửi lại).
+- Âm `sfx('pop')` nhẹ khi mở rương, mở chai. Mọi hiệu ứng tắt khi máy bật “giảm chuyển động”.
+- Kiểm 390 + 1280 (demo): 97 màn (mọi bước mọi chặng, 9 trang bến), không lỗi JS, không tràn ngang; mở rương, chọn món, ảnh lưu 1080 px có Kho báu + Bảng ước mơ; popup con dấu Bến 7 → thư; Sổ Thuyền Trưởng mở lại chai; nhận bằng → viết thư → thả chai; ES5 (acorn) cho cd02/*.js.
+
+Tệp đổi: cd02/art.js, cd02/content.js, cd02/engine.js, cd02/cd02.css (khối cuối PS1.3.51), config.js, sw.js, ?v= ở mọi trang html, CHANGELOG.md, AGENTS.md, cd02-tiep-tuc.md.
+File cần xóa trên GitHub: không có.
+
+## PS1.3.50 · 22/11/2026 · CD02.3.6 (bản 4 · đợt 2) Hoạt động mới: dây ảnh thành công, ngã rẽ, đi một vòng chỗ làm, việc khó, học từ chính mình, nhiệm vụ lên bờ
+Theo `claude/cd02-ban4-de-xuat.md` mục 3 (thầy chốt 22/11). Chỉ sửa CD02 (+ số phiên bản). CD02 nay **20 chặng** (`CD2_TOTAL` 20, config total 20).
+- **b33 · Dây ảnh “Với bạn, thành công về nghề nghiệp là gì?”** (dạng `success`, thay ô viết b33.work): 3 polaroid kẹp dây, 18 hình / 3 nhóm (`SUCC_GRP`) + Ý khác; mỗi ảnh 1 dòng “vì sao” bắt buộc; ≥ 1 ảnh. Khóa `b33.sc` [3], `b33.sco<i>` (tên ý khác), `b33.scw<i>`. Hình mới `CD2_PROP.key/up/clock`. La bàn tổng kết hiện “Thành công là”. Bài cũ (b33.work) vẫn hiện nếu chưa làm lại.
+- **b53 · Đứng giữa ngã rẽ** (Bến 5, dạng `cross` ×3 + `crosssum` + write): `CROSS` (ngã 1 gắn nhãn “Dựa trên chuyện đã từng xảy ra”, số liệu minh họa, để mở), chọn bên → chip điều đã buông → thanh “điểm đổi ý” (`lv`) → tổng kết giữ/buông (`CROSS_TAG`) so với la bàn b31 (`CROSS_CMP`). Khóa **`b53n.*`** (c0–2, p0–2, me); `b53.*` vẫn là thử nhỏ cũ (ACT_KEYS.b53 = b53n.).
+- **b72 làm lại**: `tour` Đi một vòng chỗ làm (2 cảnh `TOUR.kt/dv` theo `clipGrp()`, 5 điểm “?”, đoán → “Thử lại nhé.” / “Đúng rồi!” / Mình chưa biết → bài học + áp dụng ở JPC, KTX; hình `tourArt(k)` 360×220; khóa `b72.t`) · write `b72.why` (câu “Tại sao?” tuần này) · `hard` Được giao việc khó (3 tin nhắn `HARD` có tiếng Nhật + nút Nghe; Nhận ngay / Nhận và hỏi thêm / Xin hẹn lần sau; được – phải chịu – cơ hội; `HARD_NOTE` sodan, `HARD_SHIN` ý thầy nói gián tiếp, TD 16.12.2013; khóa `b72.hd`). Bỏ WORKS và bước habit (mã cũ còn, không dùng).
+- **b73 · Học từ chính mình** (mới): `lesson` Bài học xương máu (`MISTAKES` 6 thẻ + chuyện riêng; 3 dòng `b73.m1–m3`) · `proto` Thử để biết (nguồn từ b13, kế hoạch A/C, ảnh thành công; Hỏi / Xem / Làm thử `PROTO_K`; quy tắc `PROTO_RULE`; khóa `b73.src/.pk/.pw/.pq`) · `proto2` (đoán thích /5 `b73.pg`, hạn `b73.pdl`, thẻ `protoCard`, Shin routine `PROTO_RT`). Chấm thật sau khi thử: `b73.real`, `b73.surp` (trong cửa sổ nhiệm vụ s7c).
+- **b63** bỏ bước Thử nhỏ 2 tuần (thẻ thử nhỏ cũ vẫn hiện ở Sổ tay nếu học viên đã làm và chưa có mẫu thử).
+- **Nhiệm vụ lên bờ** (`SHORE` s2, s3, s5, s6, s7a, s7b, s7c): thẻ `shoreCard` cuối chặng b23, b33, b53, b62, b71, b72, b73 (bước có `shore:`), nút “Mình sẽ làm việc này”. f2 thêm bước `shore` “Việc trên bờ của tôi”: chọn ≥ 3, đặt hạn. Cập nhật Chưa / Đang / Đã làm + 1 dòng học được (`shoreOv`, +5 XP `S.xp['shore.<id>']`). Trang chủ khóa nhắc việc tới hạn (`shoreHome`), Sổ tay › Bài làm có danh sách. Khóa `shore.sel` {id: ngày}, `shore.st`, `shore.l.<id>`. Không chặn bằng.
+- Bản Hướng đi, tin nhắn gửi thầy cô (sheetData) và `extra` báo cáo thêm: success, cross, tourWhy, hard, lesson, proto, shore.
+- Sửa `refreshBar()` không chạy khi không ở trang chặng (lỗi khi gõ trong cửa sổ ở Sổ tay).
+- Kiểm 390 + 1280 (demo): đủ 97 màn (mọi bước mọi chặng, 9 trang bến, Sổ tay), không lỗi, không tràn ngang; đáp án sai ở `TOUR` dài bằng hoặc hơn đáp án đúng (kiểm bằng mã).
+
+Tệp đổi: cd02/art.js, cd02/content.js, cd02/engine.js, cd02/cd02.css (khối cuối PS1.3.50), cd02/index.html, config.js, sw.js, index.html, ?v= ở mọi trang, CHANGELOG.md, AGENTS.md.
+File cần xóa trên GitHub: không có.
+
+## PS1.3.49 · 22/11/2026 · CD02.3.5 (bản 4 · đợt 1) Hải đồ cân đối, nút đi tiếp, con dấu xem lại, b32, la bàn, link Tikme
+Theo `claude/cd02-ban4-de-xuat.md` mục 2 (thầy chốt 22/11: “Ok bạn triển khai”). Chỉ sửa CD02 (+ số phiên bản).
+- **Hải đồ cân đối (góp ý 1)**: Cảng 3 Năm ở giữa, 7 bến xếp vòng quanh theo chiều kim đồng hồ: Bến 1 trên trái → 2 trên phải → 3 phải → 4 dưới phải → 5 dưới → 6 dưới trái → 7 trái (content.js `BEN[].x, y`; bỏ `ship` riêng của Bến 6). Mặt Đảo giữ nguyên.
+- **Bỏ thẻ “Thử nhỏ 2 tuần” ở trang chủ khóa (2)**; vẫn có ở Sổ tay, Hướng đi.
+- **Nút đi tiếp (3, 4)**: popup con dấu xếp lại: con dấu → điểm XP/Insight (không còn thông báo che nút) → Shin → “Bạn vừa thêm vào Hướng đi” → **Tiếp theo** / Về hải đồ → thuyền. Trang bến đã xong: hộp con dấu **chạm để xem lại** (`data-act="stampAgain"` → `showStamp(b, 1)`), ngay dưới có nút **Đi tiếp: Bến x**.
+- **Phòng Hải Đồ (13)**: popup hiện đủ 3 dòng (A, B, C) thay vì tối đa 2.
+- **b32 (8, 9)**: “Mình giải quyết được” / “Ngoài khả năng”; nhãn vòng ngoài “Mình quan tâm nhưng khó thay đổi được”. Vòng trong viền cam đất liền 2,5px, vòng ngoài viền xanh xám nét đứt 2,5px, nền khác nhau.
+- **La bàn (11)**: chỉ hiện ý học viên nghiêng về (ý không chọn ẩn hẳn) ở mọi nơi có la bàn (b33, Hướng đi, ảnh lưu). Chưa nghiêng ý nào thì vẫn hiện đủ nhãn.
+- **Đảo “Về rồi lại sang Nhật” (12)**: biểu tượng 2 mũi tên vòng tròn (`CD2_IC.cycle`).
+- **Link Tikme (6)**: 22/11 tikme.com lỗi 522 (máy chủ Tikme), link trong khóa đúng. Thêm nút “Sao chép link” + dòng “Trang Tikme chưa mở được thì thử lại sau nhé” dưới mọi link Tikme (`tikCopy`, `copyTxt`).
+- Kiểm 390 (demo): hải đồ, trang bến xong, popup xem lại, b32, b33; ES5 (acorn) cho cd02/*.js.
+
+Tệp đổi: cd02/art.js, cd02/content.js, cd02/engine.js, cd02/cd02.css (khối cuối PS1.3.49), cd02/index.html, config.js, sw.js, ?v= ở mọi trang, CHANGELOG.md, AGENTS.md.
+File cần xóa trên GitHub: không có.
+
 ## PS1.3.48 · 21/11/2026 · CD02.3.4 (bản 3 · đợt 5) Hình 26 thẻ Senpai, Bảng ước mơ 10 năm nữa, rà banner
 Theo `claude/cd02-ban3-de-xuat.md` mục 1 (dreamboard) và mục 5 (hình thẻ Senpai). Thầy bỏ checklist THT ở đợt này. Chỉ sửa CD02 (+ số phiên bản).
 - **Hình 26 thẻ Senpai** (art.js `CD2_SPSC` 19 cảnh nơi làm việc, `CD2_PROP` ~40 đồ vật, `spArt(sp, 'thumb' | 'banner')`; content.js `SP_ART {mã: [cảnh hôm nay, đồ vật]}`). Nét tay mượt như CD02, vẽ nơi làm việc và đồ vật, không vẽ mặt người thật. Nền theo phía của đảo (Ở Nhật xanh lá nhạt · Về Việt Nam hồng đất · Cả hai tím nhạt).
