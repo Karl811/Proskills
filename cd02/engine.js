@@ -18,7 +18,7 @@
   /* =========================================================
      1. TRẠNG THÁI
      ========================================================= */
-  function blank() { return { v: 2, intro: 0, created: Date.now(), d: {}, done: {}, xp: {}, ins: {}, days: {}, seen: {}, cards: {}, isl: {}, stamp: {}, bak: {}, btl: {} }; }
+  function blank() { return { v: 2, intro: 0, created: Date.now(), d: {}, done: {}, xp: {}, ins: {}, days: {}, seen: {}, cards: {}, isl: {}, stamp: {}, bak: {}, btl: {}, shipSeen: {} }; }
   function normalize(s) { var b = blank(); for (var k in b) if (s[k] === undefined) s[k] = b[k]; return s; }
   /* PS1.3.42: bài làm bản cũ → bản 2 (Ngọn Hải Đăng b61, b62 → b71, b72; con dấu b6 → b7; chặng gộp b13, b43, b53 bỏ dấu xong riêng) */
   function migrate(s) {
@@ -34,6 +34,7 @@
   function load() {
     var s = null;
     try { s = (DEMO_ON && !WANT_DEMO) ? PS.get(DEMO_KEY, null) : PS.load(ID); } catch (e) {}
+    if (s && typeof s === 'object' && !s.shipSeen) { s.shipSeen = {}; var sk; for (sk in (s.stamp || {})) if (s.stamp.hasOwnProperty(sk)) s.shipSeen[sk] = 1; if (s.fin) s.shipSeen.fin = 1; } /* PS1.3.57: bến đã có dấu từ trước coi như đã xem thuyền */
     return (s && typeof s === 'object') ? normalize(migrate(s)) : blank();
   }
   var S = load();
@@ -109,11 +110,12 @@
   /* PS1.3.52: món trên thuyền = bến đã có dấu (+ fin khi nhận bằng); cấp 0–8 */
   function shipP() { var P = {}; BEN.forEach(function (b) { if (S.stamp[b.id]) P[b.id] = 1; }); if (S.fin) P.fin = 1; return P; }
   function shipCap() { return shipLv() + (S.fin ? 1 : 0); }
-  function shipUpHTML(b, anim) { /* popup con dấu / bằng: thuyền cũ → món mới hiện dần, lấp lánh */
+  function shipUpHTML(b, anim, noCap) { /* popup con dấu / bằng: thuyền cũ → món mới hiện dần, lấp lánh */
     var f = flag(), P = shipP(), k = b === GOAL_PORT ? 'fin' : b.id, it = SHIP_ITEM[k], w = 180, nw = shipSVG2(P, f.s, f.c, w), h, Q = {}, x;
     if (!it) return nw + '<p class="shipcap">' + esc(SHIP_PORT) + '</p>';
     if (anim && P[k]) { for (x in P) { if (x !== k) Q[x] = 1; } h = '<div class="shipup">' + shipSVG2(Q, f.s, f.c, w) + '<div class="shipup__new">' + nw + '</div>' + shipSpk(k) + '</div>'; }
     else h = nw;
+    if (noCap) return h;
     return h + '<p class="shipcap">' + (anim ? 'Thuyền vừa có thêm: ' : 'Món của bến này: ') + '<b>' + esc(it[0]) + '</b><small>' + esc(it[1]) + '</small></p>';
   }
   function shipSec() { /* Sổ Thuyền Trưởng: thuyền cấp x/8, món chưa có vẽ mờ */
@@ -525,7 +527,7 @@
     return '<button type="button" class="spc' + (got ? ' got' : '') + (sel ? ' on' : '') + '" data-act="sp" data-id="' + sp.id + '">' + spAv(sp) + '<span class="spc__b"><b>' + esc(sp.n) + '</b>' +
       '<small>' + esc(sp.job) + (sp.jl ? ' · ' + esc(sp.jl) : '') + '</small><em>' + esc(sp.tag) + '</em></span>' + (got ? '<span class="spc__ok">' + PS.icon('check', 14, 3) + '</span>' : '') + '</button>';
   }
-  function tikCopy(u) { /* PS1.3.49 (góp ý 6): tikme.com có lúc lỗi máy chủ (522) → cho sao chép link mở sau */
+  function tikCopy(u) { return ''; /* PS1.3.56 (thầy góp ý 1): bỏ nút Sao chép link, chỉ giữ “Đọc bài gốc trên Tikme” */
     return /tikme\.com/.test(u || '') ? '<p class="tikcp"><button type="button" class="link" data-act="copyLink" data-v="' + esc(u) + '">' + cdIc('doc', 13) + 'Sao chép link</button><span>Trang Tikme chưa mở được thì thử lại sau nhé.</span></p>' : '';
   }
   function copyTxt(t) {
@@ -683,7 +685,8 @@
   STEP.flag = function (s) {
     var f = g('x1.flag') || {};
     return qh(s.q) + '<div class="flagbox">' + flagMast(f.s || 'compass', f.c || '#0F9F98') + '</div>' +
-      '<h3 class="qs">Biểu tượng</h3><div class="symgrid">' + FLAG_SYM.map(function (x) { return '<button type="button" class="sym' + (f.s === x[0] ? ' on' : '') + '" data-act="flagSym" data-v="' + x[0] + '" aria-label="' + esc(x[1]) + '"><svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true">' + flagSym(x[0], '#141413') + '</svg><small>' + esc(x[1]) + '</small></button>'; }).join('') + '</div>' +
+      '<h3 class="qs">Biểu tượng</h3><div class="symgrid">' + (W.PSAvatar ? '<button type="button" class="sym sym--av' + (f.s === 'av' ? ' on' : '') + '" data-act="flagSym" data-v="av" aria-label="Ảnh đại diện của tôi"><svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true">' + flagSym('av') + '</svg><small>Ảnh của tôi</small></button>' : '') + FLAG_SYM.map(function (x) { return '<button type="button" class="sym' + (f.s === x[0] ? ' on' : '') + '" data-act="flagSym" data-v="' + x[0] + '" aria-label="' + esc(x[1]) + '"><svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true">' + flagSym(x[0], '#141413') + '</svg><small>' + esc(x[1]) + '</small></button>'; }).join('') + '</div>' +
+      (f.s === 'av' ? '<p class="avnote">Cờ dùng ảnh đại diện của bạn. Đổi ảnh thì cờ đổi theo. <button type="button" class="link" data-act="avPick">Đổi ảnh đại diện</button></p>' : '') +
       '<h3 class="qs">Màu cờ</h3><div class="colrow">' + FLAG_COL.map(function (x) { return '<button type="button" class="col' + (flagCol(f.c) === x[0] ? ' on' : '') + '" data-act="flagCol" data-v="' + x[0] + '" style="background:' + x[0] + '" aria-label="' + esc(x[1]) + '"></button>'; }).join('') + '</div>' +
       '<h3 class="qs">Khẩu hiệu của thủy thủ đoàn</h3><input class="inp ps-sel" data-k="x1.motto" maxlength="40" value="' + esc(g('x1.motto') || '') + '" placeholder="Ví dụ: Đi chậm mà chắc">' + tipsHTML('x1.motto', MOTTO_TIPS);
   };
@@ -859,7 +862,7 @@
   };
   STEP.compass = function () {
     return shinSays('proud', '<p>La bàn của <b class="nm">' + esc(given()) + '</b> đã chỉnh xong!</p>', 64) + '<div class="cmpbox">' + compassSVG(pv(), 340) + '</div>' +
-      '<div class="cmpsum"><div><small>Nghiêng rõ nhất</small><b>' + esc(lean()) + '</b></div><div><small>Thành công là</small><b>' + esc(sucTxt() || '…') + '</b></div><div><small>10 năm nữa sống tốt là</small><b>' + esc(trim(g('b33.life')).replace(/^(Ở tuổi 30|10 năm nữa), một cuộc sống tốt với mình là\s*/, '') || '…') + '</b></div></div>' +
+      '<div class="cmpsum"><div><small>Nghiêng rõ nhất</small><b>' + esc(lean()) + '</b></div>' + (sucList().length ? '<div class="cmpsum__suc"><small>Thành công là</small>' + sucRope(0) + '</div>' : '<div><small>Thành công là</small><b>' + esc(sucTxt() || '…') + '</b></div>') + '<div><small>10 năm nữa sống tốt là</small><b>' + esc(trim(g('b33.life')).replace(/^(Ở tuổi 30|10 năm nữa), một cuộc sống tốt với mình là\s*/, '') || '…') + '</b></div></div>' +
       '';
   };
 
@@ -868,31 +871,51 @@
   function voyIsle(v) { var id = g(v + '.isl'); if (!id) return null; if (id === 'o') return { id: 'o', n: trim(g(v + '.islo')) || 'Đảo riêng', ic: 'compass', sub: '' }; return isleOf(id); }
   function msList(v) { var L = []; ['1', '3', '5'].forEach(function (y) { var t = trim(g(v + '.m' + y)); if (t) L.push('Năm ' + y + ': ' + t); }); return L; }
   function gOf(v) { var G = g(v + '.g'); return (G && typeof G === 'object') ? G : {}; }
-  function wOf() { var w = g('b51.w'); return (w && typeof w === 'object') ? w : { like: 2, conf: 2, fit: 2, feas: 2 }; }
+  function wOf() { var w = g('b51.w'); return (w && typeof w === 'object') ? w : { like: 2, conf: 2, fit: 2 }; }
   function voyScore(v) { var G = gOf(v), W2 = wOf(), t = 0, m = 0; METERS.forEach(function (x) { var w = +W2[x[0]] || 2; t += (+G[x[0]] || 0) * w; m += 5 * w; }); return m ? Math.round(t / m * 100) : 0; }
   function voyTitle(v) { var x = voyOf(v), nm = trim(g(v + '.name')); return 'Kế hoạch ' + x[1] + (nm ? ' · ' + nm : ''); }
   function leanVoy() { var v = g('b51.lean'); return voyOf(v) ? v : ''; }
   function leanLetter() { var v = leanVoy(); return v ? voyOf(v)[1] : (g('b51.lean') === 'u' ? 'Chưa nghiêng' : ''); }
   function leanName() { var v = leanVoy(); if (v) return voyTitle(v); var is = isleOf(g('b13.isl')); return is ? 'hướng ' + is.n : 'kế hoạch bạn chọn'; }
   function leanIsle() { var v = leanVoy(); return v ? voyIsle(v) : (isleOf(g('b13.isl')) || null); }
-  function gaugeSVG(n) {
-    n = +n || 0; var L = 144.5, th = Math.PI * (1 - n / 5), nx = 60 + 34 * Math.cos(th), ny = 58 - 34 * Math.sin(th);
-    return '<svg class="gauge" viewBox="0 0 120 66" aria-hidden="true"><path d="M14 58A46 46 0 0 1 106 58" fill="none" stroke="#EEECE4" stroke-width="10" stroke-linecap="round"/>' +
-      (n ? '<path d="M14 58A46 46 0 0 1 106 58" fill="none" stroke="#C15F3C" stroke-width="10" stroke-linecap="round" stroke-dasharray="' + (L * n / 5).toFixed(1) + ' 200"/>' : '') +
+  var gaugeN = 0;
+  function gaugeSVG(n) { /* PS1.3.56 (góp ý 4): phần tô chuyển dần từ màu 1 tới màu của mức đang chọn */
+    n = +n || 0; var L = 144.5, th = Math.PI * (1 - n / 5), nx = 60 + 34 * Math.cos(th), ny = 58 - 34 * Math.sin(th), gid = 'cdg' + (++gaugeN), gr = '', k, xt = 60 - 46 * Math.cos(Math.PI * n / 5), xs;
+    if (n) { gr = '<defs><linearGradient id="' + gid + '" gradientUnits="userSpaceOnUse" x1="9" y1="0" x2="' + (xt + 5).toFixed(1) + '" y2="0"><stop offset="0" stop-color="' + METER_COL[0] + '"/>';
+      for (k = 2; k <= n; k++) { xs = 60 - 46 * Math.cos(Math.PI * (k - .5) / 5); gr += '<stop offset="' + (k === n ? 1 : Math.max(0, Math.min(1, (xs - 9) / (xt - 4)))).toFixed(3) + '" stop-color="' + METER_COL[k - 1] + '"/>'; }
+      if (n === 1) gr += '<stop offset="1" stop-color="' + METER_COL[0] + '"/>';
+      gr += '</linearGradient></defs>'; }
+    return '<svg class="gauge" viewBox="0 0 120 66" aria-hidden="true">' + gr + '<path d="M14 58A46 46 0 0 1 106 58" fill="none" stroke="#EEECE4" stroke-width="10" stroke-linecap="round"/>' +
+      (n ? '<path d="M14 58A46 46 0 0 1 106 58" fill="none" stroke="url(#' + gid + ')" stroke-width="10" stroke-linecap="round" stroke-dasharray="' + (L * n / 5).toFixed(1) + ' 200"/>' : '') +
       '<path d="M60 58L' + nx.toFixed(1) + ' ' + ny.toFixed(1) + '" stroke="#141413" stroke-width="3" stroke-linecap="round"/><circle cx="60" cy="58" r="5" fill="#141413"/></svg>';
   }
   function voyCard(v, sm) {
     var x = voyOf(v), is = voyIsle(v), G = gOf(v), ms = msList(v), jl = g(v + '.jl'), lean = leanVoy() === v;
     if (!is) return '<div class="voyc voyc--empty"><span class="voyc__l">' + x[1] + '</span><b>' + esc(x[2]) + '</b><small>Chưa vẽ</small></div>';
-    return '<div class="voyc' + (lean ? ' voyc--lean' : '') + '"><div class="voyc__h"><span class="voyc__l">' + x[1] + '</span><div><small>' + esc(x[2]) + '</small><b>' + esc(trim(g(v + '.name')) || is.n) + '</b></div></div>' +
+    return '<div class="voyc' + (lean ? ' voyc--lean' : '') + '"><div class="voyc__h"><span class="voyc__l">' + x[1] + '</span><div><small>' + esc(x[2]) + '</small><b>' + esc(trim(g(v + '.name')) || is.n) + '</b></div>' + (planK(v) ? '<span class="voyc__ic">' + planArt(planK(v), 46) + '</span>' : '') + '</div>' +
       '<p class="voyc__is">' + cdIc(is.ic, 15) + esc(is.n) + (jl ? ' · ' + esc(jl === 'x' ? 'Tiếng Nhật vừa đủ' : jl) : '') + '</p>' +
       (sm ? '' : '<ol class="voyc__ms">' + ms.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ol>') +
-      '<div class="voyc__g">' + METERS.map(function (m) { var n = +G[m[0]] || 0; return '<span><small>' + esc(m[1]) + '</small><i><b style="width:' + (n * 20) + '%"></b></i></span>'; }).join('') + '</div>' +
+      '<div class="voyc__g">' + METERS.map(function (m) { var n = +G[m[0]] || 0; return '<span><small>' + esc(m[3] || m[1]) + '</small><i><b style="width:' + (n * 20) + '%;background:' + (n ? METER_COL[n - 1] : 'none') + '"></b></i></span>'; }).join('') + '</div>' +
       (lean ? '<em class="voyc__tag">Đang nghiêng về</em>' : '') + '</div>';
+  }
+  function planK(v) { var k = g(v + '.ic'); return k && PLAN_ART[k] ? k : ''; }
+  function planLab(k) { var t = ''; PLAN_IC.forEach(function (gr) { gr[1].forEach(function (x) { if (x[0] === k) t = x[1]; }); }); return t; }
+  function planPicker(v) {
+    var cur = planK(v), x = voyOf(v);
+    ov('<h2>Chọn hình cho kế hoạch ' + x[1] + '</h2>' + PLAN_IC.map(function (gr) {
+      return '<h3 class="qs">' + esc(gr[0]) + '</h3><div class="dbp dbp--5">' + gr[1].map(function (it) { var on = cur === it[0];
+        return '<button type="button" class="dbp__b' + (on ? ' on' : '') + '" data-act="planIc" data-k="' + v + '" data-v="' + it[0] + '" aria-pressed="' + on + '">' + planArt(it[0], 42) + '<span>' + esc(it[1]) + '</span></button>'; }).join('') + '</div>';
+    }).join(''));
+  }
+  function voyHead(v) {
+    var x = voyOf(v);
+    return '<div class="vhd"><div class="vhd__abc">' + VOY.map(function (y) { var cur = y[0] === v, ok = !cur && voyIsle(y[0]);
+        return '<span class="' + (cur ? 'cur' : (ok ? 'ok' : '')) + '">' + (ok ? PS.icon('check', 12, 3) : '') + y[1] + '</span>'; }).join('<i></i>') + '</div>' +
+      '<div class="vhd__m"><span class="vhd__l">' + x[1] + '</span><div><small>Kế hoạch ' + x[1] + '</small><b>' + esc(x[2]) + '</b><p>' + Q(x[3]) + '</p></div>' + (planK(v) ? '<span class="vhd__ic">' + planArt(planK(v), 52) + '</span>' : '') + '</div></div>';
   }
   STEP.voy = function (s) {
     var v = s.v, x = voyOf(v), id = g(v + '.isl') || '', is = voyIsle(v), c = cd1(), h = s.say ? shinSays('wink', '<p>' + Q(s.say) + '</p>', 52) : '';
-    h += '<div class="voyhead"><span class="voyc__l">' + x[1] + '</span><div><b>' + esc(x[2]) + '</b><small>' + Q(x[3]) + '</small></div></div>';
+    h += voyHead(v); /* PS1.3.56 (góp ý 6): băng giải thích kế hoạch nổi bật hơn */
     if (v === 'b41') {
       if (trim(g('x1.now'))) h += '<div class="from"><div><small>Lúc nhận thuyền, bạn viết</small><b>' + esc(g('x1.now')) + '</b></div></div>';
     } else {
@@ -905,9 +928,12 @@
     if (is && id !== 'o') h += '<p class="qsub voysub">' + esc(is.sub) + '</p>';
     h += qh('Đặt tên cho kế hoạch ' + x[1]) + '<input class="inp ps-sel" data-k="' + v + '.name" maxlength="40" value="' + esc(g(v + '.name') || '') + '" placeholder="Ví dụ: Thợ hàn giỏi ở Osaka">' +
       tipsHTML(v + '.name', is && id !== 'o' ? [is.sub, 'Con đường của riêng ' + given()] : ['Con đường của riêng ' + given()]);
+    var pk = planK(v); /* PS1.3.57 (góp ý 7): chọn hình biểu tượng cho kế hoạch */
+    h += qh('Chọn hình cho kế hoạch ' + x[1]) + '<button type="button" class="plpick' + (pk ? ' on' : '') + '" data-act="planPicker" data-k="' + v + '">' +
+      (pk ? planArt(pk, 58, '#FBEFE8') + '<span><b>' + esc(planLab(pk)) + '</b><small>Chạm để đổi hình</small></span>' : '<span class="plpick__e">+</span><span><b>Chạm để chọn hình</b><small>Hình đi cùng kế hoạch trong Sổ tay và phiếu</small></span>') + '</button>';
     return h;
   };
-  CHECK.voy = function (s) { var id = g(s.v + '.isl'); if (!id) return 'Chọn một hướng'; if (id === 'o' && trim(g(s.v + '.islo')).length < 3) return 'Viết tên hướng đi'; return trim(g(s.v + '.name')).length >= 3 ? '' : 'Đặt tên cho kế hoạch'; };
+  CHECK.voy = function (s) { var id = g(s.v + '.isl'); if (!id) return 'Chọn một hướng'; if (id === 'o' && trim(g(s.v + '.islo')).length < 3) return 'Viết tên hướng đi'; if (trim(g(s.v + '.name')).length < 3) return 'Đặt tên cho kế hoạch'; return planK(s.v) ? '' : 'Chọn hình cho kế hoạch'; };
   function needOf(v) { var M = g(v + '.nh'); return (M && typeof M === 'object') ? M : {}; }
   function needSum() { var is = voyIsle('b41'), M = needOf('b41'), o = { co: [], thieu: [] }; if (is && is.need) is.need.forEach(function (t, i) { if (M[i] === 'co') o.co.push(t); if (M[i] === 'thieu') o.thieu.push(t); }); return o; }
   STEP.need = function (s) { /* PS1.3.45 (thầy góp ý 3): thuận lợi và thách thức của chính bạn với kế hoạch A */
@@ -940,18 +966,19 @@
       var n = +G[m[0]] || 0;
       return '<div class="meter"><div class="meter__g">' + gaugeSVG(n) + '<b>' + (n || '–') + '</b></div><div class="meter__b"><b>' + esc(m[1]) + '</b>' + (first ? '<small>' + esc(m[2]) + '</small>' : '') +
         (first && m[0] === 'fit' && g('b31.v') ? '<small class="meter__hint">La bàn của bạn nghiêng về “' + esc(lean()) + '”</small>' : '') +
-        '<div class="meter__n">' + [1, 2, 3, 4, 5].map(function (k) { return '<button type="button" class="' + (n === k ? 'on' : '') + '" data-act="meter" data-k="' + v + '" data-id="' + m[0] + '" data-v="' + k + '" aria-label="' + esc(m[1]) + ' ' + k + '">' + k + '</button>'; }).join('') + '</div></div></div>';
+        '<div class="meter__n">' + [1, 2, 3, 4, 5].map(function (k) { return '<button type="button" class="mn' + k + (n === k ? ' on' : '') + '" data-act="meter" data-k="' + v + '" data-id="' + m[0] + '" data-v="' + k + '" aria-label="' + esc(m[1]) + ' ' + k + '">' + k + '</button>'; }).join('') + '</div></div></div>';
     }).join('') + '</div>';
   }
   STEP.meters = function (s) { /* PS1.3.42: vs = chấm nhiều kế hoạch trên một màn (B và C), trio = đặt 3 kế hoạch cạnh nhau */
     var L = s.vs || [s.v], h = L.map(function (v) { var first = v === 'b41'; return qh('Tự chấm kế hoạch ' + voyOf(v)[1], first ? 'Chạm từ 1 đến 5, theo cảm nhận.' : '') + metersHTML(v, first); }).join('');
-    if (s.trio) { var ok = VOY.every(function (x) { var G = gOf(x[0]), n = 0; METERS.forEach(function (m) { if (G[m[0]]) n++; }); return n >= 4; });
+    if (s.trio) { var ok = VOY.every(function (x) { var G = gOf(x[0]), n = 0; METERS.forEach(function (m) { if (G[m[0]]) n++; }); return n >= METERS.length; });
       return h + (ok ? STEP.trio() : ''); }
     return h + voyCard(s.v);
   };
-  CHECK.meters = function (s) { var L = s.vs || [s.v], miss = ''; L.forEach(function (v) { if (miss) return; var G = gOf(v), n = 0; METERS.forEach(function (m) { if (G[m[0]]) n++; }); if (n < 4) miss = 'Chấm đủ 4 đồng hồ kế hoạch ' + voyOf(v)[1] + ' (' + n + '/4)'; }); return miss; };
+  CHECK.meters = function (s) { var L = s.vs || [s.v], miss = ''; L.forEach(function (v) { if (miss) return; var G = gOf(v), n = 0; METERS.forEach(function (m) { if (G[m[0]]) n++; }); if (n < METERS.length) miss = 'Chấm đủ ' + METERS.length + ' đồng hồ kế hoạch ' + voyOf(v)[1] + ' (' + n + '/' + METERS.length + ')'; }); return miss; };
   STEP.trio = function () {
-    return shinSays('wow', '<p>Đây là 3 kế hoạch của <b class="nm">' + esc(given()) + '</b>. Bạn có nhiều đường hơn bạn nghĩ!</p>', 60) +
+    return shinSays('wow', '<p>Đây là 3 kế hoạch của <b class="nm">' + esc(given()) + '</b>. Bạn có nhiều đường hơn bạn nghĩ!</p>' +
+      '<div class="trio3">' + VOY.map(function (x) { var k = planK(x[0]); return '<span>' + (k ? planArt(k, 44) : '<i class="trio3__e"></i>') + '<b>' + x[1] + '</b></span>'; }).join('') + '</div>', 60) + /* PS1.3.57 (góp ý 7) */
       '<div class="trio">' + VOY.map(function (x) { return voyCard(x[0]); }).join('') + '</div><p class="ps-small">Vuốt ngang để xem cả 3. Chưa cần chọn.</p>';
   };
 
@@ -965,7 +992,7 @@
     }).join('') + '</div>';
     h += '<h3 class="qs">Kết quả cân</h3><div class="scale">' + VOY.map(function (x) {
       var sc = voyScore(x[0]), is = voyIsle(x[0]);
-      return '<div class="scale__r' + (x[0] === best && !tie ? ' top' : '') + '"><span class="voyc__l">' + x[1] + '</span><div><b>' + esc(trim(g(x[0] + '.name')) || (is ? is.n : '')) + '</b><i><em style="width:' + sc + '%"></em></i></div><strong>' + sc + '</strong></div>';
+      return '<div class="scale__r' + (x[0] === best && !tie ? ' top' : '') + '"><span class="voyc__l">' + x[1] + '</span>' + (planK(x[0]) ? '<span class="scale__ic">' + planArt(planK(x[0]), 34) + '</span>' : '') + '<div><b>' + esc(trim(g(x[0] + '.name')) || (is ? is.n : '')) + '</b><i><em style="width:' + sc + '%"></em></i></div><strong>' + sc + '</strong></div>';
     }).join('') + '</div>';
     h += shinSays('think', '<p>' + (tie ? 'Có kế hoạch đang bằng điểm nhau. Thử đổi nặng nhẹ xem sao.' : 'Theo cân của bạn, <b>kế hoạch ' + voyOf(best)[1] + '</b> đang nặng ký nhất.') + '</p>', 52);
     return h;
@@ -1336,7 +1363,7 @@
     else inner = '<span class="pol__img pol__img--e"><i>+</i></span><span class="pol__cap pol__cap--e">' + (edit ? 'Chạm để chọn' : '') + '</span>';
     return '<' + (edit ? 'button type="button" data-act="sucCell" data-v="' + i + '" aria-label="Ảnh ' + (i + 1) + '"' : 'div') + ' class="pol' + (k ? ' on' : '') + '" style="transform:rotate(' + rot + 'deg)"><span class="pol__pin"></span>' + inner + '</' + (edit ? 'button' : 'div') + '>';
   }
-  function sucRope(edit) { return '<div class="rope"><svg class="rope__l" viewBox="0 0 360 40" preserveAspectRatio="none" aria-hidden="true"><path d="M-4 8Q180 46 364 8" fill="none" stroke="#9C7A55" stroke-width="2.4" stroke-dasharray="1 4" stroke-linecap="round"/><path d="M-4 8Q180 46 364 8" fill="none" stroke="#9C7A55" stroke-width="1.2"/></svg><div class="rope__ps">' + [0, 1, 2].filter(function (i) { return edit || sucCells()[i]; }).map(function (i) { return polaroid(i, edit); }).join('') + '</div></div>'; }
+  function sucRope(edit) { return '<div class="rope"><svg class="rope__l" viewBox="0 0 360 40" preserveAspectRatio="none" aria-hidden="true"><path d="M-4 8Q180 46 364 8" fill="none" stroke="#9C7A55" stroke-width="2.4" stroke-dasharray="1 4" stroke-linecap="round"/><path d="M-4 8Q180 46 364 8" fill="none" stroke="#9C7A55" stroke-width="1.2"/></svg><div class="rope__ps' + (edit ? '' : ' rope__ps--' + sucList().length) + '">' + [0, 1, 2].filter(function (i) { return edit || sucCells()[i]; }).map(function (i) { return polaroid(i, edit); }).join('') + '</div></div>'; }
   STEP.success = function () {
     var a = sucCells(), h = qh('Với bạn, thành công về nghề nghiệp là gì?', 'Kẹp 1–3 tấm ảnh lên dây. Không có đúng sai.') + sucRope(1);
     var rows = '';
@@ -1365,24 +1392,24 @@
   }
   function sucClear() { if (sucI < 0) return; var a = sucCells().slice(); a[sucI] = ''; S.d['b33.sc'] = a; delete S.d['b33.sco' + sucI]; delete S.d['b33.scw' + sucI]; sucI = -1; save(); closeOv(); if (V.v === 'act') keepY(redrawStep); }
 
-  /* ----- b53 · Đứng giữa ngã rẽ ----- */
-  function crossSide(n) { var v = g('b53n.c' + n); return v === 'a' || v === 'b' ? v : ''; }
-  function lvFmt(lv, v) { v = +v; if (v > lv[2]) return CROSS_NEVER; return lv[3] ? (v * lv[3]) + (lv[1].charAt(0) === '%' ? '' : ' ') + lv[1] : '+' + v + ' ' + lv[1]; }
+  /* ----- b53 · Đứng giữa ngã rẽ (PS1.3.56: 4 ngã rẽ, “đổi ý” bằng lựa chọn, không tiền) ----- */
+  function crossSide(n) { var v = g('b53x.c' + n); return v === 'a' || v === 'b' ? v : ''; }
+  function whyLab(k) { var t = ''; CROSS_WHY.forEach(function (o) { if (o[0] === k) t = o[1]; }); return t; }
   function tagChips(L, cls) { return L.map(function (t) { return '<span class="xtag' + (cls ? ' ' + cls : '') + '">' + esc(CROSS_TAG[t]) + '</span>'; }).join(''); }
   STEP.cross = function (s) {
     var c = CROSS[s.n], sd = crossSide(s.n), h = (c.real ? '<p class="xr__real">' + cdIc('bottle', 14) + 'Dựa trên chuyện đã từng xảy ra</p>' : '') + qh(c.t, 'Ngã rẽ ' + (s.n + 1) + '/' + CROSS.length + ' · chạm bên bạn chọn');
     h += '<div class="xr">' + ['a', 'b'].map(function (x) { var o = c[x], on = sd === x;
       return '<button type="button" class="xr__c' + (on ? ' on' : (sd ? ' off' : '')) + '" data-act="crossPick" data-id="' + s.n + '" data-v="' + x + '" aria-pressed="' + on + '">' + dreamSticker(o.ic, 46) + '<b>' + esc(o.n) + '</b><small>' + esc(o.d) + '</small><span class="xr__g">' + tagChips(o.g) + '</span></button>';
-    }).join('<span class="xr__or">hay</span>') + '</div>' + (/\d/.test(c.a.d + c.b.d) ? '<p class="ps-small">' + esc(CROSS_NOTE) + '</p>' : '');
+    }).join('<span class="xr__or">hay</span>') + '</div>';
     if (sd) {
-      var other = c[sd === 'a' ? 'b' : 'a'], lv = c[sd].lv, v = g('b53n.p' + s.n); if (v == null) v = Math.ceil(lv[2] / 2);
+      var other = c[sd === 'a' ? 'b' : 'a'], r = g('b53x.r' + s.n) || '';
       h += '<div class="xr__lost"><small>Bạn vừa đánh đổi</small><div>' + tagChips(other.g, 'xtag--lost') + '</div></div>' +
-        '<div class="xr__lv"><b>Điểm đổi ý</b><p>' + esc(lv[0]) + '</p><output id="xrOut' + s.n + '">' + esc(lvFmt(lv, v)) + '</output>' +
-        '<input type="range" class="xr__rg" min="1" max="' + (lv[2] + 1) + '" step="1" value="' + v + '" data-k="b53n.p' + s.n + '" aria-label="Điểm đổi ý"><div class="xr__ends"><span>' + esc(lvFmt(lv, 1)) + '</span><span>' + esc(CROSS_NEVER) + '</span></div></div>';
+        '<div class="xr__lv"><b>' + esc(CROSS_WHY_Q) + '</b><p>Bên kia: ' + esc(other.n) + '</p><div class="chips xr__why">' + CROSS_WHY.map(function (o) {
+          return '<button type="button" class="chip' + (r === o[0] ? ' on' : '') + (o[0] === 'x' ? ' chip--x' : '') + '" data-act="crossWhy" data-id="' + s.n + '" data-v="' + o[0] + '">' + esc(o[1]) + '</button>'; }).join('') + '</div></div>';
     }
     return h;
   };
-  CHECK.cross = function (s) { return crossSide(s.n) ? '' : 'Chọn một bên'; };
+  CHECK.cross = function (s) { if (!crossSide(s.n)) return 'Chọn một bên'; return g('b53x.r' + s.n) ? '' : 'Chọn điều có thể làm bạn đổi ý'; };
   function crossTally() {
     var keep = {}, lose = {}, n = 0;
     CROSS.forEach(function (c, i) { var sd = crossSide(i); if (!sd) return; n++; c[sd].g.forEach(function (t) { keep[t] = (keep[t] || 0) + 1; }); c[sd === 'a' ? 'b' : 'a'].g.forEach(function (t) { lose[t] = (lose[t] || 0) + 1; }); });
@@ -1400,15 +1427,19 @@
     return 'Ở Xưởng La Bàn, bạn nói coi trọng <b>' + esc(lp.t) + '</b>. Khi chọn thật, bạn hay giữ <b>' + esc(kp || '…') + '</b>. Bạn nghĩ sao?';
   }
   STEP.crosssum = function () {
-    var T = crossTally(), rows = CROSS.map(function (c, i) { var sd = crossSide(i); if (!sd) return ''; var lv = c[sd].lv, v = g('b53n.p' + i); if (v == null) v = Math.ceil(lv[2] / 2);
-      return '<li><b>' + esc(c[sd].n) + '</b><small>Đổi ý nếu bên kia: ' + esc(lvFmt(lv, v)) + '</small></li>'; }).join('');
+    var T = crossTally(), W2 = crossWhyN(), rows = CROSS.map(function (c, i) { var sd = crossSide(i); if (!sd) return ''; var r = g('b53x.r' + i);
+      return '<li><b>' + esc(c[sd].n) + '</b><small>' + (r === 'x' ? 'Rất chắc, không đổi' : 'Đổi ý nếu bên kia: ' + esc(lowF(whyLab(r) || '…'))) + '</small></li>'; }).join('');
     var h = shinSays('think', '<p>Khi phải chọn, <b class="nm">' + esc(given()) + '</b> hay giữ <b>' + esc(T.keep.map(function (t) { return CROSS_TAG[t]; }).join(', ') || '…') + '</b>' + (T.lose.length ? ' và hay buông <b>' + esc(T.lose.map(function (t) { return CROSS_TAG[t]; }).join(', ')) + '</b>' : '') + '.</p>', 64);
     h += '<div class="xsum"><div><small>Bạn hay giữ</small>' + tagChips(T.keep) + '</div><div><small>Bạn hay buông</small>' + (T.lose.length ? tagChips(T.lose, 'xtag--lost') : '<span class="ps-small">Không rõ bên nào</span>') + '</div></div>';
-    h += '<ol class="xlist">' + rows + '</ol><p class="ps-small">Điểm đổi ý càng nhỏ, bạn càng phân vân. “Không đổi” là bạn rất chắc.</p>';
+    h += '<div class="xsum"><div><small>Bạn chắc chắn</small><b class="xsum__n">' + W2.sure + '/' + T.n + '</b><span class="ps-small">ngã rẽ</span></div><div><small>Điều hay làm bạn đổi ý</small>' + (W2.top ? '<span class="xtag xtag--why">' + esc(W2.top) + '</span>' : '<span class="ps-small">Bạn rất chắc ở mọi ngã rẽ</span>') + '</div></div>';
+    h += '<ol class="xlist">' + rows + '</ol>';
     var cm = crossCmp(T); if (cm) h += '<div class="tnote">' + cm + '</div>';
     return h;
   };
-  function crossSum() { var T = crossTally(); return { keep: T.keep.map(function (t) { return CROSS_TAG[t]; }), lose: T.lose.map(function (t) { return CROSS_TAG[t]; }), pick: CROSS.map(function (c, i) { var sd = crossSide(i); return sd ? c[sd].n : ''; }), me: g('b53n.me') || '' }; }
+  function lowF(t) { return t ? t.charAt(0).toLowerCase() + t.slice(1) : t; }
+  function crossWhyN() { var C = {}, sure = 0, top = '', m = 0, k; CROSS.forEach(function (c, i) { var r = g('b53x.r' + i); if (!crossSide(i) || !r) return; if (r === 'x') sure++; else C[r] = (C[r] || 0) + 1; });
+    for (k in C) if (C.hasOwnProperty(k) && C[k] > m) { m = C[k]; top = whyLab(k); } return { sure: sure, top: top }; }
+  function crossSum() { var T = crossTally(), W2 = crossWhyN(); return { keep: T.keep.map(function (t) { return CROSS_TAG[t]; }), lose: T.lose.map(function (t) { return CROSS_TAG[t]; }), pick: CROSS.map(function (c, i) { var sd = crossSide(i); return sd ? c[sd].n : ''; }), why: CROSS.map(function (c, i) { return whyLab(g('b53x.r' + i)); }), sure: W2.sure, whyTop: W2.top, me: g('b53n.me') || '' }; }
 
   /* ----- b72 · Đi một vòng chỗ làm ----- */
   var tourOpen = -1, tourWrong = {};
@@ -1455,12 +1486,12 @@
   CHECK.hard = function () { var R = hardRes(), n = 0; HARD.forEach(function (x, i) { if (R[i] != null) n++; }); return n >= HARD.length ? '' : 'Trả lời đủ ' + HARD.length + ' tin nhắn (' + n + '/' + HARD.length + ')'; };
   function hardSum() { var R = hardRes(), o = []; HARD.forEach(function (m, i) { if (R[i] != null) o.push(m.r[+R[i]][0]); }); return o; }
 
-  /* ----- b73 · Bài học xương máu ----- */
+  /* ----- b73 · Bài học từ trải nghiệm ----- */
   function mkOf(id) { for (var i = 0; i < MISTAKES.length; i++) if (MISTAKES[i][0] === id) return MISTAKES[i]; return null; }
   function lessonTitle() { var k = g('b73.mk'); if (k === 'o') return trim(g('b73.mko')) || 'Chuyện của mình'; var m = mkOf(k); return m ? m[1] : ''; }
   STEP.lesson = function () {
     var k = g('b73.mk') || '', m = mkOf(k);
-    var h = qh('Bài học xương máu', 'Chọn một lần sai bạn từng gặp, hoặc kể chuyện của bạn.') + '<div class="chips chips--mk">' + MISTAKES.map(function (x) { var on = k === x[0]; return '<button type="button" class="chip' + (on ? ' on' : '') + '" data-act="pick" data-k="b73.mk" data-v="' + x[0] + '" aria-pressed="' + on + '">' + esc(x[1]) + '</button>'; }).join('') +
+    var h = qh('Bài học từ trải nghiệm', 'Chọn một lần sai bạn từng gặp, hoặc kể chuyện của bạn.') + '<div class="chips chips--mk">' + MISTAKES.map(function (x) { var on = k === x[0]; return '<button type="button" class="chip' + (on ? ' on' : '') + '" data-act="pick" data-k="b73.mk" data-v="' + x[0] + '" aria-pressed="' + on + '">' + esc(x[1]) + '</button>'; }).join('') +
       '<button type="button" class="chip' + (k === 'o' ? ' on' : '') + '" data-act="pick" data-k="b73.mk" data-v="o">Chuyện khác của mình</button></div>';
     if (k) {
       if (k === 'o') h += '<input class="inp ps-sel inp--gap" data-k="b73.mko" maxlength="60" value="' + esc(g('b73.mko') || '') + '" placeholder="Gọi tên lần sai đó trong vài chữ">';
@@ -1483,7 +1514,7 @@
   function protoK() { for (var i = 0; i < PROTO_K.length; i++) if (PROTO_K[i][0] === g('b73.pk')) return PROTO_K[i]; return null; }
   STEP.proto = function () {
     var src = g('b73.src') || '', L = protoSrcs(), K = protoK();
-    var h = shinSays('curious', '<p>Bạn đã viết mình thích, mình hợp nhiều điều. Nhưng chưa thử thật thì chưa chắc. Mình làm một <b>mẫu thử</b> nhé.</p>', 56) +
+    var h = shinSays('curious', '<p>Bạn đã viết mình thích, mình hợp nhiều điều. Nhưng chưa thử thật thì chưa chắc. <b>Mình thử làm một việc nhỏ hướng đến mục tiêu nhé!</b></p>', 56) +
       '<div class="prule">' + PROTO_RULE.map(function (r) { return '<span><b>' + esc(r[0]) + '</b><small>' + esc(r[1]) + '</small></span>'; }).join('') + '</div>' +
       qh('Bạn muốn thử điều gì?') + '<div class="opts">' + L.map(function (t) { return opt('b73.src', t[1], t[0], src === t[1]); }).join('') + opt('b73.src', 'o', 'Điều khác, mình tự viết', src === 'o') + '</div>';
     if (src === 'o') h += '<input class="inp ps-sel inp--gap" data-k="b73.srco" maxlength="60" value="' + esc(g('b73.srco') || '') + '" placeholder="Ví dụ: làm phiên dịch">';
@@ -1491,25 +1522,25 @@
       h += '<div class="pbelief">Mình tin mình thích hoặc hợp với <b>' + esc(protoSrc()) + '</b>, nhưng chưa thử thật.</div>';
       h += qh('Thử bằng cách nào?') + '<div class="pkind">' + PROTO_K.map(function (x) { var on = g('b73.pk') === x[0]; return '<button type="button" class="pkind__b' + (on ? ' on' : '') + '" data-act="pick" data-k="b73.pk" data-v="' + x[0] + '" aria-pressed="' + on + '">' + cdIc(x[3], 20) + '<b>' + esc(x[1]) + '</b><small>' + esc(x[2]) + '</small></button>'; }).join('') + '</div>';
       if (K) h += '<ul class="pex">' + K[4].map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>' +
-        '<h3 class="qs">Mẫu thử của bạn: mình sẽ…</h3>' + areaHTML('b73.pw', 'Ví dụ: ' + K[4][0].replace(/^[^:]*:\s*/, ''), 2, 200) +
+        '<h3 class="qs">Việc thử nhỏ của bạn: mình sẽ…</h3>' + areaHTML('b73.pw', 'Ví dụ: ' + K[4][0].replace(/^[^:]*:\s*/, ''), 2, 200) +
         '<h3 class="qs">Thử xong, mình muốn biết…</h3><input class="inp ps-sel" data-k="b73.pq" maxlength="100" value="' + esc(g('b73.pq') || '') + '" placeholder="Ví dụ: mình có kiên nhẫn giải thích cho người khác không?">';
     }
     return h;
   };
-  CHECK.proto = function () { if (!protoSrc()) return g('b73.src') === 'o' ? 'Viết điều bạn muốn thử' : 'Chọn điều bạn muốn thử'; if (!g('b73.pk')) return 'Chọn cách thử'; if (trim(g('b73.pw')).length < 8) return 'Viết mẫu thử của bạn'; return trim(g('b73.pq')).length >= 6 ? '' : 'Viết điều bạn muốn biết'; };
+  CHECK.proto = function () { if (!protoSrc()) return g('b73.src') === 'o' ? 'Viết điều bạn muốn thử' : 'Chọn điều bạn muốn thử'; if (!g('b73.pk')) return 'Chọn cách thử'; if (trim(g('b73.pw')).length < 8) return 'Viết việc thử nhỏ của bạn'; return trim(g('b73.pq')).length >= 6 ? '' : 'Viết điều bạn muốn biết'; };
   function likeFace(n, on, act) { return '<button type="button" class="lk' + (on ? ' on' : '') + '" data-act="' + act + '" data-v="' + n + '" aria-pressed="' + on + '"><b>' + n + '</b><small>' + esc(LIKE5[n]) + '</small></button>'; }
   STEP.proto2 = function () {
     var pg = +g('b73.pg') || 0, K = protoK();
     var h = qh('Trước khi thử, bạn đoán mình sẽ thích mức nào?', '1 là không thích, 5 là rất thích.') + '<div class="lks">' + [1, 2, 3, 4, 5].map(function (n) { return likeFace(n, pg === n, 'pg'); }).join('') + '</div>' +
-      qh('Bạn làm xong khi nào?', 'Mẫu thử nên xong trong 2 tuần.') + '<div class="seg3">' + PROTO_WHEN.map(function (o) { var on = g('b73.pd') === o[0]; return '<button type="button" class="' + (on ? 'on' : '') + '" data-act="protoWhen" data-v="' + o[0] + '">' + esc(o[1]) + '</button>'; }).join('') + '</div>';
-    if (pg && g('b73.pdl')) h += '<h3 class="qs">Thẻ mẫu thử của bạn</h3>' + protoCard(1) + (K ? rtSugHTML([PROTO_RT[K[0]]], 'Mang sang Shin routine', 'Mẫu thử là việc lặp lại mỗi ngày? Đặt thành thẻ để Shin nhắc bạn.', 1) : '');
+      qh('Bạn làm xong khi nào?', 'Việc thử nhỏ nên xong trong 2 tuần.') + '<div class="seg3">' + PROTO_WHEN.map(function (o) { var on = g('b73.pd') === o[0]; return '<button type="button" class="' + (on ? 'on' : '') + '" data-act="protoWhen" data-v="' + o[0] + '">' + esc(o[1]) + '</button>'; }).join('') + '</div>';
+    if (pg && g('b73.pdl')) h += '<h3 class="qs">Thẻ việc thử nhỏ của bạn</h3>' + protoCard(1) + (K ? rtSugHTML([PROTO_RT[K[0]]], 'Mang sang Shin routine', 'Việc thử nhỏ là việc lặp lại mỗi ngày? Đặt thành thẻ để Shin nhắc bạn.', 1) : '');
     return h;
   };
   CHECK.proto2 = function () { if (!g('b73.pg')) return 'Đoán mức thích của bạn'; return g('b73.pdl') ? '' : 'Chọn lúc làm xong'; };
   function protoCard(preview) {
     var K = protoK(); if (!K || !trim(g('b73.pw'))) return '';
     var real = +g('b73.real') || 0;
-    return '<div class="protoc"><div class="protoc__h">' + cdIc(K[3], 18) + '<b>Mẫu thử · ' + esc(K[1]) + '</b><span>' + (g('b73.pdl') ? 'Hạn ' + esc(ddmm(g('b73.pdl'))) : '') + '</span></div>' +
+    return '<div class="protoc"><div class="protoc__h">' + cdIc(K[3], 18) + '<b>Việc thử nhỏ · ' + esc(K[1]) + '</b><span>' + (g('b73.pdl') ? 'Hạn ' + esc(ddmm(g('b73.pdl'))) : '') + '</span></div>' +
       '<p class="protoc__b">' + esc(protoSrc()) + '</p><p>' + esc(trim(g('b73.pw'))) + '</p>' + (trim(g('b73.pq')) ? '<p class="protoc__q">Mình muốn biết: ' + esc(trim(g('b73.pq'))) + '</p>' : '') +
       '<div class="protoc__m"><span>Đoán: <b>' + (+g('b73.pg') || '–') + '/5</b></span><span>Thử thật: <b>' + (real ? real + '/5' : '…') + '</b></span></div>' +
       (real && trim(g('b73.surp')) ? '<p class="protoc__s">Điều bất ngờ: ' + esc(trim(g('b73.surp'))) + '</p>' : '') +
@@ -1606,9 +1637,9 @@
     var NS = needSum();
     VOY.forEach(function (x) { var is = voyIsle(x[0]); if (!is) return; var ex = [];
       if (x[0] === 'b41') { if (NS.co.length) ex.push('Thuận lợi: ' + NS.co.join('; ')); if (NS.thieu.length) ex.push('Thách thức: ' + NS.thieu.join('; ')); if (trim(g('b41.nd'))) ex.push(trim(g('b41.nd'))); }
-      add(voyTitle(x[0]) + (leanVoy() === x[0] ? '  ★ đang nghiêng' : ''), [is.n + (g(x[0] + '.jl') ? ' · Tiếng Nhật: ' + (g(x[0] + '.jl') === 'x' ? 'vừa đủ' : g(x[0] + '.jl')) : '') + ' · Cân: ' + voyScore(x[0]) + '/100'].concat(msList(x[0])).concat(ex), 'b4'); });
+      add(voyTitle(x[0]) + (leanVoy() === x[0] ? '  ★ đang nghiêng' : ''), [is.n + (g(x[0] + '.jl') ? ' · Tiếng Nhật: ' + (g(x[0] + '.jl') === 'x' ? 'vừa đủ' : g(x[0] + '.jl')) : '') + ' · Cân: ' + voyScore(x[0]) + '/100'].concat(msList(x[0])).concat(ex), 'b4'); var lst = L[L.length - 1]; if (lst && lst[2] === 'b4' && !lst[3]) lst[3] = x[0]; });
     if (blk()) add('Khi đường bị chặn', [blk().t + '. Bước đầu: ' + (g('b52.first') || '…')], 'b5');
-    var CS = crossSum(); if (S.done.b53 || CS.keep.length) add('Khi đứng giữa ngã rẽ', ['Tôi hay giữ: ' + (CS.keep.join(', ') || '…') + (CS.lose.length ? '. Hay buông: ' + CS.lose.join(', ') : ''), trim(g('b53n.me'))], 'b5');
+    var CS = crossSum(); if (S.done.b53 || CS.keep.length) add('Khi đứng giữa ngã rẽ', ['Tôi hay giữ: ' + (CS.keep.join(', ') || '…') + (CS.lose.length ? '. Hay buông: ' + CS.lose.join(', ') : '') + (CS.whyTop ? '. Dễ đổi ý khi: ' + lowF(CS.whyTop) : ''), trim(g('b53n.me'))], 'b5');
     var ad = curAd(), ps = p3Sum();
     if (ad) add(isPlan(ad) ? 'Kế hoạch kinh doanh tôi đã đọc' : 'Tin tuyển dụng 3 năm sau', [(isPlan(ad) ? ad.n : ad.vt + ' · ' + ad.lu + ' (tham khảo)') + (g('b61.why') ? '. Cần chuẩn bị: ' + trim(g('b61.why')) : '')], 'b6');
     if (S.d['b62.q'] || S.done.b62) add('Phỏng vấn 3 năm sau', [ivWho().n + ' · ' + ivQs().map(function (id) { var q = qOf(id); return q.rq ? 'Hỏi về: ' + q.ev : q.vi; }).join(' · ')], 'b6');
@@ -1617,8 +1648,8 @@
     if (g('b71.key')) add('Người giúp tôi', [ringName(g('b71.key')) + (trim(g('b71.ask')) ? '. Tôi sẽ hỏi: ' + trim(g('b71.ask')).replace(/\s*\n\s*/g, ' ') : ''), trim(g('b71.met')) ? 'Đã gặp, lời khuyên: ' + trim(g('b71.met')) : ''], 'b7');
     if (trim(g('b72.why')) || hardSum().length) add('Học từ công việc', [trim(g('b72.why')) ? 'Câu “Tại sao?” tôi sẽ hỏi: ' + trim(g('b72.why')) : '', hardSum().length ? 'Khi được giao việc khó, tôi chọn: ' + hardSum().join(' · ') : ''], 'b7');
     else if (g('b72.h')) add('Cách tôi học từ công việc', [g('b72.h') + (trim(g('b72.how')) ? ' · ' + trim(g('b72.how')) : '')], 'b7');
-    if (lessonTitle()) add('Bài học xương máu', [lessonTitle(), trim(g('b73.m2')) ? 'Tôi rút ra: ' + trim(g('b73.m2')) : '', trim(g('b73.m3')) ? 'Lần sau: ' + trim(g('b73.m3')) : ''], 'b7');
-    var PR = protoSum(); if (PR.w) add('Mẫu thử “Thử để biết”', [PR.k + ': ' + PR.w + (PR.src ? ' (' + PR.src + ')' : ''), 'Đoán thích ' + PR.guess + '/5' + (PR.real ? ', thử thật ' + PR.real + '/5' + (PR.surp ? '. Bất ngờ: ' + PR.surp : '') : (PR.due ? ', hạn ' + ddmm(PR.due) : ''))], 'b7');
+    if (lessonTitle()) add('Bài học từ trải nghiệm', [lessonTitle(), trim(g('b73.m2')) ? 'Tôi rút ra: ' + trim(g('b73.m2')) : '', trim(g('b73.m3')) ? 'Lần sau: ' + trim(g('b73.m3')) : ''], 'b7');
+    var PR = protoSum(); if (PR.w) add('Việc thử nhỏ “Thử để biết”', [PR.k + ': ' + PR.w + (PR.src ? ' (' + PR.src + ')' : ''), 'Đoán thích ' + PR.guess + '/5' + (PR.real ? ', thử thật ' + PR.real + '/5' + (PR.surp ? '. Bất ngờ: ' + PR.surp : '') : (PR.due ? ', hạn ' + ddmm(PR.due) : ''))], 'b7');
     if (g('f1.n') || S.done.f1) add('Độ mở', ['Lúc nhận thuyền: ' + nLabel(g('x1.n')) + ', rõ ' + (g('x1.sure') == null ? 5 : g('x1.sure')) + '/10. Bây giờ: ' + nLabel(g('f1.n')) + ', rõ ' + (g('f1.sure') == null ? 5 : g('f1.sure')) + '/10.', trim(g('f1.change')), trim(g('f1.ps'))], 'fin');
     if (chestSel().length) add(CHEST_MY, chestSum().map(function (x) { return x.n + (x.w ? ': ' + x.w : ''); }), 'fin'); /* PS1.3.51 */
     if (dbN()) add(DREAM_T, [dbSum().join(' · ')], 'fin'); /* PS1.3.48 */
@@ -1631,7 +1662,7 @@
       '<div class="sheet" id="sheet"><div class="sheet__h"><div class="sheet__flag">' + flagSVG(D2.f.s, D2.f.c, 64, 0) + '</div><div><small>PROSKILLS · CAREER DESIGN 02</small><b>Hướng đi của tôi</b><span>' + esc((p.name || '') + (p.cls ? ' · Lớp ' + p.cls : '')) + '</span>' +
       (g('x1.motto') ? '<em>“' + esc(g('x1.motto')) + '”</em>' : '') + '</div></div>' + chestStrip() + '<div class="sheet__cmp">' + compassSVG(pv(), 330) + '</div>' +
       (dbN() ? '<div class="sheet__db"><b>' + esc(DREAM_T) + '</b>' + dbBoard(0) + '</div>' : '') +
-      D2.L.filter(function (sec) { return sec[0] !== DREAM_T && sec[0] !== CHEST_MY; }).map(function (sec) { var bn = benOf(sec[2]); return '<div class="sheet__s"><b>' + (bn ? '<i class="sheet__ic" title="' + esc(bn.n) + '">' + cdIc(bn.ic, 14) + '</i>' : '') + esc(sec[0]) + '</b>' + sec[1].map(function (t) { return '<p>' + esc(t) + '</p>'; }).join('') + '</div>'; }).join('') +
+      D2.L.filter(function (sec) { return sec[0] !== DREAM_T && sec[0] !== CHEST_MY; }).map(function (sec) { var bn = benOf(sec[2]); return '<div class="sheet__s' + (sec[3] && planK(sec[3]) ? ' sheet__s--pl' : '') + '">' + (sec[3] && planK(sec[3]) ? '<span class="sheet__pl">' + planArt(planK(sec[3]), 48) + '</span>' : '') + '<b>' + (bn ? '<i class="sheet__ic" title="' + esc(bn.n) + '">' + cdIc(bn.ic, 14) + '</i>' : '') + esc(sec[0]) + '</b>' + sec[1].map(function (t) { return '<p>' + esc(t) + '</p>'; }).join('') + '</div>'; }).join('') +
       '<p class="sheet__ft">Proskills · Khoa Kỹ năng JPC · ' + esc(CD2_VER) + '</p></div>' +
       '<div class="repbtns"><button type="button" class="btn" data-act="sheetImg">' + PS.icon('save', 18) + 'Lưu ảnh</button><button type="button" class="btn btn--soft" data-act="sheetPrint">In / PDF</button></div>';
     return h;
@@ -1858,7 +1889,7 @@
 
   /* ----- ảnh và in Hải trình của tôi ----- */
   function sheetImg() {
-    var D2 = sheetData(), p = D2.p, cv = D.createElement('canvas'), cx = cv.getContext('2d'), Wd = 1080, PAD = 64, IN = Wd - PAD * 2, y = 0, draw = false, dbImg = null, trImg = null;
+    var D2 = sheetData(), p = D2.p, cv = D.createElement('canvas'), cx = cv.getContext('2d'), Wd = 1080, PAD = 64, IN = Wd - PAD * 2, y = 0, draw = false, dbImg = null, trImg = null, plImg = {};
     function font(w, s) { cx.font = w + ' ' + s + 'px "Be Vietnam Pro", system-ui, sans-serif'; }
     function txt(t, x, mw, lh, col) {
       var ws = String(t).split(' '), line = '';
@@ -1880,8 +1911,10 @@
         if (dbImg && sec[0] === DREAM_T) return;
         if (trImg && sec[0] === CHEST_MY) return;
         var y0 = y; if (draw) { cx.fillStyle = '#FFFFFF'; cx.fillRect(PAD, y0, IN, sec.h || 0); cx.fillStyle = '#D97757'; cx.fillRect(PAD, y0, 8, sec.h || 0); }
-        y += 22; font('800', 30); txt(sec[0], PAD + 32, IN - 60, 42, '#141413');
-        font('400', 27); sec[1].forEach(function (t) { txt(t, PAD + 32, IN - 60, 38, '#3D3D3A'); });
+        var pim = sec[3] && plImg[sec[3]]; if (pim && draw) cx.drawImage(pim, PAD + IN - 104, y0 + 18, 80, 80); /* PS1.3.57: hình kế hoạch */
+        y += 22; font('800', 30); txt(sec[0], PAD + 32, IN - (pim ? 150 : 60), 42, '#141413');
+        font('400', 27); sec[1].forEach(function (t) { txt(t, PAD + 32, IN - (pim ? 150 : 60), 38, '#3D3D3A'); });
+        if (pim && y < y0 + 104) y = y0 + 104;
         y += 20; if (!draw) sec.h = y - y0; y += 18;
       });
       font('500', 22); txt('Proskills · Khoa Kỹ năng JPC · ' + CD2_VER, PAD, IN, 34, '#6F6E69');
@@ -1910,7 +1943,11 @@
       try {
         ld(compassSVG(pv(), 432).replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" height="360" '), function (ci) {
           ld(chestSel().length ? trSVG() : '', function (ti) { trImg = ti;
-            ld(dbN() ? dbSVG() : '', function (di) { dbImg = di; run(ci); }); });
+            ld(dbN() ? dbSVG() : '', function (di) { dbImg = di;
+              var pq = VOY.map(function (x) { return x[0]; }).filter(function (v) { return planK(v); }), nx2 = function (i) { /* PS1.3.57: nạp hình 3 kế hoạch */
+                if (i >= pq.length) { run(ci); return; }
+                ld(planArt(planK(pq[i]), 160, '#FBEFE8').replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" '), function (im) { if (im) plImg[pq[i]] = im; nx2(i + 1); }); };
+              nx2(0); }); });
         });
       } catch (e) { run(null); }
     };
@@ -1965,7 +2002,7 @@
     var ask = first && !g('fut.at'); /* PS1.3.51: hỏi viết Thư gửi thuyền trưởng tương lai */
     ov('<div class="stampov">' + certHTML() + (pts ? '<p class="stampov__pts">' + pts + '</p>' : '') + shinSays('cheer', first ? '<p>Chúc mừng thuyền trưởng <b class="nm">' + esc(given()) + '</b>! Trang phục Thuyền trưởng đã có trong Tủ đồ của Shin.</p>' : '<p>Hải đồ vẫn mở. Ghé đảo, đọc thêm Senpai lúc nào cũng được.</p>', 56) +
       (ask ? futAsk() : '<button type="button" class="btn btn--go btn--w" data-act="ovHome">Về hải đồ</button>' + (g('fut.at') ? '' : '<button type="button" class="link" data-act="futWrite">' + esc(FUT.t) + '</button>')) +
-      '<div class="shipwrap shipwrap--sm">' + shipUpHTML(GOAL_PORT, first) + '</div></div>'); /* PS1.3.52 */
+      '</div>'); /* PS1.3.57 (góp ý 12): thuyền đủ 8 món hiện ở popup riêng sau khi đóng bằng */
   }
   function showStamp(b, again, pts) { /* PS1.3.45 (góp ý 14) · PS1.3.49 (góp ý 3, 4, 13): nút đi tiếp lên trên thuyền, đủ 3 dòng, xem lại được */
     var add = [], cap = 3; sheetData().L.forEach(function (sec) { if (sec[2] === b.id && add.length < cap) add.push('<li><b>' + esc(sec[0]) + '</b>' + esc(cut1(sec[1].join(' · '), 96)) + '</li>'); });
@@ -1976,9 +2013,34 @@
       (b !== PORT ? btlCard(b) : '') + /* PS1.3.51: Thư trong chai */
       (nx ? '<button type="button" class="btn btn--go btn--w" data-act="ovBen" data-st="' + nx.id + '">Tiếp theo: ' + esc(nx === GOAL_PORT ? nx.n : benLabel(nx) + ' · ' + nx.n) + PS.icon('next', 16, 2.6) + '</button><button type="button" class="btn btn--soft btn--w stampov__home" data-act="ovHome">Về hải đồ</button>' :
         '<button type="button" class="btn btn--go btn--w" data-act="ovHome">Về hải đồ</button>') +
-      '<div class="shipwrap shipwrap--sm">' + shipUpHTML(b, !again && b !== PORT) + '</div></div>');
+      '</div>'); /* PS1.3.57 (góp ý 12): bỏ thuyền khỏi popup con dấu; thuyền nâng cấp hiện ở popup riêng khi bấm Tiếp theo */
   }
 
+  /* PS1.3.57 (góp ý 12): popup “Chúc mừng {Tên}, thuyền của bạn vừa được nâng cấp” (kiểu Thư trong chai).
+     Hiện 1 lần mỗi bến, khi bấm Tiếp theo / Đi tiếp / chạm bến mới trên hải đồ. Bấm “Về hải đồ” thì bỏ qua (coi như đã xem).
+     Cuối khóa (fin): hiện sau khi đóng popup Bằng. S.shipSeen[mã] = lúc xem. */
+  function shipPend() { var r = null; BEN.forEach(function (b) { if (!r && S.stamp[b.id] && SHIP_ITEM[b.id] && !S.shipSeen[b.id]) r = b; }); if (!r && S.fin && !S.shipSeen.fin) r = GOAL_PORT; return r; }
+  function shipSkip() { BEN.forEach(function (b) { if (S.stamp[b.id] && !S.shipSeen[b.id]) S.shipSeen[b.id] = Date.now(); }); save(); }
+  function shipGate(after) { var pb = shipPend(); if (!pb) return false; shipOv(pb, after); return true; }
+  function shipOv(b, after) {
+    var k = b === GOAL_PORT ? 'fin' : b.id, it = SHIP_ITEM[k]; if (!it) return;
+    S.shipSeen[k] = Date.now(); save(); sfx('pop');
+    var nb = after && after.st ? benOf(after.st) : null;
+    var btn = nb ? '<button type="button" class="btn btn--go btn--w" data-act="ovBen" data-st="' + nb.id + '">Vào ' + esc(nb === GOAL_PORT ? nb.n : benLabel(nb) + ' · ' + nb.n) + PS.icon('next', 16, 2.6) + '</button>'
+      : '<button type="button" class="btn btn--go btn--w" data-act="' + (after && after.home ? 'ovHome' : 'ovClose') + '">' + (after && after.home ? 'Về hải đồ' : 'Tiếp tục') + '</button>';
+    ov('<div class="shipov' + (RM ? '' : ' shipov--fx') + '"><p class="shipov__k">' + cdIc('anchor', 14) + 'Thuyền cấp ' + shipCap() + ' / 8</p>' +
+      '<h2>Chúc mừng <b class="nm">' + esc(given()) + '</b>, thuyền của bạn vừa được nâng cấp!</h2>' +
+      '<div class="shipov__sea">' + shipUpHTML(b, true, 1) + '</div>' +
+      '<div class="letter shipov__it"><div class="letter__in"><small>' + cdIc('flag', 14) + 'Thuyền vừa có thêm</small><b>' + esc(it[0]) + '</b><span>' + esc(it[1]) + '</span></div></div>' +
+      btn + '</div>');
+  }
+  /* PS1.3.57 (góp ý 2): đổi ảnh đại diện ngay trong CD02 (cùng bảng chọn với Cài đặt trang chủ, lưu PS.prefs().av) */
+  function avOv() {
+    if (!W.PSAvatar || !PSAvatar.body) return;
+    ov('<div class="avov"><h2>Ảnh đại diện</h2>' + PSAvatar.body() + '</div>');
+    var box = D.getElementById('cdov');
+    if (box) box.addEventListener('click', function (e) { var bt = PS.closest(e.target, '[data-av]'); if (!bt) return; PS.setPref('av', bt.getAttribute('data-av')); sfx('ting'); closeOv(); if (V.v === 'act') keepY(redrawStep); else render(false); PS.toast('Đã đổi ảnh đại diện.'); });
+  }
   /* ---------- lớp phủ ---------- */
   function ov(html) { closeOv(); var el = D.createElement('div'); el.id = 'cdov'; el.className = 'cdov'; el.setAttribute('role', 'dialog'); el.innerHTML = '<div class="cdov__box"><button type="button" class="cdov__x" data-act="ovClose" aria-label="Đóng">' + PS.icon('close', 20) + '</button>' + html + '</div>'; D.body.appendChild(el); D.body.classList.add('ps-lock'); }
   function closeOv() { var el = D.getElementById('cdov'); if (el) el.parentNode.removeChild(el); if (!nbOpen) D.body.classList.remove('ps-lock'); }
@@ -2011,7 +2073,7 @@
     if (windList().length) h += '<div class="nbbox"><small>Điều có thể làm đổi kế hoạch</small>' + zoneHTML() + '</div>';
     if (g('b71.key')) h += '<div class="nbbox"><small>Người giúp tôi</small><div class="ringbox">' + ringSVG() + '</div>' + (trim(g('b71.ask')) ? '<p>Câu tôi sẽ hỏi: ' + esc(g('b71.ask')) + '</p>' : '') + (S.done.b71 ? (trim(g('b71.met')) ? '<p>Đã gặp: ' + esc(g('b71.met')) + '</p>' : '<button type="button" class="link" data-act="goAsk">Gặp rồi? Ghi lại lời khuyên</button>') : '') + '<p>Người giúp nhiều nhất: <b>' + esc(ringName(g('b71.key'))) + '</b></p></div>';
     if (trim(g('b72.why'))) h += '<div class="nbbox"><small>Câu “Tại sao?” tôi sẽ hỏi</small><p>' + esc(g('b72.why')) + '</p></div>';
-    if (lessonTitle()) h += '<div class="nbbox"><small>Bài học xương máu</small><p><b>' + esc(lessonTitle()) + '</b></p><p>' + esc(trim(g('b73.m2'))) + '</p>' + (trim(g('b73.m3')) ? '<p>Lần sau: ' + esc(trim(g('b73.m3'))) + '</p>' : '') + '</div>';
+    if (lessonTitle()) h += '<div class="nbbox"><small>Bài học từ trải nghiệm</small><p><b>' + esc(lessonTitle()) + '</b></p><p>' + esc(trim(g('b73.m2'))) + '</p>' + (trim(g('b73.m3')) ? '<p>Lần sau: ' + esc(trim(g('b73.m3'))) + '</p>' : '') + '</div>';
     if (g('b72.h') && !trim(g('b72.why'))) h += '<div class="nbbox"><small>Cách tôi học từ công việc</small><p><b>' + esc(g('b72.h')) + '</b>' + (g('b72.how') ? ' · ' + esc(g('b72.how')) : '') + '</p></div>';
     if (chestSel().length) h += '<div class="nbbox"><small>' + esc(CHEST_MY) + '</small>' + chestStrip(36).replace('<b>' + esc(CHEST_MY) + '</b>', '') + '</div>'; /* PS1.3.51 */
     if (dbN()) h += '<div class="nbbox"><small>' + esc(DREAM_T) + '</small>' + dbBoard(0) + '</div>';
@@ -2081,7 +2143,7 @@
     if (a === 'home') go({ v: 'home' });
     else if (a === 'psHome') { save(true); PS.home(); }
     else if (a === 'introGo') { S.intro = 1; save(true); go({ v: 'act', id: 'x1', step: 0 }); }
-    else if (a === 'ben') { var bn = benOf(b.getAttribute('data-st')); if (bn && (benOpen(bn) || benDone(bn))) go({ v: 'ben', st: bn.id }); else if (bn) PS.toast(esc(lockMsg(bn))); }
+    else if (a === 'ben') { var bn = benOf(b.getAttribute('data-st')); if (bn && !benDone(bn) && benOpen(bn) && shipGate({ st: bn.id })) return; if (bn && (benOpen(bn) || benDone(bn))) go({ v: 'ben', st: bn.id }); else if (bn) PS.toast(esc(lockMsg(bn))); }
     else if (a === 'lockMsg') { var bl = benOf(b.getAttribute('data-st')); PS.toast(esc(bl ? lockMsg(bl) : SHIN_TALK.lockFin)); }
     else if (a === 'open') { if (actOpen(id) || S.done[id]) go({ v: 'act', id: id, step: 0 }); else PS.toast(esc(lockMsg(benOf(ACTS[id].st)))); }
     else if (a === 'isle') { if (D.getElementById('cdov')) closeOv(); go({ v: 'isle', id: id }); }
@@ -2126,7 +2188,7 @@
     else if (a === 'wz') { var WZ = g('b32.z') || {}; WZ[id] = v; S.d['b32.z'] = WZ; save(); sfx('flip'); keepY(redrawStep); }
     else if (a === 'cmnSel') { var CS = (g('b22.sel') || []).slice(), csi = CS.indexOf(v); if (csi > -1) CS.splice(csi, 1); else { if (CS.length >= 3) { PS.toast('Chọn tối đa 3 điều. Bỏ một điều trước nhé.'); return; } CS.push(v); } S.d['b22.sel'] = CS; save(); keepY(redrawStep); }
     else if (a === 'hideIntro') { V.showIntro = 0; QUIET = true; render(false); QUIET = false; }
-    else if (a === 'ovBen') { closeOv(); var ob = benOf(b.getAttribute('data-st')); if (ob) go({ v: 'ben', st: ob.id }); }
+    else if (a === 'ovBen') { closeOv(); var ob = benOf(b.getAttribute('data-st')); if (ob && shipGate({ st: ob.id })) return; if (ob) go({ v: 'ben', st: ob.id }); }
     else if (a === 'copyMsg') copyText(k);
     else if (a === 'repTeams') { S.d['rep.end'] = Date.now(); save(true); setTimeout(function () { if (V.v === 'act') keepY(redrawStep); }, 400); }
     else if (a === 'work') { var P2 = g('b72.w') || {}; P2[id] = +v; S.d['b72.w'] = P2; save(); keepY(redrawStep); }
@@ -2139,7 +2201,8 @@
     else if (a === 'sucCell') sucPicker(+v);
     else if (a === 'sucPick') sucPick(v);
     else if (a === 'sucClear') sucClear();
-    else if (a === 'crossPick') { var cn = +id, cl = CROSS[cn]; if (crossSide(cn) !== v) { S.d['b53n.p' + cn] = Math.ceil(cl[v].lv[2] / 2); } S.d['b53n.c' + cn] = v; save(); sfx('flip'); keepY(redrawStep); }
+    else if (a === 'crossPick') { var cn = +id; if (crossSide(cn) !== v) delete S.d['b53x.r' + cn]; S.d['b53x.c' + cn] = v; save(); sfx('flip'); keepY(redrawStep); }
+    else if (a === 'crossWhy') { S.d['b53x.r' + id] = v; save(); sfx('ting'); keepY(redrawStep); }
     else if (a === 'tourSpot') { tourOpen = +v; keepY(redrawStep); var tp = D.getElementById('tourP'); if (tp && tp.scrollIntoView) { try { tp.scrollIntoView({ behavior: RM ? 'auto' : 'smooth', block: 'nearest' }); } catch (e2) { tp.scrollIntoView(false); } } }
     else if (a === 'tourAns') { var TR = tourRes(), ti = tourOpen; if (ti < 0) return; if (v === 'dk') TR[ti] = 'dk'; else if (+v === 0) { TR[ti] = 'ok'; sfx('ting'); } else { var TW = tourWrong[ti] || {}; TW[1] = 1; tourWrong[ti] = TW; keepY(redrawStep); return; } S.d['b72.t'] = TR; save(); keepY(redrawStep); }
     else if (a === 'tourNext') { var TR2 = tourRes(), nx2 = -1; tourOf().spots.forEach(function (x, i) { if (nx2 < 0 && !TR2[i]) nx2 = i; }); tourOpen = nx2; keepY(redrawStep); }
@@ -2154,6 +2217,9 @@
     else if (a === 'shoreSt') { var ST = obj('shore.st'); ST[id] = v; S.d['shore.st'] = ST; save(); var sg3 = PS.closest(b, '.seg3'); if (sg3) { var sbs = sg3.querySelectorAll('button'); for (var si = 0; si < sbs.length; si++) sbs[si].className = sbs[si].getAttribute('data-v') === v ? 'on' : ''; } }
     else if (a === 'shoreDone') shoreDone(id);
     else if (a === 'noop') {}
+    else if (a === 'avPick') avOv(); /* PS1.3.57 (góp ý 2) */
+    else if (a === 'planPicker') planPicker(k);
+    else if (a === 'planIc') { S.d[k + '.ic'] = v; save(); sfx('ting'); closeOv(); if (V.v === 'act') keepY(redrawStep); }
     else if (a === 'flagSym' || a === 'flagCol') { var f = g('x1.flag') || {}; if (a === 'flagSym') f.s = v; else f.c = v; S.d['x1.flag'] = { s: f.s, c: f.c }; save(); redrawStep(); }
     else if (a === 'flipGuess') { var G = g('b11.g') || {}; G[id] = v; S.d['b11.g'] = G; save(); sfx('flip'); collect(id, true); redrawStep(); }
     else if (a === 'isOpen') { V.isOpen = V.isOpen === id ? '' : id; var o = g('b12.o') || {}; o[id] = 1; S.d['b12.o'] = o; revealIsle(id, true); save(); redrawStep(); }
@@ -2184,7 +2250,7 @@
     else if (a === 'tab') { NBTAB = b.getAttribute('data-t'); drawNb(); }
     else if (a === 'ovClose') closeOv();
     else if (a === 'ovAct') { closeOv(); if (ACTS[id] && (actOpen(id) || S.done[id])) go({ v: 'act', id: id, step: resumeStep(id) }); }
-    else if (a === 'ovHome') { closeOv(); go({ v: 'home' }); }
+    else if (a === 'ovHome') { closeOv(); var sp0 = shipPend(); if (sp0 === GOAL_PORT) { shipOv(GOAL_PORT, { home: 1 }); return; } if (sp0) shipSkip(); go({ v: 'home' }); }
     else if (a === 'demoExit') exitDemo();
     else if (a === 'actMenu') actMenu(id);
     else if (a === 'actView') { closeOv(); go({ v: 'act', id: id, step: 0 }); }
@@ -2207,7 +2273,7 @@
     ov('<h2>Làm lại từ đầu?</h2><p>Bài cũ của chặng <b>' + esc(ACTS[id].t) + '</b> được giữ tạm. Đóng dấu lại thì bài mới thay bài cũ. Bỏ dở thì vẫn khôi phục được.</p>' +
       '<button type="button" class="btn btn--w" data-act="actResetGo" data-id="' + id + '">Làm lại từ đầu</button><button type="button" class="link" data-act="ovClose">Thôi, giữ bài cũ</button>');
   }
-  var ACT_KEYS = { b12: ['b12.', 'b13.'], b42: ['b42.', 'b43.'], b63: ['b63.', 'b53.'], b53: ['b53n.'] }; /* PS1.3.50: b53 mới dùng khóa b53n.* (b53.* là thử nhỏ cũ) */ /* PS1.3.42: chặng gộp giữ khóa cũ */
+  var ACT_KEYS = { b12: ['b12.', 'b13.'], b42: ['b42.', 'b43.'], b63: ['b63.', 'b53.'], b53: ['b53n.', 'b53x.'] }; /* PS1.3.50: b53 mới dùng khóa b53n.* (b53.* là thử nhỏ cũ) */ /* PS1.3.42: chặng gộp giữ khóa cũ */
   function actKeys(id) { var P = ACT_KEYS[id] || [id + '.'], out = []; for (var k in S.d) if (S.d.hasOwnProperty(k) && P.some(function (p) { return k.indexOf(p) === 0; })) out.push(k); return out; }
   function resetDo(id) {
     var keep = S.bak[id] || {}, fresh = !S.bak[id];
@@ -2223,7 +2289,7 @@
   function updIns(k) { var el = APP.querySelector('[data-ins="' + k + '"]'); if (el) el.innerHTML = insTxt(k); }
   D.addEventListener('input', function (e) {
     var t = e.target, k = t.getAttribute && t.getAttribute('data-k'); if (!k) return;
-    if (t.type === 'range') { S.d[k] = +t.value; if (/^b53n\.p\d$/.test(k)) { var xn = +k.slice(6), xo = D.getElementById('xrOut' + xn), xs = crossSide(xn); if (xo && xs) xo.textContent = lvFmt(CROSS[xn][xs].lv, t.value); save(); return; } var o = D.getElementById('sureOut'); if (o) o.textContent = t.value + '/10'; var o2 = D.getElementById('sureOut2'); if (o2) o2.textContent = 'Rõ ' + t.value + '/10'; save(); return; }
+    if (t.type === 'range') { S.d[k] = +t.value; if (0 && /^b53n\.p\d$/.test(k)) { var xn = +k.slice(6), xo = D.getElementById('xrOut' + xn), xs = crossSide(xn); if (xo && xs) xo.textContent = lvFmt(CROSS[xn][xs].lv, t.value); save(); return; } var o = D.getElementById('sureOut'); if (o) o.textContent = t.value + '/10'; var o2 = D.getElementById('sureOut2'); if (o2) o2.textContent = 'Rõ ' + t.value + '/10'; save(); return; }
     S.d[k] = t.value; save(); updIns(k); refreshBar();
     if (k === 'fut.t') { var fn = D.getElementById('futN'); if (fn) fn.textContent = t.value.length + '/' + FUT.max; }
     if (/^b32\.w\d$/.test(k)) { var zb = APP.querySelector('.z2'); if (zb) { var tmp = D.createElement('div'); tmp.innerHTML = zoneHTML(); zb.parentNode.replaceChild(tmp.firstChild, zb); } }

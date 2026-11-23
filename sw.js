@@ -6,12 +6,14 @@
      · Tệp có ?v= (js, css theo phiên bản): lấy bộ nhớ ngay, không chờ mạng (đổi phiên bản = địa chỉ mới).
      · Tệp khác (hình, phông, âm thanh): mở bản đã lưu ngay, đồng thời tải bản mới chạy ngầm cho lần sau.
    - Mọi tệp của module được lưu tự động sau lần mở đầu tiên có mạng.
+   - PS1.3.57: CD02 bản 5 đợt 2 (cờ ảnh đại diện, hình kế hoạch, popup thuyền nâng cấp, vẽ lại người).
+   - PS1.3.56: CD02 bản 5 đợt 1 (Bến 4 tự chấm 3 yếu tố, dải màu 1–5, Bến 5 bốn ngã rẽ).
    - PS1.3.55: điều hướng chung trong khóa (core PS.nav), Học tiếp mở thẳng hoạt động (?go=).
    - PS1.3.54: trang chủ tải sẵn mọi khóa (core/pwa.js PS.warmAll); tệp ?v= mất mạng thì dùng bản cùng tên đã lưu.
    - Không bao giờ đụng tới bài làm (localStorage) của học viên.
    ========================================================= */
 'use strict';
-const VERSION = 'PS1.3.55';
+const VERSION = 'PS1.3.57';
 const BASE = new URL(self.registration.scope);
 const PREFIX = 'proskills-' + encodeURIComponent(BASE.pathname) + '-';
 const SHELL = PREFIX + 'shell-' + VERSION;

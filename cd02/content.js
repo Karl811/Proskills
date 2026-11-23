@@ -13,7 +13,7 @@
    - Ý của thầy Lê Long Sơn nói gián tiếp: “thầy của Shin”. Không ghi tên Thầy trên giao diện CD02.
    - Không dùng từ “đơn hàng”. ES5. */
 var CD2_ID = 'cd02';
-var CD2_VER = 'CD02.3.11';
+var CD2_VER = 'CD02.3.13';
 var CD2_XP_ACT = 30, CD2_INS_WORDS = 15, CD2_INS_FIELD = 5, CD2_XP_CARD = 2;
 var CD2_TOTAL = 20; /* PS1.3.50 (bản 4 đợt 2): thêm b53 Đứng giữa ngã rẽ, b73 Học từ chính mình → 20 chặng. */ var CD2_TOTAL_OLD = 18; /* PS1.3.42 (bản 2, PA A): Xuất phát 1 + 7 bến (2·3·3·2·2·3·2 chặng) = 18. Cảng Khởi Hành (f1, f2) không tính. */
 
@@ -424,8 +424,8 @@ var LIFE_TIPS = ['10 năm nữa, một cuộc sống tốt với mình là có n
    Ý tưởng tham khảo: “Odyssey Plan” trong sách Designing Your Life (Burnett, Evans · Stanford). Khóa học viết lại cho học viên JPC. */
 var VOY = [ /* [mã chặng, chữ, tên, câu hỏi phụ] */
   ['b41', 'A', 'Hướng đang nghĩ tới', 'Hướng bạn đang nghĩ tới lúc này'],
-  ['b42', 'B', 'Nếu A không đi được', 'Bạn sẽ đi đâu?'],
-  ['b43', 'C', 'Nếu không phải lo tiền', 'Bạn sẽ chọn gì?']
+  ['b42', 'B', 'Nếu A khó thực hiện', 'Bạn sẽ làm gì tiếp theo?'], /* PS1.3.56 (góp ý 6) */
+  ['b43', 'C', 'Nếu không phải lo nghĩ về tiền', 'Bạn sẽ chọn làm điều gì mình thực sự mong muốn?']
 ];
 /* gợi ý mốc theo đảo (chạm để điền vào mốc còn trống, rồi sửa theo ý mình) */
 var MS_TIPS = {
@@ -439,13 +439,19 @@ var MS_TIPS = {
   que: ['Về gần nhà', 'Tìm việc dùng tay nghề ở quê', 'Phụ gia đình làm ăn', 'Sửa lại nhà cho ba mẹ'],
   o: ['Học thêm một kỹ năng', 'Để dành một khoản', 'Đậu N2', 'Làm vững một nghề']
 };
-var JL_OPTS = [['N3', 'N3'], ['N2', 'N2'], ['N1', 'N1'], ['x', 'Không cần nhiều']];
-var METERS = [ /* 4 đồng hồ tự chấm */
-  ['like', 'Thích', 'Bạn thích kế hoạch này cỡ nào?'],
-  ['conf', 'Tự tin', 'Bạn tin mình làm được cỡ nào?'],
-  ['fit', 'Hợp mình', 'Hợp điều bạn coi trọng cỡ nào?'],
-  ['feas', 'Khả thi', 'Tiền, thời gian, giấy tờ có lo được không?']
+/* PS1.3.57 (góp ý 7): hình biểu tượng cho kế hoạch A/B/C (vẽ trong art.js PLAN_ART). [nhóm, [[mã, tên], …]] */
+var PLAN_IC = [
+  ['Nghề và việc làm', [['p_tool', 'Tay nghề vững'], ['p_chef', 'Bếp, nhà hàng'], ['p_care', 'Chăm sóc người'], ['p_team', 'Dẫn dắt nhóm'], ['p_desk', 'Văn phòng']]],
+  ['Học và lên trình độ', [['p_book', 'Học tiếng Nhật'], ['p_grad', 'Đi học tiếp'], ['p_talk', 'Phiên dịch, cầu nối'], ['p_stair', 'Lên bậc nghề'], ['p_seed', 'Lớn lên từng ngày']]],
+  ['Nơi chốn và cuộc sống', [['p_jp', 'Sống ở Nhật'], ['p_vn', 'Về quê'], ['p_work', 'Xưởng, tiệm của mình'], ['p_bridge', 'Hai đầu Việt – Nhật'], ['p_home', 'Gia đình']]]
 ];
+var JL_OPTS = [['N3', 'N3'], ['N2', 'N2'], ['N1', 'N1'], ['x', 'Không cần nhiều']];
+var METERS = [ /* PS1.3.56 (góp ý 5, 8): 3 đồng hồ tự chấm, bỏ “Khả thi”. [mã, tên, câu phụ, tên ngắn] */
+  ['like', 'Yêu thích', 'Bạn thích kế hoạch này cỡ nào?', 'Yêu thích'],
+  ['conf', 'Tự tin có thể làm được', 'Bạn tin mình làm được cỡ nào?', 'Tự tin'],
+  ['fit', 'Phù hợp với mình', 'Hợp điều bạn coi trọng cỡ nào?', 'Phù hợp']
+];
+var METER_COL = ['#F6DDD3', '#E9B7A3', '#D68A6E', '#B65A3E', '#8C3A27']; /* PS1.3.56 (góp ý 4): dải nâu đỏ 1 → 5 */
 var TRIO_TIPS = ['Cả 3 hải trình đều cần tiếng Nhật tốt', 'Hải trình C làm mình thích nhất, nhưng còn xa', 'Mình có nhiều đường hơn mình nghĩ', 'Hải trình B cũng không tệ như mình tưởng'];
 
 /* ---------- BẾN 5 · VỊNH NGÃ RẼ ---------- */
@@ -490,7 +496,7 @@ var LEARN_TIPS = ['Hướng này có hợp với mình không', 'Mình có giữ
 /* ---------- BẾN 7 · NGỌN HẢI ĐĂNG (PS1.3.42: trước là Bến 6) ---------- */
 var RING_P = [['fam', 'Gia đình', 'home'], ['ban', 'Bạn cùng lớp', 'people'], ['gv', 'Thầy cô JPC', 'cap'], ['sp', 'Senpai đi trước', 'card'],
   ['boss', 'Cấp trên người Nhật', 'shield'], ['dn', 'Đồng nghiệp ở Nhật', 'tool'], ['cd', 'Bạn cùng công ty trúng tuyển', 'speech'], ['tc', 'Anh chị Nghiệp đoàn, tổ chức hỗ trợ', 'anchor']];
-var RING_L = [['1', 'Thân thiết'], ['2', 'Quen sơ'], ['3', 'Chưa quen']]; /* PS1.3.45 (thầy góp ý 29b) */
+var RING_L = [['3', 'Chưa quen'], ['2', 'Quen sơ'], ['1', 'Thân thiết']]; /* PS1.3.56 (góp ý 13): hiện Chưa quen → Thân thiết, giữ mã cũ */ /* PS1.3.45 (thầy góp ý 29b) */
 var RING_STORY = [['hoi', 'Tổng Giám đốc giới thiệu anh Hợi sang công ty của một người bạn.'], ['ngat', 'Công ty mời chị Ngát ở lại, chuyển lên văn phòng.'], ['linh', 'Nghiệp đoàn nhận chị Linh làm thông dịch viên.'], ['ngoc3', 'Công ty Nhật giao anh Trung quản lý nhà máy; đối tác Nhật giúp anh Hiếu lập công ty.']];
 var MSG_TO = ['Anh chị Senpai', 'Thầy cô chủ nhiệm', 'Một người quen đã đi Nhật'];
 var MSG_Q = ['Mình nên chuẩn bị gì từ bây giờ cho hướng này?', 'Năm đầu ở Nhật, điều gì khó nhất?', 'Lúc muốn bỏ cuộc, mình nên làm gì?', 'Hướng này cần tiếng Nhật tới đâu?', 'Làm sao để công ty tin và giao việc mới?'];
@@ -805,13 +811,13 @@ var BEN = [
     why: ['5 năm sau khi xong 3 năm ở Nhật', 'Vẽ kế hoạch A, B, C và tự chấm', '3 kế hoạch 5 năm của bạn'], aim: 'bạn có 3 kế hoạch 5 năm' },
   { id: 'b5', n: 'Vịnh Ngã Rẽ', ic: 'wave', r: 3, x: 176, y: 408, ready: 1, acts: ['b51', 'b52', 'b53'], sub: 'Cân nhắc, gỡ khó, đứng giữa ngã rẽ',
     intro: 'Ở đây bạn tập cân nhắc giữa các kế hoạch, tập gỡ khi gặp khó, và thử chọn khi đứng giữa ngã rẽ.',
-    why: ['Khi phải chọn, bạn giữ điều gì, buông điều gì', 'Cân 3 kế hoạch, gỡ một chuyện khó, chọn ở 3 ngã rẽ', 'Kế hoạch bạn nghiêng về, điều bạn nhận ra về mình'], aim: 'bạn biết mình hay giữ điều gì khi phải chọn' },
+    why: ['Khi phải chọn, bạn giữ điều gì, buông điều gì', 'Cân 3 kế hoạch, gỡ một chuyện khó, chọn ở 4 ngã rẽ', 'Kế hoạch bạn nghiêng về, điều bạn nhận ra về mình'], aim: 'bạn biết mình hay giữ điều gì khi phải chọn' },
   { id: 'b6', n: 'Phòng Tuyển Dụng', ic: 'doc', r: 3, room: 1, x: 90, y: 338, ready: 1, acts: ['b61', 'b62', 'b63'], sub: 'Tin tuyển dụng, phỏng vấn 3 năm sau',
     intro: 'Giờ là 3 năm sau. Bạn đọc tin tuyển dụng, tập trả lời phỏng vấn, rồi lên kế hoạch 3 năm ở Nhật.',
     why: ['3 năm sau, nhà tuyển dụng cần gì ở bạn, và vì sao', 'Đọc 1 tin, tập phỏng vấn đúng tin đó, xếp dòng thời gian', 'Dòng thời gian từ JPC tới lúc ứng tuyển'], aim: 'bạn biết 3 năm ở Nhật cần chuẩn bị gì' },
   { id: 'b7', n: 'Ngọn Hải Đăng', ic: 'light', r: 3, x: 74, y: 218, ready: 1, acts: ['b71', 'b72', 'b73'], sub: 'Học từ người, công việc và chính mình',
     intro: 'Không ai đi một mình. Ở đây mình học từ người giúp mình, từ công việc, và từ chính mình.',
-    why: ['Học từ người, từ công việc, từ chính mình thế nào', 'Vẽ vòng người giúp, đi một vòng chỗ làm, nhận việc khó, làm mẫu thử', 'Người bạn sẽ gặp, câu “Tại sao?” bạn sẽ hỏi, mẫu thử của bạn'], aim: 'bạn biết học từ người, từ việc và từ chính mình' }
+    why: ['Học từ người, từ công việc, từ chính mình thế nào', 'Vẽ vòng người giúp, đi một vòng chỗ làm, nhận việc khó, làm việc thử nhỏ', 'Người bạn sẽ gặp, câu “Tại sao?” bạn sẽ hỏi, việc thử nhỏ của bạn'], aim: 'bạn biết học từ người, từ việc và từ chính mình' }
 ];
 /* Cảng Khởi Hành: mở khi đủ 7 con dấu bến. Không tính vào CD2_TOTAL (giống Ga Ước Mơ của CD01). */
 var GOAL_PORT = { id: 'fin', n: 'Đảo Kho Báu', ic: 'flag', ready: 1, acts: ['f1', 'f2'], sub: 'Nhận Bằng Thuyền Trưởng Vững Vàng',
@@ -888,13 +894,13 @@ var ACTS = {
       { k: 'tline', v: 'b41' },
       { k: 'meters', v: 'b41' }
     ] },
-  b42: { st: 'b4', t: 'Kế hoạch B và C', d: 'B: nếu A không đi được · C: nếu không phải lo tiền', mins: 6,
+  b42: { st: 'b4', t: 'Kế hoạch B và C', d: 'B: nếu A khó thực hiện · C: nếu không phải lo nghĩ về tiền', mins: 6,
     steps: [
-      { k: 'say', mood: 'worry', t: 'Giả sử kế hoạch A không đi được nữa, ví dụ: “[Gió]”. Bạn sẽ đi đâu? B không phải đường kém hơn, chỉ là đường khác.' },
+      { k: 'say', mood: 'worry', t: 'Giả sử kế hoạch A khó thực hiện, ví dụ: “[Gió]”. Bạn sẽ làm gì tiếp theo? B không phải đường kém hơn, chỉ là đường khác.' },
       { k: 'voy', v: 'b42', c1: ['b'] },
       { k: 'tline', v: 'b42' },
       { k: 'meters', v: 'b42' },
-      { k: 'voy', v: 'b43', c1: ['like'], say: 'Giờ tưởng tượng: không phải lo tiền, không ai chê cười. Cứ mơ thoải mái.' },
+      { k: 'voy', v: 'b43', c1: ['like'], say: 'Giờ tưởng tượng: không phải lo nghĩ về tiền, không ai chê cười. Cứ mơ thoải mái.' },
       { k: 'tline', v: 'b43', short: 1 },
       { k: 'meters', v: 'b43', trio: 1 }
     ] },
@@ -912,14 +918,15 @@ var ACTS = {
       { k: 'ways' },
       { k: 'real' }
     ] },
-  b53: { st: 'b5', t: 'Đứng giữa ngã rẽ', d: '3 ngã rẽ, bên nào cũng tốt. Bạn giữ gì, buông gì?', mins: 5,
+  b53: { st: 'b5', t: 'Đứng giữa ngã rẽ', d: '4 ngã rẽ, bên nào cũng tốt. Bạn giữ gì, buông gì?', mins: 5,
     steps: [
       { k: 'say', mood: 'think', t: 'Ở mỗi ngã rẽ, hai bên đều tốt. Chọn bên nào thì cũng phải buông một thứ. Không có đáp án đúng.' },
       { k: 'cross', n: 0 },
       { k: 'cross', n: 1 },
       { k: 'cross', n: 2 },
+      { k: 'cross', n: 3 },
       { k: 'crosssum' },
-      { k: 'write', key: 'b53n.me', q: 'Điều mình nhận ra về bản thân khi phải chọn', ph: 'Ví dụ: mình hay giữ gia đình, kể cả khi lương thấp hơn.', shore: 's5' }
+      { k: 'write', key: 'b53n.me', q: 'Điều mình nhận ra về bản thân khi phải chọn', ph: 'Ví dụ: mình hay giữ gia đình, kể cả khi phải bỏ một việc mới thú vị.', shore: 's5' }
     ] },
   b61: { st: 'b6', t: 'Đọc tin tuyển dụng 3 năm sau', d: 'Chọn 1 trong 3 tin hợp nghề, xem họ cần gì', mins: 5,
     steps: [
@@ -953,7 +960,7 @@ var ACTS = {
       { k: 'write', key: 'b72.why', q: 'Câu “Tại sao?” bạn sẽ hỏi ở JPC hoặc KTX tuần này', ph: 'Ví dụ: Tại sao lớp mình xếp dép theo một hàng?' },
       { k: 'hard', shore: 's7b' }
     ] },
-  b73: { st: 'b7', t: 'Học từ chính mình', d: 'Bài học xương máu, thử để biết', mins: 5,
+  b73: { st: 'b7', t: 'Học từ chính mình', d: 'Bài học từ trải nghiệm, thử để biết', mins: 5,
     steps: [
       { k: 'say', mood: 'think', t: 'Người giỏi không phải người không sai. Họ học được từ chính lần sai của mình, và dám thử trước khi chọn.' },
       { k: 'lesson' },
@@ -1010,26 +1017,28 @@ var SUCC_GRP = [
 ];
 var SUCC_MIN = 1, SUCC_N = 3;
 
-/* b53 · Đứng giữa ngã rẽ. 3 ngã rẽ, mỗi ngã 2 lựa chọn đều tốt. g = điều có được (mã CROSS_TAG). lv = “điểm đổi ý” khi bạn chọn bên này: bên kia tăng thêm bao nhiêu thì bạn đổi. */
-var CROSS_TAG = { luong: 'Lương cao hơn', thich: 'Việc mình thích', nha: 'Gần gia đình', hoc: 'Học thêm, lên trình độ', on: 'Ổn định, quen việc', moi: 'Thử thách mới', nhat: 'Sống ở Nhật' };
+/* b53 · Đứng giữa ngã rẽ (PS1.3.56, góp ý 9 + 10): 4 ngã rẽ, mỗi bên 2 giá trị (mã CROSS_TAG). 10 giá trị, “Thu nhập” chỉ ở 1/8 lựa chọn,
+   mỗi giá trị gặp nhiều đối thủ khác nhau → “hay giữ / hay buông” rõ hơn. Không con số lương. Khóa b53x.c<n> (bên chọn), b53x.r<n> (điều làm đổi ý). */
+var CROSS_TAG = { on: 'Ổn định, quen việc', sau: 'Giỏi sâu một nghề', moi: 'Thử thách mới', giup: 'Giúp được người khác', nha: 'Gần gia đình',
+  tg: 'Thời gian cho bản thân', xa: 'Trải nghiệm xa nhà', hoc: 'Học lên cao hơn', luong: 'Thu nhập tốt', tudo: 'Tự làm chủ' };
 /* nối với la bàn b31 (PAIRS): mã cặp + bên (0 trái, 1 phải) */
-var CROSS_CMP = { luong: ['money', 0], nha: ['fam', 0], on: ['stab', 0], moi: ['stab', 1], nhat: ['stay', 0] };
+var CROSS_CMP = { nha: ['fam', 0], xa: ['fam', 1], on: ['stab', 0], moi: ['stab', 1], luong: ['money', 0], tg: ['money', 1], sau: ['deep', 0], tudo: ['own', 1] };
 var CROSS = [
-  { id: 0, real: 1, t: 'Hết 3 năm, bạn có 2 lời mời', a: { n: 'Ở lại công ty, làm tổ trưởng công trình', d: '28 man/tháng · việc quen, đồng nghiệp quen', g: ['luong', 'on'], ic: 'helmet',
-      lv: ['Việc quản lý thực tập sinh trả thêm bao nhiêu thì bạn đổi?', 'man/tháng', 10] },
-    b: { n: 'Sang nghiệp đoàn, làm quản lý thực tập sinh', d: '25 man/tháng · việc bạn thích hơn, phải học lại từ đầu', g: ['thich', 'moi'], ic: 'talk',
-      lv: ['Tổ trưởng được trả thêm bao nhiêu thì bạn ở lại?', 'man/tháng', 10] } },
-  { id: 1, t: 'Bạn chọn ở đâu?', a: { n: 'Về Việt Nam, làm công ty Nhật gần nhà', d: 'Khoảng 15 triệu/tháng · ở với gia đình', g: ['nha', 'on'], ic: 'homevn',
-      lv: ['Lương ở Nhật cao thêm bao nhiêu thì bạn ở lại?', 'man/tháng', 10] },
-    b: { n: 'Ở lại Nhật, diện Kỹ năng đặc định', d: 'Khoảng 22 man/tháng · xa nhà, mỗi năm về một lần', g: ['luong', 'nhat'], ic: 'fuji',
-      lv: ['Công ty gần nhà trả thêm bao nhiêu thì bạn về?', 'triệu/tháng', 10] } },
-  { id: 2, t: 'Học lên hay đi làm ngay?', a: { n: 'Học lên 2 năm trường chuyên môn', d: 'Tốn học phí · 2 năm chưa gửi tiền về được', g: ['hoc', 'moi'], ic: 'cap',
-      lv: ['Đi làm ngay được thêm bao nhiêu thì bạn đổi ý?', 'man/tháng', 10] },
-    b: { n: 'Đi làm ngay', d: 'Gửi tiền về đều mỗi tháng · học thêm thì tự sắp xếp', g: ['luong', 'on'], ic: 'piggy',
-      lv: ['Trường cho học bổng bao nhiêu phần trăm học phí thì bạn đi học?', '% học phí', 10, 10] } }
+  { id: 0, real: 1, t: 'Hết 3 năm, bạn có 2 lời mời',
+    a: { n: 'Ở lại công ty, làm tổ trưởng', d: 'Việc quen, đồng nghiệp quen, được kèm các bạn mới', g: ['on', 'sau'], ic: 'helmet' },
+    b: { n: 'Sang nghiệp đoàn, làm quản lý thực tập sinh', d: 'Việc mới, phải học lại từ đầu, giúp các bạn mới sang', g: ['moi', 'giup'], ic: 'talk' } },
+  { id: 1, t: 'Bạn chọn sống ở đâu?',
+    a: { n: 'Về Việt Nam, làm công ty Nhật gần nhà', d: 'Ở với gia đình, cuối tuần có thời gian cho mình', g: ['nha', 'tg'], ic: 'homevn' },
+    b: { n: 'Ở lại Nhật, diện Kỹ năng đặc định', d: 'Xa nhà, mỗi năm về một lần, tay nghề lên bậc', g: ['xa', 'sau'], ic: 'fuji' } },
+  { id: 2, t: 'Học lên hay đi làm ngay?',
+    a: { n: 'Học lên 2 năm trường chuyên môn', d: 'Tốn học phí, 2 năm chưa gửi tiền về được', g: ['hoc', 'moi'], ic: 'cap' },
+    b: { n: 'Đi làm ngay', d: 'Gửi tiền về đều mỗi tháng, việc đã quen tay', g: ['luong', 'on'], ic: 'piggy' } },
+  { id: 3, t: 'Về Việt Nam, bạn làm gì?',
+    a: { n: 'Mở tiệm nhỏ ở quê', d: 'Tự quyết mọi việc, gần ba mẹ, lúc đầu còn chật vật', g: ['tudo', 'nha'], ic: 'shop' },
+    b: { n: 'Làm cầu nối, hướng dẫn các bạn sắp sang Nhật', d: 'Dùng tiếng Nhật mỗi ngày, hay đi lại giữa hai nước', g: ['giup', 'xa'], ic: 'plane' } }
 ];
-var CROSS_NOTE = 'Số liệu minh họa, mỗi nơi mỗi khác.';
-var CROSS_NEVER = 'Không đổi';
+var CROSS_WHY_Q = 'Điều gì có thể làm bạn đổi sang bên kia?';
+var CROSS_WHY = [['nguoi', 'Có người giỏi dẫn dắt mình'], ['nha', 'Gần gia đình hơn'], ['hoc', 'Được học thêm'], ['can', 'Gia đình cần mình'], ['thu', 'Được làm thử 1 tháng trước'], ['x', 'Không gì cả, mình chắc rồi']];
 
 /* b72 · Đi một vòng chỗ làm. Cảnh 360×220, điểm “?” [x, y]. o[0] là ý đúng (máy xáo), o[1] là ý chưa đúng (dài bằng hoặc hơn). */
 var TOUR = {
@@ -1079,7 +1088,7 @@ var HARD = [
 var HARD_NOTE = 'Ở Nhật, việc khó thường là <b>phép thử tinh thần</b> và cũng là <b>cơ hội học</b>. Thấy quá sức thì <b>sodan</b> (相談): nói thật và hỏi cách làm. Đừng im lặng từ chối, cũng đừng nhận rồi bỏ dở.';
 var HARD_SHIN = 'Shin nhớ thầy của Shin hay nói: thử thách là người thầy lớn. Mỗi lần vượt qua, mình vững thêm một bậc.';
 
-/* b73 · Bài học xương máu: thẻ sai lầm hay gặp (ph = ví dụ mờ cho 3 dòng). Mã 'o' = chuyện khác của mình. */
+/* b73 · Bài học từ trải nghiệm: thẻ sai lầm hay gặp (ph = ví dụ mờ cho 3 dòng). Mã 'o' = chuyện khác của mình. */
 var MISTAKES = [
   ['hieu', 'Nói “hiểu rồi” khi chưa hiểu', ['Cô chỉ bài, mình gật đầu cho qua. Lúc làm thì sai.', 'Gật cho qua làm mình mất nhiều thời gian hơn.', 'Chưa hiểu thì nhắc lại để hỏi: “Ý cô là… phải không ạ?”']],
   ['im', 'Im lặng, không hỏi khi bí', ['Bài khó, mình ngồi im cả buổi, không dám hỏi.', 'Hỏi sớm thì đỡ mất công.', 'Bí quá 10 phút thì hỏi bạn hoặc thầy cô.']],
@@ -1109,7 +1118,7 @@ var SHORE = [
   { id: 's6', b: 'b6', at: 'b62', ic: 'speech', t: 'Nói câu trả lời phỏng vấn trước thầy cô hoặc bạn (hoặc tự ghi âm 60 giây)' },
   { id: 's7a', b: 'b7', at: 'b71', ic: 'light', t: 'Gặp trực tiếp người bạn chọn ở Ngọn Hải Đăng' },
   { id: 's7b', b: 'b7', at: 'b72', ic: 'tool', t: 'Xung phong nhận một việc khó ở JPC hoặc KTX tuần này' },
-  { id: 's7c', b: 'b7', at: 'b73', ic: 'compass', t: 'Làm mẫu thử “Thử để biết” của bạn' }
+  { id: 's7c', b: 'b7', at: 'b73', ic: 'compass', t: 'Làm việc thử nhỏ “Thử để biết” của bạn' }
 ];
 var SHORE_T = 'Nhiệm vụ lên bờ';
 var SHORE_SAY = 'Thuyền cập bến thì thuyền trưởng lên bờ làm việc thật. Việc này làm ngoài ứng dụng nhé.';

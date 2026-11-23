@@ -1500,3 +1500,85 @@ button.pol:active{transform:scale(.97)!important}
   .shipup__sp{display:none}
   .stampov .shipcap{animation:none}
 }
+
+/* ===== PS1.3.56 (CD02.3.12 · bản 5 đợt 1) ===== */
+/* góp ý 3: dây ảnh trong tổng kết la bàn; ít ảnh thì căn giữa */
+.rope__ps--1{grid-template-columns:minmax(0,118px);justify-content:center}
+.rope__ps--2{grid-template-columns:repeat(2,minmax(0,118px));justify-content:center;gap:18px}
+.cmpsum__suc{padding-bottom:4px!important}
+.cmpsum__suc{overflow:hidden}
+.cmpsum__suc .rope{margin:2px 0 0}
+/* góp ý 4: nút 1–5 dải nâu đỏ nhạt → đậm (chữ mực ở 1–3, chữ trắng ở 4–5) */
+.meter__n button.on{box-shadow:0 2px 0 rgba(90,40,25,.35)}
+.meter__n button.mn1.on{background:#F6DDD3;border-color:#E2B9A6;color:#2B2A27}
+.meter__n button.mn2.on{background:#E9B7A3;border-color:#D69C85;color:#2B2A27}
+.meter__n button.mn3.on{background:#D68A6E;border-color:#C2735A;color:#1E1D1B}
+.meter__n button.mn4.on{background:#B65A3E;border-color:#9E4A31;color:#fff}
+.meter__n button.mn5.on{background:#8C3A27;border-color:#73301F;color:#fff}
+.meter__g b{color:#8C3A27}
+.voyc__g{grid-template-columns:repeat(3,1fr)}
+/* góp ý 6: băng giải thích kế hoạch A/B/C */
+.vhd{position:relative;margin:2px 0 14px;padding:12px 14px 14px;border-radius:18px;background:#FBEFE8;border:1.6px solid #E3B49E}
+.vhd__abc{display:flex;align-items:center;gap:6px;margin-bottom:10px}
+.vhd__abc span{display:inline-flex;align-items:center;gap:2px;height:24px;padding:0 10px;border-radius:99px;font:700 12.5px var(--f);color:var(--muted);background:#fff;border:1px solid var(--rule-2)}
+.vhd__abc span.ok{color:#8C3A27;border-color:#E3B49E}
+.vhd__abc span.cur{color:#fff;background:var(--c);border-color:var(--c)}
+.vhd__abc i{flex:none;width:14px;height:2px;border-radius:2px;background:#E3B49E}
+.vhd__m{display:flex;gap:12px;align-items:flex-start}
+.vhd__l{flex:none;display:grid;place-items:center;width:48px;height:48px;border-radius:50%;background:var(--c);color:#fff;font:700 24px/1 var(--serif,Georgia,serif);box-shadow:0 3px 0 #9E4A31}
+.vhd__m small{display:block;font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#9E4A31}
+.vhd__m b{display:block;margin-top:1px;font:700 19px/1.25 var(--serif,Georgia,serif);color:var(--ink)}
+.vhd__m p{margin:4px 0 0;font-size:15px;line-height:1.4;font-weight:600;color:var(--ink-2,#3D3B37)}
+/* góp ý 9: “đổi ý” bằng lựa chọn */
+.xr__why{margin-top:8px}
+.xr__lv p{color:var(--muted);font-size:13px}
+.chip--x{border-style:dashed}
+.xsum__n{display:inline-block;font:700 22px var(--serif);color:#8C3A27;margin-right:4px}
+.xtag--why{background:#FBEFE8;color:#8C3A27}
+/* góp ý 11: bỏ viền trái ở dòng thời gian Bến 6 */
+.ptl__x.have{border-left:1px solid var(--rule)}
+
+/* ===== PS1.3.57 (CD02.3.13 · bản 5 đợt 2) ===== */
+/* góp ý 2: cờ dùng ảnh đại diện */
+.sym--av svg{border-radius:50%}
+.avnote{margin:8px 0 2px;font-size:13.5px;color:var(--muted)}
+.avnote .link{font-size:13.5px}
+.avov h2{margin:0 0 6px;font:600 20px var(--serif)}
+.avov .avp{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:10px 0}
+.avov .avp__b{width:100%;aspect-ratio:1;border:0;border-radius:50%;padding:0;background:none;cursor:pointer;display:grid;place-items:center;font:800 22px var(--f)}
+.avov .avp__b svg{width:100%;height:100%}
+.avov .avp__b.on{box-shadow:0 0 0 3px #fff,0 0 0 5.5px var(--c)}
+.avov .avp__h{margin:12px 0 4px;font-weight:600;font-size:14px}
+/* góp ý 7: hình biểu tượng kế hoạch */
+.plpick{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:#fff;border:1.5px dashed var(--rule-2);border-radius:16px;padding:10px 12px;font:inherit;color:var(--ink);cursor:pointer}
+.plpick.on{border-style:solid;border-color:#E3B49E;background:#FFFBF8}
+.plpick b{display:block;font-size:15px}.plpick small{display:block;font-size:12.5px;color:var(--muted)}
+.plpick__e{flex:none;display:grid;place-items:center;width:58px;height:58px;border-radius:12px;background:var(--bg-2);font:300 30px var(--f);color:var(--muted)}
+.plpick svg,.voyc__ic svg,.vhd__ic svg,.scale__ic svg,.trio3 svg,.sheet__pl svg{display:block}
+.voyc__h{position:relative}
+.voyc__ic{flex:none;margin-left:auto;align-self:flex-start;background:#FBEFE8;border-radius:12px}
+.vhd__ic{flex:none;margin-left:auto;background:#fff;border-radius:14px;border:1px solid #E3B49E}
+.scale__ic{flex:none;background:#FBEFE8;border-radius:10px;margin-right:2px}
+.trio3{display:flex;gap:10px;margin-top:8px}
+.trio3 span{display:flex;flex-direction:column;align-items:center;gap:2px;background:#FBEFE8;border-radius:12px;padding:4px 6px 3px}
+.trio3 b{font-size:12px;color:#9E4A31}
+.trio3__e{display:block;width:44px;height:44px}
+.sheet__s--pl{position:relative;padding-right:68px!important;min-height:64px}
+.sheet__pl{position:absolute;top:10px;right:10px;background:#FBEFE8;border-radius:12px}
+/* góp ý 12: popup thuyền nâng cấp (kiểu Thư trong chai) */
+.shipov{text-align:center}
+.shipov__k{display:inline-flex;align-items:center;gap:5px;margin:0 0 6px;padding:3px 10px;border-radius:99px;background:#FBEFE8;color:#9E4A31;font:700 12px var(--f);letter-spacing:.04em}
+.shipov h2{margin:0 auto 8px;max-width:320px;font:600 20px/1.35 var(--serif)}
+.shipov h2 .nm{color:var(--c-d)}
+.shipov__sea{position:relative;margin:4px -6px 10px;padding:14px 0 6px;border-radius:18px;background:linear-gradient(#EEF4F7,#DCE9F0);overflow:hidden}
+.shipov__sea::after{content:"";position:absolute;left:0;right:0;bottom:0;height:16px;background:repeating-radial-gradient(circle at 10px -4px,transparent 0 9px,rgba(255,255,255,.7) 9px 10.5px,transparent 10.5px 20px);background-size:20px 16px;opacity:.8}
+.shipov__sea svg{width:220px;height:auto}
+.shipov__it{margin-bottom:14px}
+.shipov--fx .shipov__sea .shipup{animation:shipIn .9s cubic-bezier(.2,.8,.3,1) both}
+.shipov--fx .shipov__it{animation:unfold .7s 1.6s var(--ease) both}
+.shipov--fx .shipov__it .letter__in{animation:fadeIn .4s 2s both}
+.shipov--fx>.btn{animation:fadeIn .4s 2.1s both}
+@keyframes shipIn{from{transform:translateX(-60%);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.shipov--fx .shipov__sea .shipup,.shipov--fx .shipov__it,.shipov--fx .shipov__it .letter__in,.shipov--fx>.btn{animation:none}}
+.dbp--5{grid-template-columns:repeat(5,1fr);gap:5px}
+.dbp--5 .dbp__b{padding:7px 2px 5px;font-size:10.5px;border-radius:12px}

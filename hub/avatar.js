@@ -146,5 +146,5 @@
       PS.toast('Đã đổi ảnh đại diện.');
     });
   }
-  W.PSAvatar = { html: html, rowHTML: rowHTML, wire: wire, list: AV, icon: iconSVG };
+  W.PSAvatar = { html: html, rowHTML: rowHTML, wire: wire, list: AV, icon: iconSVG, cur: cur, cols: COLS, letter: letter, map: MAP, body: body }; /* PS1.3.57: cur/cols/letter/map/body cho cờ CD02 */
 })(window);

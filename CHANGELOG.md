@@ -5,6 +5,35 @@ Quy ước số phiên bản: **PS a.b.c**
 - b: giai đoạn / thêm module hoặc tính năng lớn
 - c: sửa nhỏ trong giai đoạn đó
 
+## PS1.3.57 · 23/11/2026 · CD02 bản 5 đợt 2: cờ ảnh đại diện, hình kế hoạch, popup thuyền nâng cấp, vẽ lại người
+Theo `claude/cd02-ban5-de-xuat.md` (thầy chốt 23/11: 1 tùy chọn, 2 ok, 3 làm luôn, 4 không cần, 5 cả bếp và xưởng, 6 ok, 7 ok). CD02.3.13.
+- Ý 2 · Cờ dùng ảnh đại diện (tùy chọn): ô đầu lưới biểu tượng “Ảnh của tôi” (mã 'av'), dòng “Đổi ảnh đại diện” mở bảng chọn như Cài đặt trang chủ (`avOv`, lưu `PS.prefs().av`). `flagSym('av')` vẽ ảnh lúc hiển thị (art.js `avSym`, clipPath id riêng) nên cờ ở hải đồ, buồm thuyền, Sổ tay, Bảng ước mơ, phiếu, Bằng đổi theo khi đổi ảnh. cd02/index.html nạp `../hub/avatar.js`; avatar.js xuất thêm `cur, cols, letter, map, body`.
+- Ý 7 · 15 hình biểu tượng kế hoạch vẽ mới (art.js `PLAN_ART`, `planArt`; content.js `PLAN_IC` 3 nhóm × 5). Bước đặt tên kế hoạch có ô “Chọn hình cho kế hoạch” (bắt buộc, không chọn sẵn), bảng chọn 5 cột (`planPicker`, khóa `<b41|b42|b43>.ic`). Hình hiện ở băng kế hoạch, thẻ kế hoạch (`voyCard`, cả Sổ tay › Bài làm), lời Shin “Đây là 3 kế hoạch của…” (`.trio3`), cân Bến 5, phiếu Hướng đi (HTML + ảnh: `plImg`).
+- Ý 12 · Popup “Chúc mừng {Tên}, thuyền của bạn vừa được nâng cấp” (`shipOv`, kiểu Thư trong chai: thuyền trôi vào, món mới hiện dần, lá thư món + ý nghĩa, “Thuyền cấp x/8”, nút “Vào Bến …”). Bỏ thuyền khỏi popup con dấu và popup Bằng. Hiện 1 lần mỗi bến khi bấm Tiếp theo / Đi tiếp / chạm bến mới trên hải đồ (`shipGate`); bấm “Về hải đồ” thì bỏ qua (`shipSkip`). Cuối khóa: đóng Bằng → popup thuyền đủ 8 món. `S.shipSeen`; bài cũ: bến đã có dấu coi như đã xem.
+- Ý 14 · “Đi một vòng chỗ làm”: vẽ lại người ở cả bếp và xưởng (art.js `tourMan`): Senpai mũ đầu bếp/mũ bảo hộ cầm sổ (đúng chỗ dấu “?” Senpai cầm sổ ghi), bạn mới đội mũ, đeo khẩu trang rửa tay (bếp), mặc áo phản quang (xưởng).
+- Sửa chữ Bến 5 “chọn ở 3 ngã rẽ” → “4 ngã rẽ” (sót ở PS1.3.56).
+- Kiểm 390 + 1280: cờ + đổi ảnh, đặt tên + chọn hình, 3 kế hoạch, cân, popup thuyền, Đi một vòng, xuất ảnh phiếu (1080×2216, có hình kế hoạch). Không lỗi JS.
+
+Tệp đổi: config.js, sw.js, mọi index.html (?v=), hub/avatar.js, cd02/(index.html, art.js, content.js, engine.js, cd02.css).
+File cần xóa trên GitHub: không có.
+
+## PS1.3.56 · 23/11/2026 · CD02 bản 5 đợt 1: chữ, tự chấm 3 yếu tố, dải màu 1–5, Bến 5 bốn ngã rẽ
+Theo `claude/cd02-ban5-de-xuat.md` (thầy chốt 23/11). CD02.3.12.
+- Ý 1: bỏ nút “Sao chép link” và câu “Trang Tikme chưa mở được…” (`tikCopy` trả rỗng), chỉ giữ “Đọc bài gốc trên Tikme”.
+- Ý 3: Bến 3, bước la bàn: ô “Thành công là” thành dây ảnh 3 tấm (`sucRope(0)`, lớp `.cmpsum__suc`); ít ảnh thì căn giữa (`.rope__ps--1/--2`).
+- Ý 4: nút 1–5 tô dải nâu đỏ `METER_COL` (#F6DDD3 → #8C3A27; chữ mực 1–3, chữ trắng 4–5; lớp `.mn1`–`.mn5`). Đồng hồ bán nguyệt tô chuyển dần từ màu 1 tới màu mức đang chọn (`gaugeSVG`, linearGradient riêng mỗi đồng hồ). Thanh nhỏ trong thẻ kế hoạch tô theo mức.
+- Ý 5, 8: `METERS` còn 3: Yêu thích · Tự tin có thể làm được · Phù hợp với mình (thêm tên ngắn m[3]). Bỏ “Khả thi” ở Bến 4 và cân Bến 5. Bài cũ có `feas` thì bỏ qua.
+- Ý 6: băng giải thích kế hoạch `voyHead(v)` (lớp `.vhd`): dải A·B·C, chữ cái to, câu hỏi đậm. Chữ B: “Nếu A khó thực hiện / Bạn sẽ làm gì tiếp theo?”; C: “Nếu không phải lo nghĩ về tiền / Bạn sẽ chọn làm điều gì mình thực sự mong muốn?”. Đồng bộ mô tả b42 và lời Shin.
+- Ý 9, 10: Bến 5 “Đứng giữa ngã rẽ” làm lại: 4 ngã rẽ (thêm “Về Việt Nam, bạn làm gì?”), 10 giá trị `CROSS_TAG`, mỗi bên 2 giá trị, “Thu nhập tốt” chỉ ở 1/8 lựa chọn, không con số lương. Bỏ “Điểm đổi ý” (thanh kéo tiền) → chọn 1 trong `CROSS_WHY` (“Điều gì có thể làm bạn đổi sang bên kia?”). Tổng kết: hay giữ / hay buông / chắc chắn x/4 / điều hay làm đổi ý. Khóa mới `b53x.c<n>`, `b53x.r<n>` (bài b53 cũ vẫn “đã xong”, mở lại làm theo bản mới). `CROSS_CMP` nối 5/6 cặp la bàn.
+- Ý 11: bỏ viền trái `.ptl__x.have` ở dòng thời gian Bến 6.
+- Ý 13: Bến 7 thứ tự Chưa quen · Quen sơ · Thân thiết (`RING_L` giữ mã cũ).
+- Ý 15: “Bài học xương máu” → “Bài học từ trải nghiệm” (mô tả, bước, phiếu, Sổ tay).
+- Ý 16: Shin “Mình thử làm một việc nhỏ hướng đến mục tiêu nhé!”; “mẫu thử” → “việc thử nhỏ” ở b73, Nhiệm vụ lên bờ, mô tả Bến 7.
+- Kiểm 390: b33 la bàn, b41/b42 kế hoạch + tự chấm + 3 kế hoạch, b51 cân, b53 ngã rẽ + tổng kết, b71, b73. Không lỗi JS.
+
+Tệp đổi: config.js, sw.js, mọi index.html (?v=), cd02/(content.js, engine.js, cd02.css).
+File cần xóa trên GitHub: không có.
+
 ## PS1.3.55 · 22/11/2026 · Học tiếp vào thẳng hoạt động, điều hướng chung trong mọi khóa
 Đợt 2/2 của bản xem trước PS1.3.54 (ý 24, 25). Thay quyết định 18/11 “chỉ có nút về Proskills trong Cài đặt”.
 - **Thanh trên chung** (core.js `PS.navHTML`, core.css `.psnav`): góc trái “‹ <nơi về>” (Proskills / Sơ đồ tuyến / Hải đồ / Bản đồ / Sơ đồ phòng tập / tên ga, bến, ải, bài), giữa là tên màn (trong hoạt động: “2/3”), góc phải luôn Sổ tay (TK thêm nút Hỏi nhanh Chú Tanaka bên trái Sổ tay). Thanh ẩn khi cuộn xuống, hiện khi cuộn lên (làm chung ở core.js). Bỏ nút “‹ Proskills”, “‹ Hải đồ”… nằm trong nội dung và nút bản đồ ở thanh trên (CD01: vòng tiến độ hôm nay; TK: vòng nhịp học đi cùng nút bản đồ, nay không còn).
