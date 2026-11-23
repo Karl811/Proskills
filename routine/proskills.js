@@ -9,8 +9,10 @@
    - Cửa Rèn luyện (?door=1, trang chủ chuyển sang khi hôm nay chưa đóng dấu): đóng dấu xong thì mời vào học.
    - PS1.3.28: nút Check-in trang chủ mở ?ci=1#checkin; check-in xong hiện thanh "Đã check-in hôm nay · Vào học".
      extra báo thêm ci (đã check-in hôm nay), ciTime (giờ check-in).
-   - Nút "Về trang chủ Proskills" đặt ở đầu Sổ tay › Cài đặt (không thêm nút trên trang Hôm nay);
-     nút ⋯ (Sổ tay) mở thẳng thẻ Cài đặt.
+   - Nút "Về trang chủ Proskills" đặt ở đầu Sổ tay › Cài đặt; nút ⋯ (Sổ tay) mở thẳng thẻ Cài đặt.
+   - PS1.3.54: đầu trang có nút "‹ Proskills" (xám mờ) trước ngày, ngày viết gọn "CN, 22/11"; nút Sổ tay là ảnh đại diện
+     của học viên (hub/avatar.js); nút về trang chủ trong Cài đặt to, đủ chiều ngang + hộp "Bài làm đã lưu";
+     chấm lưu bài (PS.saveMark) theo trạng thái lưu của Shin; dải cập nhật riêng của Shin tắt (dùng thẻ cập nhật chung pwa.js).
    - Demo giáo viên dùng mật khẩu chung: routine/?demo.
    - Lần đầu mở: giữ màn chào của Shin rồi mời chọn "Việc nhỏ đầu tiên"; những lần sau vào thẳng.
    - PS1.3.26: chỉ dùng sao lưu chung (backup → PS.backup, psRestore → PS.restorePick).
@@ -87,9 +89,60 @@
   var baseNbSet = W.nbSet;
   W.nbSet = function () {
     var h = baseNbSet.apply(this, arguments);
-    var row = W.setRow('psHome', 'phone', 2, 'Trang chủ Proskills', '', '', '<a class="btn btn--soft btn--sm" href="../index.html" data-ps-home>Về trang chủ</a>');
-    return W.setGroup('Proskills', [row, fitRow()]) + h;
+    /* PS1.3.54: nút về trang chủ to, đủ chiều ngang, như Cài đặt của các khóa */
+    var home = '<a class="pshome" href="../index.html" data-ps-home>' + PS.icon('home', 20) + '<span><b>Về trang chính Proskills</b><small>Chọn khóa học khác, xem tổng điểm</small></span>' + PS.icon('next', 16) + '</a>';
+    return home + (W.DEMO ? '' : PS.savedHTML(ID)) + W.setGroup('Proskills', [fitRow()]) + h;
   };
+
+  var FROM_HUB = 0; try { FROM_HUB = W.sessionStorage.getItem('ps.nav') === 'routine' ? 1 : 0; } catch (e) {}
+  function psHomeGo() {
+    var hub = PS.url('index.html');
+    if (!FROM_HUB) { W.location.replace(hub); return; }
+    var h = null; try { h = history.state; } catch (e) {}
+    var k = h && h.shinNav14 && typeof h.step === 'number' ? h.step : 0;
+    var tm = setTimeout(function () { W.location.replace(hub); }, 900);
+    W.addEventListener('pagehide', function () { clearTimeout(tm); });
+    try { history.go(-(k + 1)); } catch (e) { clearTimeout(tm); W.location.replace(hub); }
+  }
+  /* ---------- PS1.3.54 · đầu trang: ‹ Proskills, ngày gọn, ảnh đại diện ---------- */
+  var WDS = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+  function psHead() {
+    var hd = D.getElementById('hdate'); if (!hd) return;
+    var d = new Date(), p2 = function (n) { return (n < 10 ? '0' : '') + n; }, t = WDS[d.getDay()] + ', ' + p2(d.getDate()) + '/' + p2(d.getMonth() + 1);
+    if (hd.textContent !== t) hd.textContent = t;
+    var par = hd.parentNode;
+    if (par && !par.querySelector('.psback')) {
+      var line = D.createElement('div'); line.className = 'psline';
+      var a = D.createElement('a'); a.className = 'psback'; a.href = '../index.html'; a.setAttribute('data-ps-home', '');
+      a.setAttribute('aria-label', 'Về trang chủ Proskills'); a.innerHTML = PS.icon('back', 15, 2.6) + '<span>Proskills</span>';
+      par.insertBefore(line, hd); line.appendChild(a); line.appendChild(hd);
+    }
+    var g = D.getElementById('gear');
+    if (g && W.PSAvatar) {
+      var key = String(PS.prefs().av || '') + '|' + (PS.profile().name || '');
+      if (g.getAttribute('data-av') !== key) {
+        var dot = D.getElementById('gdot'); g.innerHTML = W.PSAvatar.html(34); if (dot) g.appendChild(dot);
+        g.setAttribute('data-av', key); g.classList.add('psav'); g.setAttribute('aria-label', 'Sổ tay, cài đặt');
+      }
+    }
+  }
+  ['renderHead', 'renderTop', 'render'].forEach(function (n) {
+    var base = W[n]; if (typeof base !== 'function') return;
+    W[n] = function () { var r = base.apply(this, arguments); try { psHead(); } catch (e) {} return r; };
+  });
+  W.addEventListener('ps:change', function (e) { if (e.detail && (e.detail.field === 'av' || e.detail.field === 'profile')) { try { psHead(); } catch (er) {} } });
+  W.addEventListener('pageshow', function () { try { psHead(); } catch (e) {} });
+
+  /* ---------- PS1.3.54 · chấm lưu bài theo trạng thái lưu của Shin; tắt dải "Đã có bản mới của Shin" ---------- */
+  function svWatch() {
+    var el = D.getElementById('saveStatus32'); if (!el || el.__psw) return; el.__psw = 1;
+    var f = function () { PS.saveMark(el.getAttribute('data-state') !== 'error'); };
+    f(); if (W.MutationObserver) new MutationObserver(f).observe(el, { attributes: true, attributeFilter: ['data-state'] });
+  }
+  if (typeof W.updateRuntime32 === 'function') {
+    var baseRT = W.updateRuntime32;
+    W.updateRuntime32 = function () { W.SW_DISMISSED32 = true; return baseRT.apply(this, arguments); };
+  }
 
   /* ---------- PS1.3.36 · Tủ đồ của Shin (gà lớn dần, trang phục mở theo giai đoạn) ---------- */
   function fitRow() {
@@ -133,7 +186,12 @@
   }
   D.addEventListener('click', function (e) {
     var t = e.target && e.target.closest ? e.target : null; if (!t) return;
-    if (t.closest('[data-ps-home]')) { try { W.save(true); } catch (er) {} }
+    var hm = t.closest('[data-ps-home]');
+    if (hm) {
+      try { W.save(true); } catch (er) {}
+      /* PS1.3.55 (ý 25): về trang chủ bằng lịch sử khi Shin được mở từ trang chủ (Back không quay lại Shin) */
+      if (hm.getAttribute('href') === '../index.html') { e.preventDefault(); psHomeGo(); }
+    }
     /* nút ⋯ (Sổ tay) mở thẻ Cài đặt trước, như các khóa Proskills */
     if (t.closest('#gear')) W.NBTAB = 'set';
   }, true);
@@ -239,7 +297,18 @@
     '.psfit__b:active{transform:scale(.97)}.psfit__ft{font-size:12px;color:#6B7183;margin:10px 2px 2px;line-height:1.45}' +
     '.psgrow__art{width:150px;margin:0 auto}.psgrow__art svg{width:100%;height:auto}.psgrow small{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;color:#2265C5;margin-top:4px}' +
     '.psgrow h2{margin:4px 0 6px}.psgrow__new{background:#FFF6DA;border-radius:14px;padding:8px 12px;font-size:14px;margin:10px 0 14px}' +
-    '@media (min-width:600px){.psfit__g{grid-template-columns:repeat(4,1fr)}}';
+    '@media (min-width:600px){.psfit__g{grid-template-columns:repeat(4,1fr)}}' +
+    /* PS1.3.54 · ‹ Proskills, ảnh đại diện, nút về trang chủ trong Cài đặt */
+    '.psline{display:flex;align-items:center;gap:8px;min-width:0;white-space:nowrap;margin-bottom:2px}.psline #hdate{display:block;margin:0;overflow:hidden;text-overflow:ellipsis;font-size:13px;line-height:1.3;color:var(--on-surface-variant,#5D6478)}' +
+    '#shinTypographyRoot .m3-heading>.psline{grid-column:1!important;grid-row:1!important;display:flex!important;width:auto!important;max-width:100%;min-width:0;margin:0}' +
+    '.psback{display:inline-flex;align-items:center;gap:1px;flex:none;height:30px;padding:0 11px 0 6px;border-radius:999px;background:rgba(40,44,60,.07);color:#4A4E5C;font-size:13px;font-weight:600;text-decoration:none;-webkit-tap-highlight-color:transparent}' +
+    '.psback:active{background:rgba(40,44,60,.13)}' +
+    '#gear.psav{padding:0!important;display:grid;place-items:center;border-radius:50%}#gear.psav>svg{display:none}' +
+    '#gear .ps-av{display:grid;place-items:center;border-radius:50%;overflow:hidden;border:2px solid #fff;box-shadow:0 3px 8px -4px rgba(0,0,0,.35);font-family:Nunito,system-ui,sans-serif;font-weight:900;line-height:1;box-sizing:content-box}#gear .ps-av svg{display:block}' +
+    '.pshome{display:grid;grid-template-columns:40px 1fr auto;align-items:center;gap:12px;width:100%;box-sizing:border-box;text-decoration:none;background:#2265C5;color:#fff;border-radius:18px;padding:12px 14px;box-shadow:0 3px 0 #17479A;margin:0 0 10px;-webkit-tap-highlight-color:transparent}' +
+    '.pshome>svg:first-child{width:40px;height:40px;padding:9px;box-sizing:border-box;border-radius:12px;background:rgba(255,255,255,.18)}' +
+    '.pshome b{display:block;font-size:15.5px}.pshome small{display:block;font-size:12.5px;opacity:.85}.pshome:active{transform:translateY(2px);box-shadow:0 1px 0 #17479A}' +
+    '.pshome+.ps-saved{margin:0 0 14px}';
   D.head.appendChild(css);
 
   /* ---------- khóa gợi ý thẻ: mở thẻ, đặt công thức, rồi mời quay lại khóa ---------- */
@@ -275,6 +344,7 @@
 
   /* ---------- sau khi Shin dựng xong trang ---------- */
   function afterBoot() {
+    try { psHead(); svWatch(); } catch (e) {}
     demoStart();
     if (W.DEMO || !W.S) return;
     var S = W.S;
