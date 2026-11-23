@@ -15,9 +15,9 @@
   }
   function switchButton(){
     if(document.querySelector('[data-street-choice="invite"]'))return;
-    var back=APP.querySelector('.wrap>.back');if(!back)return;
+    var back=APP.querySelector('.wrap>.acthead')||APP.querySelector('.wrap>.aihero');if(!back)return;
     var b=document.createElement('button');b.type='button';b.className='street-mode-link';b.dataset.streetChoice='invite';b.innerHTML=icon('bike',15)+' Đổi cách học';
-    back.insertAdjacentElement('afterend',b);
+    back.insertAdjacentElement('beforebegin',b);
   }
   function prompt(error){
     clearPrompt();if(!isStreet())return;
@@ -91,7 +91,8 @@
 
 
 /* khởi động (luôn ở cuối tệp nạp sau cùng) */
-try{ history.replaceState(V,'',location.pathname); }catch(e){}   /* bỏ ?demo= khỏi địa chỉ */
+var TK_GO = PS.goParam();
+NAV.start(location.pathname);   /* PS1.3.55: bỏ ?demo, ?go khỏi địa chỉ; đếm mục lịch sử cho nút ‹ */
 if(TK_OK){
   if(ASK_DEMO) PS.demoAsk(function(ok){ if(ok) enterDemo(); else location.replace(location.pathname); });
   else if(WANT_DEMO && !S.demo) enterDemo();
@@ -100,5 +101,7 @@ if(TK_OK){
     S.onb=1; S.gate=1; S.d.firstRun=1; markDay(); save(true);
     gateIntro(function(){ render(true); toast('Chính xác! Ngộ Không mê đào tiên lắm. Lên đường thôi!'); });
   }
-  else { S.onb=1; markDay(); markVisit(); render(true); }
+  else { S.onb=1; markDay(); markVisit();
+    if(TK_GO && ACTS[TK_GO] && actOpen(TK_GO)){ var gv={v:'act', id:TK_GO}; NAV.go(gv); V=gv; } /* PS1.3.55 (ý 24): Học tiếp mở thẳng chặng */
+    render(true); }
 }

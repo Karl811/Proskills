@@ -13,7 +13,7 @@
    - Ý của thầy Lê Long Sơn nói gián tiếp: “thầy của Shin”. Không ghi tên Thầy trên giao diện CD02.
    - Không dùng từ “đơn hàng”. ES5. */
 var CD2_ID = 'cd02';
-var CD2_VER = 'CD02.3.9';
+var CD2_VER = 'CD02.3.11';
 var CD2_XP_ACT = 30, CD2_INS_WORDS = 15, CD2_INS_FIELD = 5, CD2_XP_CARD = 2;
 var CD2_TOTAL = 20; /* PS1.3.50 (bản 4 đợt 2): thêm b53 Đứng giữa ngã rẽ, b73 Học từ chính mình → 20 chặng. */ var CD2_TOTAL_OLD = 18; /* PS1.3.42 (bản 2, PA A): Xuất phát 1 + 7 bến (2·3·3·2·2·3·2 chặng) = 18. Cảng Khởi Hành (f1, f2) không tính. */
 

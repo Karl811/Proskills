@@ -6,10 +6,12 @@
      · Tệp có ?v= (js, css theo phiên bản): lấy bộ nhớ ngay, không chờ mạng (đổi phiên bản = địa chỉ mới).
      · Tệp khác (hình, phông, âm thanh): mở bản đã lưu ngay, đồng thời tải bản mới chạy ngầm cho lần sau.
    - Mọi tệp của module được lưu tự động sau lần mở đầu tiên có mạng.
+   - PS1.3.55: điều hướng chung trong khóa (core PS.nav), Học tiếp mở thẳng hoạt động (?go=).
+   - PS1.3.54: trang chủ tải sẵn mọi khóa (core/pwa.js PS.warmAll); tệp ?v= mất mạng thì dùng bản cùng tên đã lưu.
    - Không bao giờ đụng tới bài làm (localStorage) của học viên.
    ========================================================= */
 'use strict';
-const VERSION = 'PS1.3.53';
+const VERSION = 'PS1.3.55';
 const BASE = new URL(self.registration.scope);
 const PREFIX = 'proskills-' + encodeURIComponent(BASE.pathname) + '-';
 const SHELL = PREFIX + 'shell-' + VERSION;
@@ -156,7 +158,9 @@ async function cacheFirst(event) {
   const request = event.request;
   const hit = await caches.match(request);
   if (hit) return hit;
-  const r = await fetch(request);
+  let r;
+  /* PS1.3.54: mất mạng mà chưa có đúng ?v= → dùng bản đã lưu cùng tệp (khác ?v=, hoặc tải sẵn không có ?v=) */
+  try { r = await fetch(request); } catch (e) { const old = await caches.match(request, { ignoreSearch: true }); if (old) return old; throw e; }
   if (r && r.ok && r.type === 'basic') {
     const copy = r.clone();
     event.waitUntil(caches.open(RUNTIME).then(c => c.put(request, copy).then(() => trim(c, 300))).catch(() => undefined));

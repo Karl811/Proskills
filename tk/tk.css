@@ -1071,3 +1071,6 @@ body{background-color:#F4F6FE}
     @media(max-width:400px){.street-invite-box{padding:22px 19px 20px}.street-invite h2{font-size:24px}.street-invite-art{height:86px}.street-invite-art>svg{width:78px;height:78px}}
     @media(prefers-reduced-motion:reduce){.street-game-busy{animation:none}}
   
+/* PS1.3.55 (ý 25): thanh điều hướng chung (core.css .psnav); main đã chừa 76px phía trên */
+.psnav.tour-hl{position:fixed;border-radius:20px}
+.psnav__x.on{background:var(--c-t)}

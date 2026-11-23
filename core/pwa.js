@@ -50,10 +50,23 @@
       if (ev.userChoice && ev.userChoice.then) ev.userChoice.then(function (c) { if (c && c.outcome === 'accepted') installedNow = true; refresh(); });
     } catch (e) { help(); }
   }
+  /* PS1.3.54 · Cập nhật:
+     - Mở app mà chưa làm gì (trang chủ: chưa gõ, chưa mở tấm nào; trong khóa: chưa chạm) → tự cập nhật, không hỏi.
+     - Đang làm bài → thẻ "Proskills có bản mới" (Cập nhật ngay / Để sau). Bài làm được lưu trước khi cập nhật.
+     - Quay lại app (từ nền) → kiểm tra bản mới, tối đa 1 lần / 30 phút.
+     - Sau khi cập nhật: báo nhỏ "Đã cập nhật Proskills <phiên bản>". */
+  var HUB = !!D.querySelector('main.hub'), busy = false, lastCheck = Date.now();
+  function markBusy(e) { if (!HUB || e.type !== 'pointerdown') busy = true; }
+  ['pointerdown', 'keydown', 'input'].forEach(function (n) { D.addEventListener(n, markBusy, true); });
+  function idle() { return !busy && !D.querySelector('.sheet,.ps-ov,#nb,.ov'); }
   function showUpdate() {
-    if (!reg || !reg.waiting || later || D.getElementById('ps-update')) return;
-    var el = D.createElement('div'); el.id = 'ps-update'; el.className = 'ps-update'; el.setAttribute('role', 'status');
-    el.innerHTML = '<span>Có phiên bản mới.</span><button type="button" data-pwa="update">Cập nhật</button><button type="button" class="ps-update__x" data-pwa="later" aria-label="Để sau">' + PS.icon('close', 16) + '</button>';
+    if (!reg || !reg.waiting || reloading) return;
+    if (idle()) { startUpdate(); return; }
+    if (later || D.getElementById('ps-update')) return;
+    var el = D.createElement('div'); el.id = 'ps-update'; el.className = 'ps-upd'; el.setAttribute('role', 'status');
+    el.innerHTML = '<div class="ps-upd__h"><img src="' + PS.url('icons/app-192.png') + '" width="36" height="36" alt=""><b>' + APP + ' có bản mới</b></div>' +
+      '<div class="ps-upd__b"><button type="button" class="ps-btn ps-btn--go" data-pwa="update">Cập nhật ngay</button><button type="button" class="ps-btn ps-btn--soft" data-pwa="later">Để sau</button></div>' +
+      '<p class="ps-upd__n">Bài làm được lưu trước khi cập nhật.</p>';
     D.body.appendChild(el);
   }
   function startUpdate() {
@@ -69,6 +82,54 @@
       w.addEventListener('statechange', function () { if (w.state === 'installed' && navigator.serviceWorker.controller) showUpdate(); });
     });
   }
+  D.addEventListener('visibilitychange', function () {
+    if (D.hidden || !reg) return;
+    busy = false; /* quay lại app = như vừa mở */
+    if (reg.waiting) { showUpdate(); return; }
+    if (Date.now() - lastCheck > 30 * 60000) { lastCheck = Date.now(); try { reg.update()['catch'](function () {}); } catch (e) {} }
+  });
+  (function () {
+    var k = 'ps.lastVer', v = PS.cfg.APP_VER, old = null;
+    try { old = W.localStorage.getItem(k); W.localStorage.setItem(k, v); } catch (e) {}
+    if (old && old !== v) setTimeout(function () { PS.toast('Đã cập nhật ' + APP + ' ' + PS.esc(v) + '.', 2600); }, 900);
+  })();
+
+  /* PS1.3.54 · Học được khi không có internet: tải sẵn mọi khóa về máy (chạy ngầm, mỗi phiên bản một lần).
+     Tải trang khóa + tệp có ?v= trong trang + tệp nạp riêng (OFFLINE_EXTRA: hình, phông, game). Ghi ps.offline. */
+  var OFFLINE_EXTRA = {
+    cd02: ['fonts/Lora-Variable.ttf', 'fonts/Lora-Italic-Variable.ttf'],
+    tk: ['game/street.webp', 'game/street-game.js', 'game/navigation.js', 'game/street-game.css'],
+    tc01: ['matter-0.19.0.min.js']
+  };
+  var warming = false;
+  PS.warmAll = function (force) {
+    var sw = navigator.serviceWorker, c = navigator.connection, ver = PS.cfg.APP_VER;
+    if (warming) return;
+    if (!sw || !sw.controller || !W.fetch || !W.URL) { if (force) PS.toast('Hãy mở ứng dụng khi có internet để tải về máy.'); return; }
+    if (!force && c && (c.saveData || /2g/.test(c.effectiveType || ''))) return;
+    var o = PS.get('ps.offline', null) || {};
+    if (!force && o.v === ver && o.ok) return;
+    var ids = PS.modules().filter(function (m) { return m.kind !== 'routine' && m.state === 'ready'; }).map(function (m) { return m.id; });
+    var st = { v: ver, total: ids.length, n: 0, ok: 0, run: 1, bad: 0 };
+    warming = true; PS.set('ps.offline', st); if (PS.offRefresh) PS.offRefresh();
+    function get(u) { return W.fetch(u).then(function (r) { if (!r || !r.ok) st.bad++; }, function () { st.bad++; }); }
+    function one(i) {
+      if (i >= ids.length) {
+        st.run = 0; st.ok = st.bad ? 0 : 1; st.at = Date.now(); warming = false; PS.set('ps.offline', st); if (PS.offRefresh) PS.offRefresh();
+        if (force) PS.toast(st.ok ? 'Đã tải xong. Bạn học được khi không có internet.' : 'Chưa tải đủ. Thử lại khi có internet nhé.');
+        return;
+      }
+      var page = new W.URL(PS.url(ids[i] + '/index.html'), location.href).href;
+      W.fetch(page).then(function (r) { if (!r || !r.ok) throw 0; return r.text(); }).then(function (html) {
+        var re = /(?:src|href)="([^"]+\?v=[^"]+)"/g, m, list = [];
+        while ((m = re.exec(html))) list.push(new W.URL(m[1], page).href);
+        (OFFLINE_EXTRA[ids[i]] || []).forEach(function (p) { list.push(new W.URL(p, page).href); });
+        function f(k) { if (k >= list.length) { st.n++; PS.set('ps.offline', st); if (PS.offRefresh) PS.offRefresh(); one(i + 1); return; } get(list[k]).then(function () { f(k + 1); }); }
+        f(0);
+      })['catch'](function () { st.bad++; st.n++; one(i + 1); });
+    }
+    one(0);
+  };
   function register() {
     if (!('serviceWorker' in navigator) || !W.isSecureContext || location.protocol === 'file:') return;
     try { navigator.serviceWorker.register(PS.url('sw.js'), { scope: PS.url('') }).then(watch)['catch'](function () {}); } catch (e) {}
@@ -76,7 +137,7 @@
   W.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); deferred = e; refresh(); });
   W.addEventListener('appinstalled', function () { installedNow = true; deferred = null; refresh(); });
   if (mq && mq.addListener) mq.addListener(refresh);
-  if ('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('controllerchange', function () { if (reloading) W.location.reload(); });
+  if ('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('controllerchange', function () { if (reloading) { W.location.reload(); return; } if (HUB) setTimeout(function () { PS.warmAll(false); }, 2500); });
   D.addEventListener('click', function (e) {
     var b = PS.closest(e.target, '[data-pwa]'); if (!b) return;
     var a = b.getAttribute('data-pwa');

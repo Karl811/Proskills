@@ -7,7 +7,7 @@
    - Senpai có cờ draft:1 = LỜI KỂ MẪU do Claude viết, cần thay bằng chuyện thật (ẩn danh) trước khi phát hành.
    ES5. */
 var CD_ID = 'cd01';
-var CD_VER = 'CD01.1.6';
+var CD_VER = 'CD01.1.8';
 var CD_TOTAL = 18;            /* Xuất phát (1) + 7 ga (17 chặng). Ga Ước Mơ (3 chặng nghi thức, FIN_ORDER) không tính vào 18 */
 var CD_XP_ACT = 30, CD_XP_WARM = 10, CD_INS_WORDS = 20, CD_INS_FIELD = 5;
 var TIKME = 'https://tikme.com';

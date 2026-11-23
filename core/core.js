@@ -78,7 +78,22 @@
   PS.mod = function (id) { var m = PS.modules(); for (var i = 0; i < m.length; i++) if (m[i].id === id) return m[i]; return null; };
   PS.modKey = function (id) { return 'ps.mod.' + id; };
   PS.load = function (id) { return get(PS.modKey(id), null); };
-  PS.save = function (id, obj) { obj = obj || {}; obj.savedAt = Date.now(); return set(PS.modKey(id), obj); };
+  PS.save = function (id, obj) { obj = obj || {}; obj.savedAt = Date.now(); var ok = set(PS.modKey(id), obj); PS.saveMark(ok); return ok; };
+  /* PS1.3.54 · chấm lưu bài: xanh = đã lưu trên máy, đỏ = chưa lưu được (lớp ps-sv / ps-sv-err trên <html>, vẽ ở core.css) */
+  PS.saveMark = function (ok) {
+    var c = D.documentElement.classList, good = !!ok && PS.storageOK;
+    c.toggle('ps-sv', good); c.toggle('ps-sv-err', !good);
+  };
+  PS.saveMark(true);
+  /* hộp "Bài làm đã lưu" cuối trang Tổng quan mọi khóa */
+  PS.savedHTML = function (id) {
+    var o = get(PS.modKey(id), null) || {}, at = +(o.savedAt || o.saved) || 0, lb = PS.prefs().lastBackup || 0;
+    if (!PS.storageOK) return '<div class="ps-saved ps-saved--err"><span class="ps-saved__ic">' + PS.icon('info', 18, 2.4) + '</span><span><b>Chưa lưu được trên máy này</b><small>Trình duyệt đang chặn lưu bài. Hãy tải sao lưu trước khi tắt.</small></span></div>';
+    var d = lb ? Math.floor((Date.now() - lb) / 864e5) : -1;
+    return '<div class="ps-saved"><span class="ps-saved__ic">' + PS.icon('check', 18, 2.8) + '</span><span><b>Bài làm đã lưu trên máy này</b>' +
+      (at ? '<small>Lần lưu gần nhất: ' + fmtTime(at) + ' · ' + fmtDate(at) + '</small>' : '') +
+      '<small>Sao lưu gần nhất: ' + (d < 0 ? 'chưa có' : (d === 0 ? 'hôm nay' : d + ' ngày trước')) + '</small></span></div>';
+  };
   function modKeys(id) {
     var base = PS.modKey(id);
     return allKeys().filter(function (k) { return k === base || k.indexOf(base + '.') === 0; });
@@ -124,8 +139,89 @@
     if (PS.needProfile() || !PS.isUnlocked(id)) { W.location.replace(PS.url('index.html') + '?m=' + encodeURIComponent(id)); return false; }
     return true;
   };
-  PS.home = function () { W.location.href = PS.url('index.html'); };
-  PS.open = function (id) { W.location.href = PS.url(id + '/index.html'); };
+  /* PS1.3.55: có bộ điều hướng (PS.nav) thì về trang chủ bằng lịch sử (không chồng thêm trang); không thì thay trang */
+  PS.home = function () { if (NAVC) { NAVC.leave(); return; } W.location.replace(PS.url('index.html')); };
+  /* q: mã hoạt động để khóa mở thẳng (?go=, ý 24). Đánh dấu "mở từ trang chủ" để nút ‹ Proskills quay lại đúng trang chủ. */
+  PS.open = function (id, q) {
+    try { W.sessionStorage.setItem('ps.nav', id); } catch (e) {}
+    W.location.href = PS.url(id + '/index.html') + (q ? '?go=' + encodeURIComponent(q) : '');
+  };
+  PS.goParam = function () { var m = /[?&]go=([^&#]*)/.exec(W.location.search || ''); try { return m ? decodeURIComponent(m[1]) : ''; } catch (e) { return ''; } };
+
+  /* ---------- PS1.3.55 · Điều hướng chung trong khóa (ý 25) ----------
+     Quy tắc: nút ‹ góc trái và nút Back/vuốt Back của Android luôn "về một cấp" (cha của màn đang xem).
+     Lịch sử trình duyệt chỉ dùng để đếm: vào sâu thêm mục, ngang/lên thì thay; Back đọc cha từ module, không đọc mục cũ.
+     Module khai báo: var NAV = PS.nav({ mod: ID, tag: 'cd2', get: fn → V, parent: fn(v) → view | null (null = Proskills),
+       depth: fn(v) → 0,1,2…, ser: fn(v) → object, de: fn(obj) → view | null, show: fn(v, y) vẽ lại,
+       intercept: fn() → 0 | 1 (đã đóng lớp phủ, cần bù mục) | 2 (đã xử lý, không bù) });
+     Gọi NAV.start(url) một lần khi khởi động; NAV.go(v) trước khi đổi V; NAV.save() khi đổi bước trong cùng màn.
+     Thanh trên: PS.navHTML({ back, title, extra }). Nút ‹ có data-psnav="up"; nút Sổ tay data-act="nb". */
+  var NAVC = null, NAVQ = 0; /* NAVQ: lúc vừa đổi màn, bỏ qua cuộn do trang tự đặt để thanh trên không ẩn */
+  PS.nav = function (o) {
+    var N = { d: 0, fh: 0 };
+    function st(v, d, y) { var s = o.ser(v) || {}; s[o.tag] = 1; s.d = d; s.y = y || 0; s.fh = N.fh; return s; }
+    function rep(v, y, url) { try { if (url) W.history.replaceState(st(v, N.d, y), '', url); else W.history.replaceState(st(v, N.d, y), ''); } catch (e) {} }
+    function cur() { var h = null; try { h = W.history.state; } catch (e) {} return h && h[o.tag] ? h : null; }
+    N.start = function (url) {
+      var h = cur();
+      if (h && typeof h.d === 'number') { N.d = h.d; N.fh = h.fh || 0; if (url) rep(o.get(), h.y, url); return; }
+      var f = ''; try { f = W.sessionStorage.getItem('ps.nav'); W.sessionStorage.removeItem('ps.nav'); } catch (e) {}
+      N.d = 0; N.fh = f === o.mod ? 1 : 0; rep(o.get(), 0, url);
+    };
+    N.save = function (y) { rep(o.get(), y == null ? (W.pageYOffset || 0) : y); };
+    /* trước khi đổi sang màn v: vào sâu hơn thì thêm mục (đủ số cấp), ngang hoặc lên thì thay mục hiện tại */
+    N.go = function (v) {
+      NAVQ = +new Date();
+      var V0 = o.get(), dv = o.depth(v), n = Math.max(dv > o.depth(V0) ? 1 : 0, dv - N.d), chain = [], p, i;
+      rep(V0, W.pageYOffset || 0);
+      if (n <= 0) { rep(v, 0); return; }
+      for (p = v; p; p = o.parent(p)) chain.unshift(p);
+      for (i = n - 1; i >= 0; i--) { N.d++; try { W.history.pushState(st(chain[Math.max(0, chain.length - 1 - i)], N.d, 0), ''); } catch (e) {} }
+    };
+    N.up = function () {
+      var p = o.parent(o.get());
+      if (!p) { N.leave(); return; }
+      if (N.d > 0) { try { W.history.back(); return; } catch (e) {} }
+      NAVQ = +new Date(); rep(p, 0); o.show(p, 0);
+    };
+    N.leave = function () {
+      if (o.beforeLeave) o.beforeLeave();
+      var t = setTimeout(function () { W.location.replace(PS.url('index.html')); }, 900);
+      W.addEventListener('pagehide', function () { clearTimeout(t); });
+      if (N.fh) { try { W.history.go(-(N.d + 1)); return; } catch (e) {} }
+      clearTimeout(t); W.location.replace(PS.url('index.html'));
+    };
+    W.addEventListener('popstate', function (e) {
+      var h = e.state && e.state[o.tag] ? e.state : null, ic = dlgStack.length ? (dlgStack[dlgStack.length - 1](), 1) : (o.intercept ? o.intercept() : 0); /* Back đóng hộp thoại trước */
+      if (ic) { if (ic === 1) { try { W.history.pushState(st(o.get(), N.d, W.pageYOffset || 0), ''); } catch (er) {} } else if (h && typeof h.d === 'number') N.d = h.d; return; }
+      if (h && typeof h.d === 'number' && h.d > N.d) { N.d = h.d; var fv = o.de(h); if (fv) { NAVQ = +new Date(); o.show(fv, h.y || 0); return; } } /* nút Tiến (máy tính) */
+      N.d = h && typeof h.d === 'number' ? h.d : Math.max(0, N.d - 1);
+      var p = o.parent(o.get());
+      if (!p) { N.leave(); return; }
+      var hv = h ? o.de(h) : null, y = hv && JSON.stringify(o.ser(hv)) === JSON.stringify(o.ser(p)) ? (h.y || 0) : 0;
+      NAVQ = +new Date(); rep(p, y); o.show(p, y);
+    });
+    NAVC = N;
+    return N;
+  };
+  PS.navHTML = function (o) {
+    return '<nav class="psnav" id="psnav" aria-label="Điều hướng"><div class="psnav__in">' +
+      '<button type="button" class="psnav__bk" data-psnav="up" aria-label="Về ' + esc(o.back) + '">' + PS.icon('back', 18, 2.6) + '<span>' + esc(o.back) + '</span></button>' +
+      '<b class="psnav__t">' + esc(o.title || '') + '</b>' + (o.extra || '') +
+      '<button type="button" class="psnav__nb" data-act="nb" aria-label="Sổ tay" title="Sổ tay">' + PS.icon('book', 21) + (o.dot ? '<span class="psnav__dot"></span>' : '') + '</button></div></nav>';
+  };
+  D.addEventListener('click', function (e) { var b = PS.closest(e.target, '[data-psnav="up"]'); if (b && NAVC) { e.preventDefault(); NAVC.up(); } });
+  /* thanh trên ẩn khi cuộn xuống, hiện lại khi cuộn lên */
+  (function () {
+    var lastY = 0;
+    W.addEventListener('scroll', function () {
+      var n = D.getElementById('psnav'); if (!n) return;
+      var y = W.pageYOffset || 0;
+      if (+new Date() - NAVQ < 600) { lastY = y; n.classList.remove('psnav--hide'); return; }
+      if (y > lastY + 6 && y > 80) n.classList.add('psnav--hide'); else if (y < lastY - 6 || y < 80) n.classList.remove('psnav--hide');
+      lastY = y;
+    }, { passive: true });
+  })();
 
   /* ---------- điểm, chuỗi ngày (tính chung) ---------- */
   /* Module gọi PS.report(id, {xp, ins, done, total, days, extra}) mỗi lần lưu.
@@ -512,6 +608,25 @@
     var cur = String(PS.profile().teacher || '').toLowerCase();
     return '<select class="ps-inp" ' + attr + '><option value="">Chọn thầy cô</option>' + PS.teachers().map(function (t) { return '<option value="' + esc(t[1]) + '"' + (String(t[1]).toLowerCase() === cur ? ' selected' : '') + '>' + esc(t[0]) + '</option>'; }).join('') + '</select>';
   };
+  /* PS1.3.54 · Học được khi không có internet: trạng thái tải các khóa về máy (pwa.js PS.warmAll ghi ps.offline) */
+  function offInfo() {
+    var o = get('ps.offline', null) || {}, ver = CFG.APP_VER;
+    if (o.v === ver && o.ok && o.n >= o.total) return { st: 'Đã sẵn sàng', done: 1, o: o };
+    if (o.run && o.v === ver) return { st: 'Đang tải ' + (o.n || 0) + '/' + (o.total || '…'), done: 0, o: o };
+    return { st: 'Chưa tải đủ', done: 0, o: o };
+  }
+  function offBody() {
+    var f = offInfo(), o = f.o, pct = f.done ? 100 : (o.total ? Math.round((o.n || 0) / o.total * 100) : 0);
+    return '<p class="ps-small">' + (f.done ? 'Mọi khóa học đã tải về máy này. Bạn học được cả khi không có internet.' : 'Proskills tự tải các khóa về máy khi có internet, để lần sau học được cả khi không có internet.') + '</p>' +
+      '<span class="ps-offbar"><i style="width:' + pct + '%"></i></span>' +
+      (f.done ? '' : '<div class="ps-btnrow"><button type="button" class="ps-btn ps-btn--sm" data-psact="warm">' + PS.icon('save', 16) + ' Tải về máy ngay</button></div>') +
+      '<p class="ps-small">Video và bài đọc ở trang web khác vẫn cần internet.</p>';
+  }
+  PS.offRefresh = function () {
+    $$('.ps-srow[data-k="off"]').forEach(function (r) {
+      var f = offInfo(); $('.ps-srow__st', r).innerHTML = esc(f.st); $('.ps-srow__b', r).innerHTML = offBody();
+    });
+  };
   PS.settingsHTML = function (opts) {
     opts = opts || {};
     var ctx = opts.ctx || 'module', m = opts.mod ? PS.mod(opts.mod) : null, p = PS.profile(), t = PS.teacher();
@@ -533,6 +648,7 @@
     h += row('app', 'phone', 'Cài ứng dụng, toàn màn hình', '',
       '<div class="ps-btnrow"><button type="button" class="ps-btn ps-btn--sm" data-pwa="install">' + PS.icon('save', 16) + '<span data-pwa-label>Cài ứng dụng</span></button>' + (PS.fsOK() ? '<button type="button" class="ps-btn ps-btn--sm ps-btn--soft" data-psact="full">' + PS.icon('expand', 16) + ' Toàn màn hình</button>' : '') + '</div>' +
       '<p class="ps-small"><b>iPhone:</b> mở bằng Safari, chạm Chia sẻ, chọn "Thêm vào MH chính".<br><b>Android:</b> mở bằng Chrome, chạm dấu ⋮, chọn "Cài đặt ứng dụng" hoặc "Thêm vào màn hình chính".<br>Một ứng dụng ' + esc(CFG.APP) + ' dùng cho mọi module.</p>');
+    h += row('off', 'check', 'Học được khi không có internet', esc(offInfo().st), offBody());
     if (ctx === 'module' && m) h += row('reset', 'trash', 'Xóa bài làm ' + esc(m.title), '', '<p class="ps-small">Chỉ xóa bài làm của module này. Thông tin của bạn và các module khác giữ nguyên.</p><div class="ps-btnrow"><button type="button" class="ps-btn ps-btn--sm ps-btn--dangersoft" data-psact="reset">' + PS.icon('trash', 16) + ' Xóa bài làm module này</button></div>', 'ps-srow--danger');
     else h += row('reset', 'trash', 'Xóa toàn bộ dữ liệu', '', '<p class="ps-small">Xóa thông tin và bài làm của tất cả module trên máy này. Muốn làm lại một module, vào Cài đặt của module đó.</p><div class="ps-btnrow"><button type="button" class="ps-btn ps-btn--sm ps-btn--dangersoft" data-psact="resetAll">' + PS.icon('trash', 16) + ' Xóa toàn bộ</button></div>', 'ps-srow--danger');
     h += '<p class="ps-ver">' + esc(CFG.APP) + ' ' + esc(CFG.APP_VER) + (m ? ' · ' + esc(m.code) + ' ' + esc(opts.ver || m.ver || '') : '') + '</p></div>';
@@ -560,6 +676,7 @@
       else if (a === 'backup') PS.backup();
       else if (a === 'restore') PS.restorePick();
       else if (a === 'full') PS.toggleFull();
+      else if (a === 'warm') { if (PS.warmAll) PS.warmAll(true); else PS.toast('Hãy mở lại ứng dụng khi có internet nhé.'); }
       else if (a === 'reset') PS.askReset(opts.mod, opts.afterReset);
       else if (a === 'resetAll') PS.askResetAll();
       else if (a === 'editFixed') PS.editFixed(function () { refreshInfo(rootEl); if (opts.onChange) opts.onChange('profile'); });

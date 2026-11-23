@@ -5,6 +5,37 @@ Quy ước số phiên bản: **PS a.b.c**
 - b: giai đoạn / thêm module hoặc tính năng lớn
 - c: sửa nhỏ trong giai đoạn đó
 
+## PS1.3.55 · 22/11/2026 · Học tiếp vào thẳng hoạt động, điều hướng chung trong mọi khóa
+Đợt 2/2 của bản xem trước PS1.3.54 (ý 24, 25). Thay quyết định 18/11 “chỉ có nút về Proskills trong Cài đặt”.
+- **Thanh trên chung** (core.js `PS.navHTML`, core.css `.psnav`): góc trái “‹ <nơi về>” (Proskills / Sơ đồ tuyến / Hải đồ / Bản đồ / Sơ đồ phòng tập / tên ga, bến, ải, bài), giữa là tên màn (trong hoạt động: “2/3”), góc phải luôn Sổ tay (TK thêm nút Hỏi nhanh Chú Tanaka bên trái Sổ tay). Thanh ẩn khi cuộn xuống, hiện khi cuộn lên (làm chung ở core.js). Bỏ nút “‹ Proskills”, “‹ Hải đồ”… nằm trong nội dung và nút bản đồ ở thanh trên (CD01: vòng tiến độ hôm nay; TK: vòng nhịp học đi cùng nút bản đồ, nay không còn).
+- **Nút ‹ và Back Android đi giống nhau: “về một cấp”** (core.js `PS.nav`): hoạt động → ga/bến/ải/bài → bản đồ khóa → trang chủ Proskills. Back đóng hộp thoại, Sổ tay, Hỏi nhanh trước. Về trang chủ bằng lịch sử khi khóa được mở từ trang chủ (Back ở trang chủ không quay lại khóa); mở khóa trực tiếp thì thay trang. Nút “Về trang chính” trong Cài đặt dùng cùng cách (`PS.home`). Shin Routine: “‹ Proskills” và nút về trang chủ trong Cài đặt cũng về bằng lịch sử.
+- **Cuối hoạt động có Tiếp theo + Về ga/bến/ải/bài**: CD01 (hộp “Đã đóng dấu!”), CD02 (hộp mới “Xong chặng!”), TK (hộp “Chặng tiếp theo”, khi ải còn chặng), TC01 (hộp “Xong hoạt động!”, khi bài còn hoạt động). Hộp con dấu, hộp hoàn thành ga, đục lỗ thẻ, nhận bằng giữ như cũ.
+- **Học tiếp mở thẳng hoạt động** (ý 24): mỗi khóa báo `extra.next = {t, go}` (CD01, CD02: chặng kế tiếp; TK: chặng chưa làm đầu tiên; TC01: hoạt động chưa làm đầu tiên của “Gợi ý hôm nay”). Trang chủ: thẻ Học tiếp (khóa đang học dở) mở `<khóa>/?go=<mã>` (`PS.open(id, q)`); khóa mở thẳng hoạt động và dựng sẵn các cấp phía trên để nút ‹ / Back đi đúng. Dòng chữ hoạt động kế tiếp được thoát ký tự (esc).
+- Module mẫu (mau 1.0.1) dùng thanh trên chung.
+- Phiên bản khóa: CD01.1.8, CD02.3.11, TK16.3, TC01.1.7.
+- Kiểm 390 + 1280 + 360: 4 khóa × trang khóa / cấp giữa / hoạt động, Học tiếp từ trang chủ (CD02, TC01) và `?go=` (CD01, TK), ‹ và Back đến trang chủ rồi Back thêm không quay lại khóa, Back đóng menu/Sổ tay, Cài đặt › Về trang chính, ‹ Proskills của Shin, hộp cuối hoạt động (CD01, CD02, TC01, TK), thanh ẩn/hiện khi cuộn; không lỗi JS, không tràn ngang; ES5 (acorn).
+
+Tệp đổi: config.js, sw.js, index.html, core/core.js, core/core.css, hub/hub.js, routine/index.html, routine/proskills.js, cd01/(index.html, engine.js, content.js), cd02/(index.html, engine.js, content.js), tk/(index.html, engine.js, notebook.js, report.js, game-entry.js, content.js, tk.css), tc01/(index.html, engine.js, content.js), mau/(index.html, mau.js, mau.css), CHANGELOG.md, AGENTS.md.
+File cần xóa trên GitHub: không có.
+
+## PS1.3.54 · 22/11/2026 · Trang chủ 3 thẻ, cảm giác app (PWA), chấm lưu bài
+Theo bản xem trước `PS1.3.54-xem-truoc-giao-dien.html` (thầy chốt 22/11). Đợt 1/2: giao diện + PWA; đợt 2 (PS1.3.55): Học tiếp đúng hoạt động và điều hướng trong từng khóa.
+- **Trang chủ 3 thẻ ở thanh đáy** (hub.js `TAB`, `navHTML`, `setTab`; hub.css khối cuối PS1.3.54): **Hôm nay** (lời chào, khối Shin, Học tiếp; vừa 1 màn hình 390×844) · **Khóa học** (nhắc sao lưu, 3 ô số, băng chuyền, Hướng dẫn, chân trang) · **Lịch học** (thẻ lịch + nút Sửa ở đầu). Thẻ đang xem nhớ trong phiên (`sessionStorage ps.tab`); `?lich=1` mở thẻ Lịch học; nút Back Android ở thẻ 2, 3 về Hôm nay.
+- **Học tiếp** (`contHTML`, `contMods`): khóa vừa học (`lastMod`) hoặc khóa đang học dở, rồi khóa mới; tranh thẻ, tiến độ, nút màu khóa; dòng nhỏ “Cũng đang học” khi có khóa thứ hai. Đã đọc sẵn `extra.next.t` (khóa báo hoạt động kế tiếp, làm ở PS1.3.55).
+- Lời chào 26 → 23px (bằng “Khóa học của bạn”, “Lịch học”). Khối Shin: “RÈN LUYỆN CÙNG SHIN” + tiêu đề **“Giữ lửa hôm nay”** (đã check-in: “Lửa vẫn cháy!”), dãn khoảng cách tiêu đề, lời Shin, thói quen, nút.
+- Tranh thẻ CD02: thuyền buồm + la bàn, nền đất nung (`ART.cd02`, `ART_BG.cd02`).
+- Lịch học (lich.js `MON`): Kỹ năng xanh lá #348A5F (trước xanh dương), Kiến thức nghề tím dịu #7E68B0 (trước xanh ngọc). Tấm Đặt lịch / Sửa lịch dùng xanh lá (`.sheet--lc`, trước xanh dương đậm).
+- **Xoay màn hình**: bỏ `"orientation": "any"` trong manifest (Android đang xoay theo cảm biến, bỏ qua khóa xoay). App nay theo cài đặt xoay của điện thoại. Android cập nhật cho app đã cài trong khoảng 1 ngày hoặc khi cài lại.
+- **Cập nhật** (pwa.js): mở app mà chưa làm gì thì tự cập nhật không hỏi (trang chủ: chưa gõ, chưa mở tấm nào; trong khóa/Shin: chưa chạm); đang làm bài thì thẻ “Proskills có bản mới · Cập nhật ngay / Để sau” (`.ps-upd`). Quay lại app từ nền: kiểm bản mới (≤ 1 lần/30 phút). Sau cập nhật: báo “Đã cập nhật Proskills PSx” (`ps.lastVer`). Dải cập nhật riêng của Shin tắt (proskills.js).
+- **Học được khi không có internet**: tải sẵn mọi khóa chuyển từ hub.js sang `PS.warmAll` (pwa.js): trang khóa + tệp `?v=` + `OFFLINE_EXTRA` (phông Lora CD02, game TK, matter TC01). Trạng thái `ps.offline`; Cài đặt mọi khóa có mục “Học được khi không có internet” (thanh tiến độ, nút “Tải về máy ngay”). sw.js: tệp `?v=` mất mạng mà chưa có đúng bản thì dùng bản cùng tên đã lưu.
+- **Chấm lưu bài** (`PS.saveMark`, core.css): chấm xanh nhỏ (8px, không chớp) ở góc nút Sổ tay mọi khóa, ảnh đại diện trang chủ, nút Sổ tay Shin; đỏ khi máy chặn lưu / lưu lỗi. `PS.savedHTML(id)`: hộp “Bài làm đã lưu trên máy này · lần lưu gần nhất · sao lưu gần nhất” cuối Tổng quan CD01, CD02, TK, TC01 (không hiện ở demo) và trong Cài đặt Shin.
+- **Shin Routine** (routine/proskills.js, routine/index.html nạp thêm `../hub/avatar.js`): nút “‹ Proskills” xám mờ trước ngày; ngày gọn “CN, 22/11” (vừa 1 dòng ở 360px); nút ⋮ thành ảnh đại diện học viên (đổi ở trang chủ thì Shin đổi theo); Cài đặt: nút “Về trang chính Proskills” to, đủ chiều ngang (`.pshome`).
+- Phiên bản khóa: CD01.1.7, CD02.3.10, TK16.2, TC01.1.6 (chỉ thêm hộp Đã lưu ở Tổng quan).
+- Kiểm 390 + 1280 + 360 (Shin): 3 thẻ trang chủ, Back Android, tấm lịch, Tổng quan 4 khóa, Cài đặt Shin; service worker thật: tải sẵn 4/4 khóa, mở CD02 khi mất mạng, tự cập nhật ở trang chủ khi chưa làm gì, hiện thẻ cập nhật khi đang làm bài ở TK; ES5 (acorn).
+
+Tệp đổi: index.html, manifest.webmanifest, config.js, sw.js, core/core.js, core/core.css, core/pwa.js, hub/hub.js, hub/hub.css, hub/lich.js, routine/index.html, routine/proskills.js, cd01/(index.html, engine.js, content.js), cd02/(index.html, engine.js, content.js), tk/(index.html, notebook.js, content.js), tc01/(index.html, engine.js, content.js), mau/index.html, CHANGELOG.md, AGENTS.md.
+File cần xóa trên GitHub: không có.
+
 ## PS1.3.53 · 22/11/2026 · CD02.3.9 Sửa nhỏ theo thầy chốt sau PS1.3.52
 - Thẻ cuối trang chủ khóa đổi tên “Thư trong chai hôm nay” → **“Lời anh chị hôm nay”** (`SHIN_TALK.bottle`), tránh trùng với Thư trong chai 7 bến.
 - Nhận bằng: bỏ thông báo “Bằng Thuyền Trưởng Vững Vàng! +30 XP” (che nút “Để sau” và dòng “Thuyền vừa có thêm…”); điểm hiện ngay trong popup bằng dưới tấm bằng (`certOv(first, pts)`), giống popup con dấu.

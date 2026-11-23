@@ -4,7 +4,7 @@
    Nguồn nội dung: Sổ quản lý học tập GDTC v10.1, chương trình GDTC TTS/Kỹ sư, tiêu chí đo lường theo nghề (KTN),
    Sổ tay sức khỏe 2.0. Kỹ thuật động tác do GV GDTC duyệt lại. Mốc thể lực: bảng thành tích Sổ quản lý v10.1.
    ========================================================= */
-var TC_VER = 'TC01.1.5';
+var TC_VER = 'TC01.1.7';
 
 /* ---------- Gợi ý thẻ Shin Routine theo bài (PS1.3.26) ----------
    Bài có trong RT_BAI thì cuối trang bài hiện khối "Rèn mỗi ngày cùng Shin" (mã thẻ: PS_CONFIG.ROUTINE_LIB).

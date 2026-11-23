@@ -46,9 +46,18 @@
   function xpTotal() { return sumObj(S.xp); }
   function insTotal() { return sumObj(S.ins); }
   function doneMain() { var n = 0; ORDER.forEach(function (a) { if (S.done[a]) n++; }); return n; }
+  function nextInfo() { /* PS1.3.55 (ý 24): hoạt động kế tiếp cho nút Học tiếp ở trang chủ */
+    var n = nextAct() || nextFin(); if (!n || !ACTS[n]) return null;
+    return { t: stShort(stById(ACTS[n].st)) + ' · ' + ACTS[n].t, go: n };
+  }
+  function goView(c) {
+    if (!c || !ACTS[c] || !(actOpen(c) || S.done[c])) { var st = c ? stById(c) : null; return st && (stOpen(st) || stDone(st)) ? { v: 'st', st: st.id } : null; }
+    var k = S.d[c + '.st'];
+    return { v: 'act', id: c, step: !S.done[c] && typeof k === 'number' && k < ACTS[c].steps.length ? k : 0 };
+  }
   function extra() {
     var R = riaRes();
-    return { goal: g('x1.goal') || '', now: g('x1.now') || '', me: g('a13.me') || '', hope: ga('a13.hope'), first: g('a13.first') || '',
+    return { next: nextInfo(), goal: g('x1.goal') || '', now: g('x1.now') || '', me: g('a13.me') || '', hope: ga('a13.hope'), first: g('a13.first') || '',
       like: ga('a21.sel'), good: ga('a22.sel'), value: ga('a23.rank'), ria: R.full ? R.code.join('') : '',
       main: g('a33.main') || '', mainName: g('a33.main') ? indName(g('a33.main'), 'a33.main') : '', b: g('a33.b') || '', bName: g('a33.b') ? indName(g('a33.b'), 'a33.b') : '', why: g('a33.why') || '',
       visa: g('a44.path') || '', tl: g('a44.tl') || {}, jobKey: jobKey() || '', jobHist: ga('a42.hist').length, day: g('a42.day') || '', worry: worryText(g('a43.top')), ready: rdCount('r'), goWhy: g('a43.why') || '',
@@ -263,19 +272,17 @@
       svg: '<svg class="tn-ring" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18.5" fill="none" class="tn-ring__bg"/>' +
         (f > 0 ? '<circle cx="20" cy="20" r="18.5" fill="none" class="tn-ring__v' + (full ? ' ok' : '') + '" stroke-dasharray="' + (C * f).toFixed(1) + ' ' + C.toFixed(1) + '" transform="rotate(-90 20 20)"/>' : '') + '</svg>' };
   }
+  /* PS1.3.55 (ý 25): thanh trên chung · ‹ về một cấp | tên màn | Sổ tay */
   function topnav() {
-    var dr = dayRing(), lab = 'Sơ đồ tuyến · hôm nay ' + dr.nd + '/' + dr.n + ' chặng' + (dr.st ? ' · ' + dr.st.vn : '') + (dr.full ? ' · đã đủ' : '');
-    return '<nav class="topnav" aria-label="Điều hướng"><div class="topnav__in">' +
-      '<span class="tn-sp"></span><div class="tn-pill">' +
-      '<button type="button" class="tn-btn tn-btn--map' + (V.v === 'home' ? ' on' : '') + '" data-act="home" aria-label="' + esc(lab) + '" title="' + esc(lab) + '">' + dr.svg + cdIcon('map', 20) + '</button>' +
-      '<button type="button" class="tn-btn" data-act="nb" aria-label="Sổ tay" title="Sổ tay">' + PS.icon('book', 20) + '</button></div></div></nav>';
+    var bk = 'Proskills', t = 'Career Design 1', st, a;
+    if (V.v === 'st' && (st = stById(V.st))) { bk = 'Sơ đồ tuyến'; t = st === START ? 'Sân ga' : stLabel(st) + ' · ' + st.vn; }
+    else if (V.v === 'act' && (a = ACTS[V.id])) { st = stById(a.st); bk = stShort(st); t = a.warm ? 'Khởi động' : (st === START ? 'Xuất phát' : (st.acts.indexOf(V.id) + 1) + '/' + st.acts.length); }
+    return PS.navHTML({ back: bk, title: t });
   }
   function demoStrip() { return S.demo ? '<div class="demo-strip"><span>Bản demo giáo viên · học viên giả định</span><button type="button" data-act="demoExit">Thoát demo</button></div>' : ''; }
-  function hState(v, y) { return { cd: 1, v: v.v, st: v.st || null, id: v.id || null, step: v.step || 0, ret: v.ret || null, y: y || 0 }; }
   var QUIET = false;
   function render(top) {
     tmKill(); if (HOLD) { clearInterval(HOLD.h); HOLD = null; }
-    try { if (!history.state || !history.state.cd) history.replaceState(hState(V), ''); } catch (e) {}
     if (V.v === 'intro') { APP.innerHTML = '<div class="wrap enter">' + viewIntro() + '</div>'; stagger(); return; }
     var h = V.v === 'st' ? viewStation() : (V.v === 'act' ? viewAct() : viewHome());
     APP.innerHTML = topnav() + '<div class="wrap' + (QUIET ? '' : ' enter') + (S.demo ? ' wrap--demo' : '') + '">' + h + '</div>' + demoStrip();
@@ -311,23 +318,25 @@
   }
   function stagger() { var w = APP.querySelector('.enter'); if (!w) return; var c = w.children; for (var i = 0; i < c.length; i++) c[i].style.setProperty('--i', Math.min(i, 8)); }
   function go(v) {
-    try { var same = v.v === V.v && v.st === V.st && v.id === V.id; if (V.v !== 'intro' && !same) { history.replaceState(hState(V, W.pageYOffset || 0), ''); history.pushState(hState(v), ''); } else history.replaceState(hState(v), ''); } catch (e) {}
+    NAV.go(v);
     V = v; render(true);
   }
-  function stepState() { try { history.replaceState(hState(V), ''); } catch (e) {} }
-  W.addEventListener('popstate', function (e) {
-    var keep = function () { try { history.pushState(hState(V), ''); } catch (er) {} };
-    if (D.getElementById('cdov')) { closeOv(); keep(); return; }
-    if (nbOpen) { closeNb(); keep(); return; }
-    if (V.v === 'intro') return;
-    var h = e.state;
-    if (!h || !h.cd) { V = { v: 'home' }; }
-    else if (h.v === 'act' && ACTS[h.id] && (actOpen(h.id) || S.done[h.id])) V = { v: 'act', id: h.id, step: Math.min(h.step || 0, ACTS[h.id].steps.length - 1), ret: h.ret || undefined };
-    else if (h.v === 'st' && stById(h.st)) V = { v: 'st', st: h.st };
-    else V = { v: 'home' };
-    QUIET = true; render(false); QUIET = false;
-    W.scrollTo(0, h && h.y ? h.y : 0);
-  });
+  function stepState() { NAV.save(0); }
+  /* PS1.3.55: nút ‹ và Back Android cùng "về một cấp" (lõi PS.nav) */
+  function parentOf(v) { if (v.v === 'act' && ACTS[v.id]) return { v: 'st', st: ACTS[v.id].st }; if (v.v === 'st') return { v: 'home' }; return null; }
+  function viewOf(h) {
+    if (h.v === 'act' && ACTS[h.id] && (actOpen(h.id) || S.done[h.id])) return { v: 'act', id: h.id, step: Math.min(h.step || 0, ACTS[h.id].steps.length - 1), ret: h.ret || undefined };
+    if (h.v === 'st' && stById(h.st)) return { v: 'st', st: h.st };
+    if (h.v === 'home') return { v: 'home' };
+    return null;
+  }
+  var NAV = PS.nav({ mod: ID, tag: 'cd', get: function () { return V; }, parent: parentOf,
+    depth: function (v) { return v.v === 'act' ? 2 : (v.v === 'st' ? 1 : 0); },
+    ser: function (v) { return { v: v.v, st: v.st || null, id: v.id || null, step: v.step || 0, ret: v.ret || null }; },
+    de: viewOf,
+    show: function (v, y) { V = v; QUIET = true; render(false); QUIET = false; W.scrollTo(0, y || 0); },
+    intercept: function () { if (D.getElementById('cdov')) { closeOv(); return 1; } if (nbOpen) { closeNb(); return 1; } return V.v === 'intro' ? 2 : 0; },
+    beforeLeave: function () { save(true); } });
 
   /* ---------- màn mở đầu ---------- */
   /* Lần đầu mở CD01: Shin in vé hành trình (máy in, âm thanh), rồi mới lời chào. Chạm "In vé" để có âm thanh trên điện thoại. */
@@ -379,8 +388,7 @@
     if (nx) cta = '<button type="button" class="btn btn--go btn--w glow" data-act="open" data-id="' + nx + '">' + (doneMain() ? 'Đi tiếp: ' : 'Bắt đầu: ') + esc(ACTS[nx].t) + '</button>';
     else cta = '<button type="button" class="btn btn--go btn--w" data-act="open8">' + esc(TXT.sheetBtn) + '</button>';
     var trainX = 8 + Math.min(84, pct * 0.84);
-    return '<button type="button" class="pshome" data-act="psHome">' + cdIcon('arrowL', 15, 2.4) + 'Proskills</button>' +
-      (dueOver() ? '<div class="follow">' + shinSays('surprise', 'Việc khó “<b>' + esc(ga('a72.sel')[0] || '') + '</b>” đến hạn rồi. Bạn làm thế nào, kể Shin nghe nhé.') + '<button type="button" class="btn btn--go btn--w btn--sm" data-act="res7">Kể Shin nghe · +' + CD_XP_WARM + ' XP</button></div>' : shinSays(nm ? 'hi' : 'cheer', T(hi))) +
+    return (dueOver() ? '<div class="follow">' + shinSays('surprise', 'Việc khó “<b>' + esc(ga('a72.sel')[0] || '') + '</b>” đến hạn rồi. Bạn làm thế nào, kể Shin nghe nhé.') + '<button type="button" class="btn btn--go btn--w btn--sm" data-act="res7">Kể Shin nghe · +' + CD_XP_WARM + ' XP</button></div>' : shinSays(nm ? 'hi' : 'cheer', T(hi))) +
       '<section class="ticket" id="ticket" aria-label="Vé hành trình"><span class="ticket__shine" aria-hidden="true"></span><div class="ticket__body">' +
       '<div class="ticket__lab"><span>Vé hành trình</span><span>CD01</span></div>' +
       '<div class="ticket__route"><div><small>しゅっぱつ</small><b>JPC</b></div><div></div><div class="r"><small>ゆめ</small><b>Ước Mơ</b></div></div>' +
@@ -421,8 +429,7 @@
     var st = stById(V.st), acts = st.acts, nd = acts.filter(function (a) { return !!S.done[a]; }).length;
     var first = !S.seen[st.id];
     if (first) { S.seen[st.id] = 1; V.showIntro = 1; save(); } /* lần đầu: lời Shin mở sẵn, giữ mở suốt lượt này */
-    var h = '<button type="button" class="back" data-act="home">' + cdIcon('arrowL', 18, 2.4) + 'Sơ đồ tuyến</button>' +
-      '<section class="banner"><div class="banner__top"><div class="kanji' + (st.k.length > 2 ? ' k3' : '') + ' jp">' + esc(st.k) + '</div><div>' +
+    var h = '<section class="banner"><div class="banner__top"><div class="kanji' + (st.k.length > 2 ? ' k3' : '') + ' jp">' + esc(st.k) + '</div><div>' +
       '<div class="banner__lab">' + esc(stLabel(st).toUpperCase()) + '</div><h1>' + esc(st.vn) + '</h1>' +
       (KW[st.n] && st !== START ? '<div class="banner__ro"><button type="button" class="kwchip" data-act="kw" data-n="' + st.n + '"><span class="jp">' + esc(KW[st.n].w) + '</span>' + esc(KW[st.n].m) + ' <i aria-hidden="true">›</i></button></div></div></div>' :
       '<div class="banner__ro"><span class="jp">' + esc(st.kana) + '</span><span>' + esc(st.ro) + '</span><button type="button" class="say-btn" data-act="speak" data-t="' + esc(st.kana) + '" aria-label="Nghe đọc">' + PS.icon('sound', 16) + '</button></div></div></div>') +
@@ -456,8 +463,7 @@
   function viewAct() {
     var id = V.id, a = ACTS[id], steps = a.steps, i = V.step, s = steps[i], last = i === steps.length - 1;
     var miss = check(s);
-    var h = '<button type="button" class="back" data-act="station" data-st="' + a.st + '">' + cdIcon('arrowL', 18, 2.4) + esc(stById(a.st).vn) + '</button>' +
-      '<header class="ah"><div class="ah__lab">' + esc(actLabel(id)) + '</div><h1>' + esc(a.t) + '</h1><div class="stepbar" aria-label="Bước ' + (i + 1) + '/' + steps.length + '">' +
+    var h = '<header class="ah"><div class="ah__lab">' + esc(actLabel(id)) + '</div><h1>' + esc(a.t) + '</h1><div class="stepbar" aria-label="Bước ' + (i + 1) + '/' + steps.length + '">' +
       steps.map(function (x, j) { return '<i class="' + (j < i ? 'on' : (j === i ? 'cur' : '')) + '"></i>'; }).join('') + '</div></header>';
     if (V.ret) h += '<div class="retbar">' + PS.icon('info', 16) + '<span>' + esc(GATE_TXT.fixing) + '</span><button type="button" class="btn btn--sm btn--go" data-act="gateBack">' + esc(GATE_TXT.back) + '</button></div>';
     else if (S.bak[id] && i === 0) h += '<div class="redo">' + PS.icon('info', 16) + esc(TXT.redoNew) + '</div>';
@@ -1647,9 +1653,13 @@
     var stNowDone = stDone(st), newChest = stNowDone && !S.chest[st.id];
     sound(first ? 'stamp' : 'tap');
     var kan = st === START ? '出発' : st.k;
+    /* PS1.3.55 (ý 25): cuối chặng có Tiếp theo + Về ga (trừ khi mở hộp hoàn thành ga, sửa bài cho vé, Ga Ước Mơ) */
+    var nxA = null; if (!ret && !newChest && st !== FINAL) { st.acts.forEach(function (x) { if (!nxA && x !== id && !S.done[x] && actOpen(x)) nxA = x; }); nxA = nxA || nextAct() || nextFin(); }
+    var endBtn = nxA ? '<div class="ps-endnav"><button type="button" class="btn btn--go btn--w" data-act="ovAct" data-id="' + nxA + '">Tiếp theo: ' + esc((ACTS[nxA].st !== st.id ? stShort(stById(ACTS[nxA].st)) + ' · ' : '') + ACTS[nxA].t) + PS.icon('next', 16, 2.6) + '</button>' +
+      '<button type="button" class="btn btn--soft btn--w" data-act="ovNext">Về ' + esc(stShort(st)) + '</button></div>' : '<button type="button" class="btn btn--w" data-act="ovNext">Tiếp tục</button>';
     ov('<div class="stamp jp">' + esc(kan) + '</div><h2>' + (first ? 'Đã đóng dấu!' : 'Đã lưu lại') + '</h2><p>' + esc(a.t) + '</p>' +
       ((xp || gainIns) ? '<div class="gain">' + (xp ? '<span class="gx">' + PS.icon('star', 15) + '+' + xp + ' XP</span>' : '') + (gainIns ? '<span class="gi">' + PS.icon('bulb', 15) + '+' + gainIns + ' Insight</span>' : '') + '</div>' : '<p class="ps-small">Bài làm lại không cộng thêm XP.</p>') +
-      '<button type="button" class="btn btn--w" data-act="ovNext">Tiếp tục</button>', function () {
+      endBtn, function () {
         if (ret) { go({ v: 'act', id: ret, step: 0 }); return; }
         if (st === FINAL) { /* Ga Ước Mơ: đi liền một mạch, chặng cuối mở vé hoàn thành */
           if (id === 'a82' && !S.chest.s8) { S.chest.s8 = Date.now(); save(true); finaleOv(); return; }
@@ -1856,17 +1866,17 @@
   }
 
   /* ---------- hướng dẫn học lần đầu (kiểu TK): Vé → Bản Career Design → Sơ đồ tuyến → chạm thử Sổ tay ---------- */
-  var TOUR = [['#ticket', TXT.tour1], ['.cdmini', TXT.tour2], ['.route .stop', TXT.tour3], ['.tn-pill', TXT.tour4, 1]], tourI = -1;
+  var TOUR = [['#ticket', TXT.tour1], ['.cdmini', TXT.tour2], ['.route .stop', TXT.tour3], ['.psnav__nb', TXT.tour4, 1]], tourI = -1;
   function startTour(force) { if ((S.d.tour || S.demo) && !force) return; if (V.v !== 'home') return; tourI = 0; showTour(); }
   function showTour(again) {
     var old = D.querySelectorAll('.tour-hl'), i;
     for (i = 0; i < old.length; i++) old[i].classList.remove('tour-hl');
     var b = D.getElementById('tourBox'); if (b) b.parentNode.removeChild(b);
     if (tourI < 0 || tourI >= TOUR.length) { endTour(); return; }
-    var stp = TOUR[tourI], el = D.querySelector(stp[0]), nav = D.querySelector('.topnav');
+    var stp = TOUR[tourI], el = D.querySelector(stp[0]), nav = D.getElementById('psnav');
     if (el) {
       el.classList.add('tour-hl');
-      if (stp[2]) { if (nav) nav.classList.remove('topnav--hide'); }
+      if (stp[2]) { if (nav) { nav.classList.remove('psnav--hide'); nav.style.zIndex = 97; } }
       else if (!again) { try { el.scrollIntoView(RM ? true : { behavior: 'smooth', block: stp[0] === '.route .stop' ? 'start' : 'center' }); } catch (e) { el.scrollIntoView(true); } }
     }
     b = D.createElement('div'); b.id = 'tourBox'; b.className = 'tourbox' + (stp[2] ? ' tourbox--tap' : ''); b.setAttribute('role', 'dialog'); b.setAttribute('aria-live', 'polite');
@@ -1875,7 +1885,7 @@
     D.body.appendChild(b);
   }
   function endTour() {
-    var was = tourI >= 0; tourI = -1;
+    var was = tourI >= 0; tourI = -1; var pn = D.getElementById('psnav'); if (pn) pn.style.zIndex = '';
     var old = D.querySelectorAll('.tour-hl'); for (var i = 0; i < old.length; i++) old[i].classList.remove('tour-hl');
     var b = D.getElementById('tourBox'); if (b) b.parentNode.removeChild(b);
     if (was) { S.d.tour = 1; save(); }
@@ -1910,7 +1920,7 @@
     var el = D.getElementById('nb'); if (!el) return;
     el.innerHTML = '<div class="nb__in"><div class="nb__top"><h2>Sổ tay</h2><button type="button" class="nb__x" data-act="nbClose" aria-label="Đóng sổ tay">' + PS.icon('close', 20) + '</button></div>' +
       '<div class="tabs" role="tablist">' + [['tq', 'Tổng quan'], ['cd', 'Bản Career Design'], ['set', 'Cài đặt']].map(function (t) { return '<button type="button" role="tab" aria-selected="' + (NBTAB === t[0]) + '" class="' + (NBTAB === t[0] ? 'on' : '') + '" data-act="tab" data-t="' + t[0] + '">' + t[1] + '</button>'; }).join('') + '</div>' +
-      '<div id="nbBody">' + (NBTAB === 'tq' ? nbOverview() : (NBTAB === 'cd' ? nbCD() : nbSettings())) + '</div></div>';
+      '<div id="nbBody">' + (NBTAB === 'tq' ? nbOverview() + (S.demo ? '' : PS.savedHTML(ID)) : (NBTAB === 'cd' ? nbCD() : nbSettings())) + '</div></div>';
     if (NBTAB === 'set' && !S.demo) PS.wireSettings(D.getElementById('nbBody'), { ctx: 'module', mod: ID, onChange: function () { } });
   }
   function openNb(tab) {
@@ -2085,6 +2095,7 @@
     else if (a === 'vplay') { S.d[V.id + '.vid'] = 1; V.autoplay = 1; save(); var y5 = W.pageYOffset; redrawStep(); W.scrollTo(0, y5); V.autoplay = 0; }
     else if (a === 'speak') speak(b.getAttribute('data-t'));
     else if (a === 'ovNext') closeOv(true);
+    else if (a === 'ovAct') { var oa = b.getAttribute('data-id'); closeOv(); go({ v: 'st', st: ACTS[oa].st }); openAct(oa); }
     else if (a === 'chest') { var sc = stById(b.getAttribute('data-st')); chestOv(sc, shinStage(), true); }
     else if (a === 'nb') openNb('set'); /* PS1.3.25: nút Sổ tay mở thẻ Cài đặt trước (có nút về trang chính) */
     else if (a === 'nbcd') openNb('cd');
@@ -2159,28 +2170,20 @@
     setTimeout(function () { try { var n = t.value.length; t.setSelectionRange(n, n); } catch (er) {} }, 0);
   });
 
-  /* thanh trên tự ẩn khi cuộn xuống, hiện lại khi cuộn lên (như CD49) */
-  var lastY = 0, navT = null;
-  W.addEventListener('scroll', function () {
-    if (navT) return;
-    navT = setTimeout(function () {
-      navT = null; var y = W.pageYOffset || 0, nav = D.querySelector('.topnav'); if (!nav) return;
-      if (y > lastY + 6 && y > 90) nav.classList.add('topnav--hide'); else if (y < lastY - 6 || y < 90) nav.classList.remove('topnav--hide');
-      lastY = y;
-    }, 80);
-  }, { passive: true });
+  /* thanh trên ẩn khi cuộn xuống, hiện khi cuộn lên: làm chung ở core.js (PS1.3.55) */
 
   /* =========================================================
      10. KHỞI ĐỘNG
      ========================================================= */
   try { W.localStorage.removeItem('ps.mod.' + ID + '.pat'); } catch (e) {} /* bỏ chế độ xem thử hoa văn (PS1.3.14) */
-  try { if (DQ.on) history.replaceState(null, '', W.location.pathname); } catch (e) {}
+  var GO = PS.goParam();
+  NAV.start(W.location.pathname); /* PS1.3.55: bỏ ?demo, ?go khỏi địa chỉ; đếm mục lịch sử cho nút ‹ */
   if (ASK_DEMO) PS.demoAsk(function (ok) { if (ok) { NOSAVE = 0; enterDemo(); } else W.location.replace(W.location.pathname); });
   else if (WANT_DEMO) enterDemo();
   else {
     markDay();
     if (!S.intro && !S.demo) { V = { v: 'intro' }; render(true); PS.toast(TXT.gateToast); }
-    else { render(true); if (!S.d.tour && !S.demo) setTimeout(function () { if (V.v === 'home' && tourI < 0 && !nbOpen && !D.getElementById('cdov')) startTour(); }, RM ? 300 : 1700); }
+    else { var gv = goView(GO); if (gv) { NAV.go(gv); V = gv; } render(true); if (!S.d.tour && !S.demo) setTimeout(function () { if (V.v === 'home' && tourI < 0 && !nbOpen && !D.getElementById('cdov')) startTour(); }, RM ? 300 : 1700); }
     save(true);
   }
 })(window, document);

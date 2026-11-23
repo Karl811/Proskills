@@ -30,3 +30,5 @@ h1{font:800 30px/1.15 var(--h);margin:14px 0 6px}
 .tl{background:#fff;border:1px solid var(--rule);border-radius:16px;padding:12px}
 .tl b{display:block;font:800 24px/1.2 var(--h)}
 .tl small{color:var(--muted);font-size:12.5px}
+/* PS1.3.55: thanh trên chung (core.css .psnav) cố định ở đầu trang */
+.wrap{padding-top:76px}

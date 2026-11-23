@@ -8,7 +8,7 @@
    ========================================================= */
 var PS_CONFIG = {
   APP: 'Proskills',
-  APP_VER: 'PS1.3.53',
+  APP_VER: 'PS1.3.55',
   ORG: 'Khoa Kỹ năng · JPC · Proskills',
 
   /* Mật khẩu bản demo giáo viên, dùng chung cho MỌI module (phân biệt hoa thường).
@@ -48,15 +48,15 @@ var PS_CONFIG = {
       icon: 'flame', color: '#2265C5', state: 'ready', kind: 'routine', open: 1, gateQ: '', pass: [], total: 0, ver: 'M.Claude.3.4.0',
       door: 0 /* PS1.3.28: tắt (thầy chốt 18/11). 1 = mở Proskills mà hôm nay chưa đóng dấu thì vào thẳng Shin Routine; 0 = tắt */ },
     { id: 'cd01', code: 'CD01', title: 'Career Design 1', sub: 'Hiểu mình, chọn nghề, kế hoạch JPC và 3 năm đầu ở Nhật',
-      icon: 'rail', color: '#2C5BC4', state: 'ready', gateQ: 'Shin thích ăn món gì nhất?', pass: ['oden', 'おでん', 'オデン'], total: 18, ver: 'CD01.1.6' },
+      icon: 'rail', color: '#2C5BC4', state: 'ready', gateQ: 'Shin thích ăn món gì nhất?', pass: ['oden', 'おでん', 'オデン'], total: 18, ver: 'CD01.1.8' },
     { id: 'cd02', code: 'CD02', title: 'Career Design 2', sub: 'Hải Đồ La Bàn: những hướng đi sau 3 năm ở Nhật',
-      icon: 'compass', color: '#C15F3C', state: 'ready', gateQ: 'Thuyền của Shin xuất phát từ cảng nào?', pass: ['cang 3 nam', 'cảng 3 năm', '3 nam', 'ba nam', 'cang ba nam'], total: 20, ver: 'CD02.3.9' },
+      icon: 'compass', color: '#C15F3C', state: 'ready', gateQ: 'Thuyền của Shin xuất phát từ cảng nào?', pass: ['cang 3 nam', 'cảng 3 năm', '3 nam', 'ba nam', 'cang ba nam'], total: 20, ver: 'CD02.3.11' },
     { id: 'tk', code: 'HP05', title: 'Nhật Bản Du Ký', sub: 'Kiến thức quy định: luật Nhật, luật cư trú, luật Việt Nam',
-      icon: 'scroll', color: '#2F4BD8', state: 'ready', gateQ: 'Ngộ Không thích ăn quả gì nhất?', pass: ['dao'], total: 26, ver: 'TK16' },
+      icon: 'scroll', color: '#2F4BD8', state: 'ready', gateQ: 'Ngộ Không thích ăn quả gì nhất?', pass: ['dao'], total: 26, ver: 'TK16.3' },
     { id: 'tc01', code: 'TC01', title: 'Huấn luyện thể chất', sub: 'Phòng tập HLV Shin: động tác đúng, dinh dưỡng, sức khỏe theo nghề',
-      icon: 'dumbbell', color: '#348A5F', state: 'ready', gateQ: 'Bài thể dục buổi sáng của người Nhật tên là gì?', pass: ['radio taiso', 'rajio taiso', 'radio taisou', 'rajio taisou', 'radiotaiso', 'ラジオ体操', 'radio'], total: 103, ver: 'TC01.1.5' },
+      icon: 'dumbbell', color: '#348A5F', state: 'ready', gateQ: 'Bài thể dục buổi sáng của người Nhật tên là gì?', pass: ['radio taiso', 'rajio taiso', 'radio taisou', 'rajio taisou', 'radiotaiso', 'ラジオ体操', 'radio'], total: 103, ver: 'TC01.1.7' },
     { id: 'mau', code: 'MẪU', title: 'Module mẫu', sub: 'Dùng để thử khung và làm mẫu cho module mới',
-      icon: 'spark', color: '#E8834A', state: 'hidden', gateQ: 'Mật khẩu thử là gì?', pass: ['mau'], total: 3, ver: '1.0.0' }
+      icon: 'spark', color: '#E8834A', state: 'hidden', gateQ: 'Mật khẩu thử là gì?', pass: ['mau'], total: 3, ver: '1.0.1' }
   ],
 
   /* Thẻ thói quen của Shin Routine mà các khóa có thể gợi ý (mã thẻ → tên ngắn).

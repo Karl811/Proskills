@@ -3,6 +3,8 @@
    Màn hình: Chào mừng + nhập thông tin (lần đầu) → Trang chủ
    PS1.3.28: thanh trên (chuỗi ngày, ảnh đại diện = Cài đặt) → lời chào → khối Shin Routine (nút Check-in mở routine/?ci=1#checkin)
              → Lịch học → Khóa học (XP, Insight, phút hôm nay + băng chuyền thẻ kiểu labs.google: KC, kcLayout, kcGo) → Hướng dẫn
+   PS1.3.54: trang chủ chia 3 thẻ ở thanh đáy (TAB): Hôm nay (lời chào, khối Shin, Học tiếp) · Khóa học (3 ô số, băng chuyền, Hướng dẫn) · Lịch học.
+             Thẻ đang xem nhớ trong phiên (sessionStorage ps.tab); nút Back Android ở thẻ 2, 3 về Hôm nay.
    Cửa Rèn luyện (PS1.3.25): mở Proskills mà hôm nay chưa đóng dấu Shin Routine thì vào thẳng routine/ (mỗi phiên một lần)
    Lớp phủ: Cổng mật khẩu module · Cài đặt (thẻ chuẩn của lõi)
    Không chứa nội dung bài học. Danh sách module đọc từ config.js.
@@ -72,13 +74,14 @@
         '<svg class="ps-ic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>' +
         '<span>Check-in</span><small>' + esc(ci.time) + '</small></button>';
     return '<section class="shn" style="--i:1"><div class="shn__card" data-act="mod" data-id="routine" role="link" tabindex="0" aria-label="Mở Shin Routine">' +
-      '<small class="shn__k">RÈN LUYỆN HẰNG NGÀY CÙNG</small>' +
-      '<h2 class="shn__t">Shin Routine<svg class="shn__sw" viewBox="0 0 200 10" preserveAspectRatio="none" aria-hidden="true"><path d="M3 7C55 2 140 1.5 197 5.5"/></svg></h2>' +
+      '<small class="shn__k">RÈN LUYỆN CÙNG SHIN</small>' +
+      '<h2 class="shn__t">' + (ci.done ? 'Lửa vẫn cháy!' : 'Giữ lửa hôm nay') + '<svg class="shn__sw" viewBox="0 0 200 10" preserveAspectRatio="none" aria-hidden="true"><path d="M3 7C55 2 140 1.5 197 5.5"/></svg></h2>' +
       '<div class="shn__row">' + (lk ? '<span class="shn__shin shn__shin--g">' + W.PSShin.svg(md, { stg: lk.stg, fit: lk.fit, days: lk.days }) + '</span>' : '<img class="shn__shin" src="' + PS.url('routine/icon-192.png') + '" width="56" height="56" alt="">') + '<p class="shn__bub">' + bub + '</p></div>' +
       chips + btn + '</div></section>';
   }
   function goCheckin() {
     D.body.classList.add('leaving');
+    try { W.sessionStorage.setItem('ps.nav', 'routine'); } catch (e) {} /* PS1.3.55: ‹ Proskills của Shin quay lại đúng trang chủ */
     setTimeout(function () { W.location.href = PS.url('routine/index.html') + '?ci=1#checkin'; }, noMotion ? 0 : 160);
   }
 
@@ -144,9 +147,14 @@
       '<g class="kc-float"><path d="M40 98h44" stroke="#fff" stroke-width="6" stroke-linecap="round" opacity=".7"/><path d="M150 26h34" stroke="#fff" stroke-width="6" stroke-linecap="round" opacity=".75"/></g><path d="M20 132c40-10 80 6 120-2s60-8 82 0" stroke="#fff" stroke-width="3" fill="none" stroke-dasharray="2 8" stroke-linecap="round"/></svg>',
     tc01: '<svg viewBox="0 0 240 150" aria-hidden="true"><g class="kc-float"><g transform="rotate(-16 120 76)"><rect x="56" y="70" width="128" height="12" rx="6" fill="#2E7D55"/><rect x="62" y="44" width="20" height="64" rx="8" fill="#348A5F"/><rect x="44" y="54" width="16" height="44" rx="7" fill="#4FA77A"/><rect x="158" y="44" width="20" height="64" rx="8" fill="#348A5F"/><rect x="180" y="54" width="16" height="44" rx="7" fill="#4FA77A"/></g></g>' +
       '<path d="M178 104l20 32h-40z" fill="#fff"/><rect x="170" y="122" width="16" height="14" rx="2" fill="#2F3B35"/><circle cx="46" cy="30" r="9" fill="#fff" opacity=".8"/><circle cx="208" cy="28" r="5" fill="#fff" opacity=".8"/></svg>',
-    cd02: '<svg viewBox="0 0 240 150" aria-hidden="true"><g class="kc-float"><circle cx="120" cy="76" r="44" fill="#fff"/><circle cx="120" cy="76" r="44" fill="none" stroke="#0F9F98" stroke-width="5"/><path d="m138 58-10 22-22 10 10-22z" fill="#0F9F98"/><circle cx="120" cy="76" r="4" fill="#fff"/></g><path d="M40 40h22M180 116h24" stroke="#fff" stroke-width="6" stroke-linecap="round" opacity=".75"/></svg>'
+    /* PS1.3.54: thuyền buồm + la bàn, nền đất nung theo màu CD02 */
+    cd02: '<svg viewBox="0 0 240 150" aria-hidden="true"><g fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".8"><path d="M26 22l6 8M46 14l2 9"/></g>' +
+      '<g class="kc-float kc-float--b"><circle cx="192" cy="40" r="20" fill="#fff"/><circle cx="192" cy="40" r="20" fill="none" stroke="#C15F3C" stroke-width="3.5"/><path d="m200 30-5 12-11 6 5-12z" fill="#C15F3C"/><circle cx="192" cy="40" r="2.6" fill="#fff"/></g>' +
+      '<g class="kc-float"><path d="M120 30v70" stroke="#7A3E26" stroke-width="3.4" stroke-linecap="round"/><path d="M120 28l14 4.5-14 4.5z" fill="#E9A15B"/><path d="M124 40c18 14 30 32 34 54h-34z" fill="#fff"/><path d="M116 48c-12 12-20 28-22 46h22z" fill="#fff" opacity=".92"/>' +
+      '<path d="M66 100h108l-15 20H81z" fill="#C15F3C"/><path d="M66 100h108l-3 4H69z" fill="#9E4A2C"/><circle cx="100" cy="110" r="3" fill="#F6E6DD"/><circle cx="114" cy="110" r="3" fill="#F6E6DD"/></g>' +
+      '<path d="M30 128c10-6 20-6 30 0s20 6 30 0 20-6 30 0 20 6 30 0 20-6 30 0 20 6 30 0" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".85"/><path d="M48 142c10-5 20-5 30 0s20 5 30 0" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".55"/></svg>'
   };
-  var ART_BG = { cd01: 'linear-gradient(160deg,#FFEDB5,#FFD27A)', tk: 'linear-gradient(160deg,#E6E4FF,#C9C6FF)', tc01: 'linear-gradient(160deg,#DDF5E6,#B4E6C8)', cd02: 'linear-gradient(160deg,#D9F3F1,#AEE3DF)' };
+  var ART_BG = { cd01: 'linear-gradient(160deg,#FFEDB5,#FFD27A)', tk: 'linear-gradient(160deg,#E6E4FF,#C9C6FF)', tc01: 'linear-gradient(160deg,#DDF5E6,#B4E6C8)', cd02: 'linear-gradient(160deg,#F7E7DC,#E7BFA5)' };
   function num(n) { return String(n || 0).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
   function artHTML(m) {
     return ART[m.id] || '<svg viewBox="0 0 240 150" aria-hidden="true"><circle class="kc-float" cx="120" cy="75" r="46" fill="#fff"/></svg><span class="kc__bigic">' + icon(m.icon, 54, 1.8) + '</span>';
@@ -309,26 +317,83 @@
     if (t.done > 0 && Date.now() - lb > 7 * 864e5) return '<div class="nudge">' + icon('shield', 18) + '<p>' + (lb ? 'Đã hơn 7 ngày bạn chưa sao lưu.' : 'Bạn chưa sao lưu bài làm lần nào.') + ' Một tập tin giữ bài của mọi khóa.</p><button type="button" class="ps-btn ps-btn--sm ps-btn--go" data-act="backup">Tải sao lưu</button></div>';
     return '';
   }
+  /* ---------------- PS1.3.54 · Trang chủ 3 thẻ (thanh đáy) ---------------- */
+  var TABS = [['today', 'Hôm nay'], ['course', 'Khóa học'], ['lich', 'Lịch học']];
+  var TAB = 'today', TABPUSH = 0;
+  try { var t0 = W.sessionStorage.getItem('ps.tab'); if (t0 === 'course' || t0 === 'lich') TAB = t0; } catch (e) {}
+  if (QS.lich) TAB = 'lich';
+  var TAB_IC = {
+    today: '<svg class="ps-ic" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/></svg>',
+    course: '<svg class="ps-ic" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="13" height="15" rx="3"/><path d="M8 3h10a3 3 0 0 1 3 3v11"/></svg>',
+    lich: '<svg class="ps-ic" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>'
+  };
+  function navHTML() {
+    return '<nav class="bnav" aria-label="Trang chủ">' + TABS.map(function (t) {
+      var on = TAB === t[0];
+      return '<button type="button" class="bnav__b' + (on ? ' is-on' : '') + '" data-act="tab" data-t="' + t[0] + '"' + (on ? ' aria-current="page"' : '') + '><span class="bnav__i">' + TAB_IC[t[0]] + '</span><small>' + t[1] + '</small></button>';
+    }).join('') + '</nav>';
+  }
+  function setTab(t, fromBack) {
+    if (t === TAB) { if (!fromBack) W.scrollTo(0, 0); return; }
+    var prev = TAB; TAB = t;
+    try { W.sessionStorage.setItem('ps.tab', t); } catch (e) {}
+    if (!fromBack) {
+      if (prev === 'today' && t !== 'today') { try { history.pushState({ psTab: 1 }, ''); TABPUSH = 1; } catch (e) {} }
+      else if (t === 'today' && TABPUSH) { TABPUSH = 0; try { history.back(); } catch (e) {} }
+    }
+    render(false); W.scrollTo(0, 0);
+    var c = D.querySelector('.tabc'); if (c && !noMotion) { c.classList.remove('tabin'); void c.offsetWidth; c.classList.add('tabin'); }
+  }
+  /* Học tiếp (ý 24): khóa vừa học (PS.prefs().lastMod), nếu chưa có thì khóa đang học dở, rồi khóa mới.
+     Khi khóa báo extra.next {t: 'Bến 3 · …'} (PS1.3.55) thì hiện đúng hoạt động kế tiếp. */
+  function contMods() {
+    var a = visibleMods().filter(function (m) { return m.state === 'ready'; }), last = PS.prefs().lastMod, first = null, more = null;
+    a.forEach(function (m) { if (m.id === last && modState(m).st !== 'done') first = m; });
+    if (!first) a.forEach(function (m) { if (!first && modState(m).st === 'go') first = m; });
+    if (!first) a.forEach(function (m) { if (!first && (modState(m).st === 'new' || modState(m).st === 'lock')) first = m; });
+    if (!first && a.length) first = a[0];
+    if (first) a.forEach(function (m) { if (!more && m !== first && modState(m).st === 'go') more = m; });
+    return { m: first, more: more };
+  }
+  function contHTML() {
+    var c = contMods(), m = c.m; if (!m) return '';
+    var k = modState(m), mc = m.color || '#24307A', x = (k.s && k.s.extra) || {}, nx = x.next && x.next.t ? esc(x.next.t) : '', ng = x.next && x.next.go && k.st === 'go' ? String(x.next.go) : '';
+    var sub = nx || (k.st === 'lock' ? 'Thầy cô cho mật khẩu khi bắt đầu khóa tại lớp' : (k.st === 'new' ? esc(m.sub || '') : 'Đã xong ' + k.done + (k.total ? '/' + k.total : '') + ' hoạt động'));
+    var btn = { 'new': 'Bắt đầu', lock: 'Mở khóa', go: 'Học tiếp', done: 'Ôn lại' }[k.st] || 'Học tiếp';
+    var more = c.more ? '<button type="button" class="ct__more" data-act="mod" data-id="' + esc(c.more.id) + '"><i style="background:' + esc(c.more.color || '#24307A') + '"></i><span>Cũng đang học: <b>' + esc(c.more.code) + ' · ' + esc(c.more.title) + '</b></span>' + icon('next', 15) + '</button>' : '';
+    return '<section class="ct" style="--i:2;--mc:' + esc(mc) + ';--md:' + mix(mc, '#0B1233', 0.28) + ';--mt:' + mix(mc, '#FFFFFF', 0.88) + '">' +
+      '<div class="ct__card" data-act="mod" data-id="' + esc(m.id) + '"' + (ng ? ' data-go="' + esc(ng) + '"' : '') + ' role="link" tabindex="0" aria-label="' + btn + ' ' + esc(m.title) + '">' +
+      '<div class="ct__row"><span class="ct__art"' + (ART_BG[m.id] ? ' style="background:' + ART_BG[m.id] + '"' : '') + '>' + artHTML(m) + '</span>' +
+      '<span class="ct__tx"><span class="ct__code">' + esc(m.code) + '</span><b>' + esc(m.title) + '</b><small>' + sub + '</small></span></div>' +
+      (k.st === 'go' || k.st === 'done' ? '<span class="ct__bar"><i style="width:' + k.pct + '%"></i></span>' : '') +
+      '<span class="ct__go">' + (k.st === 'lock' ? icon('lock', 18, 2.4) : '') + '<span>' + btn + '</span>' + icon('next', 18, 2.6) + '</span></div>' + more + '</section>';
+  }
   function vHome() {
     var t = PS.totals(), nm = shortName();
-    var mods = carMods();
-    return '<header class="hbar"><div class="hbar__brand">' + logo(32) + '<b>' + esc(CFG.APP) + '</b></div>' +
+    var head = '<header class="hbar"><div class="hbar__brand">' + logo(32) + '<b>' + esc(CFG.APP) + '</b></div>' +
       '<div class="hbar__btns"><button type="button" class="hbar__btn hub-install" data-pwa="install" aria-label="Cài ứng dụng">' + icon('phone', 19) + '<span data-pwa-label>Cài ứng dụng</span></button>' +
       '<span class="hbar__fire" title="Chuỗi ngày học" aria-label="Chuỗi ' + t.streak + ' ngày">' + icon('flame', 16) + '<b>' + t.streak + '</b> ngày</span>' +
       '<button type="button" class="hbar__av" data-act="settings" aria-label="Cài đặt">' + (W.PSAvatar ? W.PSAvatar.html(40) : esc(nm.split(' ').pop().charAt(0).toUpperCase())) + '</button></div></header>' +
-      '<div class="hdeco" aria-hidden="true"><i class="hd hd--a">' + icon('bulb', 64, 1.6) + '</i><i class="hd hd--b">' + icon('rail', 58, 1.6) + '</i><i class="hd hd--c">' + icon('star', 46, 1.6) + '</i><i class="hd hd--d">' + icon('dumbbell', 52, 1.8) + '</i></div>' +
-      '<div class="wrap wrap--top enter">' +
-      '<h1 class="hi" style="--i:0"><span>' + greet() + ',</span> ' + esc(nm) + '</h1>' +
-      routineHTML() +
-      '<div style="--i:2">' + (W.PSLich ? W.PSLich.cardHTML() : '') + '</div>' +
-      '<div style="--i:3">' + nudge() + '</div>' +
-      '<h2 class="sec" style="--i:4">Khóa học của bạn</h2>' +
-      '<div class="kstats" style="--i:4"><div class="ks"><b>' + num(t.xp) + '</b><small>Tổng XP</small></div><div class="ks"><b>' + num(t.ins) + '</b><small>Insight</small></div><div class="ks"><b>' + t.todayMin + ' phút</b><small>Hôm nay</small></div></div>' +
-      '</div>' +
-      '<div class="enter">' + carouselHTML(mods) + '</div>' +
-      '<div class="wrap enter">' + guidesHTML() +
-      '<footer class="hfoot">' + esc(CFG.ORG) + '<br>' + esc(CFG.APP) + ' ' + esc(CFG.APP_VER) + ' · Bài làm lưu trên máy này</footer>' +
-      '</div>';
+      '<div class="hdeco" aria-hidden="true"><i class="hd hd--a">' + icon('bulb', 64, 1.6) + '</i><i class="hd hd--b">' + icon('rail', 58, 1.6) + '</i><i class="hd hd--c">' + icon('star', 46, 1.6) + '</i><i class="hd hd--d">' + icon('dumbbell', 52, 1.8) + '</i></div>';
+    var body;
+    if (TAB === 'course') {
+      body = '<div class="wrap wrap--top enter">' + '<div style="--i:0">' + nudge() + '</div>' +
+        '<h1 class="sec sec--top" style="--i:0">Khóa học của bạn</h1>' +
+        '<div class="kstats" style="--i:1"><div class="ks"><b>' + num(t.xp) + '</b><small>Tổng XP</small></div><div class="ks"><b>' + num(t.ins) + '</b><small>Insight</small></div><div class="ks"><b>' + t.todayMin + ' phút</b><small>Hôm nay</small></div></div>' +
+        '</div>' +
+        '<div class="enter">' + carouselHTML(carMods()) + '</div>' +
+        '<div class="wrap enter">' + guidesHTML() +
+        '<footer class="hfoot">' + esc(CFG.ORG) + '<br>' + esc(CFG.APP) + ' ' + esc(CFG.APP_VER) + ' · Bài làm lưu trên máy này</footer></div>';
+    } else if (TAB === 'lich') {
+      body = '<div class="wrap wrap--top enter"><div class="tabh" style="--i:0"><h1 class="sec sec--top">Lịch học</h1>' +
+        (W.PSLich && W.PSLich.count && W.PSLich.count() ? '<button type="button" class="lc-edit" data-act="lcOpen">' + icon('edit', 15) + ' Sửa</button>' : '') + '</div>' +
+        '<div class="tab-lich" style="--i:1">' + (W.PSLich ? W.PSLich.cardHTML() : '') + '</div></div>';
+    } else {
+      body = '<div class="wrap wrap--top enter">' +
+        '<h1 class="hi" style="--i:0"><span>' + greet() + ',</span> ' + esc(nm) + '</h1>' +
+        routineHTML() + contHTML() + '</div>';
+    }
+    return head + '<div class="tabc tabc--' + TAB + '">' + body + '</div>' + navHTML();
   }
 
   /* thẻ hướng dẫn (cao bằng nửa thẻ khóa): CFG.GUIDES */
@@ -345,10 +410,10 @@
 
   /* ---------------- Cổng mật khẩu ---------------- */
   var gateErr = 0;
-  function openMod(id) {
+  function openMod(id, q) { /* q: mã hoạt động (Học tiếp, ý 24) */
     var m = PS.mod(id); if (!m) return;
     if (m.state === 'soon') { PS.toast('Khóa <b>' + esc(m.title) + '</b> đang được xây dựng.'); return; }
-    if (PS.isUnlocked(id)) { go(id); return; }
+    if (PS.isUnlocked(id)) { go(id, q); return; }
     gateErr = 0;
     PS.dialog({
       icon: 'lock', title: 'Mở khóa ' + esc(m.title),
@@ -371,7 +436,7 @@
       ]
     });
   }
-  function go(id) {
+  function go(id, q) {
     if (!PS.isUnlocked(id)) return;
     var m = PS.mod(id) || {};
     if (m.kind !== 'routine') PS.setPref('lastMod', id);
@@ -382,7 +447,7 @@
       o.innerHTML = '<div><small>ĐANG MỞ</small>' + esc(m.title || '') + '</div><i aria-hidden="true"><b></b><b></b><b></b></i>';
       D.body.appendChild(o);
     }
-    setTimeout(function () { PS.open(id); }, noMotion ? 0 : 60);
+    setTimeout(function () { PS.open(id, q); }, noMotion ? 0 : 60);
   }
 
   /* ---------------- Cài đặt ---------------- */
@@ -401,7 +466,8 @@
   W.PSSheetPush = function () { if (SHEET) return; try { history.pushState({ psSheet: 1 }, ''); SHEET = 1; } catch (e) {} };
   W.PSSheetDone = function () { if (!SHEET) return; SHEET = 0; try { history.back(); } catch (e) {} };
   W.addEventListener('popstate', function () {
-    if (!SHEET) return; SHEET = 0;
+    if (!SHEET) { if (TABPUSH && !D.querySelector('.sheet')) { TABPUSH = 0; setTab('today', true); } return; }
+    SHEET = 0;
     Array.prototype.forEach.call(D.querySelectorAll('.ps-ov'), function (o) { o.parentNode.removeChild(o); });
     if (D.querySelector('.sheet--lc') && W.PSLich && W.PSLich.close) { W.PSLich.close(true); return; }
     if (D.querySelector('.sheet')) closeSettings(true);
@@ -410,7 +476,8 @@
   /* ---------------- vẽ, sự kiện ---------------- */
   function render(enter) {
     APP.innerHTML = PS.needProfile() ? vWelcome() : vHome();
-    if (!PS.needProfile()) kcStart(carMods());
+    if (!PS.needProfile() && TAB === 'course') kcStart(carMods());
+    D.body.classList.toggle('has-bnav', !PS.needProfile());
     if (!enter || noMotion) Array.prototype.forEach.call(APP.querySelectorAll('.enter'), function (e) { e.classList.remove('enter'); });
     if (PS.pwaRefresh) PS.pwaRefresh();
   }
@@ -418,8 +485,9 @@
     var b = PS.closest(e.target, '[data-act]'); if (!b) return;
     var a = b.getAttribute('data-act');
     if (a === 'onbGo') onbGo();
-    else if (a === 'mod') openMod(b.getAttribute('data-id'));
+    else if (a === 'mod') openMod(b.getAttribute('data-id'), b.getAttribute('data-go'));
     else if (a === 'ci') goCheckin();
+    else if (a === 'tab') setTab(b.getAttribute('data-t'));
     else if (a === 'kcPrev') kcGo(KC.i - 1);
     else if (a === 'kcNext') kcGo(KC.i + 1);
     else if (a === 'settings') openSettings();
@@ -429,6 +497,7 @@
   });
   D.addEventListener('keydown', function (e) {
     if ((e.key === 'Enter' || e.keyCode === 13) && e.target && e.target.classList && e.target.classList.contains('shn__card')) { e.preventDefault(); openMod('routine'); return; }
+    if ((e.key === 'Enter' || e.keyCode === 13) && e.target && e.target.classList && e.target.classList.contains('ct__card')) { e.preventDefault(); openMod(e.target.getAttribute('data-id'), e.target.getAttribute('data-go')); return; }
     if ((e.key === 'Enter' || e.keyCode === 13) && PS.closest(e.target, '.onb__form') && e.target.tagName === 'INPUT') { e.preventDefault(); onbGo(); }
     if ((e.key === 'Escape' || e.keyCode === 27) && D.querySelector('.sheet:not(.sheet--lc)') && !D.querySelector('.ps-ov')) closeSettings();
   });
@@ -486,30 +555,12 @@
     }
   }
 
-  /* PS1.3.34 · tải sẵn các khóa (chạy ngầm, mỗi phiên bản một lần) để lần đầu mở khóa không phải chờ mạng */
-  function warm() {
-    var sw = W.navigator.serviceWorker, c = W.navigator.connection;
-    if (!sw || !sw.controller || !W.fetch || !W.URL) return;
-    if (c && (c.saveData || /2g/.test(c.effectiveType || ''))) return;
-    try { if (W.localStorage.getItem('ps.warm') === CFG.APP_VER) return; } catch (e) { return; }
-    var ids = PS.modules().filter(function (m) { return m.kind !== 'routine' && m.state === 'ready'; }).map(function (m) { return m.id; });
-    function one(i) {
-      if (i >= ids.length) { try { W.localStorage.setItem('ps.warm', CFG.APP_VER); } catch (e) {} return; }
-      var page = new W.URL(PS.url(ids[i] + '/index.html'), location.href).href;
-      W.fetch(page).then(function (r) { return r.text(); }).then(function (html) {
-        var re = /(?:src|href)="([^"]+\?v=[^"]+)"/g, m, list = [];
-        while ((m = re.exec(html))) list.push(new W.URL(m[1], page).href);
-        function f(k) { if (k >= list.length) { one(i + 1); return; } W.fetch(list[k]).then(function () { f(k + 1); }, function () { f(k + 1); }); }
-        f(0);
-      })['catch'](function () { one(i + 1); });
-    }
-    one(0);
-  }
+  /* PS1.3.54: tải sẵn mọi khóa chuyển sang core/pwa.js (PS.warmAll), kèm trạng thái ở Cài đặt › Học được khi không có internet */
   var INTRO = introNeeded();
   if (!INTRO) D.documentElement.classList.remove('ps-intro');
   if (INTRO) intro();
   render(true);
-  setTimeout(warm, 4000);
+  setTimeout(function () { if (PS.warmAll) PS.warmAll(false); }, 4000);
   /* lối tắt "Học tiếp" trên biểu tượng app (manifest shortcuts): ?go=last mở khóa học gần nhất */
   if (QS.go === 'last' && !PS.needProfile()) {
     try { history.replaceState(null, '', location.pathname); } catch (e) {}

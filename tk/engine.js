@@ -38,7 +38,7 @@ function save(now){
   var w=function(){ if(NOSAVE || window.PS_NOSAVE) return; try{
     if(S.demo){ S.savedAt=Date.now(); PS.set(DEMO_KEY, S); return; }
     PS.save(TK_ID, S);
-    PS.report(TK_ID, {xp:xpTotal(), ins:insTotal(), done:doneCount(), total:TOTAL_ACTS, days:S.days, ver:VERSION});
+    PS.report(TK_ID, {xp:xpTotal(), ins:insTotal(), done:doneCount(), total:TOTAL_ACTS, days:S.days, ver:VERSION, extra:{next:nextInfo()}});
   }catch(e){} };
   if(now) w(); else saveT=setTimeout(w, 250);
 }
@@ -119,18 +119,32 @@ function anyDone(n){ var a=aiOf(n); return a.acts && a.acts.some(actDone); }
 var V = {v:'home'};
 function go(v, opt){
   var nv={v:v}; for(var k in (opt||{})) nv[k]=opt[k];
-  var from=V.v; V=nv; if(v==='act') sfx('whoosh');
+  var from=V.v; NAV.go(nv); V=nv; if(v==='act') sfx('whoosh');
   if(v!=='ai' && v!=='act'){ S.d._aivMark=null; S.d.dlgOpen=null; }
-  try{ history.pushState(V,'', ''); }catch(e){}
   if(v==='ai' && from!=='act' && S.gate && S.onb){ aiTransition(nv.n, function(){ render(true); }); return; }
   render(true);
 }
-window.addEventListener('popstate', function(e){
-  if(nbOpen){ closeNb(true); return; }
-  if(askOpen){ closeAsk(true); return; }
-  V = (e.state && e.state.v) ? e.state : {v:'home'};
-  render(true);
-});
+/* PS1.3.55 (ý 25): nút ‹ và Back Android cùng "về một cấp" (lõi PS.nav) */
+function navParent(v){ if(v.v==='act' && ACTS[v.id]) return {v:'ai', n:ACTS[v.id].ai}; if(v.v==='ai' || v.v==='rep') return {v:'home'}; return null; }
+var NAV = PS.nav({ mod: TK_ID, tag: 'tk', get: function(){ return V; }, parent: navParent,
+  depth: function(v){ return v.v==='act' ? 2 : ((v.v==='ai' || v.v==='rep') ? 1 : 0); },
+  ser: function(v){ return {v:v.v, n:(v.n==null?null:v.n), id:v.id||null}; },
+  de: function(h){
+    if(h.v==='act' && ACTS[h.id] && actOpen(h.id)) return {v:'act', id:h.id};
+    if(h.v==='ai' && h.n!=null && (+h.n===0 || aiOpen(+h.n))) return {v:'ai', n:+h.n};
+    if(h.v==='rep') return {v:'rep'};
+    if(h.v==='home') return {v:'home'};
+    return null; },
+  show: function(v, y){ V=v; if(v.v!=='ai' && v.v!=='act'){ S.d._aivMark=null; S.d.dlgOpen=null; } render(false); window.scrollTo(0, y||0); },
+  intercept: function(){ if(nbOpen){ closeNb(true); return 1; } if(askOpen){ closeAsk(true); return 1; } return 0; },
+  beforeLeave: function(){ save(true); } });
+/* PS1.3.55 (ý 24): hoạt động kế tiếp cho nút Học tiếp ở trang chủ */
+function nextInfo(){
+  var L=[START].concat(AIS,[FINAL]);
+  for(var i=0;i<L.length;i++){ var a=L[i]; if(!a.acts || (a.n && (!BUILT[a.n] || !aiOpen(a.n)))) continue;
+    for(var j=0;j<a.acts.length;j++){ var id=a.acts[j]; if(ACTS[id] && !ACTS[id].warm && !actDone(id) && actOpen(id)) return {t:a.vn+' · '+ACTS[id].t, go:id}; } }
+  return null;
+}
 
 /* ---------- thông báo ---------- */
 var toastT=null;
@@ -147,19 +161,17 @@ function pointToast(xp, ins, msg){
 }
 
 /* ---------- thanh điều hướng nổi ---------- */
+/* PS1.3.55 (ý 25): thanh trên chung · ‹ về một cấp | tên màn | Hỏi nhanh + Sổ tay */
 function updateNav(){
-  $('#navMap').innerHTML=icon('map',22)+(S.gate?paceRing():'');
-  $('#navAsk').innerHTML=icon('ask',22);
-  $('#navNb').innerHTML=icon('book',22)+(S.d.nbDot?'<span class="dot" aria-label="Có điểm mới"></span>':'');
-  $('#navMap').classList.toggle('on', V.v==='home');
-  $('#nav').style.display = (S.gate && S.onb) ? '' : 'none';
+  var on=!!(S.gate && S.onb), bk='Proskills', t='Nhật Bản Du Ký', a, ai;
+  if(V.v==='ai'){ ai=aiOf(V.n); bk='Bản đồ'; t=ai?ai.vn:''; }
+  else if(V.v==='act' && (a=ACTS[V.id])){ ai=aiOf(a.ai); bk=ai.vn; t=a.warm?'Khởi động':(ai.acts.indexOf(V.id)+1)+'/'+ai.acts.length; }
+  else if(V.v==='rep'){ bk='Bản đồ'; t='Bản ghi chép'; }
+  var tl=document.getElementById('psnav'), hid=tl && tl.classList.contains('tour-hl');
+  $('#nav').innerHTML = on ? PS.navHTML({back:bk, title:t, dot:S.d.nbDot, extra:'<button type="button" class="psnav__x'+(askOpen?' on':'')+'" data-act="ask" aria-label="Hỏi nhanh Chú Tanaka" title="Hỏi nhanh Chú Tanaka">'+icon('ask',22)+'</button>'}) : '';
+  document.body.classList.toggle('tk-nav', on);
+  if(hid && $('#psnav')) $('#psnav').classList.add('tour-hl');
 }
-var lastY=0;
-window.addEventListener('scroll', function(){
-  var y=window.scrollY, n=$('#nav');
-  if(y>lastY+6 && y>80) n.classList.add('hide'); else if(y<lastY-6) n.classList.remove('hide');
-  lastY=y;
-}, {passive:true});
 
 /* ---------- khung chung ---------- */
 function sayHTML(who, mood, text, cls){
@@ -253,7 +265,7 @@ function homeLine(){
   return T('[Tên] đã đến Phù Tang! Đi đến nơi, về đến chốn nhé. Vé hoàn thành ở ngay trên văn điệp.');
 }
 function vHome(){
-  var h='<div class="wrap">'+'<button type="button" class="pshome" data-act="psHome">'+icon('back',16)+' Proskills</button>'+vanDiep()+
+  var h='<div class="wrap">'+vanDiep()+
     '<div class="pwa-install-inline"><button type="button" class="pwa-install-chip" data-pwa="install">'+icon('download',16)+'<span data-pwa-label>Cài ứng dụng</span></button><span>Mở nhanh từ màn hình chính</span></div>'+
     sayHTML('hau', startDone()?'cheer':'hi', homeLine())+
     '<div class="sec"><h2>Bản đồ du ký</h2><p>Từ Đất Việt vượt biển đến xứ Phù Tang. Mây mù sẽ tan dần trên hành trình bạn đi. Chạm vào một ải trên hành trình để bước vào.</p></div>'+
@@ -274,7 +286,6 @@ function vAi(n){
   var acts=a.acts, dn=acts.filter(actDone).length, mins=acts.reduce(function(s,x){ return s+ACTS[x].mins; },0);
   var code = n===0 ? 'ĐIỂM XUẤT PHÁT' : (n===8 ? 'ĐIỂM ĐÍCH' : 'CỬA ẢI '+pad(n));
   var h='<div class="wrap">'+
-    '<button class="back" data-act="home">'+icon('back',18)+' Bản đồ</button>'+
     '<section class="aihero"><span class="hc hc1">'+hcloud()+'</span><span class="hc hc2">'+hcloud()+'</span>'+
       '<div class="aihero__row"><div class="kseal'+(a.k.length>1?' k2':'')+'" style="--ac:'+a.col+'"><span>'+a.k+'</span></div>'+
       '<div><div class="aihero__code">'+code+'</div><h1>'+esc(a.vn)+'</h1><div class="aihero__ro"><span class="jp">'+a.kana+'</span>'+esc(a.ro)+' '+spk(a.k)+'</div></div></div>'+
@@ -326,7 +337,6 @@ function vAct(id){
   var lbl = a.warm ? (a.ai?'CỬA ẢI '+pad(a.ai)+' · ':'')+'KHỞI ĐỘNG' : (a.ai===0?'CHUẨN BỊ':(a.ai===8?'PHÙ TANG':'CỬA ẢI '+pad(a.ai)))+' · CHẶNG '+(idx+1);
   var prog=a.steps.map(function(s,i){ return '<i class="'+(i<st.i?'on':(i===st.i?'cur':''))+'"></i>'; }).join('');
   return '<div class="wrap">'+
-    '<button class="back" data-act="ai" data-n="'+a.ai+'">'+icon('back',18)+' '+esc(ai.vn)+'</button>'+
     '<header class="acthead"><small>'+lbl+'</small><h1>'+esc(a.t)+'</h1>'+(a.steps.length>1?'<div class="prog" aria-label="Bước '+(st.i+1)+' trên '+a.steps.length+'">'+prog+'</div>':'')+'</header>'+
     (actDone(id)?'<div class="redo"><span>'+icon('check',16,3)+' Bạn đã hoàn thành chặng này.</span><button class="btn btn--sm btn--soft" data-act="redoAsk" data-id="'+id+'">'+icon('redo',15)+' Làm lại để ôn</button></div>':'')+
     '<div class="stepbox" id="stepbox"></div>'+
@@ -377,10 +387,17 @@ function finishAct(){
     go('ai',{n:a.ai});
     var tot=0; for(var k in S.xp){ if(k.split('.')[1]===id) tot+=S.xp[k]; }
     if(first) pointToast(tot,0,msg); else toast('Ôn xong chặng này! Kết quả lần đầu vẫn được giữ.',4000); 
+    var nx=null; (ai.acts||[]).forEach(function(x){ if(!nx && x!==id && !actDone(x) && actOpen(x) && !ACTS[x].warm) nx=x; });
+    if(nx) setTimeout(function(){ if(V.v==='ai' && !nbOpen && !askOpen) endNav(ai, nx); }, first?900:300); /* PS1.3.55 (ý 25): Tiếp theo + Về ải */
     if(first && !a.warm && ai.acts.every(actDone) && ai.kinh && a.ai>=1 && a.ai<=7) setTimeout(function(){ if(!S.seals[a.ai] && V.v==='ai') victory(a.ai); }, 1400);
     if(first && a.ai===8 && ai.acts.every(actDone)) setTimeout(function(){ if(!S.seals[8] && V.v==='ai') toast('Bạn đã đi hết hành trình. Chạm "Nhận vé hoàn thành" để mở trang bí kíp cuối cùng.',6000); }, 1400);
     if(first && a.ai===0 && startDone()) setTimeout(function(){ if(V.v==='ai') toast('Xong phần Lên đường! Ải 1 · Cổng Làng đã mở cửa.'); }, 4300);
   }, noMotion()?50:950);
+}
+function endNav(ai, nx){
+  PS.dialog({ title:'Chặng tiếp theo', html:'<p><b>'+esc(ACTS[nx].t)+'</b></p>', buttons:[
+    {t:'Tiếp theo '+icon('next',16), cls:'ps-btn--go', fn:function(){ setTimeout(function(){ go('act',{id:nx}); },0); return true; }},
+    {t:'Về '+esc(ai.vn), cls:'ps-btn--soft'}] });
 }
 function stampFx(k){
   if(noMotion()) return;

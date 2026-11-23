@@ -48,12 +48,12 @@
 
   /* ---------- giao diện ---------- */
   var APP = D.getElementById('app'), nbOpen = false;
-  function bar() {
-    return '<header class="mbar"><button type="button" class="mbar__home" data-act="home" aria-label="Về trang chính">' + icon('home', 20) + '</button>' +
-      '<b class="mbar__t">' + esc(MOD.code) + ' · ' + esc(MOD.title) + '</b>' +
-      '<span class="mbar__pts"><span class="p--fire">' + icon('flame', 15) + PS.streak() + '</span><span class="p--xp">' + icon('star', 15) + xpTotal() + '</span><span class="p--ins">' + icon('bulb', 15) + insTotal() + '</span></span>' +
-      '<button type="button" class="mbar__nb" data-act="nb">' + icon('book', 18) + '<span>Sổ tay</span></button></header>';
-  }
+  /* PS1.3.55 (ý 25): thanh trên chung · ‹ về một cấp | tên màn | Sổ tay. Module nhiều cấp: xem PS.nav trong core.js (cd02/engine.js là ví dụ đầy đủ). */
+  function bar() { return PS.navHTML({ back: 'Proskills', title: MOD.code + ' · ' + MOD.title }); }
+  var NAV = PS.nav({ mod: ID, tag: 'mau', get: function () { return { v: 'home' }; }, parent: function () { return null; }, depth: function () { return 0; },
+    ser: function (v) { return { v: v.v }; }, de: function () { return { v: 'home' }; }, show: function () { render(); },
+    intercept: function () { if (nbOpen) { closeNb(); return 1; } return 0; }, beforeLeave: function () { save(true); } });
+  NAV.start(W.location.pathname);
   function render() {
     APP.innerHTML = bar() + '<div class="wrap"><h1>Chào <b class="nm">' + esc(PS.given()) + '</b>!</h1><p class="lead">Đây là module mẫu để kiểm tra khung Proskills. Hoàn thành hoạt động để thấy điểm cộng lên trang chủ.</p>' +
       ACTS.map(function (a, i) {

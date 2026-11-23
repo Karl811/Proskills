@@ -166,8 +166,9 @@
       ring: g('b71.r') || {}, guide: ringName(g('b71.key')), ask: g('b71.ask') || '', met: g('b71.met') || '', ria: ria().join(''), work6: g('b72.w') || {}, learnH: g('b72.h') || '', learnHow: g('b72.how') || '',
       open2: { n: g('f1.n') || '', sure: g('f1.sure') == null ? '' : +g('f1.sure') }, change: g('f1.change') || '', ps: g('f1.ps') || '', fin: S.fin || 0,
       peer: g('b23.who') || '', ad: adSum(), iv: ivSum(), plan3: p3Sum(), clip: clipSum(), db: dbSum(), rt: { id: rtTrialId(), st: rtState(rtTrialId()), dn: rtDays(rtTrialId()) }, cross: crossSum(), tourWhy: g('b72.why') || '', hard: hardSum(), lesson: { t: lessonTitle(), m: [g('b73.m1') || '', g('b73.m2') || '', g('b73.m3') || ''] }, proto: protoSum(), shore: shoreSum(), chest: chestSum(), btl: btlN(), fut: futSum(),
-      cd1: cd1State(), carry: (g('x1.carry') || []).map(function (k) { return C1_LAB[k]; }), quick: { me: g('x1.me') || '', val: g('x1.val') || [], good: g('x1.good') || [] } };
+      next: nextInfo(), cd1: cd1State(), carry: (g('x1.carry') || []).map(function (k) { return C1_LAB[k]; }), quick: { me: g('x1.me') || '', val: g('x1.val') || [], good: g('x1.good') || [] } };
   }
+  function nextInfo() { var n = nextAct(); if (!n || !ACTS[n]) return null; return { t: navName(benOf(ACTS[n].st)) + ' · ' + ACTS[n].t, go: n }; } /* PS1.3.55 (ý 24) */
   function save(now) {
     clearTimeout(saveT);
     if (NOSAVE || W.PS_NOSAVE) return;
@@ -237,16 +238,19 @@
      ========================================================= */
   var APP = D.getElementById('app');
   var V = { v: 'home' }, nbOpen = false, NBTAB = 'cd', QUIET = false, mapMode = 'ben', openR = {};
+  /* PS1.3.55 (ý 25): thanh trên chung · ‹ về một cấp | tên màn | Sổ tay */
+  function navName(b) { return b === PORT || b === GOAL_PORT ? b.n : benLabel(b); }
   function topnav() {
-    return '<nav class="topnav" aria-label="Điều hướng"><div class="topnav__in"><span class="tn-sp"></span><div class="tn-pill">' +
-      '<button type="button" class="tn-btn' + (V.v === 'home' ? ' on' : '') + '" data-act="home" aria-label="Hải đồ" title="Hải đồ">' + cdIc('map', 20) + '</button>' +
-      '<button type="button" class="tn-btn" data-act="nb" aria-label="Sổ tay" title="Sổ tay">' + PS.icon('book', 20) + '</button></div></div></nav>';
+    var bk = 'Proskills', t = 'Career Design 2', b, a;
+    if (V.v === 'ben' && (b = benOf(V.st))) { bk = 'Hải đồ'; t = b === PORT || b === GOAL_PORT ? b.n : benLabel(b) + ' · ' + b.n; }
+    else if (V.v === 'act' && (a = ACTS[V.id])) { b = benOf(a.st); bk = navName(b); t = (b.acts.indexOf(V.id) + 1) + '/' + b.acts.length; }
+    else if (V.v === 'isle' && isleOf(V.id)) { bk = 'Hải đồ'; t = isleOf(V.id).n; }
+    else if (V.v === 'sp' && spOf(V.id)) { bk = V.from && isleOf(V.from) ? isleOf(V.from).n : 'Hải đồ'; t = 'Chuyện Senpai'; }
+    return PS.navHTML({ back: bk, title: t });
   }
   function demoStrip() { return S.demo ? '<div class="demo-strip"><span>Bản demo giáo viên · học viên giả định</span><button type="button" data-act="demoExit">Thoát demo</button></div>' : ''; }
   function shinSays(mood, html, sz) { return '<div class="say">' + shin2(mood, sz || 64) + '<div class="say__b">' + html + '</div></div>'; }
-  function hState(v, y) { return { cd2: 1, v: v.v, st: v.st || null, id: v.id || null, step: v.step || 0, y: y || 0 }; }
   function render(top) {
-    try { if (!history.state || !history.state.cd2) history.replaceState(hState(V), ''); } catch (e) {}
     var h;
     if (V.v === 'intro') { APP.innerHTML = '<div class="wrap enter">' + viewIntro() + '</div>'; stagger(); return; }
     if (V.v === 'ben') h = viewBen(); else if (V.v === 'act') h = viewAct(); else if (V.v === 'isle') h = viewIsle(); else if (V.v === 'sp') h = viewSp(); else h = viewHome();
@@ -257,7 +261,7 @@
   }
   function stagger() { var w = APP.querySelector('.enter'); if (!w) return; var c = w.children; for (var i = 0; i < c.length; i++) c[i].style.setProperty('--i', Math.min(i, 8)); }
   function go(v) {
-    try { var same = v.v === V.v && v.st === V.st && v.id === V.id; if (V.v !== 'intro' && !same) { history.replaceState(hState(V, W.pageYOffset || 0), ''); history.pushState(hState(v), ''); } else history.replaceState(hState(v), ''); } catch (e) {}
+    NAV.go(v);
     var pv = V; V = v; placeIn(pv, v); render(true); delete V.fx; placeOut(pv, v);
   }
   /* PS1.3.43: ra/vào bến, phòng. Vào từ Hải đồ, đảo, thẻ Senpai (không tính khi quay về từ chặng): cảng → chuông thuyền; phòng (room: 1) → chuông cửa + cửa trượt mở trên banner. Ra Hải đồ → tiếng nhẹ đi xuống. Không tiếng sóng. */
@@ -268,22 +272,28 @@
   }
   function placeOut(pv, v) { if (pv.v === 'ben' && v.v === 'home') { var b = benOf(pv.st); sfx(b && b.room ? 'shut' : 'out'); } }
   function rmOn() { try { return W.matchMedia && W.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } }
-  W.addEventListener('popstate', function (e) {
-    var keep = function () { try { history.pushState(hState(V), ''); } catch (er) {} };
-    if (D.getElementById('cdov')) { closeOv(); keep(); return; }
-    if (nbOpen) { closeNb(); keep(); return; }
-    if (V.v === 'intro') return;
-    var h = e.state, pv0 = V;
-    if (!h || !h.cd2) V = { v: 'home' };
-    else if (h.v === 'act' && ACTS[h.id] && (actOpen(h.id) || S.done[h.id])) V = { v: 'act', id: h.id, step: Math.min(h.step || 0, ACTS[h.id].steps.length - 1) };
-    else if (h.v === 'ben' && benOf(h.st)) V = { v: 'ben', st: h.st };
-    else if (h.v === 'isle' && isleOf(h.id)) V = { v: 'isle', id: h.id };
-    else if (h.v === 'sp' && spOf(h.id)) V = { v: 'sp', id: h.id };
-    else V = { v: 'home' };
-    QUIET = true; render(false); QUIET = false;
-    if (pv0.v === 'ben') placeOut(pv0, V);
-    W.scrollTo(0, h && h.y ? h.y : 0);
-  });
+  /* PS1.3.55: nút ‹ và Back Android cùng "về một cấp" (lõi PS.nav) */
+  function parentOf(v) {
+    if (v.v === 'act' && ACTS[v.id]) return { v: 'ben', st: ACTS[v.id].st };
+    if (v.v === 'sp') return v.from && isleOf(v.from) ? { v: 'isle', id: v.from } : { v: 'home' };
+    if (v.v === 'ben' || v.v === 'isle') return { v: 'home' };
+    return null;
+  }
+  function viewOf(h) {
+    if (h.v === 'act' && ACTS[h.id] && (actOpen(h.id) || S.done[h.id])) return { v: 'act', id: h.id, step: Math.min(h.step || 0, ACTS[h.id].steps.length - 1) };
+    if (h.v === 'ben' && benOf(h.st)) return { v: 'ben', st: h.st };
+    if (h.v === 'isle' && isleOf(h.id)) return { v: 'isle', id: h.id };
+    if (h.v === 'sp' && spOf(h.id)) return { v: 'sp', id: h.id, from: h.from || null };
+    if (h.v === 'home') return { v: 'home' };
+    return null;
+  }
+  var NAV = PS.nav({ mod: ID, tag: 'cd2', get: function () { return V; }, parent: parentOf,
+    depth: function (v) { return v.v === 'act' ? 2 : (v.v === 'sp' ? (v.from ? 2 : 1) : (v.v === 'ben' || v.v === 'isle' ? 1 : 0)); },
+    ser: function (v) { return { v: v.v, st: v.st || null, id: v.id || null, step: v.step || 0, from: v.from || null }; },
+    de: viewOf,
+    show: function (v, y) { var pv0 = V; V = v; QUIET = true; render(false); QUIET = false; if (pv0.v === 'ben') placeOut(pv0, V); W.scrollTo(0, y || 0); },
+    intercept: function () { if (D.getElementById('cdov')) { closeOv(); return 1; } if (nbOpen) { closeNb(); return 1; } return V.v === 'intro' ? 2 : 0; },
+    beforeLeave: function () { save(true); } });
 
   /* ---------- âm thanh nhỏ (tự soạn, theo công tắc chung) ---------- */
   var AC = null;
@@ -417,8 +427,7 @@
     var cta = nx ? '<button type="button" class="btn btn--go btn--w glow" data-act="open" data-id="' + nx + '">' + (doneMain() ? 'Đi tiếp: ' : 'Bắt đầu: ') + esc(ACTS[nx].t) + '</button>' : (finDone() ? '<button type="button" class="btn btn--go btn--w" data-act="certOv">' + cdIc('flag', 20) + 'Xem Bằng Thuyền Trưởng Vững Vàng</button>' : '');
     /* PS1.3.49: bỏ thẻ Thử nhỏ 2 tuần ở trang chủ khóa (thầy góp ý 2) */
     var bq = bottleQ(), ownIs = portDone();
-    return '<button type="button" class="pshome" data-act="psHome">' + cdIc('arrowL', 15, 2.4) + 'Proskills</button>' +
-      shinSays(nx ? 'hi' : 'cheer', T(hi)) + bookHTML() + '<div class="cta">' + cta + '</div>' + shoreHome() +
+    return shinSays(nx ? 'hi' : 'cheer', T(hi)) + bookHTML() + '<div class="cta">' + cta + '</div>' + shoreHome() +
       '<div class="maphd"><h2 class="sec-h">Hải đồ La Bàn</h2><div class="seg" role="group" aria-label="Mặt hải đồ">' +
       '<button type="button" class="seg__b' + (mapMode === 'ben' ? ' on' : '') + '" data-act="mapMode" data-v="ben" aria-pressed="' + (mapMode === 'ben') + '">' + cdIc('anchor', 15) + 'Bến</button>' +
       '<button type="button" class="seg__b' + (mapMode === 'isl' ? ' on' : '') + '" data-act="mapMode" data-v="isl" aria-pressed="' + (mapMode === 'isl') + '">' + cdIc('compass', 15) + 'Đảo <small>' + fogOpen() + '/8</small></button></div></div>' +
@@ -454,8 +463,7 @@
     var b = benOf(V.st), first = !S.seen[b.id];
     if (first) { S.seen[b.id] = 1; V.showIntro = 1; save(); }
     var nd = b.acts.filter(function (a) { return !!S.done[a]; }).length;
-    var h = '<button type="button" class="back" data-act="home">' + cdIc('arrowL', 18, 2.4) + 'Hải đồ</button>' +
-      '<section class="bnr' + (V.fx === 'room' ? ' bnr--door' : '') + '"><div class="bnr__art">' + sceneSVG(CD2_PLACE[b.id], roundBg(b.r), 150, b.id === 'b6' ? ivWho().id : null) + (V.fx === 'room' ? '<i class="bnr__dr" aria-hidden="true"><b></b><b></b></i>' : '') + '</div><div class="bnr__b"><div class="bnr__lab">' + esc(benLabel(b)) + (b.r ? ' · ' + esc(ROUNDS[b.r].split(' · ')[0]) : '') + '</div><h1>' + esc(b.n) + '</h1>' + (b.sub ? '<p>' + esc(b.sub) + '</p>' : '') +
+    var h = '<section class="bnr' + (V.fx === 'room' ? ' bnr--door' : '') + '"><div class="bnr__art">' + sceneSVG(CD2_PLACE[b.id], roundBg(b.r), 150, b.id === 'b6' ? ivWho().id : null) + (V.fx === 'room' ? '<i class="bnr__dr" aria-hidden="true"><b></b><b></b></i>' : '') + '</div><div class="bnr__b"><div class="bnr__lab">' + esc(benLabel(b)) + (b.r ? ' · ' + esc(ROUNDS[b.r].split(' · ')[0]) : '') + '</div><h1>' + esc(b.n) + '</h1>' + (b.sub ? '<p>' + esc(b.sub) + '</p>' : '') +
       '<div class="bnr__bar"><span>' + nd + '/' + b.acts.length + ' chặng</span><i><b style="width:' + Math.round(nd / b.acts.length * 100) + '%"></b></i></div></div></section>';
     h += (first || V.showIntro) ? benIntro(b, first) : '<button type="button" class="shinmini" data-act="showIntro">' + shin2('hi', 34) + '<span class="shinmini__t"><b>Bến này để làm gì?</b></span><i class="shinmini__i">' + PS.icon('info', 20) + '</i></button>';
     h += '<div class="acts">' + b.acts.map(function (id, i) {
@@ -494,8 +502,7 @@
   function viewIsle() {
     var is = isleOf(V.id);
     if (portDone()) revealIsle(is.id, true);
-    var h = '<button type="button" class="back" data-act="home">' + cdIc('arrowL', 18, 2.4) + 'Hải đồ</button>' +
-      '<section class="bnr"><div class="bnr__art">' + sceneSVG('isle', '#DCE6EC', 150, is) + '</div><div class="bnr__b"><div class="bnr__lab">' + esc(ISLE_SIDE[is.side]) + '</div><h1>' + esc(is.n) + '</h1><p>' + esc(is.sub) + '</p></div></section>';
+    var h = '<section class="bnr"><div class="bnr__art">' + sceneSVG('isle', '#DCE6EC', 150, is) + '</div><div class="bnr__b"><div class="bnr__lab">' + esc(ISLE_SIDE[is.side]) + '</div><h1>' + esc(is.n) + '</h1><p>' + esc(is.sub) + '</p></div></section>';
     if (!portDone()) h += shinSays('wink', 'Nhận thuyền ở Cảng 3 Năm trước, rồi mình ghé đảo này nhé!');
     h += isleInfo(is) + pathHTML(is, 1);
     h += '<h2 class="sec-h">Anh chị đã đi hướng này</h2><p class="sec-sub">Chạm thẻ để đọc chuyện</p><div class="spgrid">' + is.who.map(function (id) { return spCard(spOf(id)); }).join('') + '</div>';
@@ -577,7 +584,7 @@
   }
   function viewSp() {
     var sp = spOf(V.id); collect(sp.id);
-    return '<button type="button" class="back" data-act="' + (V.from ? 'isle' : 'home') + '"' + (V.from ? ' data-id="' + V.from + '"' : '') + '>' + cdIc('arrowL', 18, 2.4) + (V.from ? esc(isleOf(V.from).n) : 'Hải đồ') + '</button>' + spBody(sp);
+    return spBody(sp);
   }
 
   /* =========================================================
@@ -586,8 +593,7 @@
   function viewAct() {
     var id = V.id, a = ACTS[id], steps = a.steps, i = V.step, s = steps[i], last = i === steps.length - 1;
     var miss = check(s), b = benOf(a.st);
-    var h = '<button type="button" class="back" data-act="ben" data-st="' + a.st + '">' + cdIc('arrowL', 18, 2.4) + esc(b.n) + '</button>' +
-      '<header class="ah"><div class="ah__lab">' + esc(benLabel(b)) + ' · ' + esc(b.n) + '</div><h1>' + esc(a.t) + '</h1><div class="stepbar" aria-label="Bước ' + (i + 1) + '/' + steps.length + '">' +
+    var h = '<header class="ah"><div class="ah__lab">' + esc(benLabel(b)) + ' · ' + esc(b.n) + '</div><h1>' + esc(a.t) + '</h1><div class="stepbar" aria-label="Bước ' + (i + 1) + '/' + steps.length + '">' +
       steps.map(function (x, j) { return '<i class="' + (j < i ? 'on' : (j === i ? 'cur' : '')) + '"></i>'; }).join('') + '</div></header>';
     if (S.bak[id] && i === 0) h += '<div class="redo redo--new">' + PS.icon('info', 16) + esc(SHIN_TALK.redoNew) + '</div>';
     else if (S.done[id] && i === 0) h += '<div class="redo">' + PS.icon('check', 16, 3) + esc(SHIN_TALK.redo) + '</div>';
@@ -1937,8 +1943,23 @@
     else sfx('ting');
     var ptx = '+' + CD2_XP_ACT + ' XP' + (ins ? ' · +' + ins + ' Insight' : '');
     if (stampNew) { go({ v: 'ben', st: b.id }); showStamp(b, 0, ptx); return; } /* PS1.3.49: điểm hiện trong popup, không để thông báo che nút */
-    PS.toast('<b>' + esc(SHIN_TALK.doneAct) + '</b> ' + ptx);
-    go({ v: 'ben', st: b.id });
+    go({ v: 'ben', st: b.id }); doneOv(b, id, ptx); /* PS1.3.55 (ý 25): cuối chặng có Tiếp theo + Về bến */
+  }
+  function nextIn(b, id) { var n = null; b.acts.forEach(function (x) { if (!n && x !== id && !S.done[x] && actOpen(x)) n = x; }); return n || nextAct(); }
+  function doneOv(b, id, ptx) {
+    var nx = nextIn(b, id), nb = nx ? benOf(ACTS[nx].st) : null;
+    ov('<div class="stampov donev"><h2>' + esc(SHIN_TALK.doneAct) + '</h2><p class="stampov__pts">' + ptx + '</p>' +
+      shinSays('cheer', '<p>Bạn vừa xong <b>' + esc(ACTS[id].t) + '</b>.</p>', 56) + '<div class="ps-endnav">' +
+      (nx ? '<button type="button" class="btn btn--go btn--w" data-act="ovAct" data-id="' + nx + '">Tiếp theo: ' + esc((nb !== b ? navName(nb) + ' · ' : '') + ACTS[nx].t) + PS.icon('next', 16, 2.6) + '</button>' : '') +
+      '<button type="button" class="btn btn--soft btn--w" data-act="ovClose">Về ' + esc(navName(b)) + '</button></div></div>');
+  }
+  function resumeStep(id) { var st = S.d[id + '.st']; return !S.done[id] && typeof st === 'number' && st > 0 && st < ACTS[id].steps.length ? st : 0; }
+  /* PS1.3.55 (ý 24): trang chủ Proskills mở thẳng hoạt động bằng ?go=<mã chặng | mã bến> */
+  function goView(c) {
+    if (!c) return null;
+    if (ACTS[c] && (actOpen(c) || S.done[c])) return { v: 'act', id: c, step: resumeStep(c) };
+    var b = benOf(c); if (b && (benOpen(b) || benDone(b))) return { v: 'ben', st: b.id };
+    return null;
   }
   function certOv(first, pts) {
     var ask = first && !g('fut.at'); /* PS1.3.51: hỏi viết Thư gửi thuyền trưởng tương lai */
@@ -2014,7 +2035,7 @@
     var el = D.getElementById('nb'); if (!el) return;
     el.innerHTML = '<div class="nb__in"><div class="nb__cover"><div class="nb__top"><div><h2>Sổ Thuyền Trưởng</h2><small>' + esc(prof().name || 'Thuyền trưởng') + ' · Sổ tay CD02</small></div><button type="button" class="nb__x" data-act="nbClose" aria-label="Đóng sổ tay">' + PS.icon('close', 20) + '</button></div>' +
       '<div class="tabs" role="tablist">' + [['tq', 'Tổng quan'], ['ht', 'Bài làm'], ['sp', 'Thẻ Senpai'], ['cd', 'Cài đặt']].map(function (t) { return '<button type="button" role="tab" aria-selected="' + (NBTAB === t[0]) + '" class="' + (NBTAB === t[0] ? 'on' : '') + '" data-act="tab" data-t="' + t[0] + '">' + t[1] + '</button>'; }).join('') + '</div>' +
-      '</div><div id="nbBody" class="nb__body">' + (NBTAB === 'tq' ? nbOverview() : (NBTAB === 'ht' ? nbLog() : (NBTAB === 'sp' ? nbCards() : nbSettings()))) + '</div></div>';
+      '</div><div id="nbBody" class="nb__body">' + (NBTAB === 'tq' ? nbOverview() + (S.demo ? '' : PS.savedHTML(ID)) : (NBTAB === 'ht' ? nbLog() : (NBTAB === 'sp' ? nbCards() : nbSettings()))) + '</div></div>';
     if (NBTAB === 'cd' && !S.demo) PS.wireSettings(D.getElementById('nbBody'), { ctx: 'module', mod: ID, onChange: function () { drawNb(); } });
   }
   function openNb(tab) { NBTAB = tab || 'cd'; if (nbOpen) { drawNb(); return; } nbOpen = true; var el = D.createElement('div'); el.id = 'nb'; el.className = 'nb'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', 'Sổ tay'); D.body.appendChild(el); D.body.classList.add('ps-lock'); drawNb(); }
@@ -2087,7 +2108,7 @@
     else if (a === 'clipOv') { ov('<div class="sp">' + clipHTML(id) + '</div>'); }
     else if (a === 'sp') { if (V.v === 'act') { ov(spBody(spOf(id))); collect(id, true); } else go({ v: 'sp', id: id, from: V.v === 'isle' ? V.id : null }); }
     else if (a === 'showIntro') { V.showIntro = 1; QUIET = true; render(false); QUIET = false; }
-    else if (a === 'next') { var s0 = ACTS[V.id].steps[V.step]; if (check(s0)) return; if (s0.k === 'open1' && g('x1.sure') == null) S.d['x1.sure'] = 5; if (s0.k === 'open2' && g('f1.sure') == null) S.d['f1.sure'] = 5; if (s0.k === 'weigh') S.d['b51.w'] = wOf(); if (s0.k === 'ivset') { S.d['b62.who'] = ivWho().id; if (adNews()) S.d['b62.rq'] = ivRq(adNews()); S.d['b62.q'] = ivQs(); } V.step++; S.d[V.id + '.st'] = V.step; save(); try { history.replaceState(hState(V), ''); } catch (er) {} render(true); }
+    else if (a === 'next') { var s0 = ACTS[V.id].steps[V.step]; if (check(s0)) return; if (s0.k === 'open1' && g('x1.sure') == null) S.d['x1.sure'] = 5; if (s0.k === 'open2' && g('f1.sure') == null) S.d['f1.sure'] = 5; if (s0.k === 'weigh') S.d['b51.w'] = wOf(); if (s0.k === 'ivset') { S.d['b62.who'] = ivWho().id; if (adNews()) S.d['b62.rq'] = ivRq(adNews()); S.d['b62.q'] = ivQs(); } V.step++; S.d[V.id + '.st'] = V.step; save(); NAV.save(0); render(true); }
     else if (a === 'prev') { if (V.step > 0) { V.step--; render(true); } }
     else if (a === 'finish') { var s1 = ACTS[V.id].steps[V.step]; if (check(s1)) return; finishAct(); }
     else if (a === 'pick') { S.d[k] = v; if (k === 'x1.job' && v !== 'u') { /* đổi nghề: sách cùng nghề chọn lại */ } save(); redrawStep(); }
@@ -2162,6 +2183,7 @@
     else if (a === 'nbClose') closeNb();
     else if (a === 'tab') { NBTAB = b.getAttribute('data-t'); drawNb(); }
     else if (a === 'ovClose') closeOv();
+    else if (a === 'ovAct') { closeOv(); if (ACTS[id] && (actOpen(id) || S.done[id])) go({ v: 'act', id: id, step: resumeStep(id) }); }
     else if (a === 'ovHome') { closeOv(); go({ v: 'home' }); }
     else if (a === 'demoExit') exitDemo();
     else if (a === 'actMenu') actMenu(id);
@@ -2208,26 +2230,19 @@
   });
   function keepY(fn) { var y = W.pageYOffset || 0; fn(); W.scrollTo(0, y); }
 
-  /* thanh trên tự ẩn khi cuộn xuống */
-  var lastY = 0, navT = null;
-  W.addEventListener('scroll', function () {
-    if (navT) return;
-    navT = setTimeout(function () {
-      navT = null; var y = W.pageYOffset || 0, nav = D.querySelector('.topnav'); if (!nav) return;
-      if (y > lastY + 6 && y > 90) nav.classList.add('topnav--hide'); else if (y < lastY - 6 || y < 90) nav.classList.remove('topnav--hide');
-      lastY = y;
-    }, 80);
-  }, { passive: true });
+  /* thanh trên ẩn khi cuộn xuống, hiện khi cuộn lên: làm chung ở core.js (PS1.3.55) */
 
   /* =========================================================
      9. KHỞI ĐỘNG
      ========================================================= */
-  try { if (DQ.on) history.replaceState(null, '', W.location.pathname); } catch (e) {}
+  var GO = PS.goParam();
+  NAV.start(W.location.pathname); /* PS1.3.55: bỏ ?demo, ?go khỏi địa chỉ; đếm mục lịch sử cho nút ‹ */
   if (ASK_DEMO) PS.demoAsk(function (ok) { if (ok) { NOSAVE = 0; enterDemo(); } else W.location.replace(W.location.pathname); });
   else if (WANT_DEMO) enterDemo();
   else {
     markDay();
     if (!S.intro && !S.demo) V = { v: 'intro' };
+    else { var gv = goView(GO); if (gv) { NAV.go(gv); V = gv; } }
     render(true); save(true);
   }
 })(window, document);

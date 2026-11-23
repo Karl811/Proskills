@@ -9,7 +9,7 @@ function openNb(){
   if(tourI>=0 && TOUR[tourI] && TOUR[tourI].tap){ endTour(); setTimeout(function(){ toast('Giỏi lắm! Sổ tay luôn ở đây. Giờ bắt đầu từ điểm Lên đường nhé.',5000); },600); }
   if(nbOpen) return; nbOpen=true;
   var seenOld=S.d.seen||{}; S.d.nbDot=0; save(); updateNav();
-  try{ history.pushState({v:V.v,n:V.n,id:V.id,nb:1},'',''); }catch(e){}
+  /* PS1.3.55: không thêm mục lịch sử; Back đóng Sổ tay qua PS.nav (intercept) */
   sheetBack('nbClose');
   var el=document.createElement('div'); el.className='nb'; el.id='nb'; el.setAttribute('role','dialog'); el.setAttribute('aria-label','Sổ tay');
   document.body.appendChild(el); document.body.style.overflow='hidden'; sheetDrag(el,function(){ closeNb(); });
@@ -18,14 +18,13 @@ function openNb(){
 }
 function closeNb(fromPop){
   var el=$('#nb'); if(el) el.remove(); $$('.sheetback').forEach(function(b){ b.remove(); }); nbOpen=false; document.body.style.overflow='';
-  if(!fromPop){ try{ history.back(); }catch(e){} }
   updateNav();
 }
 function drawNb(seenOld){
   var tab=S.d.nbTab||'tq';
   var h='<div class="nb__in"><div class="grab"></div><div class="nb__top"><h2>Sổ tay</h2><button class="nb__x" data-act="nbClose" aria-label="Đóng sổ tay">'+icon('close',20)+'</button></div>'+
     '<div class="tabs" role="tablist">'+[['tq','Tổng quan'],['kinh','Bí kíp'],['cd','Cài đặt']].map(function(t){ return '<button role="tab" aria-selected="'+(tab===t[0])+'" class="'+(tab===t[0]?'on':'')+'" data-act="nbTab" data-t="'+t[0]+'">'+t[1]+'</button>'; }).join('')+'</div>'+
-    '<div id="nbBody">'+(tab==='tq'?nbOverview():(tab==='kinh'?nbKinh():nbSettings()))+'</div></div>';
+    '<div id="nbBody">'+(tab==='tq'?nbOverview()+(DEMO_ON?'':PS.savedHTML(TK_ID)):(tab==='kinh'?nbKinh():nbSettings()))+'</div></div>';
   $('#nb').innerHTML=h;
   if(tab==='tq') animateTiles(seenOld||S.d.seen||{});
   if(tab==='cd') wireSettings();

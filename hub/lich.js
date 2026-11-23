@@ -15,8 +15,8 @@
   var DAYS = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
   var BYD = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU'];
   var MON = {
-    kn: { n: 'Kỹ năng', s: 'KN', c: '#2C5BC4', t: '#E6EDFB' },
-    ng: { n: 'Kiến thức nghề', s: 'Nghề', c: '#0F8F88', t: '#E0F4F2' },
+    kn: { n: 'Kỹ năng', s: 'KN', c: '#348A5F', t: '#E6F1EA' }, /* PS1.3.54: xanh lá như lịch (trước #2C5BC4) */
+    ng: { n: 'Kiến thức nghề', s: 'Nghề', c: '#7E68B0', t: '#EEEAF7' }, /* PS1.3.54: tím dịu (trước #0F8F88), dễ phân biệt với xanh lá */
     tc: { n: 'Thể chất', s: 'TC', c: '#E0703A', t: '#FDEBE1' }
   };
   var MKEYS = ['kn', 'ng', 'tc'];

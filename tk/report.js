@@ -9,11 +9,11 @@ var askOpen=false, askCh=null, askQ='';
 function openAsk(ch){
   if(nbOpen) closeNb(true);
   askCh=ch||null; askQ='';
-  if(!askOpen){ askOpen=true; try{ history.pushState({v:V.v,n:V.n,id:V.id,ask:1},'',''); }catch(e){}
+  if(!askOpen){ askOpen=true;
     sheetBack('askClose'); var el=document.createElement('div'); el.className='nb'; el.id='ask'; el.setAttribute('role','dialog'); el.setAttribute('aria-label','Hỏi nhanh Chú Tanaka'); document.body.appendChild(el); document.body.style.overflow='hidden'; sheetDrag(el,function(){ closeAsk(); }); }
   drawAsk(); updateNav();
 }
-function closeAsk(fromPop){ var el=$('#ask'); if(el) el.remove(); $$('.sheetback').forEach(function(b){ b.remove(); }); askOpen=false; document.body.style.overflow=''; if(!fromPop){ try{ history.back(); }catch(e){} } updateNav(); }
+function closeAsk(fromPop){ var el=$('#ask'); if(el) el.remove(); $$('.sheetback').forEach(function(b){ b.remove(); }); askOpen=false; document.body.style.overflow=''; updateNav(); }
 function qaHit(q,s){ var n=norm(q.q+' '+q.a); return norm(s).length<2 || s.split(/\s+/).every(function(w){ return n.indexOf(norm(w))>=0; }); }
 function drawAsk(){
   var h='<div class="nb__in"><div class="grab"></div><div class="nb__top"><div style="display:flex;gap:10px;align-items:center"><div style="width:48px">'+av('tan','')+'</div><div><h2 style="font-size:20px">Hỏi nhanh Chú Tanaka</h2><p class="small muted" style="margin:0">'+QA.length+' câu hỏi học viên hay hỏi nhất</p></div></div><button class="nb__x" data-act="askClose" aria-label="Đóng">'+icon('close',20)+'</button></div>'+
@@ -215,7 +215,7 @@ function repSection(a){
   return h+'</section>';
 }
 function vRep(){
-  var h='<div class="wrap rep" id="report"><button class="back noprint" data-act="home">'+icon('back',18)+' Bản đồ</button>'+
+  var h='<div class="wrap rep" id="report">'+
     (goalText()?'':'')+'<div class="noprint repbar"><button class="btn" data-act="pdf">'+icon('download',18)+' Tải PDF</button><button class="btn btn--soft" data-act="rptOpen">Tải PDF và báo cáo thầy cô</button>'+(S.seals[8]?'<button class="btn btn--soft" data-act="brag">Ảnh khoe vé</button>':'')+'<button class="btn btn--link" data-act="printA4">In khổ A4 bằng trình duyệt</button></div>'+
     '<section class="rsec rsec--top"><small>BẢN GHI CHÉP · '+esc(COURSE)+'</small><h1 style="font-size:28px;margin:4px 0 10px">Nhật Bản Du Ký</h1>'+
     '<div class="rgrid"><div><small>Học viên</small><b>'+esc(S.name)+'</b></div><div><small>Lớp · Diện</small><b>'+esc(S.cls)+' · '+esc(S.path)+'</b></div><div><small>Thầy cô hướng dẫn</small><b>'+esc(teacher()?tName():'Chưa điền')+'</b></div><div><small>Lên đường</small><b>'+fmtDate(S.created)+'</b></div></div>'+
@@ -250,8 +250,8 @@ function brag(){
 var TOUR=[
   {q:'.vdx', t:'Đây là văn điệp thông quan. Qua mỗi ải, văn điệp có thêm một con dấu đỏ.'},
   {q:'.dmap', t:'Bản đồ du ký: từ Đất Việt vượt biển sang xứ Phù Tang. Mây mù che những ải chưa tới, đi đến đâu mây tan đến đó.'},
-  {q:'#nav', t:'Nút dấu hỏi là "Hỏi nhanh Chú Tanaka": tra cứu những câu học viên hay hỏi, bất cứ lúc nào.'},
-  {q:'#nav', t:'Giờ bạn thử nhé: bấm vào nút Sổ tay (hình quyển sách) để xem điểm và bài làm của mình.', tap:1}
+  {q:'#psnav', t:'Nút dấu hỏi là "Hỏi nhanh Chú Tanaka": tra cứu những câu học viên hay hỏi, bất cứ lúc nào.'},
+  {q:'#psnav', t:'Giờ bạn thử nhé: bấm vào nút Sổ tay (hình quyển sách) để xem điểm và bài làm của mình.', tap:1}
 ];
 var tourI=-1;
 function startTour(){ if(S.d.tour || S.demo) return; tourI=0; window.scrollTo(0,0); showTour(); }
@@ -260,7 +260,7 @@ function showTour(){
   var b=$('#tourBox'); if(b) b.remove();
   if(tourI<0 || tourI>=TOUR.length){ endTour(); return; }
   var st=TOUR[tourI], el=$(st.q);
-  if(el){ el.classList.add('tour-hl'); if(st.q!=='#nav') el.scrollIntoView({behavior:noMotion()?'auto':'smooth',block:'center'}); else $('#nav').classList.remove('hide'); }
+  if(el){ el.classList.add('tour-hl'); if(st.q!=='#psnav') el.scrollIntoView({behavior:noMotion()?'auto':'smooth',block:'center'}); else el.classList.remove('psnav--hide'); }
   b=document.createElement('div'); b.id='tourBox'; b.className='tourbox';
   b.innerHTML='<div class="tourbox__c"><div style="width:44px;flex:none">'+av('hau',st.tap?'think':'hi')+'</div><p>'+esc(st.t)+'</p></div><div class="tourbox__b"><span class="small muted">'+(tourI+1)+'/'+TOUR.length+'</span><span>'+
     '<button class="btn btn--link" data-act="tourSkip">Bỏ qua</button>'+(st.tap?'':'<button class="btn btn--sm" data-act="tourNext">Đã hiểu</button>')+'</span></div>';
